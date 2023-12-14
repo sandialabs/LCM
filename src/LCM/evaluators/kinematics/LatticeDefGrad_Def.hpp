@@ -16,25 +16,16 @@ LatticeDefGrad<EvalT, Traits>::LatticeDefGrad(Teuchos::ParameterList const& p)
       defgrad(p.get<std::string>("DefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       JH(p.get<std::string>("DetDefGradH Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      CtotalRef(
-          p.get<std::string>("Stress Free Total Concentration Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Ctotal(
-          p.get<std::string>("Total Concentration Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      VH(p.get<std::string>("Partial Molar Volume Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      CtotalRef(p.get<std::string>("Stress Free Total Concentration Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Ctotal(p.get<std::string>("Total Concentration Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      VH(p.get<std::string>("Partial Molar Volume Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       VM(p.get<std::string>("Molar Volume Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      latticeDefGrad(
-          p.get<std::string>("Lattice Deformation Gradient Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      latticeDefGrad(p.get<std::string>("Lattice Deformation Gradient Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       weightedAverage(false),
       alpha(0.05)
 {
-  if (p.isType<std::string>("Weighted Volume Average J Name"))
-    weightedAverage = p.get<bool>("Weighted Volume Average J");
-  if (p.isType<double>("Average J Stabilization Parameter Name"))
-    alpha = p.get<double>("Average J Stabilization Parameter");
+  if (p.isType<std::string>("Weighted Volume Average J Name")) weightedAverage = p.get<bool>("Weighted Volume Average J");
+  if (p.isType<double>("Average J Stabilization Parameter Name")) alpha = p.get<double>("Average J Stabilization Parameter");
 
   Teuchos::RCP<PHX::DataLayout> tensor_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
 
@@ -111,8 +102,7 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       for (int qp = 0; qp < numQPs; ++qp) {
         for (int i = 0; i < numDims; ++i) {
           for (int j = 0; j < numDims; ++j) {
-            wJbar = std::exp(
-                (1 - alpha) * Jbar + alpha * std::log(1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp))));
+            wJbar = std::exp((1 - alpha) * Jbar + alpha * std::log(1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp))));
             latticeDefGrad(cell, qp, i, j) *= std::pow(wJbar, -1. / 3.);
           }
         }

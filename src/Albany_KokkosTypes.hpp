@@ -38,8 +38,7 @@ using DeviceView2d = Kokkos::View<Scalar**, Kokkos::LayoutLeft, PHX::Device, Mem
 using DeviceLocalGraph = Kokkos::StaticCrsGraph<LO, Kokkos::LayoutLeft, PHX::Device>;
 
 template <typename Scalar>
-using DeviceLocalMatrix =
-    KokkosSparse::CrsMatrix<Scalar, LO, PHX::Device, Kokkos::MemoryUnmanaged, DeviceLocalGraph::size_type>;
+using DeviceLocalMatrix = KokkosSparse::CrsMatrix<Scalar, LO, PHX::Device, Kokkos::MemoryUnmanaged, DeviceLocalGraph::size_type>;
 
 }  // namespace Albany
 

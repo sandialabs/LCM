@@ -17,8 +17,7 @@
 namespace PHAL {
 
 template <typename Traits>
-SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::SDirichlet(Teuchos::ParameterList& p)
-    : PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
+SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::SDirichlet(Teuchos::ParameterList& p) : PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
 
@@ -118,8 +117,7 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits
 }
 
 template <typename Traits>
-SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::SDirichlet(Teuchos::ParameterList& p)
-    : PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
+SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::SDirichlet(Teuchos::ParameterList& p) : PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 

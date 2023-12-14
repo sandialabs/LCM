@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ElectrostaticResidual<EvalT, Traits>::ElectrostaticResidual(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ElectrostaticResidual<EvalT, Traits>::ElectrostaticResidual(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : edisp_(p.get<std::string>("Electric Displacement Name"), dl->qp_vector),
       w_grad_bf_(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_vector),
       residual_(p.get<std::string>("Residual Name"), dl->node_scalar)
@@ -49,8 +47,7 @@ ElectrostaticResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
     for (int node = 0; node < num_nodes_; ++node) residual_(cell, node) = ScalarT(0);
     for (int pt = 0; pt < num_pts_; ++pt)
       for (int node = 0; node < num_nodes_; ++node)
-        for (int i = 0; i < num_dims_; ++i)
-          residual_(cell, node) += edisp_(cell, pt, i) * w_grad_bf_(cell, node, pt, i);
+        for (int i = 0; i < num_dims_; ++i) residual_(cell, node) += edisp_(cell, pt, i) * w_grad_bf_(cell, node, pt, i);
   }
 }
 }  // namespace LCM

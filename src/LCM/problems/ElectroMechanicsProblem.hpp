@@ -95,9 +95,7 @@ class ElectroMechanicsProblem : public Albany::AbstractProblem
   /// Retrieve the state data
   ///
   void
-  getAllocatedStates(
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> old_state,
-      Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> new_state) const;
+  getAllocatedStates(Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> old_state, Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::RCP<FC>>> new_state) const;
 
  private:
   ///
@@ -226,15 +224,13 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
 
   // Collect problem-specific response parameters
 
-  Teuchos::RCP<Teuchos::ParameterList> pFromProb =
-      Teuchos::rcp(new Teuchos::ParameterList("Response Parameters from Problem"));
+  Teuchos::RCP<Teuchos::ParameterList> pFromProb = Teuchos::rcp(new Teuchos::ParameterList("Response Parameters from Problem"));
 
   // get the name of the current element block
   std::string eb_name = meshSpecs.ebName;
 
   // get the name of the material model to be used (and make sure there is one)
-  std::string material_model_name =
-      material_db_->getElementBlockSublist(eb_name, "Material Model").get<std::string>("Model Name");
+  std::string material_model_name = material_db_->getElementBlockSublist(eb_name, "Material Model").get<std::string>("Model Name");
   ALBANY_PANIC(material_model_name.length() == 0, "A material model must be defined for block: " + eb_name);
 
 #if defined(ALBANY_VERBOSE)
@@ -244,9 +240,8 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
 #endif
 
   // define cell topologies
-  Teuchos::RCP<shards::CellTopology> comp_cellType =
-      Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Tetrahedron<11>>()));
-  Teuchos::RCP<shards::CellTopology> cellType = Teuchos::rcp(new shards::CellTopology(&meshSpecs.ctd));
+  Teuchos::RCP<shards::CellTopology> comp_cellType = Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Tetrahedron<11>>()));
+  Teuchos::RCP<shards::CellTopology> cellType      = Teuchos::rcp(new shards::CellTopology(&meshSpecs.ctd));
 
   // volume averaging flags
   bool     volume_average_pressure(false);
@@ -254,14 +249,12 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
   if (material_db_->isElementBlockParam(eb_name, "Volume Average Pressure"))
     volume_average_pressure = material_db_->getElementBlockParam<bool>(eb_name, "Volume Average Pressure");
   if (material_db_->isElementBlockParam(eb_name, "Average J Stabilization Parameter"))
-    volume_average_stabilization_param =
-        material_db_->getElementBlockParam<RealType>(eb_name, "Average J Stabilization Parameter");
+    volume_average_stabilization_param = material_db_->getElementBlockParam<RealType>(eb_name, "Average J Stabilization Parameter");
 
   // get the intrepid basis for the given cell topology
   Intrepid2Basis                                 intrepidBasis = Albany::getIntrepid2Basis(meshSpecs.ctd);
   Intrepid2::DefaultCubatureFactory              cubFactory;
-  Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   // Note that these are the volume element quantities
   num_nodes_             = intrepidBasis->getCardinality();
@@ -272,8 +265,8 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
   num_vertices_ = cellType->getNodeCount();
 
 #if defined(ALBANY_VERBOSE)
-  *out << "Field Dimensions: Workset=" << workset_size << ", Vertices= " << num_vertices_ << ", Nodes= " << num_nodes_
-       << ", QuadPts= " << num_pts_ << ", Dim= " << num_dims_ << std::endl;
+  *out << "Field Dimensions: Workset=" << workset_size << ", Vertices= " << num_vertices_ << ", Nodes= " << num_nodes_ << ", QuadPts= " << num_pts_
+       << ", Dim= " << num_dims_ << std::endl;
 #endif
 
   // Construct standard FEM evaluators with standard field names
@@ -310,8 +303,7 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, resid_names));
     offset += num_dims_;
@@ -322,8 +314,7 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
     Teuchos::ArrayRCP<std::string> resid_names(1);
     dof_names[0]   = "Electric Potential";
     resid_names[0] = dof_names[0] + " Residual";
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherCoordinateVectorEvaluator());
 
@@ -333,11 +324,9 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Electric Potential"));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Electric Potential"));
     offset++;
   }
 
@@ -391,14 +380,14 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
       temp = material_db_->getElementBlockParam<double>(eb_name, "Initial Temperature");
     }
     Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Save Temperature"));
-    p  = stateMgr.registerStateVariable(temperature, dl_->qp_scalar, dl_->dummy, eb_name, "scalar", temp, true, false);
-    ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
+    p                                      = stateMgr.registerStateVariable(temperature, dl_->qp_scalar, dl_->dummy, eb_name, "scalar", temp, true, false);
+    ev                                     = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
   {  // Constitutive Model Parameters
-    Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Parameters"));
-    std::string                          matName = material_db_->getElementBlockParam<std::string>(eb_name, "material");
+    Teuchos::RCP<Teuchos::ParameterList> p          = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Parameters"));
+    std::string                          matName    = material_db_->getElementBlockParam<std::string>(eb_name, "material");
     Teuchos::ParameterList&              param_list = material_db_->getElementBlockSublist(eb_name, matName);
     p->set<std::string>("Temperature Name", temperature);
     param_list.set<bool>("Have Temperature", true);
@@ -415,8 +404,8 @@ Albany::ElectroMechanicsProblem::constructEvaluators(
   }
 
   {
-    Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Interface"));
-    std::string                          matName = material_db_->getElementBlockParam<std::string>(eb_name, "material");
+    Teuchos::RCP<Teuchos::ParameterList> p          = Teuchos::rcp(new Teuchos::ParameterList("Constitutive Model Interface"));
+    std::string                          matName    = material_db_->getElementBlockParam<std::string>(eb_name, "material");
     Teuchos::ParameterList&              param_list = material_db_->getElementBlockSublist(eb_name, matName);
 
     p->set<std::string>("Temperature Name", temperature);

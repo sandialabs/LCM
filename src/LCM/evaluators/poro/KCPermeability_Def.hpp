@@ -13,9 +13,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 KCPermeability<EvalT, Traits>::KCPermeability(Teuchos::ParameterList& p)
-    : kcPermeability(
-          p.get<std::string>("Kozeny-Carman Permeability Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+    : kcPermeability(p.get<std::string>("Kozeny-Carman Permeability Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   Teuchos::ParameterList* elmd_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -83,8 +81,8 @@ KCPermeability<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {
         // Cozeny Karman permeability equation
-        kcPermeability(cell, qp) = constant_value * porosity(cell, qp) * porosity(cell, qp) * porosity(cell, qp) /
-                                   ((1.0 - porosity(cell, qp)) * (1.0 - porosity(cell, qp)));
+        kcPermeability(cell, qp) =
+            constant_value * porosity(cell, qp) * porosity(cell, qp) * porosity(cell, qp) / ((1.0 - porosity(cell, qp)) * (1.0 - porosity(cell, qp)));
       }
     }
   }
@@ -96,9 +94,7 @@ typename KCPermeability<EvalT, Traits>::ScalarT&
 KCPermeability<EvalT, Traits>::getValue(std::string const& n)
 {
   if (n == "Kozeny-Carman Permeability") return constant_value;
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in KCPermeability::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in KCPermeability::getValue()" << std::endl);
   return constant_value;
 }
 

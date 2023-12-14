@@ -15,9 +15,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits, typename Kernel>
-inline ParallelConstitutiveModel<EvalT, Traits, Kernel>::ParallelConstitutiveModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+inline ParallelConstitutiveModel<EvalT, Traits, Kernel>::ParallelConstitutiveModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   kernel_ = util::make_unique<EvalKernel>(*this, p, dl);

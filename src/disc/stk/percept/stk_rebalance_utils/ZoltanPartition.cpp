@@ -543,18 +543,8 @@ merge_parameters(std::vector<std::pair<std::string, std::string>>& str_zoltan_pa
 }
 }  // namespace
 
-Zoltan::Zoltan(
-    stk::mesh::BulkData& bulk,
-    ParallelMachine      pm,
-    const unsigned       ndim,
-    Parameters&          rebal_region_parameters,
-    std::string const    parameters_name)
-    : GeomDecomp(pm),
-      m_bulk(bulk),
-      m_zoltan_id_(NULL),
-      m_spatial_dimension_(ndim),
-      m_mesh_information_(&bulk),
-      m_total_number_entities_(0)
+Zoltan::Zoltan(stk::mesh::BulkData& bulk, ParallelMachine pm, const unsigned ndim, Parameters& rebal_region_parameters, std::string const parameters_name)
+    : GeomDecomp(pm), m_bulk(bulk), m_zoltan_id_(NULL), m_spatial_dimension_(ndim), m_mesh_information_(&bulk), m_total_number_entities_(0)
 {
   /* Determine if the default set of parameters already exists. */
   if (!rebal_region_parameters.isSublist(default_parameters_name())) {
@@ -577,10 +567,7 @@ Zoltan::Zoltan(
 }
 
 void
-Zoltan::set_mesh_info(
-    std::vector<mesh::Entity> const& mesh_entities,
-    const VectorField*               nodal_coord_ref,
-    const ScalarField*               elem_weight_ref)
+Zoltan::set_mesh_info(std::vector<mesh::Entity> const& mesh_entities, const VectorField* nodal_coord_ref, const ScalarField* elem_weight_ref)
 {
   MeshInfo mesh_info(&m_bulk);
 
@@ -622,8 +609,7 @@ Zoltan::init(const vector<pair<std::string, std::string>>& dynamicLoadRebalancin
    * Set up dynamic load rebalancing
    */
 
-  vector<pair<std::string, std::string>>::const_iterator P  = dynamicLoadRebalancingParameters.begin(),
-                                                         PE = dynamicLoadRebalancingParameters.end();
+  vector<pair<std::string, std::string>>::const_iterator P = dynamicLoadRebalancingParameters.begin(), PE = dynamicLoadRebalancingParameters.end();
 
   for (; PE != P; P++) {
     char* label = const_cast<char*>(P->first.c_str());
@@ -651,8 +637,7 @@ double
 Zoltan::init_zoltan_library()
 {
   float version = 0.0;
-  if (Zoltan_Initialize(0, NULL, &version) != ZOLTAN_OK)
-    throw std::runtime_error("Return code from Zoltan_Initialize() != ZOLTAN_OK ");
+  if (Zoltan_Initialize(0, NULL, &version) != ZOLTAN_OK) throw std::runtime_error("Return code from Zoltan_Initialize() != ZOLTAN_OK ");
 
   static_zoltan_version(version);
   std::ostringstream s;
@@ -817,14 +802,7 @@ Zoltan::register_callbacks()
 }
 
 int
-Zoltan::evaluate(
-    int     print_stats,
-    int*    nentity,
-    double* entity_wgt,
-    int*    ncuts,
-    double* cut_wgt,
-    int*    nboundary,
-    int*    nadj)
+Zoltan::evaluate(int print_stats, int* nentity, double* entity_wgt, int* ncuts, double* cut_wgt, int* nboundary, int* nadj)
 {
   int ierr = 0;
 
@@ -970,8 +948,7 @@ Zoltan::determine_new_partition(bool& RebalancingNeeded)
   /**
    * Clean up after zoltan
    */
-  if (ZOLTAN_OK !=
-      Zoltan_LB_Free_Data(&import_gids, &import_lids, &import_procs, &export_gids, &export_lids, &export_procs)) {
+  if (ZOLTAN_OK != Zoltan_LB_Free_Data(&import_gids, &import_lids, &import_procs, &export_gids, &export_lids, &export_procs)) {
     throw runtime_error(" FATAL ERROR in Zoltan_LB_Free_Data.");
   }
 }
@@ -1024,8 +1001,7 @@ Zoltan::convert_names_and_values(const Parameters& from, Parameters& to)
     std::string to_value = Teuchos::getValue<string>(from.entry(from_iter));
     // if (Value_Conversion->isParameter(from_name)) to_value =
     // Value_Conversion->get<std::string>(to_value);
-    if (Value_Conversion->isParameter(from_name))
-      to_value = Value_Conversion->sublist(from_name).get<std::string>(to_value);
+    if (Value_Conversion->isParameter(from_name)) to_value = Value_Conversion->sublist(from_name).get<std::string>(to_value);
     if (!to_name.empty()) to.set(to_name, to_value);
   }
 }

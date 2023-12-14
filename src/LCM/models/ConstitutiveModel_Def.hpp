@@ -67,12 +67,7 @@ class computeVolumeAverageKernel
  public:
   using device_type = PHX::Device;
 
-  computeVolumeAverageKernel(
-      ArrayStress&        stress_,
-      ArrayWeights const& weights,
-      ArrayJ const&       j,
-      int const           num_pts,
-      int const           num_dims)
+  computeVolumeAverageKernel(ArrayStress& stress_, ArrayWeights const& weights, ArrayJ const& j, int const num_pts, int const num_dims)
       : stress(stress_), weights_(weights), j_(j), num_pts_(num_pts), num_dims_(num_dims)
   {
     return;

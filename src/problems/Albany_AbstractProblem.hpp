@@ -267,12 +267,7 @@ struct ConstructEvaluatorsOp
       Albany::StateManager&                       stateMgr_,
       Albany::FieldManagerChoice                  fmchoice_     = BUILD_RESID_FM,
       const Teuchos::RCP<Teuchos::ParameterList>& responseList_ = Teuchos::null)
-      : prob(prob_),
-        fm(fm_),
-        meshSpecs(meshSpecs_),
-        stateMgr(stateMgr_),
-        fmchoice(fmchoice_),
-        responseList(responseList_)
+      : prob(prob_), fm(fm_), meshSpecs(meshSpecs_), stateMgr(stateMgr_), fmchoice(fmchoice_), responseList(responseList_)
   {
     tags = Teuchos::rcp(new Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>);
   }

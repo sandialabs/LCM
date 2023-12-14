@@ -55,10 +55,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  CrystalPlasticityKernel(
-      ConstitutiveModel<EvalT, Traits>&    model,
-      Teuchos::ParameterList*              p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  CrystalPlasticityKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   CrystalPlasticityKernel(CrystalPlasticityKernel const&) = delete;
   CrystalPlasticityKernel&
@@ -270,8 +267,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class CrystalPlasticityModel
-    : public LCM::ParallelConstitutiveModel<EvalT, Traits, CrystalPlasticityKernel<EvalT, Traits>>
+class CrystalPlasticityModel : public LCM::ParallelConstitutiveModel<EvalT, Traits, CrystalPlasticityKernel<EvalT, Traits>>
 {
  public:
   CrystalPlasticityModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);

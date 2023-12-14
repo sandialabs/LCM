@@ -171,24 +171,21 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, T& y_v
   auto const number_points = 1;
 
   // Container for the parametric coordinates
-  Kokkos::DynRankView<RealType, PHX::Device> parametric_point(
-      "par_point", number_cells, number_points, parametric_dimension);
+  Kokkos::DynRankView<RealType, PHX::Device> parametric_point("par_point", number_cells, number_points, parametric_dimension);
 
   for (unsigned j = 0; j < parametric_dimension; ++j) {
     parametric_point(0, 0, j) = 0.0;
   }
 
   // Container for the physical point
-  Kokkos::DynRankView<RealType, PHX::Device> physical_coordinates(
-      "phys_point", number_cells, number_points, coupled_dimension);
+  Kokkos::DynRankView<RealType, PHX::Device> physical_coordinates("phys_point", number_cells, number_points, coupled_dimension);
 
   for (unsigned i = 0; i < coupled_dimension; ++i) {
     physical_coordinates(0, 0, i) = point(i);
   }
 
   // Container for the physical nodal coordinates
-  Kokkos::DynRankView<RealType, PHX::Device> nodal_coordinates(
-      "coords", number_cells, coupled_node_count, coupled_dimension);
+  Kokkos::DynRankView<RealType, PHX::Device> nodal_coordinates("coords", number_cells, coupled_node_count, coupled_dimension);
 
   bool found = false;
 
@@ -223,8 +220,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, T& y_v
       }
 
       // Get parametric coordinates
-      Intrepid2::CellTools<PHX::Device>::mapToReferenceFrame(
-          parametric_point, physical_coordinates, nodal_coordinates, coupled_cell_topology);
+      Intrepid2::CellTools<PHX::Device>::mapToReferenceFrame(parametric_point, physical_coordinates, nodal_coordinates, coupled_cell_topology);
 
       bool in_element = true;
 
@@ -304,8 +300,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   Teuchos::RCP<Albany::AbstractSTKMeshStruct> const coupled_stk_mesh_struct = coupled_stk_disc->getSTKMeshStruct();
 
   // get pointer to metadata from coupled_stk_disc
-  Teuchos::RCP<stk::mesh::MetaData const> const coupled_meta_data =
-      Teuchos::rcpFromRef(coupled_stk_disc->getSTKMetaData());
+  Teuchos::RCP<stk::mesh::MetaData const> const coupled_meta_data = Teuchos::rcpFromRef(coupled_stk_disc->getSTKMetaData());
 
   // Get coupled_app parameter list
   Teuchos::RCP<Teuchos::ParameterList const> coupled_app_params = coupled_app.getAppPL();
@@ -317,9 +312,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   std::string map_name = dtk_params.get("Map Type", "Consistent Interpolation");
 
   Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field =
-      Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(
-          coupled_stk_disc->getSTKMeshStruct()->getFieldContainer())
-          ->getSolutionField();
+      Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(coupled_stk_disc->getSTKMeshStruct()->getFieldContainer())->getSolutionField();
 
   stk::mesh::Selector coupled_stk_selector = stk::mesh::Selector(coupled_meta_data->universal_part());
 
@@ -331,9 +324,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   Teuchos::RCP<stk::mesh::MetaData const> this_meta_data = Teuchos::rcpFromRef(this_stk_disc->getSTKMetaData());
 
   Albany::AbstractSTKFieldContainer::VectorFieldType* this_field =
-      Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(
-          this_stk_disc->getSTKMeshStruct()->getFieldContainer())
-          ->getSolutionFieldDTK();
+      Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(this_stk_disc->getSTKMeshStruct()->getFieldContainer())->getSolutionFieldDTK();
 
   // Get the part corresponding to this nodeset.
   std::string const& nodeset_name = this->nodeSetID;
@@ -354,20 +345,17 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
 
   // Create a solution vector for the source.
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> coupled_vector =
-      coupled_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(
-          Teuchos::ptr(coupled_field), neq);
+      coupled_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(Teuchos::ptr(coupled_field), neq);
 
   // Create a solution vector for the target.
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> this_vector =
-      this_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(
-          Teuchos::ptr(this_field), neq);
+      this_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(Teuchos::ptr(this_field), neq);
 
   // Solution transfer
 
   DataTransferKit::MapOperatorFactory op_factory;
 
-  Teuchos::RCP<DataTransferKit::MapOperator> map_op =
-      op_factory.create(coupled_vector->getMap(), this_vector->getMap(), dtk_params);
+  Teuchos::RCP<DataTransferKit::MapOperator> map_op = op_factory.create(coupled_vector->getMap(), this_vector->getMap(), dtk_params);
 
   // Setup the map operator. This creates the underlying linear operators.
   map_op->setup(coupled_manager.functionSpace(), this_manager.functionSpace());
@@ -452,8 +440,7 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData workset)
 
 // Specialization: Residual
 template <typename Traits>
-SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::SchwarzBC(Teuchos::ParameterList& p)
-    : SchwarzBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
+SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::SchwarzBC(Teuchos::ParameterList& p) : SchwarzBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
 
@@ -467,8 +454,7 @@ SchwarzBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits:
 
 // Specialization: Jacobian
 template <typename Traits>
-SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::SchwarzBC(Teuchos::ParameterList& p)
-    : SchwarzBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
+SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::SchwarzBC(Teuchos::ParameterList& p) : SchwarzBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 

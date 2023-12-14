@@ -6,8 +6,7 @@
 
 namespace LCM {
 
-StatelessObserverImpl::StatelessObserverImpl(Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps)
-    : n_models_(apps.size()), apps_(apps)
+StatelessObserverImpl::StatelessObserverImpl(Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps) : n_models_(apps.size()), apps_(apps)
 {
   sol_out_time_ = Teuchos::TimeMonitor::getNewTimer("Albany: Output to File");
   return;
@@ -37,8 +36,7 @@ StatelessObserverImpl::observeSolution(
   Teuchos::TimeMonitor timer(*sol_out_time_);
 
   for (int m = 0; m < n_models_; m++) {
-    Teuchos::RCP<Thyra_Vector const> const overlapped_solution =
-        apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolution(*non_overlapped_solution[m]);
+    Teuchos::RCP<Thyra_Vector const> const overlapped_solution = apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolution(*non_overlapped_solution[m]);
     if (non_overlapped_solution_dot[m] != Teuchos::null) {
       Teuchos::RCP<Thyra_Vector const> const overlapped_solution_dot =
           apps_[m]->getAdaptSolMgr()->updateAndReturnOverlapSolutionDot(*non_overlapped_solution_dot[m]);

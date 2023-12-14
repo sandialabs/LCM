@@ -132,10 +132,7 @@ CapExplicitModel<EvalT, Traits>::CapExplicitModel(Teuchos::ParameterList* p, con
 }
 template <typename EvalT, typename Traits>
 void
-CapExplicitModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+CapExplicitModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto strain          = *dep_fields["Strain"];
@@ -170,8 +167,7 @@ CapExplicitModel<EvalT, Traits>::computeState(
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < num_pts_; ++qp) {
       // local parameters
-      lame = elastic_modulus(cell, qp) * poissons_ratio(cell, qp) / (1.0 + poissons_ratio(cell, qp)) /
-             (1.0 - 2.0 * poissons_ratio(cell, qp));
+      lame        = elastic_modulus(cell, qp) * poissons_ratio(cell, qp) / (1.0 + poissons_ratio(cell, qp)) / (1.0 - 2.0 * poissons_ratio(cell, qp));
       mu          = elastic_modulus(cell, qp) / 2.0 / (1.0 + poissons_ratio(cell, qp));
       bulkModulus = lame + (2. / 3.) * mu;
 
@@ -241,8 +237,7 @@ CapExplicitModel<EvalT, Traits>::computeState(
           hkappa = 0.0;
 
         ScalarT kai(0.0);
-        kai = minitensor::dotdot(dfdsigma, minitensor::dotdot(Celastic, dgdsigma)) -
-              minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
+        kai = minitensor::dotdot(dfdsigma, minitensor::dotdot(Celastic, dgdsigma)) - minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
 
         // H = -minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
 
@@ -447,10 +442,7 @@ CapExplicitModel<EvalT, Traits>::computeState(
 template <typename EvalT, typename Traits>
 typename CapExplicitModel<EvalT, Traits>::ScalarT
 // typename EvalT::ScalarT
-CapExplicitModel<EvalT, Traits>::compute_f(
-    minitensor::Tensor<ScalarT>& sigma,
-    minitensor::Tensor<ScalarT>& alpha,
-    ScalarT&                     kappa)
+CapExplicitModel<EvalT, Traits>::compute_f(minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa)
 {
   xi = sigma - alpha;
 
@@ -464,8 +456,7 @@ CapExplicitModel<EvalT, Traits>::compute_f(
 
   ScalarT Gamma = 1.0;
   if (psi != 0 && J2 != 0)
-    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
-                   (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) + (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
 
   ScalarT Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
 
@@ -481,10 +472,7 @@ CapExplicitModel<EvalT, Traits>::compute_f(
 }
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapExplicitModel<EvalT, Traits>::ScalarT>
-CapExplicitModel<EvalT, Traits>::compute_dfdsigma(
-    minitensor::Tensor<ScalarT>& sigma,
-    minitensor::Tensor<ScalarT>& alpha,
-    ScalarT&                     kappa)
+CapExplicitModel<EvalT, Traits>::compute_dfdsigma(minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa)
 {
   xi = sigma - alpha;
 
@@ -513,8 +501,7 @@ CapExplicitModel<EvalT, Traits>::compute_dfdsigma(
 
   ScalarT Gamma = 1.0;
   if (psi != 0 && J2 != 0)
-    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
-                   (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) + (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
 
   // derivatives
   ScalarT dFfdI1 = -(B * C * std::exp(B * I1) + theta);
@@ -540,10 +527,7 @@ CapExplicitModel<EvalT, Traits>::compute_dfdsigma(
 }
 template <typename EvalT, typename Traits>
 minitensor::Tensor<typename CapExplicitModel<EvalT, Traits>::ScalarT>
-CapExplicitModel<EvalT, Traits>::compute_dgdsigma(
-    minitensor::Tensor<ScalarT>& sigma,
-    minitensor::Tensor<ScalarT>& alpha,
-    ScalarT&                     kappa)
+CapExplicitModel<EvalT, Traits>::compute_dgdsigma(minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa)
 {
   xi = sigma - alpha;
 
@@ -572,8 +556,7 @@ CapExplicitModel<EvalT, Traits>::compute_dgdsigma(
 
   ScalarT Gamma = 1.0;
   if (psi != 0 && J2 != 0)
-    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) +
-                   (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) + (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
 
   // derivatives
   ScalarT dFfdI1 = -(L * C * std::exp(L * I1) + phi);
@@ -599,10 +582,7 @@ CapExplicitModel<EvalT, Traits>::compute_dgdsigma(
 }
 template <typename EvalT, typename Traits>
 typename CapExplicitModel<EvalT, Traits>::ScalarT
-CapExplicitModel<EvalT, Traits>::compute_dfdkappa(
-    minitensor::Tensor<ScalarT>& sigma,
-    minitensor::Tensor<ScalarT>& alpha,
-    ScalarT&                     kappa)
+CapExplicitModel<EvalT, Traits>::compute_dfdkappa(minitensor::Tensor<ScalarT>& sigma, minitensor::Tensor<ScalarT>& alpha, ScalarT& kappa)
 {
   ScalarT dfdkappa;
 
@@ -625,8 +605,7 @@ CapExplicitModel<EvalT, Traits>::compute_dfdkappa(
   ScalarT dFcdkappa = 0.0;
 
   if ((kappa - I1) > 0 && ((X - kappa) != 0)) {
-    dFcdkappa = 2 * (I1 - kappa) * ((X - kappa) + R * (I1 - kappa) * (theta + B * C * std::exp(B * kappa))) /
-                (X - kappa) / (X - kappa) / (X - kappa);
+    dFcdkappa = 2 * (I1 - kappa) * ((X - kappa) + R * (I1 - kappa) * (theta + B * C * std::exp(B * kappa))) / (X - kappa) / (X - kappa) / (X - kappa);
   }
 
   dfdkappa = -dFcdkappa * (Ff_I1 - N) * (Ff_I1 - N);

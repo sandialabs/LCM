@@ -13,9 +13,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 BiotCoefficient<EvalT, Traits>::BiotCoefficient(Teuchos::ParameterList& p)
-    : biotCoefficient(
-          p.get<std::string>("Biot Coefficient Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+    : biotCoefficient(p.get<std::string>("Biot Coefficient Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   Teuchos::ParameterList* elmd_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -96,9 +94,7 @@ BiotCoefficient<EvalT, Traits>::getValue(std::string const& n)
     return Kskeleton_value;
   else if (n == "Grain Bulk Modulus Value")
     return Kgrain_value;
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in BiotCoefficient::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in BiotCoefficient::getValue()" << std::endl);
   return constant_value;
 }
 

@@ -15,9 +15,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   scatter_operation = Teuchos::rcp(new PHX::Tag<ScalarT>("MortarContact", dl->dummy));
 
@@ -47,9 +45,7 @@ MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-MortarContactResidualBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+MortarContactResidualBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   for (std::size_t eq = 0; eq < numFieldsBase; ++eq) this->utils.setFieldData(val[eq], fm);
   numNodes = val[0].extent(1);
@@ -59,9 +55,7 @@ MortarContactResidualBase<EvalT, Traits>::postRegistrationSetup(
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::MortarContactResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::MortarContactResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : MortarContactResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl),
       numFields(MortarContactResidualBase<PHAL::AlbanyTraits::Residual, Traits>::numFieldsBase)
 {
@@ -71,9 +65,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::MortarContactResidu
 // Kokkos kernels
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
-    const PHAL_MortarContactResRank0_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_MortarContactResRank0_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -84,9 +76,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
-    const PHAL_MortarContactResRank1_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_MortarContactResRank1_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -97,9 +87,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(
-    const PHAL_MortarContactResRank2_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_MortarContactResRank2_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
@@ -145,9 +133,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(type
 // **********************************************************************
 
 template <typename Traits>
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::MortarContactResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::MortarContactResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : MortarContactResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl),
       numFields(MortarContactResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::numFieldsBase)
 {
@@ -157,9 +143,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::MortarContactResidu
 // Kokkos kernels
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactResRank0_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactResRank0_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -170,9 +154,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactJacRank0_Adjoint_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactJacRank0_Adjoint_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -204,9 +186,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactJacRank0_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactJacRank0_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -238,9 +218,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactResRank1_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactResRank1_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -251,9 +229,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactJacRank1_Adjoint_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactJacRank1_Adjoint_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -288,9 +264,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactJacRank1_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactJacRank1_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -323,9 +297,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactResRank2_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactResRank2_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
@@ -337,9 +309,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactJacRank2_Adjoint_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactJacRank2_Adjoint_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -372,9 +342,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_MortarContactJacRank2_Tag&,
-    int const& cell) const
+MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_MortarContactJacRank2_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -398,8 +366,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
     for (int eq = 0; eq < numFields; eq++) {
       rowT = nodeID(cell, node, this->offset + eq);
       if (((this->valTensor)(cell, node, eq / numDims, eq % numDims)).hasFastAccess()) {
-        for (int i = 0; i < nunk; ++i)
-          vals[i] = (this->valTensor)(cell, node, eq / numDims, eq % numDims).fastAccessDx(i);
+        for (int i = 0; i < nunk; ++i) vals[i] = (this->valTensor)(cell, node, eq / numDims, eq % numDims).fastAccessDx(i);
         Jac_kokkos.sumIntoValues(rowT, colT, nunk, vals, false, true);
       }
     }

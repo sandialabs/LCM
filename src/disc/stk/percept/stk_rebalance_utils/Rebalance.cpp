@@ -117,8 +117,7 @@ rebalance_dependent_entities(
 {
   size_t init_size = entity_procs.size();
   // stk::mesh::MetaData & fem_meta = stk::mesh::MetaData::get(bulk_data);
-  const stk::mesh::EntityRank element_rank =
-      (rank != stk::mesh::InvalidEntityRank) ? rank : stk::topology::ELEMENT_RANK;
+  const stk::mesh::EntityRank element_rank = (rank != stk::mesh::InvalidEntityRank) ? rank : stk::topology::ELEMENT_RANK;
 
   // why??? srk 06/06/14
   if (dep_rank == element_rank) return;
@@ -167,8 +166,8 @@ rebalance_dependent_entities(
 
   size_t final_size = entity_procs.size();
   if (0 && bulk_data.parallel_rank() == 0) {
-    std::cout << "rebalance_dependent_entities: for dep_rank = " << dep_rank << " rank= " << rank
-              << " init_size= " << init_size << " final_size= " << final_size << std::endl;
+    std::cout << "rebalance_dependent_entities: for dep_rank = " << dep_rank << " rank= " << rank << " init_size= " << init_size
+              << " final_size= " << final_size << std::endl;
   }
 }
 
@@ -190,12 +189,9 @@ full_rebalance(mesh::BulkData& bulk_data, Partition* partition, const stk::mesh:
 
     // Don't know the rank of the elements rebalanced, assume all are dependent.
     rebalance_dependent_entities(bulk_data, partition, node_rank, cs_elem, rank);
-    if (stk::mesh::InvalidEntityRank != edge_rank && rank != edge_rank)
-      rebalance_dependent_entities(bulk_data, partition, edge_rank, cs_elem, rank);
-    if (stk::mesh::InvalidEntityRank != face_rank && rank != face_rank)
-      rebalance_dependent_entities(bulk_data, partition, face_rank, cs_elem, rank);
-    if (stk::mesh::InvalidEntityRank != elem_rank && rank != elem_rank)
-      rebalance_dependent_entities(bulk_data, partition, elem_rank, cs_elem, rank);
+    if (stk::mesh::InvalidEntityRank != edge_rank && rank != edge_rank) rebalance_dependent_entities(bulk_data, partition, edge_rank, cs_elem, rank);
+    if (stk::mesh::InvalidEntityRank != face_rank && rank != face_rank) rebalance_dependent_entities(bulk_data, partition, face_rank, cs_elem, rank);
+    if (stk::mesh::InvalidEntityRank != elem_rank && rank != elem_rank) rebalance_dependent_entities(bulk_data, partition, elem_rank, cs_elem, rank);
     if (stk::mesh::InvalidEntityRank != constraint_rank && rank != constraint_rank)
       rebalance_dependent_entities(bulk_data, partition, constraint_rank, cs_elem, rank);
   }
@@ -219,8 +215,7 @@ stk::rebalance::rebalance(
     const stk::mesh::EntityRank rank)
 {
   // stk::mesh::MetaData &fem_meta = stk::mesh::MetaData::get(bulk_data);
-  const stk::mesh::EntityRank element_rank =
-      (rank != stk::mesh::InvalidEntityRank) ? rank : stk::topology::ELEMENT_RANK;
+  const stk::mesh::EntityRank element_rank = (rank != stk::mesh::InvalidEntityRank) ? rank : stk::topology::ELEMENT_RANK;
 
   mesh::EntityVector rebal_elem_ptrs;
   mesh::EntityVector entities;

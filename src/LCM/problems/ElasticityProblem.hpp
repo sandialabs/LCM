@@ -173,22 +173,19 @@ Albany::ElasticityProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numDim      = cubature->getDimension();
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
   //   int const numVertices = cellType->getVertexCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPts
+       << ", Dim= " << numDim << std::endl;
 
   // Construct standard FEM evaluators with standard field names
   dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
-  ALBANY_PANIC(
-      dl->vectorAndGradientLayoutsAreEquivalent == false,
-      "Data Layout Usage in Mechanics problems assume vecDim = numDim");
+  ALBANY_PANIC(dl->vectorAndGradientLayoutsAreEquivalent == false, "Data Layout Usage in Mechanics problems assume vecDim = numDim");
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
 
   // Determine if transient analyses should be supported
@@ -212,14 +209,12 @@ Albany::ElasticityProblem::constructEvaluators(
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0]));
 
-  if (supportsTransient)
-    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dotdot[0]));
+  if (supportsTransient) fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dotdot[0]));
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0]));
 
   if (supportsTransient)
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator_withAcceleration(true, dof_names, Teuchos::null, dof_names_dotdot));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_withAcceleration(true, dof_names, Teuchos::null, dof_names_dotdot));
   else
     fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names));
 
@@ -241,11 +236,9 @@ Albany::ElasticityProblem::constructEvaluators(
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecGradInterpolationEvaluator(edof_names[0], offset));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructGatherSolutionEvaluator_noTransient(true, edof_names, offset));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(true, edof_names, offset));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(true, eresid_names, offset, "Scatter Error"));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, eresid_names, offset, "Scatter Error"));
   }
 
   // Standard FEM stuff
@@ -254,8 +247,7 @@ Albany::ElasticityProblem::constructEvaluators(
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   // Temporary variable used numerous times below
   Teuchos::RCP<PHX::Evaluator<AlbanyTraits>> ev;
@@ -353,8 +345,7 @@ Albany::ElasticityProblem::constructEvaluators(
     // Output
     p->set<std::string>("Strain Name", "Strain");
 
-    if (Teuchos::nonnull(rc_mgr))
-      rc_mgr->registerField("Strain", dl->qp_tensor, AAdapt::rc::Init::zero, AAdapt::rc::Transformation::none, p);
+    if (Teuchos::nonnull(rc_mgr)) rc_mgr->registerField("Strain", dl->qp_tensor, AAdapt::rc::Init::zero, AAdapt::rc::Transformation::none, p);
 
     ev = rcp(new LCM::Strain<EvalT, AlbanyTraits>(*p, dl));
     fm0.template registerEvaluator<EvalT>(ev);

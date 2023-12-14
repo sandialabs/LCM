@@ -47,8 +47,7 @@ main(int ac, char* av[])
 
   LCM::PARTITION::Scheme partition_scheme = LCM::PARTITION::Scheme::KDTREE;
 
-  command_line_processor.setOption(
-      "scheme", &partition_scheme, number_schemes, scheme_values, scheme_names, "Partition Scheme");
+  command_line_processor.setOption("scheme", &partition_scheme, number_schemes, scheme_values, scheme_names, "Partition Scheme");
 
   double length_scale = 0.00165;
 
@@ -68,20 +67,13 @@ main(int ac, char* av[])
 
   int const number_initializers = 3;
 
-  LCM::PARTITION::Scheme const initializer_values[] = {
-      LCM::PARTITION::Scheme::RANDOM, LCM::PARTITION::Scheme::GEOMETRIC, LCM::PARTITION::Scheme::HYPERGRAPH};
+  LCM::PARTITION::Scheme const initializer_values[] = {LCM::PARTITION::Scheme::RANDOM, LCM::PARTITION::Scheme::GEOMETRIC, LCM::PARTITION::Scheme::HYPERGRAPH};
 
   char const* initializer_names[] = {"random", "geometric", "hypergraph"};
 
   LCM::PARTITION::Scheme initializer_scheme = LCM::PARTITION::Scheme::GEOMETRIC;
 
-  command_line_processor.setOption(
-      "initializer",
-      &initializer_scheme,
-      number_initializers,
-      initializer_values,
-      initializer_names,
-      "Initializer Scheme");
+  command_line_processor.setOption("initializer", &initializer_scheme, number_initializers, initializer_values, initializer_names, "Initializer Scheme");
 
   // Throw a warning and not error for unrecognized options
   command_line_processor.recogniseAllOptions(true);

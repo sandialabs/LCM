@@ -16,8 +16,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-DirichletBase<EvalT, Traits>::DirichletBase(Teuchos::ParameterList& p)
-    : offset(p.get<int>("Equation Offset")), nodeSetID(p.get<std::string>("Node Set ID"))
+DirichletBase<EvalT, Traits>::DirichletBase(Teuchos::ParameterList& p) : offset(p.get<int>("Equation Offset")), nodeSetID(p.get<std::string>("Node Set ID"))
 {
   value = p.get<RealType>("Dirichlet Value");
 
@@ -58,8 +57,7 @@ DirichletBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::Dirichlet(Teuchos::ParameterList& p)
-    : DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
+Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::Dirichlet(Teuchos::ParameterList& p) : DirichletBase<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
 
@@ -100,8 +98,7 @@ Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits:
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits>
-Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::Dirichlet(Teuchos::ParameterList& p)
-    : DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
+Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::Dirichlet(Teuchos::ParameterList& p) : DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 

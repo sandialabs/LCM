@@ -9,9 +9,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ConstitutiveModelDriverPre<EvalT, Traits>::ConstitutiveModelDriverPre(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ConstitutiveModelDriverPre<EvalT, Traits>::ConstitutiveModelDriverPre(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : solution_(p.get<std::string>("Solution Name"), dl->node_tensor),
       def_grad_(p.get<std::string>("F Name"), dl->qp_tensor),
       j_(p.get<std::string>("J Name"), dl->qp_scalar),
@@ -44,9 +42,7 @@ ConstitutiveModelDriverPre<EvalT, Traits>::ConstitutiveModelDriverPre(
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelDriverPre<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ConstitutiveModelDriverPre<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(solution_, fm);
   this->utils.setFieldData(time_, fm);

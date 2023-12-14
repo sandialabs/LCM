@@ -164,24 +164,21 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, 
   auto const number_points = 1;
 
   // Container for the parametric coordinates
-  Kokkos::DynRankView<RealType, PHX::Device> parametric_point(
-      "par_point", number_cells, number_points, parametric_dimension);
+  Kokkos::DynRankView<RealType, PHX::Device> parametric_point("par_point", number_cells, number_points, parametric_dimension);
 
   for (unsigned j = 0; j < parametric_dimension; ++j) {
     parametric_point(0, 0, j) = 0.0;
   }
 
   // Container for the physical point
-  Kokkos::DynRankView<RealType, PHX::Device> physical_coordinates(
-      "phys_point", number_cells, number_points, coupled_dimension);
+  Kokkos::DynRankView<RealType, PHX::Device> physical_coordinates("phys_point", number_cells, number_points, coupled_dimension);
 
   for (unsigned i = 0; i < coupled_dimension; ++i) {
     physical_coordinates(0, 0, i) = point(i);
   }
 
   // Container for the physical nodal coordinates
-  Kokkos::DynRankView<RealType, PHX::Device> nodal_coordinates(
-      "coords", number_cells, coupled_node_count, coupled_dimension);
+  Kokkos::DynRankView<RealType, PHX::Device> nodal_coordinates("coords", number_cells, coupled_node_count, coupled_dimension);
 
   bool found = false;
 
@@ -215,8 +212,7 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, 
       }
 
       // Get parametric coordinates
-      Intrepid2::CellTools<PHX::Device>::mapToReferenceFrame(
-          parametric_point, physical_coordinates, nodal_coordinates, coupled_cell_topology);
+      Intrepid2::CellTools<PHX::Device>::mapToReferenceFrame(parametric_point, physical_coordinates, nodal_coordinates, coupled_cell_topology);
 
       bool in_element = true;
 
@@ -296,8 +292,7 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   Teuchos::RCP<Albany::AbstractSTKMeshStruct> const coupled_stk_mesh_struct = coupled_stk_disc->getSTKMeshStruct();
 
   // get pointer to metadata from coupled_stk_disc
-  Teuchos::RCP<stk::mesh::MetaData const> const coupled_meta_data =
-      Teuchos::rcpFromRef(coupled_stk_disc->getSTKMetaData());
+  Teuchos::RCP<stk::mesh::MetaData const> const coupled_meta_data = Teuchos::rcpFromRef(coupled_stk_disc->getSTKMetaData());
 
   // Get coupled_app parameter list
   Teuchos::RCP<Teuchos::ParameterList const> coupled_app_params = coupled_app.getAppPL();
@@ -309,9 +304,7 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   std::string map_name = dtk_params.get("Map Type", "Consistent Interpolation");
 
   Teuchos::Array<Albany::AbstractSTKFieldContainer::VectorFieldType*> coupled_field_array =
-      Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(
-          coupled_stk_disc->getSTKMeshStruct()->getFieldContainer())
-          ->getSolutionFieldArray();
+      Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(coupled_stk_disc->getSTKMeshStruct()->getFieldContainer())->getSolutionFieldArray();
 
   int num_sol_vecs = coupled_field_array.length();
 
@@ -329,12 +322,9 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   Teuchos::RCP<stk::mesh::MetaData const> this_meta_data = Teuchos::rcpFromRef(this_stk_disc->getSTKMetaData());
 
   Teuchos::Array<Albany::AbstractSTKFieldContainer::VectorFieldType*> this_field_array =
-      Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(
-          this_stk_disc->getSTKMeshStruct()->getFieldContainer())
-          ->getSolutionFieldDTKArray();
+      Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(this_stk_disc->getSTKMeshStruct()->getFieldContainer())->getSolutionFieldDTKArray();
 
-  ALBANY_ASSERT(
-      num_sol_vecs == this_field_array.length(), "coupled_field_array and this_field_array must have the same length!");
+  ALBANY_ASSERT(num_sol_vecs == this_field_array.length(), "coupled_field_array and this_field_array must have the same length!");
 
   Albany::AbstractSTKFieldContainer::VectorFieldType* this_field = this_field_array[0];
 
@@ -357,8 +347,7 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> this_vector =
       doDTKInterpolation(coupled_manager, this_manager, coupled_field, this_field, neq, dtk_params);
 
-  Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>> this_vector_arrays(
-      num_sol_vecs);
+  Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>> this_vector_arrays(num_sol_vecs);
   this_vector_arrays[0] = this_vector;
 
   // Do interpolation of solution time-derivatives using DTK (if applicable)
@@ -371,17 +360,15 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> this_vector_dotdot;
 
   if (num_sol_vecs > 1) {
-    this_field_dot    = this_field_array[1];
-    coupled_field_dot = coupled_field_array[1];
-    this_vector_dot =
-        doDTKInterpolation(coupled_manager, this_manager, coupled_field_dot, this_field_dot, neq, dtk_params);
+    this_field_dot        = this_field_array[1];
+    coupled_field_dot     = coupled_field_array[1];
+    this_vector_dot       = doDTKInterpolation(coupled_manager, this_manager, coupled_field_dot, this_field_dot, neq, dtk_params);
     this_vector_arrays[1] = this_vector_dot;
   }
   if (num_sol_vecs > 2) {
-    this_field_dotdot    = this_field_array[2];
-    coupled_field_dotdot = coupled_field_array[2];
-    this_vector_dotdot =
-        doDTKInterpolation(coupled_manager, this_manager, coupled_field_dotdot, this_field_dotdot, neq, dtk_params);
+    this_field_dotdot     = this_field_array[2];
+    coupled_field_dotdot  = coupled_field_array[2];
+    this_vector_dotdot    = doDTKInterpolation(coupled_manager, this_manager, coupled_field_dotdot, this_field_dotdot, neq, dtk_params);
     this_vector_arrays[2] = this_vector_dotdot;
   }
 
@@ -400,20 +387,17 @@ StrongSchwarzBC_Base<EvalT, Traits>::doDTKInterpolation(
 {
   // Create a solution vector for the source.
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> coupled_vector =
-      coupled_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(
-          Teuchos::ptr(coupled_field), neq);
+      coupled_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(Teuchos::ptr(coupled_field), neq);
 
   // Create a solution vector for the target.
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> this_vector =
-      this_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(
-          Teuchos::ptr(this_field), neq);
+      this_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(Teuchos::ptr(this_field), neq);
 
   // Solution transfer
 
   DataTransferKit::MapOperatorFactory op_factory;
 
-  Teuchos::RCP<DataTransferKit::MapOperator> map_op =
-      op_factory.create(coupled_vector->getMap(), this_vector->getMap(), dtk_params);
+  Teuchos::RCP<DataTransferKit::MapOperator> map_op = op_factory.create(coupled_vector->getMap(), this_vector->getMap(), dtk_params);
 
   // Setup the map operator. This creates the underlying linear operators.
   map_op->setup(coupled_manager.functionSpace(), this_manager.functionSpace());
@@ -442,20 +426,17 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
   ALBANY_ASSERT(has_disp == true, "");
 
   // Displacement
-  Teuchos::RCP<Thyra_Vector> disp =
-      has_disp == true ? Teuchos::rcpFromRef(const_cast<Thyra_Vector&>(*const_disp)) : Teuchos::null;
+  Teuchos::RCP<Thyra_Vector> disp = has_disp == true ? Teuchos::rcpFromRef(const_cast<Thyra_Vector&>(*const_disp)) : Teuchos::null;
 
   auto disp_view = has_disp == true ? Albany::getNonconstLocalData(disp) : Teuchos::null;
 
   // Velocity
-  Teuchos::RCP<Thyra_Vector> velo =
-      has_velo == true ? Teuchos::rcpFromRef(const_cast<Thyra_Vector&>(*const_velo)) : Teuchos::null;
+  Teuchos::RCP<Thyra_Vector> velo = has_velo == true ? Teuchos::rcpFromRef(const_cast<Thyra_Vector&>(*const_velo)) : Teuchos::null;
 
   auto velo_view = has_velo == true ? Albany::getNonconstLocalData(velo) : Teuchos::null;
 
   // Acceleration
-  Teuchos::RCP<Thyra_Vector> acce =
-      has_acce == true ? Teuchos::rcpFromRef(const_cast<Thyra_Vector&>(*const_acce)) : Teuchos::null;
+  Teuchos::RCP<Thyra_Vector> acce = has_acce == true ? Teuchos::rcpFromRef(const_cast<Thyra_Vector&>(*const_acce)) : Teuchos::null;
 
   auto acce_view = has_acce == true ? Albany::getNonconstLocalData(acce) : Teuchos::null;
 
@@ -465,8 +446,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
 
 #if defined(ALBANY_DTK)
 
-  Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>> bcs_array =
-      sbc.computeBCsDTK();
+  Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>> bcs_array = sbc.computeBCsDTK();
 
   ALBANY_ASSERT(has_velo == false || bcs_array.length() >= 2);
   ALBANY_ASSERT(has_acce == false || bcs_array.length() >= 3);

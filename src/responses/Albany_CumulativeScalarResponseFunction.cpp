@@ -133,8 +133,7 @@ Albany::CumulativeScalarResponseFunction::evaluateGradient(
     }
 
     // Evaluate response function
-    responses[i]->evaluateGradient(
-        current_time, x, xdot, xdotdot, p, deriv_p, g_i, dg_dx_i, dg_dxdot_i, dg_dxdotdot_i, dg_dp_i);
+    responses[i]->evaluateGradient(current_time, x, xdot, xdotdot, p, deriv_p, g_i, dg_dx_i, dg_dxdot_i, dg_dxdotdot_i, dg_dp_i);
 
     // Copy results into combined result
     if (!g.is_null()) {

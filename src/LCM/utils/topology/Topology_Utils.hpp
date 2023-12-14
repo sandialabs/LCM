@@ -43,11 +43,7 @@ display_relation(Topology& topology, stk::mesh::Entity entity, stk::mesh::Entity
 /// These are relations that connect cells to points.
 ///
 bool
-is_needed_for_stk(
-    stk::mesh::BulkData&        bulk_data,
-    stk::mesh::Entity           source_entity,
-    stk::mesh::EntityRank       target_rank,
-    stk::mesh::EntityRank const cell_rank);
+is_needed_for_stk(stk::mesh::BulkData& bulk_data, stk::mesh::Entity source_entity, stk::mesh::EntityRank target_rank, stk::mesh::EntityRank const cell_rank);
 
 ///
 /// Add a dash and processor rank to a string. Useful for output
@@ -126,17 +122,9 @@ new_id_from_old_id(
     stk::mesh::EntityId const   old_id,
     bool const                  is_low_from_high);
 stk::mesh::EntityId
-low_id_from_high_id(
-    size_t const                dimension,
-    int const                   parallel_rank,
-    stk::mesh::EntityRank const rank,
-    stk::mesh::EntityId const   high_id);
+low_id_from_high_id(size_t const dimension, int const parallel_rank, stk::mesh::EntityRank const rank, stk::mesh::EntityId const high_id);
 stk::mesh::EntityId
-high_id_from_low_id(
-    size_t const                dimension,
-    int const                   parallel_rank,
-    stk::mesh::EntityRank const rank,
-    stk::mesh::EntityId const   low_id);
+high_id_from_low_id(size_t const dimension, int const parallel_rank, stk::mesh::EntityRank const rank, stk::mesh::EntityId const low_id);
 
 ///
 /// Determine surface element topology based on bulk element topology

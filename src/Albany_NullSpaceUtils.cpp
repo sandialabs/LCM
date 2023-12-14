@@ -18,12 +18,7 @@ namespace {
 // Copied from Trilinos/packages/ml/src/Utils/ml_rbm.c.
 template <class Traits>
 void
-Coord2RBM(
-    Teuchos::RCP<Thyra_MultiVector> const& coordMV,
-    int const                              Ndof,
-    int const                              NscalarDof,
-    int const                              NSdim,
-    typename Traits::array_type&           rbm)
+Coord2RBM(Teuchos::RCP<Thyra_MultiVector> const& coordMV, int const Ndof, int const NscalarDof, int const NSdim, typename Traits::array_type& rbm)
 {
   int ii, jj;
   int dof;
@@ -130,12 +125,7 @@ Coord2RBM(
 // IKT, 6/28/15: the following set RBMs for non-elasticity problems.
 template <class Traits>
 void
-Coord2RBM_nonElasticity(
-    Teuchos::RCP<Thyra_MultiVector> const& coordMV,
-    int const                              Ndof,
-    int const                              NscalarDof,
-    int const                              NSdim,
-    typename Traits::array_type&           rbm)
+Coord2RBM_nonElasticity(Teuchos::RCP<Thyra_MultiVector> const& coordMV, int const Ndof, int const NscalarDof, int const NSdim, typename Traits::array_type& rbm)
 {
   // std::cout << "setting RBMs in Coord2RBM_nonElasticity!" << std::endl;
   int ii, jj;
@@ -275,13 +265,7 @@ struct TraitsImpl : public TraitsImplBase
 };
 
 RigidBodyModes::RigidBodyModes(int numPDEs_)
-    : numPDEs(numPDEs_),
-      numElasticityDim(0),
-      numScalar(0),
-      nullSpaceDim(0),
-      mueLuUsed(false),
-      froschUsed(false),
-      setNonElastRBM(false)
+    : numPDEs(numPDEs_), numElasticityDim(0), numScalar(0), nullSpaceDim(0), mueLuUsed(false), froschUsed(false), setNonElastRBM(false)
 {
 }
 
@@ -312,12 +296,7 @@ RigidBodyModes::updatePL(const Teuchos::RCP<Teuchos::ParameterList>& precParams)
 }
 
 void
-RigidBodyModes::setParameters(
-    int const  numPDEs_,
-    int const  numElasticityDim_,
-    int const  numScalar_,
-    int const  nullSpaceDim_,
-    bool const setNonElastRBM_)
+RigidBodyModes::setParameters(int const numPDEs_, int const numElasticityDim_, int const numScalar_, int const nullSpaceDim_, bool const setNonElastRBM_)
 {
   numPDEs          = numPDEs_;
   numElasticityDim = numElasticityDim_;
@@ -378,8 +357,7 @@ RigidBodyModes::setCoordinatesAndNullspace(
       using Traits   = Tpetra_NullSpace_Traits;
       auto  t_traits = Teuchos::rcp_dynamic_cast<TraitsImpl<Traits>>(traits);
       auto& trr      = t_traits->arr;
-      trr            = Teuchos::rcp(
-          new Tpetra_NullSpace_Traits::base_array_type(getTpetraMap(soln_vs), nullSpaceDim + numScalar, false));
+      trr            = Teuchos::rcp(new Tpetra_NullSpace_Traits::base_array_type(getTpetraMap(soln_vs), nullSpaceDim + numScalar, false));
 
       subtractCentroid(coordMV);
 

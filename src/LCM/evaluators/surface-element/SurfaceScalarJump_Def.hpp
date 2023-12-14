@@ -9,9 +9,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis"))
 {
@@ -30,8 +28,7 @@ SurfaceScalarJump<EvalT, Traits>::SurfaceScalarJump(
     jumpPorePressure = decltype(jumpPorePressure)(p.get<std::string>("Jump of Pore Pressure Name"), dl->qp_scalar);
     this->addEvaluatedField(jumpPorePressure);
 
-    midPlanePorePressure =
-        decltype(midPlanePorePressure)(p.get<std::string>("MidPlane Pore Pressure Name"), dl->qp_scalar);
+    midPlanePorePressure = decltype(midPlanePorePressure)(p.get<std::string>("MidPlane Pore Pressure Name"), dl->qp_scalar);
     this->addEvaluatedField(midPlanePorePressure);
   }
 

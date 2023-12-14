@@ -44,8 +44,7 @@ class DirichletField_Base : public PHAL::DirichletBase<EvalT, Traits>
 // Residual
 // **************************************************************
 template <typename Traits>
-class DirichletField<PHAL::AlbanyTraits::Residual, Traits>
-    : public DirichletField_Base<PHAL::AlbanyTraits::Residual, Traits>
+class DirichletField<PHAL::AlbanyTraits::Residual, Traits> : public DirichletField_Base<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   DirichletField(Teuchos::ParameterList& p);
@@ -58,8 +57,7 @@ class DirichletField<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class DirichletField<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public DirichletField_Base<PHAL::AlbanyTraits::Jacobian, Traits>
+class DirichletField<PHAL::AlbanyTraits::Jacobian, Traits> : public DirichletField_Base<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   DirichletField(Teuchos::ParameterList& p);

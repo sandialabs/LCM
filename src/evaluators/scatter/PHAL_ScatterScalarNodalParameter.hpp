@@ -30,8 +30,7 @@ namespace PHAL {
 // **************************************************************
 
 template <typename EvalT, typename Traits>
-class ScatterScalarNodalParameterBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                        public PHX::EvaluatorDerived<EvalT, Traits>
+class ScatterScalarNodalParameterBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ScatterScalarNodalParameterBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -56,8 +55,7 @@ template <typename EvalT, typename Traits>
 class ScatterScalarNodalParameter : public ScatterScalarNodalParameterBase<EvalT, Traits>
 {
  public:
-  ScatterScalarNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : ScatterScalarNodalParameterBase<EvalT, Traits>(p, dl)
+  ScatterScalarNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl) : ScatterScalarNodalParameterBase<EvalT, Traits>(p, dl)
   {
   }
 
@@ -95,8 +93,7 @@ class ScatterScalarExtruded2DNodalParameter : public ScatterScalarNodalParameter
 // Residual
 // **************************************************************
 template <typename Traits>
-class ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>
-    : public ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>
+class ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits> : public ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ScatterScalarNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -112,8 +109,7 @@ class ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>
 };
 
 template <typename Traits>
-class ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>
-    : public ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>
+class ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits> : public ScatterScalarNodalParameterBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ScatterScalarExtruded2DNodalParameter(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

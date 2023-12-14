@@ -26,14 +26,11 @@
 namespace LameUtils {
 
 Teuchos::RCP<LameMaterial>
-constructLameMaterialModel(
-    std::string const             lameMaterialModelName,
-    Teuchos::ParameterList const& lameMaterialParameters)
+constructLameMaterialModel(std::string const lameMaterialModelName, Teuchos::ParameterList const& lameMaterialParameters)
 {
   // Strings should be all upper case with spaces replaced with underscores
   std::string materialModelName = lameMaterialModelName;
-  std::transform(
-      materialModelName.begin(), materialModelName.end(), materialModelName.begin(), (int (*)(int))std::toupper);
+  std::transform(materialModelName.begin(), materialModelName.end(), materialModelName.begin(), (int (*)(int))std::toupper);
   std::replace(materialModelName.begin(), materialModelName.end(), ' ', '_');
 
   LameMatProps props;
@@ -74,8 +71,7 @@ constructLameMaterialModel(
   else if (materialModelName == "NEOHOOKEAN")
     materialModel = Teuchos::rcp(new lament::Neohookean<double>(props));
   else {
-    if (materialModel.is_null())
-      ALBANY_ABORT(" unsupported LAMENT material model: " + lameMaterialModelName + " (" + materialModelName + ")\n");
+    if (materialModel.is_null()) ALBANY_ABORT(" unsupported LAMENT material model: " + lameMaterialModelName + " (" + materialModelName + ")\n");
   }
 #endif
 
@@ -110,9 +106,7 @@ getStateVariableNames(std::string const& lameMaterialModelName, Teuchos::Paramet
 }
 
 std::vector<double>
-getStateVariableInitialValues(
-    std::string const&            lameMaterialModelName,
-    Teuchos::ParameterList const& lameMaterialParameters)
+getStateVariableInitialValues(std::string const& lameMaterialModelName, Teuchos::ParameterList const& lameMaterialParameters)
 {
   Teuchos::RCP<LameMaterial> materialModel = constructLameMaterialModel(lameMaterialModelName, lameMaterialParameters);
 

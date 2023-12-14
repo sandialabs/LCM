@@ -49,8 +49,7 @@ TopologyMod::TopologyMod(
 
   topology_ = Teuchos::rcp(new LCM::Topology(discretization_, bulk_block_name, interface_block_name));
 
-  failure_criterion_ =
-      Teuchos::rcp(new LCM::FractureCriterionTraction(*topology_, stress_name, critical_traction, beta));
+  failure_criterion_ = Teuchos::rcp(new LCM::FractureCriterionTraction(*topology_, stress_name, critical_traction, beta));
 
   topology_->set_failure_criterion(failure_criterion_);
 }
@@ -134,8 +133,7 @@ AAdapt::TopologyMod::showRelations()
       std::cout << "Element " << bulk_data_->identifier(element_list[i]) << " relations are :" << std::endl;
 
       for (size_t j = 0; j < num_relations; ++j) {
-        std::cout << "entity:\t" << bulk_data_->identifier(relations[j]) << "," << bulk_data_->entity_rank(relations[j])
-                  << "\tlocal id: " << ords[j] << "\n";
+        std::cout << "entity:\t" << bulk_data_->identifier(relations[j]) << "," << bulk_data_->entity_rank(relations[j]) << "\tlocal id: " << ords[j] << "\n";
       }
     }
   }
@@ -154,9 +152,7 @@ AAdapt::TopologyMod::accumulateFractured(int num_fractured)
 // Parallel all-gatherv function. Communicates local open list to
 // all processors to form global open list.
 void
-AAdapt::TopologyMod::getGlobalOpenList(
-    std::map<EntityKey, bool>& local_entity_open,
-    std::map<EntityKey, bool>& global_entity_open)
+AAdapt::TopologyMod::getGlobalOpenList(std::map<EntityKey, bool>& local_entity_open, std::map<EntityKey, bool>& global_entity_open)
 {
   // Make certain that we can send keys as MPI_UINT64_T types
   assert(sizeof(EntityKey::entity_key_t) >= sizeof(uint64_t));
@@ -207,15 +203,7 @@ AAdapt::TopologyMod::getGlobalOpenList(
 #define MPI_UINT64_T MPI_UNSIGNED_LONG_LONG
 #endif
   EntityKey::entity_key_t* result_array = new EntityKey::entity_key_t[total_number_of_open_entities];
-  MPI_Allgatherv(
-      (void*)&v[0],
-      num_open_on_pe,
-      MPI_UINT64_T,
-      (void*)result_array,
-      sizes,
-      offsets,
-      MPI_UINT64_T,
-      bulk_data_->parallel());
+  MPI_Allgatherv((void*)&v[0], num_open_on_pe, MPI_UINT64_T, (void*)result_array, sizes, offsets, MPI_UINT64_T, bulk_data_->parallel());
 
   // Save the global keys
   for (int i = 0; i < total_number_of_open_entities; i++) {

@@ -61,11 +61,7 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
 
     numEB = input_nEB;
 
-  params->validateParameters(
-      *this->getValidDiscretizationParameters(),
-      0,
-      Teuchos::VALIDATE_USED_ENABLED,
-      Teuchos::VALIDATE_DEFAULTS_DISABLED);
+  params->validateParameters(*this->getValidDiscretizationParameters(), 0, Teuchos::VALIDATE_USED_ENABLED, Teuchos::VALIDATE_DEFAULTS_DISABLED);
 
   nelem[0] = 1;    // One element in the case of a single point 0D mesh (the below
                    // isn't executed)
@@ -281,17 +277,7 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
     const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
 
     this->meshSpecs[0] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-        ctd,
-        numDim,
-        cub,
-        nsNames,
-        ssNames,
-        worksetSize,
-        partVec[0]->name(),
-        ebNameToIndex,
-        this->interleavedOrdering,
-        false,
-        cub_rule));
+        ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering, false, cub_rule));
   } else {
     meshSpecs.resize(numEB);
 
@@ -305,17 +291,7 @@ Albany::TmplSTKMeshStruct<Dim, traits>::TmplSTKMeshStruct(
       const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
 
       this->meshSpecs[eb] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-          ctd,
-          numDim,
-          cub,
-          nsNames,
-          ssNames,
-          worksetSize,
-          partVec[eb]->name(),
-          ebNameToIndex,
-          this->interleavedOrdering,
-          true,
-          cub_rule));
+          ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[eb]->name(), ebNameToIndex, this->interleavedOrdering, true, cub_rule));
     }
   }
 
@@ -363,9 +339,7 @@ Albany::TmplSTKMeshStruct<Dim, traits>::setFieldAndBulkData(
   for (unsigned idx = 0; idx < Dim; idx++) {
     x[idx][0] = 0;
 
-    for (unsigned int i = 1; i <= nelem[idx]; i++)
-
-      x[idx][i] = x[idx][i - 1] + h_dim[idx][i - 1];  // place the coordinates of the element nodes
+    for (unsigned int i = 1; i <= nelem[idx]; i++) x[idx][i] = x[idx][i - 1] + h_dim[idx][i - 1];  // place the coordinates of the element nodes
   }
 
   SetupFieldData(commT, neq_, req, sis, worksetSize);
@@ -517,8 +491,7 @@ Albany::EBSpecsStruct<2>::Initialize(int i, const Teuchos::RCP<Teuchos::Paramete
   // Get the parameter string for this block. Note the default (below) applies
   // if there is no block information in the xml file.
 
-  std::string blkinfo =
-      params->get<std::string>(ss.str(), "begins at (0, 0) ends at (100, 100) length (1.0, 1.0) named Block0");
+  std::string blkinfo = params->get<std::string>(ss.str(), "begins at (0, 0) ends at (100, 100) length (1.0, 1.0) named Block0");
 
   // Parse it
   sscanf(
@@ -557,8 +530,7 @@ Albany::EBSpecsStruct<3>::Initialize(int i, const Teuchos::RCP<Teuchos::Paramete
   // Parse it
   sscanf(
       &blkinfo[0],
-      "begins at (" ST_LLU "," ST_LLU "," ST_LLU ") ends at (" ST_LLU "," ST_LLU "," ST_LLU
-      ") length (%lf,%lf,%lf) named %s",
+      "begins at (" ST_LLU "," ST_LLU "," ST_LLU ") ends at (" ST_LLU "," ST_LLU "," ST_LLU ") length (%lf,%lf,%lf) named %s",
       &min[0],
       &min[1],
       &min[2],
@@ -665,9 +637,7 @@ Albany::TmplSTKMeshStruct<1>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        ALBANY_ABORT(
-            std::endl
-            << "Error: Could not place element " << elem_GID << " in its corresponding element block." << std::endl);
+        ALBANY_ABORT(std::endl << "Error: Could not place element " << elem_GID << " in its corresponding element block." << std::endl);
       }
     }
 
@@ -780,9 +750,7 @@ Albany::TmplSTKMeshStruct<2>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        ALBANY_ABORT(
-            std::endl
-            << "Error: Could not place element " << elem_GID << " in its corresponding element block." << std::endl);
+        ALBANY_ABORT(std::endl << "Error: Could not place element " << elem_GID << " in its corresponding element block." << std::endl);
       }
     }
 
@@ -803,8 +771,7 @@ Albany::TmplSTKMeshStruct<2>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
       bulkData->declare_relation(elem, llnode, 0);
       bulkData->declare_relation(elem, lrnode, 1);
       bulkData->declare_relation(elem, urnode, 2);
-      stk::mesh::Entity elem2 =
-          bulkData->declare_entity(stk::topology::ELEMENT_RANK, 1 + 2 * elem_id + 1, singlePartVec);
+      stk::mesh::Entity elem2 = bulkData->declare_entity(stk::topology::ELEMENT_RANK, 1 + 2 * elem_id + 1, singlePartVec);
       bulkData->declare_relation(elem2, llnode, 0);
       bulkData->declare_relation(elem2, urnode, 1);
       bulkData->declare_relation(elem2, ulnode, 2);
@@ -1055,9 +1022,7 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
       if (ebNo == numEB) {  // error, we didn't find an element block that this
                             // element should fit in
 
-        ALBANY_ABORT(
-            std::endl
-            << "Error: Could not place element " << elem_GID << " in its corresponding element block." << std::endl);
+        ALBANY_ABORT(std::endl << "Error: Could not place element " << elem_GID << " in its corresponding element block." << std::endl);
       }
     }
 
@@ -1153,8 +1118,7 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
 
       singlePartVec[0] = ssPartVec["SideSet1"];
 
-      stk::mesh::EntityId side_id =
-          (stk::mesh::EntityId)(nelem[0] + (2 * y_GID) + 1 + (nelem[0] + nelem[1]) * 2 * z_GID);
+      stk::mesh::EntityId side_id = (stk::mesh::EntityId)(nelem[0] + (2 * y_GID) + 1 + (nelem[0] + nelem[1]) * 2 * z_GID);
 
       stk::mesh::Entity side = bulkData->declare_entity(metaData->side_rank(), 1 + side_id, singlePartVec);
       bulkData->declare_relation(elem, side, 1 /*local side id*/);
@@ -1186,8 +1150,7 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
 
       singlePartVec[0] = ssPartVec["SideSet3"];
 
-      stk::mesh::EntityId side_id =
-          (stk::mesh::EntityId)(nelem[0] + (2 * nelem[1]) + x_GID + (nelem[0] + nelem[1]) * 2 * z_GID);
+      stk::mesh::EntityId side_id = (stk::mesh::EntityId)(nelem[0] + (2 * nelem[1]) + x_GID + (nelem[0] + nelem[1]) * 2 * z_GID);
 
       stk::mesh::Entity side = bulkData->declare_entity(metaData->side_rank(), 1 + side_id, singlePartVec);
       bulkData->declare_relation(elem, side, 2 /*local side id*/);
@@ -1202,8 +1165,7 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
 
       singlePartVec[0] = ssPartVec["SideSet4"];
 
-      stk::mesh::EntityId side_id =
-          (stk::mesh::EntityId)((nelem[0] + nelem[1]) * 2 * nelem[2] + x_GID + (2 * nelem[0]) * y_GID);
+      stk::mesh::EntityId side_id = (stk::mesh::EntityId)((nelem[0] + nelem[1]) * 2 * nelem[2] + x_GID + (2 * nelem[0]) * y_GID);
 
       stk::mesh::Entity side = bulkData->declare_entity(metaData->side_rank(), 1 + side_id, singlePartVec);
       bulkData->declare_relation(elem, side, 4 /*local side id*/);
@@ -1216,9 +1178,8 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
     if ((z_GIDplus1) == nelem[2]) {
       // elem has side 5 (4567) on back boundary
 
-      singlePartVec[0] = ssPartVec["SideSet5"];
-      stk::mesh::EntityId side_id =
-          (stk::mesh::EntityId)((nelem[0] + nelem[1]) * 2 * nelem[2] + x_GID + (2 * nelem[0]) * y_GID + nelem[0]);
+      singlePartVec[0]            = ssPartVec["SideSet5"];
+      stk::mesh::EntityId side_id = (stk::mesh::EntityId)((nelem[0] + nelem[1]) * 2 * nelem[2] + x_GID + (2 * nelem[0]) * y_GID + nelem[0]);
 
       stk::mesh::Entity side = bulkData->declare_entity(metaData->side_rank(), 1 + side_id, singlePartVec);
       bulkData->declare_relation(elem, side, 5 /*local side id*/);
@@ -1363,10 +1324,7 @@ Albany::TmplSTKMeshStruct<1>::getValidDiscretizationParameters() const
     std::stringstream ss;
     ss << "Block " << i;
 
-    validPL->set<std::string>(
-        ss.str(),
-        "begins at 0 ends at 100 length 1.0 named Bck0",
-        "Beginning and ending parametric coordinates of block, block name");
+    validPL->set<std::string>(ss.str(), "begins at 0 ends at 100 length 1.0 named Bck0", "Beginning and ending parametric coordinates of block, block name");
   }
 
   return validPL;
@@ -1386,8 +1344,7 @@ Albany::TmplSTKMeshStruct<2>::getValidDiscretizationParameters() const
   validPL->set<double>("2D Scale", 1.0, "Height of Y discretization");
   validPL->set<std::string>("Cell Topology", "Quad", "Quad or Tri Cell Topology");
   validPL->sublist("Required Fields Info", false, "Info for the loading of the required fields");
-  validPL->set<bool>(
-      "Write points coordinates to ascii file", false, "If true, writes the mesh points coordinates on file");
+  validPL->set<bool>("Write points coordinates to ascii file", false, "If true, writes the mesh points coordinates on file");
 
   // Multiple element blocks parameters
   validPL->set<int>("Element Blocks", 1, "Number of elements blocks that span the X-Y domain");
@@ -1397,9 +1354,7 @@ Albany::TmplSTKMeshStruct<2>::getValidDiscretizationParameters() const
     ss << "Block " << i;
 
     validPL->set<std::string>(
-        ss.str(),
-        "begins at (0, 0) ends at (100, 100) length (1.0, 1.0) named Bck0",
-        "Beginning and ending parametric coordinates of block, block name");
+        ss.str(), "begins at (0, 0) ends at (100, 100) length (1.0, 1.0) named Bck0", "Beginning and ending parametric coordinates of block, block name");
   }
 
   return validPL;

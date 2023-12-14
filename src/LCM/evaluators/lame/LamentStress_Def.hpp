@@ -65,18 +65,15 @@ LamentStress<EvalT, Traits>::LamentStress(Teuchos::ParameterList& p)
   // This assumes that there is a single material model associated with this
   // evaluator and that the material properties are constant (read directly
   // from input deck parameter list)
-  lamentMaterialModel =
-      LameUtils::constructLamentMaterialModel<ScalarT>(lamentMaterialModelName, lamentMaterialParameters);
+  lamentMaterialModel = LameUtils::constructLamentMaterialModel<ScalarT>(lamentMaterialModelName, lamentMaterialParameters);
 
   // Get a list of the LAMENT material model state variable names
-  lamentMaterialModelStateVariableNames =
-      LameUtils::getStateVariableNames(lamentMaterialModelName, lamentMaterialParameters);
+  lamentMaterialModelStateVariableNames = LameUtils::getStateVariableNames(lamentMaterialModelName, lamentMaterialParameters);
 
   // Declare the state variables as evaluated fields (type is always double)
   Teuchos::RCP<PHX::DataLayout> dataLayout = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
   for (unsigned int i = 0; i < lamentMaterialModelStateVariableNames.size(); ++i) {
-    PHX::MDField<ScalarT, Cell, QuadPoint> lamentMaterialModelStateVariableField(
-        lamentMaterialModelStateVariableNames[i], dataLayout);
+    PHX::MDField<ScalarT, Cell, QuadPoint> lamentMaterialModelStateVariableField(lamentMaterialModelStateVariableNames[i], dataLayout);
     this->addEvaluatedField(lamentMaterialModelStateVariableField);
     lamentMaterialModelStateVariableFields.push_back(lamentMaterialModelStateVariableField);
   }
@@ -88,8 +85,7 @@ LamentStress<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d,
 {
   this->utils.setFieldData(defGradField, fm);
   this->utils.setFieldData(stressField, fm);
-  for (unsigned int i = 0; i < lamentMaterialModelStateVariableFields.size(); ++i)
-    this->utils.setFieldData(lamentMaterialModelStateVariableFields[i], fm);
+  for (unsigned int i = 0; i < lamentMaterialModelStateVariableFields.size(); ++i) this->utils.setFieldData(lamentMaterialModelStateVariableFields[i], fm);
 }
 
 template <typename EvalT, typename Traits>
@@ -302,15 +298,7 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
       // rotate to get the Cauchy Stress
       minitensor::Tensor<ScalarT> lameStress(
-          stressNew[0],
-          stressNew[3],
-          stressNew[5],
-          stressNew[3],
-          stressNew[1],
-          stressNew[4],
-          stressNew[5],
-          stressNew[4],
-          stressNew[2]);
+          stressNew[0], stressNew[3], stressNew[5], stressNew[3], stressNew[1], stressNew[4], stressNew[5], stressNew[4], stressNew[2]);
       minitensor::Tensor<ScalarT> cauchy = R * lameStress * transpose(R);
 
       // Copy the new stress into the stress field
@@ -329,8 +317,7 @@ LamentStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
       // copy state_new data from the LAMENT data structure to the corresponding
       // state variable field
-      for (int iVar = 0; iVar < numStateVariables; iVar++)
-        this->lamentMaterialModelStateVariableFields[iVar](cell, qp) = stateNew[iVar];
+      for (int iVar = 0; iVar < numStateVariables; iVar++) this->lamentMaterialModelStateVariableFields[iVar](cell, qp) = stateNew[iVar];
     }
   }
 }

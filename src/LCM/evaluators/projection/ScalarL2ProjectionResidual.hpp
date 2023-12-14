@@ -22,8 +22,7 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class ScalarL2ProjectionResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                   public PHX::EvaluatorDerived<EvalT, Traits>
+class ScalarL2ProjectionResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ScalarL2ProjectionResidual(Teuchos::ParameterList const& p);

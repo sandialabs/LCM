@@ -55,9 +55,7 @@ class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::Eval
   ///
   template <typename ST>
   void
-  computeMidplaneCoords(
-      PHX::MDField<const ST, Cell, Vertex, Dim> const coords,
-      Kokkos::DynRankView<ST, PHX::Device>&           midplane_coords);
+  computeMidplaneCoords(PHX::MDField<const ST, Cell, Vertex, Dim> const coords, Kokkos::DynRankView<ST, PHX::Device>& midplane_coords);
 
   ///
   /// Computes basis from the reference midplane
@@ -66,9 +64,7 @@ class SurfaceBasis : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::Eval
   ///
   template <typename ST>
   void
-  computeBasisVectors(
-      Kokkos::DynRankView<ST, PHX::Device> const& midplane_coords,
-      PHX::MDField<ST, Cell, QuadPoint, Dim, Dim> basis);
+  computeBasisVectors(Kokkos::DynRankView<ST, PHX::Device> const& midplane_coords, PHX::MDField<ST, Cell, QuadPoint, Dim, Dim> basis);
 
   ///
   /// Computes the Dual from the midplane and reference bases

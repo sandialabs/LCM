@@ -11,15 +11,9 @@ namespace HMC {
 //*****
 template <typename EvalT, typename Traits>
 MicroResidual<EvalT, Traits>::MicroResidual(Teuchos::ParameterList const& p)
-    : microStress(
-          p.get<std::string>("Micro Stress Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      doubleStress(
-          p.get<std::string>("Double Stress Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+    : microStress(p.get<std::string>("Micro Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      doubleStress(p.get<std::string>("Double Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
       wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       ExResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Tensor Data Layout"))
 {
@@ -38,7 +32,7 @@ MicroResidual<EvalT, Traits>::MicroResidual(Teuchos::ParameterList const& p)
   if (enableTransient) {
     // One more field is required for transient capability
     Teuchos::RCP<PHX::DataLayout> tensor_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout");
-    epsDotDot = decltype(epsDotDot)(p.get<std::string>("Time Dependent Variable Name"), tensor_dl);
+    epsDotDot                               = decltype(epsDotDot)(p.get<std::string>("Time Dependent Variable Name"), tensor_dl);
     this->addDependentField(epsDotDot);
   }
 
@@ -81,8 +75,8 @@ MicroResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         for (std::size_t i = 0; i < numDims; i++) {
           for (std::size_t j = 0; j < numDims; j++) {
             for (std::size_t dim = 0; dim < numDims; dim++) {
-              ExResidual(cell, node, i, j) += doubleStress(cell, qp, i, j, dim) * wGradBF(cell, node, qp, dim) +
-                                              microStress(cell, qp, i, j) * wBF(cell, node, qp);
+              ExResidual(cell, node, i, j) +=
+                  doubleStress(cell, qp, i, j, dim) * wGradBF(cell, node, qp, dim) + microStress(cell, qp, i, j) * wBF(cell, node, qp);
             }
           }
         }

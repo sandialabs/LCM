@@ -13,29 +13,15 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::ParameterList const& p)
     : wbf_(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      tdot_(
-          p.get<std::string>("QP Time Derivative Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      wgradbf_(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      tgrad_(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      tdot_(p.get<std::string>("QP Time Derivative Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      wgradbf_(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      tgrad_(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       residual_(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
-      thermal_conductivity_(
-          p.get<std::string>("ACE_Therm_Cond QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      thermal_inertia_(
-          p.get<std::string>("ACE_Thermal_Inertia QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      thermal_cond_grad_at_qps_(
-          p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      thermal_conductivity_(p.get<std::string>("ACE_Therm_Cond QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      thermal_inertia_(p.get<std::string>("ACE_Thermal_Inertia QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      thermal_cond_grad_at_qps_(p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       tau_(p.get<std::string>("Tau Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      jacobian_det_(
-          p.get<std::string>("Jacobian Det Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      jacobian_det_(p.get<std::string>("Jacobian Det Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   this->addDependentField(wbf_);
@@ -55,10 +41,10 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
   max_time_stab_                          = p.get<double>("Max Stabilization Time");
   stab_type_                              = p.get<std::string>("Stabilization Type");
   Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
-  coord_vec_ = decltype(coord_vec_)(p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
+  coord_vec_                              = decltype(coord_vec_)(p.get<std::string>("QP Coordinate Vector Name"), vector_dl);
   this->addDependentField(coord_vec_);
 
-  Teuchos::RCP<PHX::DataLayout> node_qp_vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           node_qp_vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   node_qp_vector_dl->dimensions(dims);
   workset_size_ = dims[0];
@@ -71,9 +57,7 @@ ACETempStandAloneResid<EvalT, Traits>::ACETempStandAloneResid(Teuchos::Parameter
 //*****
 template <typename EvalT, typename Traits>
 void
-ACETempStandAloneResid<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ACETempStandAloneResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(wbf_, fm);
   this->utils.setFieldData(tgrad_, fm);
@@ -103,8 +87,7 @@ ACETempStandAloneResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData 
         residual_(cell, node) += thermal_inertia_(cell, qp) * tdot_(cell, qp) * wbf_(cell, node, qp);
         // Diffusion part of residual
         for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
-          residual_(cell, node) +=
-              thermal_conductivity_(cell, qp) * tgrad_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim);
+          residual_(cell, node) += thermal_conductivity_(cell, qp) * tgrad_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim);
         }
       }
     }
@@ -124,13 +107,10 @@ ACETempStandAloneResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData 
           for (std::size_t ndim = 0; ndim < num_dims_; ++ndim) {
             // Apply stabilization only for x > x_max_ - 1.5*h, z > z_max_ - 1.5*h
             // and t < max_time_stab_
-            if (((x > x_max_ - 1.5 * mesh_size) || z > (z_max_ - 1.5 * mesh_size)) &&
-                (workset.current_time < max_time_stab_)) {
+            if (((x > x_max_ - 1.5 * mesh_size) || z > (z_max_ - 1.5 * mesh_size)) && (workset.current_time < max_time_stab_)) {
               if (stab_type_ == "SUPG") {
-                residual_(cell, node) -= thermal_cond_grad_at_qps_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim) *
-                                         tau_(cell, qp) *
-                                         (thermal_inertia_(cell, qp) * tdot_(cell, qp) -
-                                          thermal_cond_grad_at_qps_(cell, qp, ndim) * tgrad_(cell, qp, ndim));
+                residual_(cell, node) -= thermal_cond_grad_at_qps_(cell, qp, ndim) * wgradbf_(cell, node, qp, ndim) * tau_(cell, qp) *
+                                         (thermal_inertia_(cell, qp) * tdot_(cell, qp) - thermal_cond_grad_at_qps_(cell, qp, ndim) * tgrad_(cell, qp, ndim));
               } else if (stab_type_ == "Laplacian") {
                 residual_(cell, node) += wgradbf_(cell, node, qp, ndim) * tau_(cell, qp) * tgrad_(cell, qp, ndim);
               }

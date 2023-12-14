@@ -13,18 +13,10 @@ template <typename EvalT, typename Traits>
 CahnHillWResid<EvalT, Traits>::CahnHillWResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
       BF(p.get<std::string>("BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      rhoDot(
-          p.get<std::string>("Rho QP Time Derivative Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      rhoDotNode(
-          p.get<std::string>("Rho QP Time Derivative Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      wGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      rhoDot(p.get<std::string>("Rho QP Time Derivative Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      rhoDotNode(p.get<std::string>("Rho QP Time Derivative Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      wGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       wResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout"))
 {
   lump = p.get<bool>("Lump Mass");
@@ -37,7 +29,7 @@ CahnHillWResid<EvalT, Traits>::CahnHillWResid(Teuchos::ParameterList const& p)
   this->addDependentField(wGradBF.fieldTag());
   this->addEvaluatedField(wResidual);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   worksetSize = dims[0];
@@ -92,13 +84,9 @@ CahnHillWResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     for (std::size_t cell = 0; cell < workset.numCells; ++cell)
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
         diag = 0;
-        for (std::size_t node = 0; node < numNodes; ++node)
+        for (std::size_t node = 0; node < numNodes; ++node) diag += BF(cell, node, qp);  // lump all the row onto the diagonal
 
-          diag += BF(cell, node, qp);  // lump all the row onto the diagonal
-
-        for (std::size_t node = 0; node < numNodes; ++node)
-
-          wResidual(cell, node) += diag * rhoDotNode(cell, node) * wBF(cell, node, qp);
+        for (std::size_t node = 0; node < numNodes; ++node) wResidual(cell, node) += diag * rhoDotNode(cell, node) * wBF(cell, node, qp);
       }
   }
 }

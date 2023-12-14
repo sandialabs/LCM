@@ -20,9 +20,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   std::string fieldName;
   if (p.isType<std::string>("Scatter Field Name"))
@@ -108,11 +106,8 @@ ScatterResidualBase<EvalT, Traits>::postRegistrationSetup(typename Traits::Setup
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::ScatterResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
-    : ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl),
-      numFields(ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>::numFieldsBase)
+ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::ScatterResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
+    : ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl), numFields(ScatterResidualBase<PHAL::AlbanyTraits::Residual, Traits>::numFieldsBase)
 {
 }
 
@@ -120,8 +115,7 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::ScatterResidual(
 // Kokkos kernels
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank0_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank0_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -132,8 +126,7 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_Sca
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank1_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank1_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -144,8 +137,7 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_Sca
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank2_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank2_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
@@ -200,11 +192,8 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename T
 // **********************************************************************
 
 template <typename Traits>
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::ScatterResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
-    : ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl),
-      numFields(ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::numFieldsBase)
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::ScatterResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
+    : ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>(p, dl), numFields(ScatterResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>::numFieldsBase)
 {
 }
 
@@ -212,8 +201,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::ScatterResidual(
 // Kokkos kernels
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank0_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank0_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -224,9 +212,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterJacRank0_Adjoint_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank0_Adjoint_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -258,8 +244,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank0_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank0_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -290,8 +275,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank1_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank1_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++) {
     for (std::size_t eq = 0; eq < numFields; eq++) {
@@ -303,9 +287,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterJacRank1_Adjoint_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank1_Adjoint_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -338,8 +320,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank1_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank1_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -371,8 +352,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank2_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank2_Tag&, int const& cell) const
 {
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
@@ -384,9 +364,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
-    const PHAL_ScatterJacRank2_Adjoint_Tag&,
-    int const& cell) const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank2_Adjoint_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -419,8 +397,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(
 
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank2_Tag&, int const& cell)
-    const
+ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank2_Tag&, int const& cell) const
 {
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
@@ -443,8 +420,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
     for (int eq = 0; eq < numFields; eq++) {
       row = nodeID(cell, node, this->offset + eq);
       if (((this->valTensor)(cell, node, eq / numDims, eq % numDims)).hasFastAccess()) {
-        for (int i = 0; i < nunk; ++i)
-          vals[i] = (this->valTensor)(cell, node, eq / numDims, eq % numDims).fastAccessDx(i);
+        for (int i = 0; i < nunk; ++i) vals[i] = (this->valTensor)(cell, node, eq / numDims, eq % numDims).fastAccessDx(i);
         Jac_kokkos.sumIntoValues(row, col, nunk, vals, false, true);
       }
     }

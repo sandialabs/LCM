@@ -16,15 +16,11 @@ CP::hardeningParameterFactory(CP::HardeningLawType type_hardening_law)
       exit(1);
       break;
 
-    case HardeningLawType::LINEAR_MINUS_RECOVERY:
-      return HPUP(new CP::LinearMinusRecoveryHardeningParameters<NumDimT, NumSlipT>());
-      break;
+    case HardeningLawType::LINEAR_MINUS_RECOVERY: return HPUP(new CP::LinearMinusRecoveryHardeningParameters<NumDimT, NumSlipT>()); break;
 
     case HardeningLawType::SATURATION: return HPUP(new CP::SaturationHardeningParameters<NumDimT, NumSlipT>()); break;
 
-    case HardeningLawType::DISLOCATION_DENSITY:
-      return HPUP(new CP::DislocationDensityHardeningParameters<NumDimT, NumSlipT>());
-      break;
+    case HardeningLawType::DISLOCATION_DENSITY: return HPUP(new CP::DislocationDensityHardeningParameters<NumDimT, NumSlipT>()); break;
 
     case HardeningLawType::UNDEFINED: return HPUP(new CP::NoHardeningParameters<NumDimT, NumSlipT>()); break;
   }
@@ -49,17 +45,11 @@ CP::HardeningLawFactory<NumDimT, NumSlipT>::createHardeningLaw(HardeningLawType 
       exit(1);
       break;
 
-    case HardeningLawType::LINEAR_MINUS_RECOVERY:
-      return allocator_.create<LinearMinusRecoveryHardeningLaw<NumDimT, NumSlipT, ArgT>>();
-      break;
+    case HardeningLawType::LINEAR_MINUS_RECOVERY: return allocator_.create<LinearMinusRecoveryHardeningLaw<NumDimT, NumSlipT, ArgT>>(); break;
 
-    case HardeningLawType::SATURATION:
-      return allocator_.create<SaturationHardeningLaw<NumDimT, NumSlipT, ArgT>>();
-      break;
+    case HardeningLawType::SATURATION: return allocator_.create<SaturationHardeningLaw<NumDimT, NumSlipT, ArgT>>(); break;
 
-    case HardeningLawType::DISLOCATION_DENSITY:
-      return allocator_.create<DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>>();
-      break;
+    case HardeningLawType::DISLOCATION_DENSITY: return allocator_.create<DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>>(); break;
 
     case HardeningLawType::UNDEFINED: return allocator_.create<NoHardeningLaw<NumDimT, NumSlipT, ArgT>>(); break;
   }
@@ -120,14 +110,10 @@ CP::LinearMinusRecoveryHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
 
       // FIXME: there is no guard against log(x), x<0
       RealType const effective_slip_n =
-          -1.0 / modulus_recovery *
-          std::log(
-              1.0 - modulus_recovery / modulus_hardening * (state_hardening_n[ss_index_global] - hardness_initial));
+          -1.0 / modulus_recovery * std::log(1.0 - modulus_recovery / modulus_hardening * (state_hardening_n[ss_index_global] - hardness_initial));
 
       state_hardening_np1[ss_index_global] =
-          modulus_hardening / modulus_recovery *
-              (1.0 - std::exp(-modulus_recovery * (effective_slip_n + dt * driver_hardening[ss_index]))) +
-          hardness_initial;
+          modulus_hardening / modulus_recovery * (1.0 - std::exp(-modulus_recovery * (effective_slip_n + dt * driver_hardening[ss_index]))) + hardness_initial;
 
       slip_resistance[ss_index_global] = state_hardening_np1[ss_index_global];
     }
@@ -135,8 +121,7 @@ CP::LinearMinusRecoveryHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
     for (minitensor::Index ss_index(0); ss_index < num_slip_sys; ++ss_index) {
       auto const ss_index_global = slip_family.slip_system_indices_(ss_index);
 
-      state_hardening_np1[ss_index_global] =
-          state_hardening_n[ss_index_global] + modulus_hardening * dt * driver_hardening[ss_index];
+      state_hardening_np1[ss_index_global] = state_hardening_n[ss_index_global] + modulus_hardening * dt * driver_hardening[ss_index];
 
       slip_resistance[ss_index_global] = state_hardening_np1[ss_index_global];
     }
@@ -161,8 +146,8 @@ CP::SaturationHardeningParameters<NumDimT, NumSlipT>::createLatentMatrix(
     for (minitensor::Index ss_index_j(0); ss_index_j < slip_family.num_slip_sys_; ++ss_index_j) {
       auto const slip_system_j = slip_systems[slip_family.slip_system_indices_[ss_index_j]];
 
-      slip_family.latent_matrix_(ss_index_i, ss_index_j) = std::fabs(
-          minitensor::dotdot(minitensor::sym(slip_system_i.projector_), minitensor::sym(slip_system_j.projector_)));
+      slip_family.latent_matrix_(ss_index_i, ss_index_j) =
+          std::fabs(minitensor::dotdot(minitensor::sym(slip_system_i.projector_), minitensor::sym(slip_system_j.projector_)));
     }
   }
 
@@ -258,8 +243,7 @@ CP::SaturationHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
 
     // if (driver_hardening[ss_index] !=0 )
     // {
-    state_hard =
-        state_hardening_n[ss_index_global] + dt * rate_hardening * driver_hardening[ss_index] * ratio_hardening;
+    state_hard = state_hardening_n[ss_index_global] + dt * rate_hardening * driver_hardening[ss_index] * ratio_hardening;
 
     // }
     // else
@@ -298,8 +282,7 @@ CP::DislocationDensityHardeningParameters<NumDimT, NumSlipT>::createLatentMatrix
 
       minitensor::Vector<RealType, CP::MAX_DIM> normal_j = slip_system_j.n_;
 
-      minitensor::Vector<RealType, CP::MAX_DIM> transverse_j =
-          minitensor::unit(minitensor::cross(normal_j, direction_j));
+      minitensor::Vector<RealType, CP::MAX_DIM> transverse_j = minitensor::unit(minitensor::cross(normal_j, direction_j));
 
       slip_family.latent_matrix_(ss_index_i, ss_index_j) = std::abs(minitensor::dot(normal_i, transverse_j));
     }
@@ -310,8 +293,7 @@ CP::DislocationDensityHardeningParameters<NumDimT, NumSlipT>::createLatentMatrix
 
   for (minitensor::Index ss_index_i(0); ss_index_i < slip_family.num_slip_sys_; ++ss_index_i) {
     for (minitensor::Index ss_index_j(0); ss_index_j < slip_family.num_slip_sys_; ++ss_index_j) {
-      slip_family.aux_matrix_(ss_index_i, ss_index_j) =
-          std::sqrt(1.0 - std::pow(slip_family.latent_matrix_(ss_index_i, ss_index_j), 2));
+      slip_family.aux_matrix_(ss_index_i, ss_index_j) = std::sqrt(1.0 - std::pow(slip_family.latent_matrix_(ss_index_i, ss_index_j), 2));
     }
   }
 
@@ -385,8 +367,7 @@ CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
       driver_hardening = 0.0;
     }
 
-    state_hardening_np1[ss_index_global] =
-        state_hardening_n[ss_index_global] + dt * driver_hardening * std::abs(rate_slip[ss_index_global]);
+    state_hardening_np1[ss_index_global] = state_hardening_n[ss_index_global] + dt * driver_hardening * std::abs(rate_slip[ss_index_global]);
   }
 
   minitensor::Vector<ArgT, NumSlipT> const densities_parallel = slip_family.aux_matrix_ * state_hardening_np1;
@@ -400,8 +381,7 @@ CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
     }
 
     // Compute the slip resistance
-    slip_resistance[ss_index_global] =
-        factor_geometry_dislocation * modulus_shear * magnitude_burgers * std::sqrt(densities_parallel[ss_index]);
+    slip_resistance[ss_index_global] = factor_geometry_dislocation * modulus_shear * magnitude_burgers * std::sqrt(densities_parallel[ss_index]);
   }
 }
 

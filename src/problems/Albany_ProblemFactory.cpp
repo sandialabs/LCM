@@ -156,11 +156,7 @@ Albany::ProblemFactory::create()
   } else if (method == "Electromechanics 3D") {
     strategy = rcp(new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
   } else {
-    ALBANY_ABORT(
-        std::endl
-        << "Error!  Unknown problem " << method << "!" << std::endl
-        << "Supplied parameter list is " << std::endl
-        << *problemParams);
+    ALBANY_ABORT(std::endl << "Error!  Unknown problem " << method << "!" << std::endl << "Supplied parameter list is " << std::endl << *problemParams);
   }
 
   return strategy;

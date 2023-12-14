@@ -22,9 +22,7 @@ Albany::ThermoElectrostaticsProblem::ThermoElectrostaticsProblem(
 Albany::ThermoElectrostaticsProblem::~ThermoElectrostaticsProblem() {}
 
 void
-Albany::ThermoElectrostaticsProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::ThermoElectrostaticsProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");
@@ -66,8 +64,7 @@ Albany::ThermoElectrostaticsProblem::constructDirichletEvaluators(Albany::MeshSp
 Teuchos::RCP<Teuchos::ParameterList const>
 Albany::ThermoElectrostaticsProblem::getValidProblemParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL =
-      this->getGenericProblemParams("ValidThermoElectrostaticsProblemParams");
+  Teuchos::RCP<Teuchos::ParameterList> validPL = this->getGenericProblemParams("ValidThermoElectrostaticsProblemParams");
 
   validPL->sublist("TE Properties", false, "");
   validPL->set("Convection Velocity", "{0,0,0}", "");

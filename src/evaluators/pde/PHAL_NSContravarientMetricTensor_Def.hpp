@@ -11,13 +11,10 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(Teuchos::ParameterList const& p)
-    : coordVec(
-          p.get<std::string>("Coordinate Vector Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Coordinate Data Layout")),
+    : coordVec(p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Coordinate Data Layout")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       cellType(p.get<Teuchos::RCP<shards::CellTopology>>("Cell Type")),
-      Gc(p.get<std::string>("Contravarient Metric Tensor Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout"))
+      Gc(p.get<std::string>("Contravarient Metric Tensor Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout"))
 {
   this->addDependentField(coordVec.fieldTag());
   this->addEvaluatedField(Gc);
@@ -36,9 +33,7 @@ NSContravarientMetricTensor<EvalT, Traits>::NSContravarientMetricTensor(Teuchos:
 //*****
 template <typename EvalT, typename Traits>
 void
-NSContravarientMetricTensor<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+NSContravarientMetricTensor<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(coordVec, fm);
   this->utils.setFieldData(Gc, fm);

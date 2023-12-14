@@ -13,9 +13,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
-    : elasticModulus(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+    : elasticModulus(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   Teuchos::ParameterList* elmd_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -52,7 +50,7 @@ ElasticModulus<EvalT, Traits>::ElasticModulus(Teuchos::ParameterList& p)
 
   if (p.isType<std::string>("QP Temperature Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-    Temperature = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), scalar_dl);
+    Temperature                             = decltype(Temperature)(p.get<std::string>("QP Temperature Name"), scalar_dl);
     this->addDependentField(Temperature);
     isThermoElastic = true;
     dEdT_value      = elmd_list->get("dEdT Value", 0.0);
@@ -134,9 +132,7 @@ ElasticModulus<EvalT, Traits>::getValue(std::string const& n)
     return constant_value;
   else if (n == "dEdT Value")
     return dEdT_value;
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in ElasticModulus::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in ElasticModulus::getValue()" << std::endl);
   return constant_value;
 }
 

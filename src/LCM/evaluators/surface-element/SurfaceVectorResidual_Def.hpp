@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-SurfaceVectorResidual<EvalT, Traits>::SurfaceVectorResidual(
-    Teuchos::ParameterList&              p,
-    Teuchos::RCP<Albany::Layouts> const& dl)
+SurfaceVectorResidual<EvalT, Traits>::SurfaceVectorResidual(Teuchos::ParameterList& p, Teuchos::RCP<Albany::Layouts> const& dl)
     : thickness_(p.get<double>("thickness")),
 
       cubature_(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
@@ -166,16 +164,15 @@ SurfaceVectorResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
               for (int i(0); i < num_dims_; ++i) {
                 for (int L(0); L < num_dims_; ++L) {
                   // tmp1 = (1/2) * delta * lambda_{,alpha} * G^{alpha L}
-                  tmp1 =
-                      0.5 * I(m, i) * (ref_grads_(bottom_node, pt, 0) * G0(L) + ref_grads_(bottom_node, pt, 1) * G1(L));
+                  tmp1 = 0.5 * I(m, i) * (ref_grads_(bottom_node, pt, 0) * G0(L) + ref_grads_(bottom_node, pt, 1) * G1(L));
 
                   // tmp2 = (1/2) * dndxbar * G^{3}
                   dndxbar = 0.0;
                   for (int r(0); r < num_dims_; ++r) {
                     for (int s(0); s < num_dims_; ++s) {
                       dndxbar += minitensor::levi_civita<MeshScalarT>(i, r, s) *
-                                 (g_1(r) * ref_grads_(bottom_node, pt, 0) - g_0(r) * ref_grads_(bottom_node, pt, 1)) *
-                                 (I(m, s) - n(m) * n(s)) / minitensor::norm(minitensor::cross(g_0, g_1));
+                                 (g_1(r) * ref_grads_(bottom_node, pt, 0) - g_0(r) * ref_grads_(bottom_node, pt, 1)) * (I(m, s) - n(m) * n(s)) /
+                                 minitensor::norm(minitensor::cross(g_0, g_1));
                     }
                   }
                   tmp2 = 0.5 * dndxbar * G2(L);

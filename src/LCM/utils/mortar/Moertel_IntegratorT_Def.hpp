@@ -15,8 +15,7 @@
   |  ctor (public)                                            mwgee 07/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::IntegratorT(int ngp, bool oneD, int outlevel)
-    : oneD_(oneD), ngp_(ngp), outputlevel_(outlevel)
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::IntegratorT(int ngp, bool oneD, int outlevel) : oneD_(oneD), ngp_(ngp), outputlevel_(outlevel)
 {
   if (oneD) {
     coords_.resize(ngp_);
@@ -673,8 +672,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
         oss << "***ERR*** MoertelT::InterfaceT::Integrate_2D_Section:\n"
             << "***ERR*** mismatch in number of Lagrange multipliers and "
                "primal degrees of freedom:\n"
-            << "***ERR*** slave node " << snodes[rownode]->Id() << "***ERR*** # Lagrange multipliers " << nlmdof
-            << " # dofs " << ndof << "\n"
+            << "***ERR*** slave node " << snodes[rownode]->Id() << "***ERR*** # Lagrange multipliers " << nlmdof << " # dofs " << ndof << "\n"
             << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         throw MoertelT::ReportError(oss);
       }
@@ -712,8 +710,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 Teuchos::SerialDenseMatrix<LO, ST>*
-MoertelT::MOERTEL_TEMPLATE_CLASS(
-    IntegratorT)::Integrate(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, double sxia, double sxib)
+MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, double sxia, double sxib)
 {
   int                                 nrow   = sseg.Nnode();
   int                                 ncol   = nrow;
@@ -950,11 +947,10 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
           if (!snodes[slave]->IsOnBoundary()) snodes[slave]->AddMmodValue(sdof, val, col);
           // if slave node is on boundary
           else {
-            std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>& suppnodes = snodes[slave]->GetSupportedByNode();
-            double                                                   w = 1. / (double)(snodes[slave]->NSupportSet());
+            std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>&          suppnodes = snodes[slave]->GetSupportedByNode();
+            double                                                            w         = 1. / (double)(snodes[slave]->NSupportSet());
             std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>::iterator curr;
-            for (curr = suppnodes.begin(); curr != suppnodes.end(); ++curr)
-              curr->second->AddMmodValue(sdof, w * val, col);
+            for (curr = suppnodes.begin(); curr != suppnodes.end(); ++curr) curr->second->AddMmodValue(sdof, w * val, col);
           }
 
         }  // for (int mdof=0; mdof<mndof; ++mdof)
@@ -1014,8 +1010,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
   double sarea = sseg.Area();
 
   if (abs(area / sarea) < eps) {
-    if (OutLevel() > 10)
-      std::cout << "MoertelT: ***WRN*** Skipping overlap segment with tiny area " << area << std::endl;
+    if (OutLevel() > 10) std::cout << "MoertelT: ***WRN*** Skipping overlap segment with tiny area " << area << std::endl;
     points.clear();
     return false;
   }
@@ -1120,9 +1115,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Integrate(
     double x[3] = {0.0};
     double n[3];
     int    dof[3];
-    dof[0] = dof[1] = dof[2] = -1;
-    Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> gpnode =
-        Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(-2, x, 3, dof, false, OutLevel()));
+    dof[0] = dof[1] = dof[2]                                     = -1;
+    Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> gpnode = Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(-2, x, 3, dof, false, OutLevel()));
 
     // create a projector to project gaussian points
     MoertelT::ProjectorT projector(false, OutLevel());
@@ -1252,7 +1246,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
     // row node is a boundary node
     else {
       std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>&          suppnodes = snode[row]->GetSupportedByNode();
-      double                                                            w = 1. / (double)(snode[row]->NSupportSet());
+      double                                                            w         = 1. / (double)(snode[row]->NSupportSet());
       std::map<int, MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*>::iterator curr;
       for (curr = suppnodes.begin(); curr != suppnodes.end(); ++curr)
         for (int col = 0; col < nnode; ++col) {

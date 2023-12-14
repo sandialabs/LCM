@@ -82,10 +82,7 @@ GursonModel<EvalT, Traits>::GursonModel(Teuchos::ParameterList* p, const Teuchos
 }
 template <typename EvalT, typename Traits>
 void
-GursonModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+GursonModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto def_grad          = *dep_fields["F"];
@@ -430,8 +427,7 @@ GursonModel<EvalT, Traits>::ResidualJacobian(
   // fvoidFad or fvoidFad_star
   DFadType dfg(0.0);
   if (taue > 0.0) {
-    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad_star * Ybar * std::sinh(tmp) +
-          sq23 * dgam * kw_ * fvoidFad * omega * smag;
+    dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad_star * Ybar * std::sinh(tmp) + sq23 * dgam * kw_ * fvoidFad * omega * smag;
   } else {
     dfg = dgam * q1_ * q2_ * (1.0 - fvoidFad) * fvoidFad_star * Ybar * std::sinh(tmp);
   }

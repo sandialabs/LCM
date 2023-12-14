@@ -122,12 +122,7 @@ class DispConstTemperatureLinear : public AnalyticFunction
 class ConstantFunctionPerturbed : public AnalyticFunction
 {
  public:
-  ConstantFunctionPerturbed(
-      int                    neq_,
-      int                    numDim_,
-      int                    worksetID,
-      Teuchos::Array<double> const_data_,
-      Teuchos::Array<double> pert_mag_);
+  ConstantFunctionPerturbed(int neq_, int numDim_, int worksetID, Teuchos::Array<double> const_data_, Teuchos::Array<double> pert_mag_);
   void
   compute(double* x, const double* X);
 
@@ -145,12 +140,7 @@ class ConstantFunctionPerturbed : public AnalyticFunction
 class ConstantFunctionGaussianPerturbed : public AnalyticFunction
 {
  public:
-  ConstantFunctionGaussianPerturbed(
-      int                    neq_,
-      int                    numDim_,
-      int                    worksetID,
-      Teuchos::Array<double> const_data_,
-      Teuchos::Array<double> pert_mag_);
+  ConstantFunctionGaussianPerturbed(int neq_, int numDim_, int worksetID, Teuchos::Array<double> const_data_, Teuchos::Array<double> pert_mag_);
   void
   compute(double* x, const double* X);
 

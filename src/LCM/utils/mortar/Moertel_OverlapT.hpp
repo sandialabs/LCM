@@ -220,10 +220,7 @@ class OverlapT
   bool
   AddPointtoPolygon(int const id, double const* P);
   bool
-  AddPointtoPolygon(
-      std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p,
-      int const                                                              id,
-      double const*                                                          P);
+  AddPointtoPolygon(std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& p, int const id, double const* P);
   // remove a point from the polygon
   bool
   RemovePointfromPolygon(int const id, double const* P);
@@ -249,10 +246,7 @@ class OverlapT
       std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>& to);
   // compute the centroid of a polygon (which is defined anti-clockwise)
   bool
-  Centroid(
-      double                                                                     xi[],
-      std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> const& points,
-      int const                                                                  np);
+  Centroid(double xi[], std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>> const& points, int const np);
 
   //@}
 
@@ -287,10 +281,8 @@ class OverlapT
 
   bool exactvalues_;  // use exact function values at gauss points
 
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>
-      p_;  // map holding polygon points and later points of triangulation
-  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>
-      s_;  // map holding segments of polygon triangulation
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(PointT)>>   p_;  // map holding polygon points and later points of triangulation
+  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>> s_;  // map holding segments of polygon triangulation
 
 };  // class Overlap
 

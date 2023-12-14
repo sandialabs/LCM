@@ -167,10 +167,7 @@ class BifurcationCheck : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::
   /// PSO method
   ///
   ScalarT
-  stereographic_pso(
-      minitensor::Tensor4<ScalarT, 3> const& tangent,
-      minitensor::Vector<ScalarT, 2>&        arg_minimum,
-      minitensor::Vector<ScalarT, 3>&        direction);
+  stereographic_pso(minitensor::Tensor4<ScalarT, 3> const& tangent, minitensor::Vector<ScalarT, 2>& arg_minimum, minitensor::Vector<ScalarT, 3>& direction);
 
   ///
   /// Get normal

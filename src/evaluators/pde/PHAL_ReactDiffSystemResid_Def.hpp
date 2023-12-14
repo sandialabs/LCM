@@ -12,13 +12,9 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 ReactDiffSystemResid<EvalT, Traits>::ReactDiffSystemResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Gradient Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Gradient Data Layout")),
       U(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      UGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      UGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       Residual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
   this->addDependentField(U.fieldTag());
@@ -108,28 +104,19 @@ ReactDiffSystemResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       for (std::size_t i = 0; i < vecDim; i++) Residual(cell, node, i) = 0.0;
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
         //- mu0*delta(u0) + a0*u0 + a1*u1 + a2*u2 = f0
-        Residual(cell, node, 0) += mu0 * UGrad(cell, qp, 0, 0) * wGradBF(cell, node, qp, 0) +
-                                   mu0 * UGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 1) +
-                                   mu0 * UGrad(cell, qp, 0, 2) * wGradBF(cell, node, qp, 2) -
-                                   reactCoeff0[0] * U(cell, qp, 0) * wBF(cell, node, qp) -
-                                   reactCoeff0[1] * U(cell, qp, 1) * wBF(cell, node, qp) -
-                                   reactCoeff0[2] * U(cell, qp, 2) * wBF(cell, node, qp) -
+        Residual(cell, node, 0) += mu0 * UGrad(cell, qp, 0, 0) * wGradBF(cell, node, qp, 0) + mu0 * UGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 1) +
+                                   mu0 * UGrad(cell, qp, 0, 2) * wGradBF(cell, node, qp, 2) - reactCoeff0[0] * U(cell, qp, 0) * wBF(cell, node, qp) -
+                                   reactCoeff0[1] * U(cell, qp, 1) * wBF(cell, node, qp) - reactCoeff0[2] * U(cell, qp, 2) * wBF(cell, node, qp) -
                                    forces[0] * wBF(cell, node, qp);
         //- mu1*delta(u1) + b0*u0 + b1*u1 + b2*u2 = f1
-        Residual(cell, node, 1) += mu1 * UGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 0) +
-                                   mu1 * UGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 1) +
-                                   mu1 * UGrad(cell, qp, 1, 2) * wGradBF(cell, node, qp, 2) -
-                                   reactCoeff1[0] * U(cell, qp, 0) * wBF(cell, node, qp) -
-                                   reactCoeff1[1] * U(cell, qp, 1) * wBF(cell, node, qp) -
-                                   reactCoeff1[2] * U(cell, qp, 2) * wBF(cell, node, qp) -
+        Residual(cell, node, 1) += mu1 * UGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 0) + mu1 * UGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 1) +
+                                   mu1 * UGrad(cell, qp, 1, 2) * wGradBF(cell, node, qp, 2) - reactCoeff1[0] * U(cell, qp, 0) * wBF(cell, node, qp) -
+                                   reactCoeff1[1] * U(cell, qp, 1) * wBF(cell, node, qp) - reactCoeff1[2] * U(cell, qp, 2) * wBF(cell, node, qp) -
                                    forces[1] * wBF(cell, node, qp);
         //- mu2*delta(u2) + c0*u0 + c1*u1 + c2*u2 = f2
-        Residual(cell, node, 2) += mu2 * UGrad(cell, qp, 2, 0) * wGradBF(cell, node, qp, 0) +
-                                   mu2 * UGrad(cell, qp, 2, 1) * wGradBF(cell, node, qp, 1) +
-                                   mu2 * UGrad(cell, qp, 2, 2) * wGradBF(cell, node, qp, 2) -
-                                   reactCoeff2[0] * U(cell, qp, 0) * wBF(cell, node, qp) -
-                                   reactCoeff2[1] * U(cell, qp, 1) * wBF(cell, node, qp) -
-                                   reactCoeff2[2] * U(cell, qp, 2) * wBF(cell, node, qp) -
+        Residual(cell, node, 2) += mu2 * UGrad(cell, qp, 2, 0) * wGradBF(cell, node, qp, 0) + mu2 * UGrad(cell, qp, 2, 1) * wGradBF(cell, node, qp, 1) +
+                                   mu2 * UGrad(cell, qp, 2, 2) * wGradBF(cell, node, qp, 2) - reactCoeff2[0] * U(cell, qp, 0) * wBF(cell, node, qp) -
+                                   reactCoeff2[1] * U(cell, qp, 1) * wBF(cell, node, qp) - reactCoeff2[2] * U(cell, qp, 2) * wBF(cell, node, qp) -
                                    forces[2] * wBF(cell, node, qp);
       }
     }

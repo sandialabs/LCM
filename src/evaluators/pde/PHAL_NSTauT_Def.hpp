@@ -12,15 +12,10 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 NSTauT<EvalT, Traits>::NSTauT(Teuchos::ParameterList const& p)
     : V(p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      ThermalCond(
-          p.get<std::string>("ThermalConductivity Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Gc(p.get<std::string>("Contravarient Metric Tensor Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      rho(p.get<std::string>("Density QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Cp(p.get<std::string>("Specific Heat QP Variable Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      ThermalCond(p.get<std::string>("ThermalConductivity Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Gc(p.get<std::string>("Contravarient Metric Tensor Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      rho(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Cp(p.get<std::string>("Specific Heat QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       TauT(p.get<std::string>("Tau T Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 
 {
@@ -70,8 +65,7 @@ NSTauT<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       normGc(cell, qp) = 0.0;
       for (std::size_t i = 0; i < numDims; ++i) {
         for (std::size_t j = 0; j < numDims; ++j) {
-          TauT(cell, qp) += rho(cell, qp) * Cp(cell, qp) * rho(cell, qp) * Cp(cell, qp) * V(cell, qp, i) *
-                            Gc(cell, qp, i, j) * V(cell, qp, j);
+          TauT(cell, qp) += rho(cell, qp) * Cp(cell, qp) * rho(cell, qp) * Cp(cell, qp) * V(cell, qp, i) * Gc(cell, qp, i, j) * V(cell, qp, j);
           normGc(cell, qp) += Gc(cell, qp, i, j) * Gc(cell, qp, i, j);
         }
       }

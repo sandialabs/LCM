@@ -14,9 +14,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-GatherEigenvectors<EvalT, Traits>::GatherEigenvectors(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+GatherEigenvectors<EvalT, Traits>::GatherEigenvectors(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   char buf[200];
 
@@ -42,9 +40,7 @@ GatherEigenvectors<EvalT, Traits>::GatherEigenvectors(
 
 template <typename EvalT, typename Traits>
 void
-GatherEigenvectors<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& fm)
+GatherEigenvectors<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& fm)
 {
   for (std::size_t k = 0; k < nEigenvectors; ++k) {
     this->utils.setFieldData(eigenvector_Re[k], fm);

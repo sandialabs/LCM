@@ -95,11 +95,7 @@ struct ParallelKernel
       Workset&                                workset);
 
   void
-  extractEvaluatedFieldArray(
-      std::string const&                      field_name,
-      std::size_t                             num,
-      std::vector<Teuchos::RCP<ScalarField>>& state,
-      FieldMap<ScalarT>&                      eval_fields);
+  extractEvaluatedFieldArray(std::string const& field_name, std::size_t num, std::vector<Teuchos::RCP<ScalarField>>& state, FieldMap<ScalarT>& eval_fields);
 
   ConstitutiveModel<EvalT, Traits>& model_;
 
@@ -207,14 +203,10 @@ class ParallelConstitutiveModel : public LCM::ConstitutiveModel<EvalT, Traits>
   virtual ~ParallelConstitutiveModel() = default;
 
   void
-  computeState(typename Traits::EvalData workset, FieldMap<ScalarT const> dep_fields, FieldMap<ScalarT> eval_fields)
-      final;
+  computeState(typename Traits::EvalData workset, FieldMap<ScalarT const> dep_fields, FieldMap<ScalarT> eval_fields) final;
 
   virtual void
-  computeStateParallel(
-      typename Traits::EvalData workset,
-      FieldMap<ScalarT const>   dep_fields,
-      FieldMap<ScalarT>         eval_fields) override
+  computeStateParallel(typename Traits::EvalData workset, FieldMap<ScalarT const> dep_fields, FieldMap<ScalarT> eval_fields) override
   {
     ALBANY_ABORT("Not implemented.");
   }

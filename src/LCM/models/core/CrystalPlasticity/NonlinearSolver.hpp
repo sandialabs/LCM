@@ -15,8 +15,7 @@ namespace CP {
  *  increments as unknowns.
  */
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
-class ResidualSlipNLS
-    : public minitensor::Function_Base<ResidualSlipNLS<NumDimT, NumSlipT, EvalT>, typename EvalT::ScalarT, NumSlipT>
+class ResidualSlipNLS : public minitensor::Function_Base<ResidualSlipNLS<NumDimT, NumSlipT, EvalT>, typename EvalT::ScalarT, NumSlipT>
 {
   using ScalarT = typename EvalT::ScalarT;
 
@@ -80,8 +79,7 @@ class ResidualSlipNLS
 //  Dissipation class for the CrystalPlasticity model; slip
 //  increments as unknowns.
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
-class Dissipation
-    : public minitensor::Function_Base<Dissipation<NumDimT, NumSlipT, EvalT>, typename EvalT::ScalarT, NumSlipT>
+class Dissipation : public minitensor::Function_Base<Dissipation<NumDimT, NumSlipT, EvalT>, typename EvalT::ScalarT, NumSlipT>
 {
   using ScalarT = typename EvalT::ScalarT;
 
@@ -142,10 +140,8 @@ class Dissipation
 //! Nonlinear Solver (NLS) class for the CrystalPlasticity model; slip
 //  increments and hardnesses as unknowns.
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
-class ResidualSlipHardnessNLS : public minitensor::Function_Base<
-                                    ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>,
-                                    typename EvalT::ScalarT,
-                                    CP::NlsDim<NumSlipT>::value>
+class ResidualSlipHardnessNLS
+    : public minitensor::Function_Base<ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>, typename EvalT::ScalarT, CP::NlsDim<NumSlipT>::value>
 {
   using ScalarT = typename EvalT::ScalarT;
 
@@ -164,10 +160,7 @@ class ResidualSlipHardnessNLS : public minitensor::Function_Base<
 
   static constexpr char const* const NAME{"Slip and Hardness Residual Nonlinear System"};
 
-  using Base = minitensor::Function_Base<
-      ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>,
-      typename EvalT::ScalarT,
-      CP::NlsDim<NumSlipT>::value>;
+  using Base = minitensor::Function_Base<ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>, typename EvalT::ScalarT, CP::NlsDim<NumSlipT>::value>;
 
   //! Default implementation of value.
   template <typename T, minitensor::Index N = minitensor::DYNAMIC>
@@ -210,16 +203,11 @@ class ResidualSlipHardnessNLS : public minitensor::Function_Base<
 };
 
 template <minitensor::Index NumDimT, minitensor::Index NumSlipT, typename EvalT>
-class ResidualSlipHardnessFN : public minitensor::Function_Base<
-                                   ResidualSlipHardnessFN<NumDimT, NumSlipT, EvalT>,
-                                   typename EvalT::ScalarT,
-                                   CP::NlsDim<NumSlipT>::value>
+class ResidualSlipHardnessFN
+    : public minitensor::Function_Base<ResidualSlipHardnessFN<NumDimT, NumSlipT, EvalT>, typename EvalT::ScalarT, CP::NlsDim<NumSlipT>::value>
 {
  public:
-  using Base = minitensor::Function_Base<
-      ResidualSlipHardnessFN<NumDimT, NumSlipT, EvalT>,
-      typename EvalT::ScalarT,
-      CP::NlsDim<NumSlipT>::value>;
+  using Base = minitensor::Function_Base<ResidualSlipHardnessFN<NumDimT, NumSlipT, EvalT>, typename EvalT::ScalarT, CP::NlsDim<NumSlipT>::value>;
 
   using ScalarT = typename EvalT::ScalarT;
 

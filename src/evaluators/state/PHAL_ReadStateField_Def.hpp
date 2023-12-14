@@ -54,9 +54,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::ReadStateField(Teuchos::Pa
 
 template <typename Traits>
 void
-ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& fm)
+ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field, fm);
 }

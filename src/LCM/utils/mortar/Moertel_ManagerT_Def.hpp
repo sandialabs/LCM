@@ -167,8 +167,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::Print() const
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AddInterface(
-    const Teuchos::RCP<const MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>& interface)
+MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AddInterface(const Teuchos::RCP<const MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>& interface)
 {
   if (!interface->IsComplete()) {
     std::cout << "***ERR*** MoertelT::ManagerT::AddInterface:\n"
@@ -177,8 +176,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::AddInterface(
     return false;
   }
 
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)> tmp =
-      Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)(*interface));
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)> tmp = Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)(*interface));
   interface_.insert(std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>(tmp->Id(), tmp));
 
   return true;
@@ -569,8 +567,7 @@ MoertelT::ManagerT<2, ST, LO, GO, N>::Integrate_Interfaces()
       bool ok = curr->second->DetectEndSegmentsandReduceOrder();
       if (!ok) {
         std::cout << "***ERR*** MoertelT::ManagerT::Integrate_Interfaces_2D:\n"
-                  << "***ERR*** interface " << curr->second->Id()
-                  << " returned false from DetectEndSegmentsandReduceOrder\n"
+                  << "***ERR*** interface " << curr->second->Id() << " returned false from DetectEndSegmentsandReduceOrder\n"
                   << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         return false;
       }
@@ -742,8 +739,7 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::Integrate_Interfaces()
       bool ok = curr->second->DetectEndSegmentsandReduceOrder();
       if (!ok) {
         std::cout << "***ERR*** MoertelT::ManagerT::Integrate_Interfaces_3D:\n"
-                  << "***ERR*** interface " << curr->second->Id()
-                  << " returned false from DetectEndSegmentsandReduceOrder\n"
+                  << "***ERR*** interface " << curr->second->Id() << " returned false from DetectEndSegmentsandReduceOrder\n"
                   << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
         return false;
       }
@@ -848,8 +844,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::ChooseMortarSide()
  *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::ManagerT<3, ST, LO, GO, N>::ChooseMortarSideInterface(
-    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter)
+MoertelT::ManagerT<3, ST, LO, GO, N>::ChooseMortarSideInterface(std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter)
 {
   // loop interfaces and choose the side with less nodes as slave side
   // (only if not already chosen on some interface)
@@ -869,8 +864,7 @@ MoertelT::ManagerT<3, ST, LO, GO, N>::ChooseMortarSideInterface(
  *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::ManagerT<2, ST, LO, GO, N>::ChooseMortarSideInterface(
-    std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter)
+MoertelT::ManagerT<2, ST, LO, GO, N>::ChooseMortarSideInterface(std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)>>& inter)
 {
   // loop interfaces and choose the side with less nodes as slave side
   // (only if not already chosen on some interface)
@@ -1376,24 +1370,21 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(ManagerT)::BuildSaddleMap()
   }
 
   // the saddle point problem rowmap is the problemmap_ + the constraintmap
-  Tpetra::global_size_t numglobalelements =
-      problemmap_->getGlobalNumElements() + constraintsmap_->getGlobalNumElements();
-  size_t          nummyelements = problemmap_->getLocalNumElements() + constraintsmap_->getLocalNumElements();
-  std::vector<GO> myglobalelements(nummyelements);
-  size_t          count                 = 0;
-  auto            inputmyglobalelements = problemmap_->getMyGlobalIndices();
+  Tpetra::global_size_t numglobalelements = problemmap_->getGlobalNumElements() + constraintsmap_->getGlobalNumElements();
+  size_t                nummyelements     = problemmap_->getLocalNumElements() + constraintsmap_->getLocalNumElements();
+  std::vector<GO>       myglobalelements(nummyelements);
+  size_t                count                 = 0;
+  auto                  inputmyglobalelements = problemmap_->getMyGlobalIndices();
   for (size_t i = 0; i < problemmap_->getLocalNumElements(); ++i) myglobalelements[count++] = inputmyglobalelements[i];
   auto constraintsmyglobalelements = constraintsmap_->getMyGlobalIndices();
-  for (size_t i = 0; i < constraintsmap_->getLocalNumElements(); ++i)
-    myglobalelements[count++] = constraintsmyglobalelements[i];
+  for (size_t i = 0; i < constraintsmap_->getLocalNumElements(); ++i) myglobalelements[count++] = constraintsmyglobalelements[i];
   if (count != nummyelements) {
     std::cout << "***ERR*** MoertelT::ManagerT::BuildSaddleMap:\n"
               << "***ERR*** Mismatch in dimensions\n"
               << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return false;
   }
-  saddlemap_ =
-      Teuchos::rcp(new Tpetra::Map<LO, GO, N>(numglobalelements, &(myglobalelements[0]), nummyelements, 0, comm_));
+  saddlemap_ = Teuchos::rcp(new Tpetra::Map<LO, GO, N>(numglobalelements, &(myglobalelements[0]), nummyelements, 0, comm_));
   myglobalelements.clear();
 
   return true;

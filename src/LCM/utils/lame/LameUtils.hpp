@@ -36,8 +36,7 @@ parameterListToMatProps(Teuchos::ParameterList const& lameMaterialParameters, La
   // load the material properties into the lame(nt)::MatProps container.
   // LAME material properties must be of type int, double, or string.
 
-  for (Teuchos::ParameterList::ConstIterator it = lameMaterialParameters.begin(); it != lameMaterialParameters.end();
-       ++it) {
+  for (Teuchos::ParameterList::ConstIterator it = lameMaterialParameters.begin(); it != lameMaterialParameters.end(); ++it) {
     std::string name = lameMaterialParameters.name(it);
     std::transform(name.begin(), name.end(), name.begin(), (int (*)(int))std::toupper);
     std::replace(name.begin(), name.end(), ' ', '_');
@@ -71,23 +70,18 @@ parameterListToMatProps(Teuchos::ParameterList const& lameMaterialParameters, La
 //  Teuchos::RCP<LameMaterial> constructLameMaterialModel(std::string const&
 //  lameMaterialModelName,
 Teuchos::RCP<LameMaterial>
-constructLameMaterialModel(
-    std::string const             lameMaterialModelName,
-    Teuchos::ParameterList const& lameMaterialParameters);
+constructLameMaterialModel(std::string const lameMaterialModelName, Teuchos::ParameterList const& lameMaterialParameters);
 
 #if defined(ALBANY_LAMENT)
 //! Instantiate a lament::MaterialModel<ADType> given the model name and a set
 //! of material parameters.
 template <typename ScalarT>
 inline Teuchos::RCP<lament::Material<ScalarT>>
-constructLamentMaterialModel(
-    std::string const&            lameMaterialModelName,
-    Teuchos::ParameterList const& lameMaterialParameters)
+constructLamentMaterialModel(std::string const& lameMaterialModelName, Teuchos::ParameterList const& lameMaterialParameters)
 {
   // Strings should be all upper case with spaces replaced with underscores
   std::string materialModelName = lameMaterialModelName;
-  std::transform(
-      materialModelName.begin(), materialModelName.end(), materialModelName.begin(), (int (*)(int))std::toupper);
+  std::transform(materialModelName.begin(), materialModelName.end(), materialModelName.begin(), (int (*)(int))std::toupper);
   std::replace(materialModelName.begin(), materialModelName.end(), ' ', '_');
 
   LameMatProps props;
@@ -100,8 +94,7 @@ constructLamentMaterialModel(
   else if (materialModelName == "NEOHOOKEAN")
     materialModel = Teuchos::rcp(new lament::Neohookean<ScalarT>(props));
   else {
-    if (materialModel.is_null())
-      ALBANY_ABORT(" unsupported LAMENT material model: " + lameMaterialModelName + " (" + materialModelName + ")\n");
+    if (materialModel.is_null()) ALBANY_ABORT(" unsupported LAMENT material model: " + lameMaterialModelName + " (" + materialModelName + ")\n");
   }
 
   return materialModel;
@@ -116,9 +109,7 @@ getStateVariableNames(std::string const& lameMaterialModelName, Teuchos::Paramet
 //! Return a vector containing the initial values for the state variables
 //! associated with the given LAME material model and material parameters.
 std::vector<double>
-getStateVariableInitialValues(
-    std::string const&            lameMaterialModelName,
-    Teuchos::ParameterList const& lameMaterialParameters);
+getStateVariableInitialValues(std::string const& lameMaterialModelName, Teuchos::ParameterList const& lameMaterialParameters);
 
 }  // namespace LameUtils
 

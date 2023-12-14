@@ -12,12 +12,9 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 NSPermeabilityTerm<EvalT, Traits>::NSPermeabilityTerm(Teuchos::ParameterList const& p)
     : V(p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      mu(p.get<std::string>("Viscosity QP Variable Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      phi(p.get<std::string>("Porosity QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      K(p.get<std::string>("Permeability QP Variable Name"),
-        p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      mu(p.get<std::string>("Viscosity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      phi(p.get<std::string>("Porosity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      K(p.get<std::string>("Permeability QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       permTerm(p.get<std::string>("Permeability Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"))
 
 {
@@ -33,7 +30,7 @@ NSPermeabilityTerm<EvalT, Traits>::NSPermeabilityTerm(Teuchos::ParameterList con
 
   this->addEvaluatedField(permTerm);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numNodes = dims[1];

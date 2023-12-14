@@ -37,9 +37,7 @@ Reader<EvalT, Traits>::Reader(const Teuchos::RCP<Manager>& rc_mgr) : ReaderBase<
 }
 
 template <typename Traits>
-Reader<PHAL::AlbanyTraits::Residual, Traits>::Reader(
-    const Teuchos::RCP<Manager>&         rc_mgr,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+Reader<PHAL::AlbanyTraits::Residual, Traits>::Reader(const Teuchos::RCP<Manager>& rc_mgr, const Teuchos::RCP<Albany::Layouts>& dl)
     : ReaderBase<PHAL::AlbanyTraits::Residual, Traits>(rc_mgr)
 {
   if (this->rc_mgr_->usingProjection()) {
@@ -52,9 +50,7 @@ Reader<PHAL::AlbanyTraits::Residual, Traits>::Reader(
 
 template <typename Traits>
 void
-Reader<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+Reader<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   if (this->rc_mgr_->usingProjection()) {
     this->utils.setFieldData(bf_, fm);
@@ -72,9 +68,7 @@ Reader<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::Ev
   // available.
   if (this->rc_mgr_->usingProjection()) {
     this->rc_mgr_->beginQpInterp();
-    for (typename ReaderBase<PHAL::AlbanyTraits::Residual, Traits>::FieldsIterator it = this->fields_.begin();
-         it != this->fields_.end();
-         ++it)
+    for (typename ReaderBase<PHAL::AlbanyTraits::Residual, Traits>::FieldsIterator it = this->fields_.begin(); it != this->fields_.end(); ++it)
       this->rc_mgr_->interpQpField(*it, workset, bf_);
     this->rc_mgr_->endQpInterp();
   }

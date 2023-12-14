@@ -8,16 +8,15 @@
 #include "Teuchos_CommHelpers.hpp"
 
 template <typename EvalT, typename Traits, typename SourceScalarT, typename TargetScalarT>
-PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetScalarT>::
-    ResponseSquaredL2DifferenceSideBase(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
+PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetScalarT>::ResponseSquaredL2DifferenceSideBase(
+    Teuchos::ParameterList&              p,
+    const Teuchos::RCP<Albany::Layouts>& dl)
 {
   // get response parameter list
   Teuchos::ParameterList* plist = p.get<Teuchos::ParameterList*>("Parameter List");
 
   sideSetName = plist->get<std::string>("Side Set Name");
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! Layout for side set " << sideSetName << " not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! Layout for side set " << sideSetName << " not found.\n");
 
   Teuchos::RCP<Albany::Layouts> dl_side = dl->side_layouts.at(sideSetName);
 
@@ -67,12 +66,11 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
 
   // Setup scatter evaluator
   p.set("Stand-alone Evaluator", false);
-  std::string                   local_response_name  = "Local Response Squared L2 Error Side";
-  std::string                   global_response_name = "Global Response Squared L2 Error Side";
-  int                           worksetSize          = dl->cell_scalar->extent(0);
-  int                           responseSize         = 1;
-  Teuchos::RCP<PHX::DataLayout> local_response_layout =
-      Teuchos::rcp(new PHX::MDALayout<Cell, Dim>(worksetSize, responseSize));
+  std::string                   local_response_name    = "Local Response Squared L2 Error Side";
+  std::string                   global_response_name   = "Global Response Squared L2 Error Side";
+  int                           worksetSize            = dl->cell_scalar->extent(0);
+  int                           responseSize           = 1;
+  Teuchos::RCP<PHX::DataLayout> local_response_layout  = Teuchos::rcp(new PHX::MDALayout<Cell, Dim>(worksetSize, responseSize));
   Teuchos::RCP<PHX::DataLayout> global_response_layout = Teuchos::rcp(new PHX::MDALayout<Dim>(responseSize));
   PHX::Tag<ScalarT>             local_response_tag(local_response_name, local_response_layout);
   PHX::Tag<ScalarT>             global_response_tag(global_response_name, global_response_layout);
@@ -101,8 +99,7 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
 // **********************************************************************
 template <typename EvalT, typename Traits, typename SourceScalarT, typename TargetScalarT>
 void
-PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetScalarT>::preEvaluate(
-    typename Traits::PreEvalData workset)
+PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetScalarT>::preEvaluate(typename Traits::PreEvalData workset)
 {
   PHAL::set(this->global_response_eval, 0.0);
 
@@ -113,12 +110,9 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
 // **********************************************************************
 template <typename EvalT, typename Traits, typename SourceScalarT, typename TargetScalarT>
 void
-PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetScalarT>::evaluateFields(
-    typename Traits::EvalData workset)
+PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetScalarT>::evaluateFields(typename Traits::EvalData workset)
 {
-  ALBANY_PANIC(
-      workset.sideSets == Teuchos::null,
-      "Side sets defined in input file but not properly specified on the mesh" << std::endl);
+  ALBANY_PANIC(workset.sideSets == Teuchos::null, "Side sets defined in input file but not properly specified on the mesh" << std::endl);
 
   // Zero out local response
   PHAL::set(this->local_response_eval, 0.0);
@@ -142,15 +136,10 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
         ScalarT sq = 0;
         // Computing squared difference at qp
         switch (fieldDim) {
-          case 0:
-            sq += std::pow(
-                sourceField(cell, side, qp) - (target_value ? target_value_val : targetField(cell, side, qp)), 2);
-            break;
+          case 0: sq += std::pow(sourceField(cell, side, qp) - (target_value ? target_value_val : targetField(cell, side, qp)), 2); break;
           case 1:
             // Precompute differentce and access fields only n times (not n^2)
-            for (int i = 0; i < dims[3]; ++i)
-              diff_1[i] =
-                  sourceField(cell, side, qp, i) - (target_value ? target_value_val : targetField(cell, side, qp, i));
+            for (int i = 0; i < dims[3]; ++i) diff_1[i] = sourceField(cell, side, qp, i) - (target_value ? target_value_val : targetField(cell, side, qp, i));
 
             for (int i = 0; i < dims[3]; ++i)
               for (int j = 0; j < dims[3]; ++j) sq += diff_1[i] * metric(cell, side, qp, i, j) * diff_1[j];
@@ -159,14 +148,12 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
             // Precompute differentce and access fields only n^2 times (not n^4)
             for (int i = 0; i < dims[3]; ++i)
               for (int j = 0; j < dims[3]; ++j)
-                diff_2[i][j] = sourceField(cell, side, qp, i, j) -
-                               (target_value ? target_value_val : targetField(cell, side, qp, i, j));
+                diff_2[i][j] = sourceField(cell, side, qp, i, j) - (target_value ? target_value_val : targetField(cell, side, qp, i, j));
 
             for (int i = 0; i < dims[3]; ++i)
               for (int j = 0; j < dims[3]; ++j)
                 for (int k = 0; k < dims[3]; ++k)
-                  for (int l = 0; l < dims[3]; ++l)
-                    sq += metric(cell, side, qp, k, i) * diff_2[i][j] * metric(cell, side, qp, j, l) * diff_2[l][k];
+                  for (int l = 0; l < dims[3]; ++l) sq += metric(cell, side, qp, k, i) * diff_2[i][j] * metric(cell, side, qp, j, l) * diff_2[l][k];
             break;
         }
         sum += sq * w_measure(cell, side, qp);
@@ -184,13 +171,11 @@ PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetSc
 // **********************************************************************
 template <typename EvalT, typename Traits, typename SourceScalarT, typename TargetScalarT>
 void
-PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetScalarT>::postEvaluate(
-    typename Traits::PostEvalData workset)
+PHAL::ResponseSquaredL2DifferenceSideBase<EvalT, Traits, SourceScalarT, TargetScalarT>::postEvaluate(typename Traits::PostEvalData workset)
 {
   PHAL::reduceAll<ScalarT>(*workset.comm, Teuchos::REDUCE_SUM, this->global_response_eval);
 
-  if (workset.comm->getRank() == 0)
-    std::cout << "resp" << PHX::print<EvalT>() << ": " << this->global_response_eval(0) << "\n" << std::flush;
+  if (workset.comm->getRank() == 0) std::cout << "resp" << PHX::print<EvalT>() << ": " << this->global_response_eval(0) << "\n" << std::flush;
 
   // Do global scattering
   PHAL::SeparableScatterScalarResponse<EvalT, Traits>::postEvaluate(workset);

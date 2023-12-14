@@ -9,9 +9,7 @@
 
 //*****
 template <typename EvalT, typename Traits>
-PNP::PotentialResid<EvalT, Traits>::PotentialResid(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+PNP::PotentialResid<EvalT, Traits>::PotentialResid(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       wGradBF(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_gradient),
       Permittivity(p.get<std::string>("Permittivity Name"), dl->qp_scalar),

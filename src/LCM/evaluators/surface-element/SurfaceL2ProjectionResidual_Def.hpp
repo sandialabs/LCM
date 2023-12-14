@@ -15,9 +15,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceL2ProjectionResidual<EvalT, Traits>::SurfaceL2ProjectionResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceL2ProjectionResidual<EvalT, Traits>::SurfaceL2ProjectionResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
@@ -66,9 +64,7 @@ SurfaceL2ProjectionResidual<EvalT, Traits>::SurfaceL2ProjectionResidual(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceL2ProjectionResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceL2ProjectionResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(surface_Grad_BF, fm);
   this->utils.setFieldData(refDualBasis, fm);
@@ -122,8 +118,7 @@ SurfaceL2ProjectionResidual<EvalT, Traits>::evaluateFields(typename Traits::Eval
           tau += detF_(cell, pt) * Cauchy_stress_(cell, pt, dim, dim) / numDims;
         }
 
-        projection_residual_(cell, node) +=
-            refValues(node, pt) * (projected_tau_(cell, pt) - tau) * refArea(cell, pt) * thickness;
+        projection_residual_(cell, node) += refValues(node, pt) * (projected_tau_(cell, pt) - tau) * refArea(cell, pt) * thickness;
       }
       projection_residual_(cell, topNode) = projection_residual_(cell, node);
     }

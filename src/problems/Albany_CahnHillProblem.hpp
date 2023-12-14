@@ -44,7 +44,7 @@ class CahnHillProblem : public AbstractProblem
   {
     return use_sdbcs_;
   }
-  
+
   ///
   /// Get boolean telling code if Adaptation is utilized
   ///
@@ -53,7 +53,6 @@ class CahnHillProblem : public AbstractProblem
   {
     return false;
   }
-
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
@@ -151,14 +150,13 @@ Albany::CahnHillProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cellCubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cellCubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPtsCell = cellCubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPtsCell << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPtsCell
+       << ", Dim= " << numDim << std::endl;
 
   dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPtsCell, numDim));
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
@@ -184,8 +182,7 @@ Albany::CahnHillProblem::constructEvaluators(
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cellCubature));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cellCubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cellCubature));
 
   for (unsigned int i = 0; i < neq; i++) {
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[i], i));
@@ -230,9 +227,7 @@ Albany::CahnHillProblem::constructEvaluators(
     // Standard deviation of the noise
     p->set<double>("SD Value", params->get<double>("Langevin Noise SD"));
     // Time period over which to apply the noise (-1 means over the whole time)
-    p->set<Teuchos::Array<int>>(
-        "Langevin Noise Time Period",
-        params->get<Teuchos::Array<int>>("Langevin Noise Time Period", Teuchos::tuple<int>(-1, -1)));
+    p->set<Teuchos::Array<int>>("Langevin Noise Time Period", params->get<Teuchos::Array<int>>("Langevin Noise Time Period", Teuchos::tuple<int>(-1, -1)));
 
     // Input
     p->set<string>("Rho QP Variable Name", "Rho");

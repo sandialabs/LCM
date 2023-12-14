@@ -27,9 +27,7 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                    public PHX::EvaluatorDerived<EvalT, Traits>,
-                    public Sacado::ParameterAccessor<EvalT, SPL_Traits>
+class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>, public Sacado::ParameterAccessor<EvalT, SPL_Traits>
 {
  public:
   enum NEU_TYPE
@@ -76,10 +74,10 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
   Teuchos::RCP<Albany::Layouts> const&         dl;
   Teuchos::RCP<Albany::MeshSpecsStruct> const& meshSpecs;
 
-  int                 cellDims{0}, numQPs{0}, numNodes{0}, numCells{0}, maxSideDim{0}, maxNumQpSide{0};
-  mutable int         numBlocks{0};
-  Teuchos::Array<int> offset;
-  int                 numDOFsSet{0};
+  int                                      cellDims{0}, numQPs{0}, numNodes{0}, numCells{0}, maxSideDim{0}, maxNumQpSide{0};
+  mutable int                              numBlocks{0};
+  Teuchos::Array<int>                      offset;
+  int                                      numDOFsSet{0};
   mutable Teuchos::RCP<Teuchos_Comm const> commT;
 
   // Should only specify flux vector components (dudx, dudy, dudz), dudn, or
@@ -91,15 +89,11 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
 
   // robin (also uses flux scaling)
   void
-  calc_dudn_robin(
-      Kokkos::DynRankView<ScalarT, PHX::Device>&       qp_data_returned,
-      Kokkos::DynRankView<ScalarT, PHX::Device> const& dof_side) const;
+  calc_dudn_robin(Kokkos::DynRankView<ScalarT, PHX::Device>& qp_data_returned, Kokkos::DynRankView<ScalarT, PHX::Device> const& dof_side) const;
 
   // Stefan-Boltzmann (also uses flux scaling)
   void
-  calc_dudn_radiate(
-      Kokkos::DynRankView<ScalarT, PHX::Device>&       qp_data_returned,
-      Kokkos::DynRankView<ScalarT, PHX::Device> const& dof_side) const;
+  calc_dudn_radiate(Kokkos::DynRankView<ScalarT, PHX::Device>& qp_data_returned, Kokkos::DynRankView<ScalarT, PHX::Device> const& dof_side) const;
 
   // (dudx, dudy, dudz)
   void
@@ -145,13 +139,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>,
       const ScalarT zval) const;
 
   ScalarT
-  calc_ace_press_at_z_point(
-      const double  rho,
-      const double  g,
-      const ScalarT s,
-      const ScalarT w,
-      const ScalarT k,
-      const ScalarT zval) const;
+  calc_ace_press_at_z_point(const double rho, const double g, const ScalarT s, const ScalarT w, const ScalarT k, const ScalarT zval) const;
 
   // closed_from bc assignment
   // closed_from bc assignment

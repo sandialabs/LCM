@@ -178,10 +178,7 @@ Table<EvalT, Traits>::Table(Teuchos::ParameterList& p)
   // open file
   std::ifstream inFile(&filename[0]);
 
-  ALBANY_PANIC(
-      !inFile,
-      std::endl
-          << "Error! Cannot open tabular data file \"" << filename << "\" in source table fill" << std::endl);
+  ALBANY_PANIC(!inFile, std::endl << "Error! Cannot open tabular data file \"" << filename << "\" in source table fill" << std::endl);
 
   // Count lines in file
   int array_size = std::count(std::istreambuf_iterator<char>(inFile), std::istreambuf_iterator<char>(), '\n');
@@ -266,9 +263,8 @@ Table<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     ALBANY_PANIC(
         !found_it,
         std::endl
-            << "Error! Cannot locate the current time \"" << workset.current_time
-            << "\" in the time series data between the endpoints " << time[0] << " and " << time[num_time_vals - 1]
-            << "." << std::endl);
+            << "Error! Cannot locate the current time \"" << workset.current_time << "\" in the time series data between the endpoints " << time[0] << " and "
+            << time[num_time_vals - 1] << "." << std::endl);
   }
 
   // Loop over cells, quad points: compute Table Source Term
@@ -374,8 +370,7 @@ Trigonometric<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t iqp = 0; iqp < m_num_qp; iqp++) {
         // MeshScalarT *X = &coordVec(cell,iqp,0);
-        m_source(cell, iqp) =
-            8.0 * pi * pi * sin(2.0 * pi * coordVec(cell, iqp, 0)) * cos(2.0 * pi * coordVec(cell, iqp, 1));
+        m_source(cell, iqp) = 8.0 * pi * pi * sin(2.0 * pi * coordVec(cell, iqp, 0)) * cos(2.0 * pi * coordVec(cell, iqp, 1));
       }
     }
   } else {
@@ -484,8 +479,7 @@ Quadratic<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     }
   } else {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t iqp = 0; iqp < m_num_qp; iqp++)
-        m_source(cell, iqp) = m_factor * m_baseField(cell, iqp) * m_baseField(cell, iqp);
+      for (std::size_t iqp = 0; iqp < m_num_qp; iqp++) m_source(cell, iqp) = m_factor * m_baseField(cell, iqp) * m_baseField(cell, iqp);
     }
   }
 }
@@ -548,8 +542,7 @@ class NeutronFission : public Source_Base<EvalT, Traits>
   evaluateFields(typename Traits::EvalData workset)
   {
     for (std::size_t cell = 0; cell < workset.numCells; ++cell)
-      for (std::size_t iqp = 0; iqp < m_num_qp; iqp++)
-        m_source(cell, iqp) = m_phi(cell, iqp) * m_sigma_f(cell, iqp) * m_E_f(cell, iqp);
+      for (std::size_t iqp = 0; iqp < m_num_qp; iqp++) m_source(cell, iqp) = m_phi(cell, iqp) * m_sigma_f(cell, iqp) * m_E_f(cell, iqp);
   }
 
  private:
@@ -660,8 +653,7 @@ MVQuadratic<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 
   // Loop over cells, quad points: compute MVQuadratic Source Term
   for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-    for (std::size_t iqp = 0; iqp < m_num_qp; iqp++)
-      m_source(cell, iqp) = a * m_baseField(cell, iqp) * m_baseField(cell, iqp);
+    for (std::size_t iqp = 0; iqp < m_num_qp; iqp++) m_source(cell, iqp) = a * m_baseField(cell, iqp) * m_baseField(cell, iqp);
   }
 }
 
@@ -935,8 +927,7 @@ PointSource<EvalT, Traits>::check_for_existance(Teuchos::ParameterList* source_l
 }
 
 template <typename EvalT, typename Traits>
-PointSource<EvalT, Traits>::PointSource(Teuchos::ParameterList* source_list)
-    : m_num_qp(0), m_wavelet(NULL), m_spatials(), m_source_list(source_list)
+PointSource<EvalT, Traits>::PointSource(Teuchos::ParameterList* source_list) : m_num_qp(0), m_wavelet(NULL), m_spatials(), m_source_list(source_list)
 {
   Teuchos::ParameterList& paramList     = source_list->sublist("Point", true);
   std::size_t const       num           = paramList.get("Number", 0);

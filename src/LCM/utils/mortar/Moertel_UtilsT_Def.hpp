@@ -52,12 +52,7 @@ MoertelT::solve33T(double const A[][3], double* x, double const* b)
 
 template <class ST, class LO, class GO, class N>
 int
-MoertelT::MatrixMatrixAdd(
-    const Tpetra::CrsMatrix<ST, LO, GO, N>& A,
-    bool                                    transposeA,
-    double                                  scalarA,
-    Tpetra::CrsMatrix<ST, LO, GO, N>&       B,
-    double                                  scalarB)
+MoertelT::MatrixMatrixAdd(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, bool transposeA, double scalarA, Tpetra::CrsMatrix<ST, LO, GO, N>& B, double scalarB)
 {
   // This method forms the matrix-matrix sum B = scalarA * op(A) + scalarB * B,
   // where
@@ -72,12 +67,7 @@ MoertelT::MatrixMatrixAdd(
  *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
-MoertelT::MatMatMult(
-    const Tpetra::CrsMatrix<ST, LO, GO, N>& A,
-    bool                                    transA,
-    const Tpetra::CrsMatrix<ST, LO, GO, N>& B,
-    bool                                    transB,
-    int                                     outlevel)
+MoertelT::MatMatMult(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, bool transA, const Tpetra::CrsMatrix<ST, LO, GO, N>& B, bool transB, int outlevel)
 {
   // create resultmatrix with correct rowmap
   Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> C;
@@ -99,9 +89,8 @@ template <class ST, class LO, class GO, class N>
 Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
 MoertelT::PaddedMatrix(const Tpetra::Map<LO, GO, N>& rowmap, double val, int const numentriesperrow)
 {
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> tmp =
-      Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(rowmap, numentriesperrow));
-  int const numrows = tmp->getGlobalNumRows();
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> tmp     = Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(rowmap, numentriesperrow));
+  int const                                      numrows = tmp->getGlobalNumRows();
   for (int i = 0; i < numrows; ++i) {
     int grid = tmp->getRangeMap()->getGlobalElement(i);
     int err  = tmp->insertGlobalValues(grid, 1, &val, &grid);
@@ -123,8 +112,7 @@ template <class ST, class LO, class GO, class N>
 Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
 MoertelT::StripZeros(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, double eps)
 {
-  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> out =
-      Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(A.getRowMap(), 10));
+  Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>> out = Teuchos::rcp(new Tpetra::CrsMatrix<ST, LO, GO, N>(A.getRowMap(), 10));
   for (size_t lrow = 0; lrow < A.getLocalNumRows(); ++lrow) {
     GO grow = A.getRowMap()->getGlobalElement(lrow);
     if (grow < 0) {
@@ -601,8 +589,7 @@ MoertelT::SplitMap(const Tpetra::Map<LO, GO, N>& Amap, const Tpetra::Map<LO, GO,
   myaugids.resize(count);
   int gcount;
   Teuchos::reduceAll(Comm, Teuchos::REDUCE_SUM, 1, &count, &gcount);
-  Teuchos::RCP<Tpetra::Map<LO, GO, N>> Aunknown =
-      Teuchos::rcp(new Tpetra::Map<LO, GO, N>(gcount, count, &myaugids[0], 0, Comm));
+  Teuchos::RCP<Tpetra::Map<LO, GO, N>> Aunknown = Teuchos::rcp(new Tpetra::Map<LO, GO, N>(gcount, count, &myaugids[0], 0, Comm));
   myaugids.clear();
   return Aunknown;
 }
@@ -652,10 +639,7 @@ MoertelT::SplitVector(
  *----------------------------------------------------------------------*/
 template <class ST, class LO, class GO, class N>
 bool
-MoertelT::MergeVector(
-    const Tpetra::Vector<ST, LO, GO, N>& x1,
-    const Tpetra::Vector<ST, LO, GO, N>& x2,
-    Tpetra::Vector<ST, LO, GO, N>&       xresult)
+MoertelT::MergeVector(const Tpetra::Vector<ST, LO, GO, N>& x1, const Tpetra::Vector<ST, LO, GO, N>& x2, Tpetra::Vector<ST, LO, GO, N>& xresult)
 {
   // use an exporter or importer object
   Tpetra::Export<LO, GO, N> exporter_x1(x1.Map(), xresult.Map());

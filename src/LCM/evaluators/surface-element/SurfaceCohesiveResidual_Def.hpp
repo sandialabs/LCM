@@ -11,9 +11,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceCohesiveResidual<EvalT, Traits>::SurfaceCohesiveResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceCohesiveResidual<EvalT, Traits>::SurfaceCohesiveResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : cubature_(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepid_basis_(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
       ref_area_(p.get<std::string>("Reference Area Name"), dl->qp_scalar),
@@ -45,9 +43,7 @@ SurfaceCohesiveResidual<EvalT, Traits>::SurfaceCohesiveResidual(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceCohesiveResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceCohesiveResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(cohesive_traction_, fm);
   this->utils.setFieldData(ref_area_, fm);

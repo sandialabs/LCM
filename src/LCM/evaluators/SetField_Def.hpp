@@ -12,9 +12,7 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 SetField<EvalT, Traits>::SetField(Teuchos::ParameterList const& p)
     : evaluatedFieldName(p.get<std::string>("Evaluated Field Name")),
-      evaluatedField(
-          p.get<std::string>("Evaluated Field Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Evaluated Field Data Layout")),
+      evaluatedField(p.get<std::string>("Evaluated Field Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Evaluated Field Data Layout")),
       fieldValues(p.get<Teuchos::ArrayRCP<ScalarT>>("Field Values"))
 {
   // Get the dimensions of the data layout for the field that is to be set
@@ -68,8 +66,7 @@ SetField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     int dim3 = evaluatedFieldDimensions[2];
     int dim2 = evaluatedFieldDimensions[1];
     int dim4 = evaluatedFieldDimensions[3];
-    ALBANY_PANIC(
-        fieldValues.size() != dim1 * dim2 * dim3 * dim4, "SetField::evaluateFields(), inconsistent data sizes.");
+    ALBANY_PANIC(fieldValues.size() != dim1 * dim2 * dim3 * dim4, "SetField::evaluateFields(), inconsistent data sizes.");
     for (int i = 0; i < dim1; ++i) {
       for (int j = 0; j < dim2; ++j) {
         for (int m = 0; m < dim3; ++m) {

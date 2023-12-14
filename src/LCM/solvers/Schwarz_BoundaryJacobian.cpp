@@ -18,12 +18,7 @@ Schwarz_BoundaryJacobian::Schwarz_BoundaryJacobian(
     Teuchos::Array<Teuchos::RCP<Thyra_LinearOp>>                jacs,
     int const                                                   this_app_index,
     int const                                                   coupled_app_index)
-    : coupled_apps_(ca),
-      jacs_(jacs),
-      this_app_index_(this_app_index),
-      coupled_app_index_(coupled_app_index),
-      comm_(comm),
-      n_models_(0)
+    : coupled_apps_(ca), jacs_(jacs), this_app_index_(this_app_index), coupled_app_index_(coupled_app_index), comm_(comm), n_models_(0)
 {
   ALBANY_EXPECT(0 <= this_app_index && this_app_index < ca.size());
   ALBANY_EXPECT(0 <= coupled_app_index && coupled_app_index < ca.size());
@@ -46,8 +41,7 @@ Schwarz_BoundaryJacobian::getExplicitOperator() const
 
   // IKT: there may be problems here in creating jac_factory - will need to
   // check
-  Teuchos::RCP<Albany::ThyraCrsMatrixFactory> jac_factory =
-      Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(this->range(), this->domain(), max_num_cols));
+  Teuchos::RCP<Albany::ThyraCrsMatrixFactory> jac_factory = Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(this->range(), this->domain(), max_num_cols));
 
   jac_factory->fillComplete();
 

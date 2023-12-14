@@ -7,6 +7,7 @@
 #include <Ioss_SubSystem.h>
 
 #include <Shards_BasicTopologies.hpp>
+#include <Teuchos_RCPStdSharedPtrConversions.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <iostream>
 #include <stk_io/IossBridge.hpp>
@@ -16,8 +17,6 @@
 #include <stk_mesh/base/GetEntities.hpp>
 #include <stk_mesh/base/Selector.hpp>
 
-
-#include <Teuchos_RCPStdSharedPtrConversions.hpp>
 #include "Albany_Utils.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
@@ -87,14 +86,12 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   std::string mesh_type;
   std::string file_name;
   if (!usePamgen) {
-    *out << "Albany_IOSS: Loading STKMesh from Exodus file  " << params->get<std::string>("Exodus Input File Name")
-         << std::endl;
+    *out << "Albany_IOSS: Loading STKMesh from Exodus file  " << params->get<std::string>("Exodus Input File Name") << std::endl;
 
     mesh_type = "exodusII";
     file_name = params->get<std::string>("Exodus Input File Name");
   } else {
-    *out << "Albany_IOSS: Loading STKMesh from Pamgen file  " << params->get<std::string>("Pamgen Input File Name")
-         << std::endl;
+    *out << "Albany_IOSS: Loading STKMesh from Pamgen file  " << params->get<std::string>("Pamgen Input File Name") << std::endl;
 
     mesh_type = "pamgen";
     file_name = params->get<std::string>("Pamgen Input File Name");
@@ -109,12 +106,10 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
 
   typedef Teuchos::Array<std::string> StringArray;
   const StringArray                   additionalNodeSets = params->get("Additional Node Sets", StringArray());
-  for (StringArray::const_iterator it = additionalNodeSets.begin(), it_end = additionalNodeSets.end(); it != it_end;
-       ++it) {
+  for (StringArray::const_iterator it = additionalNodeSets.begin(), it_end = additionalNodeSets.end(); it != it_end; ++it) {
     stk::mesh::Part& newNodeSet = metaData->declare_part(*it, stk::topology::NODE_RANK);
     if (!stk::io::is_part_io_part(newNodeSet)) {
-      stk::mesh::Field<double>* const distrFactorfield =
-          metaData->get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "distribution_factors");
+      stk::mesh::Field<double>* const distrFactorfield = metaData->get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "distribution_factors");
       if (distrFactorfield != NULL) {
         stk::mesh::put_field_on_mesh(*distrFactorfield, newNodeSet, nullptr);
       }
@@ -162,8 +157,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     if (ssb.size() == 0) {
       continue;
     }
-    ALBANY_PANIC(
-        ssb.size() == 0, "Error! There is a sideset (" + ss->name() + ") in the input mesh with zero side sets.\n");
+    ALBANY_PANIC(ssb.size() == 0, "Error! There is a sideset (" + ss->name() + ") in the input mesh with zero side sets.\n");
 
     const auto* ioss_topo = ssb[0]->topology();
     ALBANY_PANIC(ioss_topo == nullptr, "I give up. No topology in the input mesh for side set " + ss->name() << ".\n");
@@ -232,17 +226,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
     const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
     this->meshSpecs[0]                    = Teuchos::rcp(new Albany::MeshSpecsStruct(
-        ctd,
-        numDim,
-        cub,
-        nsNames,
-        ssNames,
-        worksetSize,
-        partVec[0]->name(),
-        ebNameToIndex,
-        this->interleavedOrdering,
-        false,
-        cub_rule));
+        ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering, false, cub_rule));
 
   } else {
     *out << "MULTIPLE Elem Block in Ioss: DO worksetSize[eb] max?? " << std::endl;
@@ -253,17 +237,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
       shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
       const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
       this->meshSpecs[eb]                   = Teuchos::rcp(new Albany::MeshSpecsStruct(
-          ctd,
-          numDim,
-          cub,
-          nsNames,
-          ssNames,
-          worksetSize,
-          partVec[eb]->name(),
-          ebNameToIndex,
-          this->interleavedOrdering,
-          true,
-          cub_rule));
+          ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[eb]->name(), ebNameToIndex, this->interleavedOrdering, true, cub_rule));
     }
   }
 
@@ -425,8 +399,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
   if (m_hasRestartSolution) {
     Teuchos::Array<std::string> default_field;
     default_field.push_back("solution");
-    Teuchos::Array<std::string> restart_fields =
-        params->get<Teuchos::Array<std::string>>("Restart Fields", default_field);
+    Teuchos::Array<std::string> restart_fields = params->get<Teuchos::Array<std::string>>("Restart Fields", default_field);
 
     // Get the fields to be used for restart
 
@@ -457,21 +430,14 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
 
     // Read global mesh variables. Should we emit warnings at all?
     for (auto& it : fieldContainer->getMeshVectorStates()) {
-      bool found = mesh_data->get_global(
-          it.first,
-          it.second,
-          false);  // Last variable is abort_if_not_found. We don't want that.
-      if (!found)
-        *out << "  *** WARNING *** Mesh vector state '" << it.first << "' was not found in the mesh database.\n";
+      bool found = mesh_data->get_global(it.first, it.second,
+                                         false);  // Last variable is abort_if_not_found. We don't want that.
+      if (!found) *out << "  *** WARNING *** Mesh vector state '" << it.first << "' was not found in the mesh database.\n";
     }
     for (auto& it : fieldContainer->getMeshScalarIntegerStates()) {
-      bool found = mesh_data->get_global(
-          it.first,
-          it.second,
-          false);  // Last variable is abort_if_not_found. We don't want that.
-      if (!found)
-        *out << "  *** WARNING *** Mesh scalar integer state '" << it.first
-             << "' was not found in the mesh database.\n";
+      bool found = mesh_data->get_global(it.first, it.second,
+                                         false);  // Last variable is abort_if_not_found. We don't want that.
+      if (!found) *out << "  *** WARNING *** Mesh scalar integer state '" << it.first << "' was not found in the mesh database.\n";
     }
 
     // Read info for layered mehes.
@@ -492,8 +458,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
     if (hasLayeredStructure) {
       Teuchos::ArrayRCP<double> layerThicknessRatio(ltr.size());
       for (int i = 0; i < ltr.size(); ++i) layerThicknessRatio[i] = ltr[i];
-      this->layered_mesh_numbering = Teuchos::rcp(
-          new LayeredMeshNumbering<LO>(stride, static_cast<LayeredMeshOrdering>(ordering), layerThicknessRatio));
+      this->layered_mesh_numbering = Teuchos::rcp(new LayeredMeshNumbering<LO>(stride, static_cast<LayeredMeshOrdering>(ordering), layerThicknessRatio));
     }
   } else {
     // We put all the fields as 'missing'
@@ -570,7 +535,7 @@ Albany::IossSTKMeshStruct::loadOrSetCoordinates3d(int index)
 {
   std::string const coords3d_name = "coordinates3d";
 
-  auto      region      = mesh_data->get_input_ioss_region();
+  auto                            region      = mesh_data->get_input_ioss_region();
   const Ioss::NodeBlockContainer& node_blocks = region->get_node_blocks();
   Ioss::NodeBlock*                nb          = node_blocks[0];
 
@@ -641,8 +606,7 @@ Albany::IossSTKMeshStruct::getValidDiscretizationParameters() const
   validPL->set<bool>("Write points coordinates to ascii file", "", "Write the mesh points coordinates to file?");
 
   Teuchos::Array<std::string> emptyStringArray;
-  validPL->set<Teuchos::Array<std::string>>(
-      "Additional Node Sets", emptyStringArray, "Declare additional node sets not present in the input file");
+  validPL->set<Teuchos::Array<std::string>>("Additional Node Sets", emptyStringArray, "Declare additional node sets not present in the input file");
 
   return validPL;
 }

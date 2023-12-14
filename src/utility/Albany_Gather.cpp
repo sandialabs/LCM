@@ -14,10 +14,7 @@
 namespace Albany {
 
 void
-gatherAllV(
-    const Teuchos::RCP<Teuchos_Comm const>& comm,
-    const Teuchos::ArrayView<const GO>&     myVals,
-    Teuchos::Array<GO>&                     allVals)
+gatherAllV(const Teuchos::RCP<Teuchos_Comm const>& comm, const Teuchos::ArrayView<const GO>& myVals, Teuchos::Array<GO>& allVals)
 {
   int const myCount = myVals.size();
   if (const Teuchos::MpiComm<int>* mpiComm = dynamic_cast<const Teuchos::MpiComm<int>*>(comm.get())) {
@@ -40,14 +37,7 @@ gatherAllV(
 
     auto GO_type = Teuchos::Details::MpiTypeTraits<GO>::getType();
     MPI_Allgatherv(
-        const_cast<GO*>(myVals.getRawPtr()),
-        myCount,
-        GO_type,
-        allVals.getRawPtr(),
-        allValCounts.getRawPtr(),
-        allValDisps.getRawPtr(),
-        GO_type,
-        rawComm);
+        const_cast<GO*>(myVals.getRawPtr()), myCount, GO_type, allVals.getRawPtr(), allValCounts.getRawPtr(), allValDisps.getRawPtr(), GO_type, rawComm);
   } else if (dynamic_cast<const Teuchos::SerialComm<int>*>(comm.get())) {
     allVals.resize(myCount);
     std::copy(myVals.getRawPtr(), myVals.getRawPtr() + myCount, allVals.getRawPtr());
@@ -58,11 +48,7 @@ gatherAllV(
 }
 
 void
-gatherV(
-    const Teuchos::RCP<Teuchos_Comm const>& comm,
-    const Teuchos::ArrayView<const GO>&     myVals,
-    Teuchos::Array<GO>&                     allVals,
-    const LO                                root_rank)
+gatherV(const Teuchos::RCP<Teuchos_Comm const>& comm, const Teuchos::ArrayView<const GO>& myVals, Teuchos::Array<GO>& allVals, const LO root_rank)
 {
   int const myCount = myVals.size();
   if (const Teuchos::MpiComm<int>* mpiComm = dynamic_cast<const Teuchos::MpiComm<int>*>(comm.get())) {
@@ -77,16 +63,14 @@ gatherV(
 
     int const           cpuCount = mpiComm->getSize();
     Teuchos::Array<int> allValCounts(cpuCount);
-    int const ierr = MPI_Gather(&myCount, 1, MPI_INT, allValCounts.getRawPtr(), 1, MPI_INT, root_rank, rawComm);
+    int const           ierr = MPI_Gather(&myCount, 1, MPI_INT, allValCounts.getRawPtr(), 1, MPI_INT, root_rank, rawComm);
     ALBANY_PANIC(ierr != 0);
 
     Teuchos::Array<int> allValDisps(cpuCount, 0);
     for (int i = 1; i < cpuCount; ++i) {
       allValDisps[i] = allValDisps[i - 1] + allValCounts[i - 1];
     }
-    ALBANY_EXPECT(
-        myRank != root_rank || (allCount == allValCounts.back() + allValDisps.back()),
-        "Error! Mismatch in values counts.\n");
+    ALBANY_EXPECT(myRank != root_rank || (allCount == allValCounts.back() + allValDisps.back()), "Error! Mismatch in values counts.\n");
 
     auto GO_type = Teuchos::Details::MpiTypeTraits<GO>::getType();
     MPI_Gatherv(

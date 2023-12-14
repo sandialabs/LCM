@@ -20,8 +20,7 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits, typename ScalarT>
-class DOFTensorInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                   public PHX::EvaluatorDerived<EvalT, Traits>
+class DOFTensorInterpolationBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   DOFTensorInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -83,21 +82,12 @@ class FastSolutionTensorInterpolationBase : public DOFTensorInterpolationBase<Ev
 //! Specialization for Jacobian evaluation taking advantage of known sparsity
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 template <typename Traits>
-class FastSolutionTensorInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>
-    : public DOFTensorInterpolationBase<
-          PHAL::AlbanyTraits::Jacobian,
-          Traits,
-          typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+class FastSolutionTensorInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
+    : public DOFTensorInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>
 {
  public:
   FastSolutionTensorInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : DOFTensorInterpolationBase<
-            PHAL::AlbanyTraits::Jacobian,
-            Traits,
-            typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
+      : DOFTensorInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>(p, dl)
   {
     this->setName("FastSolutionTensorInterpolationBase" + PHX::print<PHAL::AlbanyTraits::Jacobian>());
     offset = p.get<int>("Offset of First DOF");
@@ -106,8 +96,7 @@ class FastSolutionTensorInterpolationBase<
   void
   postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm)
   {
-    DOFTensorInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-        postRegistrationSetup(d, vm);
+    DOFTensorInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::postRegistrationSetup(d, vm);
   }
 
   void

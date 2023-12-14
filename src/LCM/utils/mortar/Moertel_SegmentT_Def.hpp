@@ -192,8 +192,7 @@ bool MOERTEL::Segment::SetFunction(int id, Teuchos::RCP<MOERTEL::Function> func)
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
 bool
-MoertelT::SEGMENT_TEMPLATE_CLASS(
-    SegmentT)::EvaluateFunction(int id, const double* xi, double* val, int valdim, double* deriv)
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::EvaluateFunction(int id, const double* xi, double* val, int valdim, double* deriv)
 {
   std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)>>::iterator curr = functions_.find(id);
   if (curr == functions_.end()) {
@@ -322,8 +321,7 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(MoertelT::InterfaceT<
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
 bool
-MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
-    std::vector<MoertelT::SEGMENT_TEMPLATE_CLASS(NodeT) *>& nodes)
+MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(std::vector<MoertelT::SEGMENT_TEMPLATE_CLASS(NodeT) *>& nodes)
 {
   if (!nodeId_.size()) return false;
 
@@ -355,8 +353,7 @@ MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::GetPtrstoNodes(
  | return type of function with certain id                              |
  *----------------------------------------------------------------------*/
 SEGMENT_TEMPLATE_STATEMENT
-MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)::FunctionType MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::FunctionType(
-    int id)
+MoertelT::SEGMENT_TEMPLATE_CLASS(FunctionT)::FunctionType MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)::FunctionType(int id)
 {
   // find the function with id id
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)>>::iterator curr = functions_.find(id);
@@ -485,9 +482,9 @@ MoertelT::Linear1DSeg::UnPack(int* pack)
   int nfunc = pack[count++];
 
   for (int i = 0; i < nfunc; ++i) {
-    int                             id   = pack[count++];
-    int                             type = pack[count++];
-    MOERTEL::Function*              func = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
+    int                             id        = pack[count++];
+    int                             type      = pack[count++];
+    MOERTEL::Function*              func      = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
     Teuchos::RCP<MOERTEL::Function> rcptrfunc = Teuchos::rcp(func);
     functions_.insert(std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
   }
@@ -517,9 +514,9 @@ MoertelT::BiLinearTriSeg::UnPack(int* pack)
   int nfunc = pack[count++];
 
   for (int i = 0; i < nfunc; ++i) {
-    int                             id   = pack[count++];
-    int                             type = pack[count++];
-    MOERTEL::Function*              func = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
+    int                             id        = pack[count++];
+    int                             type      = pack[count++];
+    MOERTEL::Function*              func      = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
     Teuchos::RCP<MOERTEL::Function> rcptrfunc = Teuchos::rcp(func);
     functions_.insert(std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
   }
@@ -547,9 +544,9 @@ MoertelT::BiLinearQuadSeg::UnPack(int* pack)
   for (int i = 0; i < (int)nodeId_.size(); ++i) nodeId_[i] = pack[count++];
   int nfunc = pack[count++];
   for (int i = 0; i < nfunc; ++i) {
-    int                             id   = pack[count++];
-    int                             type = pack[count++];
-    MOERTEL::Function*              func = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
+    int                             id        = pack[count++];
+    int                             type      = pack[count++];
+    MOERTEL::Function*              func      = MOERTEL::AllocateFunction((MOERTEL::Function::FunctionType)type, OutLevel());
     Teuchos::RCP<MOERTEL::Function> rcptrfunc = Teuchos::rcp(func);
     functions_.insert(std::pair<int, Teuchos::RCP<MOERTEL::Function>>(id, rcptrfunc));
   }

@@ -22,8 +22,7 @@ namespace LCM {
 **/
 
 template <typename EvalT, typename Traits>
-class SurfaceScalarGradientOperatorPorePressure : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                                  public PHX::EvaluatorDerived<EvalT, Traits>
+class SurfaceScalarGradientOperatorPorePressure : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   SurfaceScalarGradientOperatorPorePressure(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

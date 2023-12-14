@@ -29,8 +29,7 @@ LinComprNSBodyForce<EvalT, Traits>::LinComprNSBodyForce(Teuchos::ParameterList c
     bf_type = DRIVENPULSE;
 
   if (bf_type != NONE) {
-    coordVec = decltype(coordVec)(
-        p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Gradient Data Layout"));
+    coordVec = decltype(coordVec)(p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Gradient Data Layout"));
     this->addDependentField(coordVec);
   }
 
@@ -88,8 +87,7 @@ LinComprNSBodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData wor
         MeshScalarT y      = coordVec(cell, qp, 1);
         force(cell, qp, 0) = -1.0 * (ubar * (y - x * sin(x)) + vbar * x + zetabar * 2.0 * x * (0.5 - y));
         force(cell, qp, 1) = -1.0 * (ubar * cos(x) * y + vbar * sin(x) - zetabar * x * x);
-        force(cell, qp, 2) =
-            -1.0 * (gamma_gas * pbar * (y - x * sin(x) + sin(x)) + ubar * 2.0 * x * (0.5 - y) - vbar * x * x);
+        force(cell, qp, 2) = -1.0 * (gamma_gas * pbar * (y - x * sin(x) + sin(x)) + ubar * 2.0 * x * (0.5 - y) - vbar * x * x);
       }
     }
   } else if (bf_type == UNSTEADYEULMMS) {
@@ -107,14 +105,14 @@ LinComprNSBodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData wor
         MeshScalarT x      = coordVec(cell, qp, 0);
         MeshScalarT y      = coordVec(cell, qp, 1);
         force(cell, qp, 0) = -1.0 * exp(-a * time) *
-                             (-a * sin(x2pi) * cos(y2pi) + ubar * 2.0 * pi * cos(x2pi) * cos(y2pi) -
-                              vbar * 2.0 * pi * sin(x2pi) * sin(y2pi) + 2.0 * pi * zetabar * cos(x2pi) * sin(y2pi));
+                             (-a * sin(x2pi) * cos(y2pi) + ubar * 2.0 * pi * cos(x2pi) * cos(y2pi) - vbar * 2.0 * pi * sin(x2pi) * sin(y2pi) +
+                              2.0 * pi * zetabar * cos(x2pi) * sin(y2pi));
         force(cell, qp, 1) = -1.0 * exp(-a * time) *
-                             (-a * cos(x2pi) * sin(y2pi) - 2.0 * pi * ubar * sin(x2pi) * sin(y2pi) +
-                              vbar * 2.0 * pi * cos(x2pi) * cos(y2pi) + 2.0 * pi * zetabar * sin(x2pi) * cos(y2pi));
+                             (-a * cos(x2pi) * sin(y2pi) - 2.0 * pi * ubar * sin(x2pi) * sin(y2pi) + vbar * 2.0 * pi * cos(x2pi) * cos(y2pi) +
+                              2.0 * pi * zetabar * sin(x2pi) * cos(y2pi));
         force(cell, qp, 2) = -1.0 * exp(-a * time) *
-                             (-a * sin(x2pi) * sin(y2pi) + gamma_gas * pbar * 4.0 * pi * cos(x2pi) * cos(y2pi) +
-                              ubar * 2.0 * pi * cos(x2pi) * sin(y2pi) + vbar * 2.0 * pi * sin(x2pi) * cos(y2pi));
+                             (-a * sin(x2pi) * sin(y2pi) + gamma_gas * pbar * 4.0 * pi * cos(x2pi) * cos(y2pi) + ubar * 2.0 * pi * cos(x2pi) * sin(y2pi) +
+                              vbar * 2.0 * pi * sin(x2pi) * cos(y2pi));
       }
     }
   } else if (bf_type == DRIVENPULSE) {

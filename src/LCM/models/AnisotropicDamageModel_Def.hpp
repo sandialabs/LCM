@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       k_f1_(p->get<RealType>("Fiber 1 k", 1.0)),
       q_f1_(p->get<RealType>("Fiber 1 q", 1.0)),
@@ -121,10 +119,7 @@ AnisotropicDamageModel<EvalT, Traits>::AnisotropicDamageModel(
 }
 template <typename EvalT, typename Traits>
 void
-AnisotropicDamageModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+AnisotropicDamageModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // bool print = false;
   // if (typeid(ScalarT) == typeid(RealType)) print = true;
@@ -197,8 +192,7 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
 
       // local parameters
       mu   = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
-      lame = elastic_modulus(cell, pt) * poissons_ratio(cell, pt) / (1.0 + poissons_ratio(cell, pt)) /
-             (1.0 - 2.0 * poissons_ratio(cell, pt));
+      lame = elastic_modulus(cell, pt) * poissons_ratio(cell, pt) / (1.0 + poissons_ratio(cell, pt)) / (1.0 - 2.0 * poissons_ratio(cell, pt));
 
       F.fill(def_grad, cell, pt, 0, 0);
       // Right Cauchy-Green Tensor C = F^{T} * F
@@ -210,8 +204,7 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
       lnI3_m = std::log(I3_m);
 
       // energy for M
-      energy_m(cell, pt) =
-          volume_fraction_m_ * (0.125 * lame * lnI3_m * lnI3_m - 0.5 * mu * lnI3_m + 0.5 * mu * (I1_m - 3.0));
+      energy_m(cell, pt) = volume_fraction_m_ * (0.125 * lame * lnI3_m * lnI3_m - 0.5 * mu * lnI3_m + 0.5 * mu * (I1_m - 3.0));
 
       // 2nd PK stress (undamaged) for M
       S0_m = volume_fraction_m_ * (0.5 * lame * lnI3_m * invC + mu * (I - invC));
@@ -226,8 +219,7 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
 
       if (compute_tangent_) {
         tangent_m =
-            volume_fraction_m_ * (lame * minitensor::tensor(invC, invC) +
-                                  mu_tilde * (minitensor::tensor2(invC, invC) + minitensor::tensor3(invC, invC)));
+            volume_fraction_m_ * (lame * minitensor::tensor(invC, invC) + mu_tilde * (minitensor::tensor2(invC, invC) + minitensor::tensor3(invC, invC)));
       }  // compute_tangent_
 
       // damage term in M
@@ -290,21 +282,17 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
       energy_f2(cell, pt) = volume_fraction_f2_ * (k_f2_ * (std::exp(q_f2_ * (I4_f2 - 1) * (I4_f2 - 1)) - 1) / q_f2_);
 
       // undamaged stress (2nd PK stress)
-      S0_f1 =
-          volume_fraction_f1_ * (4.0 * k_f1_ * (I4_f1 - 1.0) * std::exp(q_f1_ * (I4_f1 - 1) * (I4_f1 - 1))) * M1dyadM1;
-      S0_f2 =
-          volume_fraction_f2_ * (4.0 * k_f2_ * (I4_f2 - 1.0) * std::exp(q_f2_ * (I4_f2 - 1) * (I4_f2 - 1))) * M2dyadM2;
+      S0_f1 = volume_fraction_f1_ * (4.0 * k_f1_ * (I4_f1 - 1.0) * std::exp(q_f1_ * (I4_f1 - 1) * (I4_f1 - 1))) * M1dyadM1;
+      S0_f2 = volume_fraction_f2_ * (4.0 * k_f2_ * (I4_f2 - 1.0) * std::exp(q_f2_ * (I4_f2 - 1) * (I4_f2 - 1))) * M2dyadM2;
 
       // Fiber undamaged Cauchy stress
       sigma_f1 = (1.0 / J(cell, pt)) * minitensor::dot(F, minitensor::dot(S0_f1, minitensor::transpose(F)));
       sigma_f2 = (1.0 / J(cell, pt)) * minitensor::dot(F, minitensor::dot(S0_f2, minitensor::transpose(F)));
 
       // undamaged tangent for fibers
-      coefficient_f1 = volume_fraction_f1_ * 8.0 * k_f1_ * (1.0 + 2.0 * q_f1_ * (I4_f1 - 1.0) * (I4_f1 - 1.0)) *
-                       exp(q_f1_ * (I4_f1 - 1.0) * (I4_f1 - 1.0));
+      coefficient_f1 = volume_fraction_f1_ * 8.0 * k_f1_ * (1.0 + 2.0 * q_f1_ * (I4_f1 - 1.0) * (I4_f1 - 1.0)) * exp(q_f1_ * (I4_f1 - 1.0) * (I4_f1 - 1.0));
 
-      coefficient_f2 = volume_fraction_f2_ * 8.0 * k_f2_ * (1.0 + 2.0 * q_f2_ * (I4_f2 - 1.0) * (I4_f2 - 1.0)) *
-                       exp(q_f2_ * (I4_f2 - 1.0) * (I4_f2 - 1.0));
+      coefficient_f2 = volume_fraction_f2_ * 8.0 * k_f2_ * (1.0 + 2.0 * q_f2_ * (I4_f2 - 1.0) * (I4_f2 - 1.0)) * exp(q_f2_ * (I4_f2 - 1.0) * (I4_f2 - 1.0));
 
       // optional material tangent computation
       if (compute_tangent_) {
@@ -364,9 +352,8 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
       // total Cauchy stress (M, Fibers)
       for (int i(0); i < num_dims_; ++i) {
         for (int j(0); j < num_dims_; ++j) {
-          stress(cell, pt, i, j) = (1.0 - damage_m(cell, pt)) * sigma_m(i, j) +
-                                   (1. - damage_f1(cell, pt)) * sigma_f1(i, j) +
-                                   (1. - damage_f2(cell, pt)) * sigma_f2(i, j);
+          stress(cell, pt, i, j) =
+              (1.0 - damage_m(cell, pt)) * sigma_m(i, j) + (1. - damage_f1(cell, pt)) * sigma_f1(i, j) + (1. - damage_f2(cell, pt)) * sigma_f2(i, j);
         }
       }
 
@@ -378,8 +365,7 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(
               for (int l(0); l < num_dims_; ++l) {
                 // std::cout << "Tangent w.r.t. the deformation gradient"
                 // << std::endl;
-                tangent(cell, pt, i, j, k, l) =
-                    tangentA_m(i, j, k, l) + tangentA_f1(i, j, k, l) + tangentA_f2(i, j, k, l);
+                tangent(cell, pt, i, j, k, l) = tangentA_m(i, j, k, l) + tangentA_f1(i, j, k, l) + tangentA_f2(i, j, k, l);
 
                 // std::cout << "Tangent w.r.t. the right Cauchy-Green tensor"
                 // << std::endl;

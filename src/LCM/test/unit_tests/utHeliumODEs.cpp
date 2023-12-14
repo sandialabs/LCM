@@ -52,7 +52,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   int const                  num_dims     = 3;
   int const                  num_vertices = 8;
   int const                  num_nodes    = 8;
-  const RCP<Albany::Layouts> dl = rcp(new Albany::Layouts(workset_size, num_vertices, num_nodes, num_pts, num_dims));
+  const RCP<Albany::Layouts> dl           = rcp(new Albany::Layouts(workset_size, num_vertices, num_nodes, num_pts, num_dims));
 
   // total concentration
   ArrayRCP<ScalarT> total_concentration(1);
@@ -130,9 +130,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   state_field_manager.registerEvaluator<Residual>(HeODEs);
 
   // Set the evaluated fields as required fields
-  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = HeODEs->evaluatedFields().begin();
-       it != HeODEs->evaluatedFields().end();
-       it++)
+  for (std::vector<RCP<PHX::FieldTag>>::const_iterator it = HeODEs->evaluatedFields().begin(); it != HeODEs->evaluatedFields().end(); it++)
     field_manager.requireField<Residual>(**it);
 
   // Instantiate a state manager
@@ -215,35 +213,26 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   std::string output_file = "output.exo";
 
   // Create discretization, as required by the StateManager
-  Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList =
-      Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
+  Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList = Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
   discretizationParameterList->set<int>("1D Elements", workset_size);
   discretizationParameterList->set<int>("2D Elements", 1);
   discretizationParameterList->set<int>("3D Elements", 1);
   discretizationParameterList->set<std::string>("Method", "STK3D");
   discretizationParameterList->set<int>("Number Of Time Derivatives", 0);
   discretizationParameterList->set<std::string>("Exodus Output File Name", output_file);
-  Teuchos::RCP<Thyra_VectorSpace const> space =
-      Albany::createLocallyReplicatedVectorSpace(workset_size * num_dims * num_nodes, commT);
+  Teuchos::RCP<Thyra_VectorSpace const> space = Albany::createLocallyReplicatedVectorSpace(workset_size * num_dims * num_nodes, commT);
 
   Teuchos::RCP<Thyra_Vector> solution_vector = Thyra::createMember(space);
 
   int                                                        numberOfEquations = 3;
   Albany::AbstractFieldContainer::FieldContainerRequirements req;
 
-  Teuchos::RCP<Albany::AbstractSTKMeshStruct> stkMeshStruct =
-      Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(discretizationParameterList, Teuchos::null, commT));
+  Teuchos::RCP<Albany::AbstractSTKMeshStruct> stkMeshStruct = Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(discretizationParameterList, Teuchos::null, commT));
   stkMeshStruct->setFieldAndBulkData(
-      commT,
-      discretizationParameterList,
-      numberOfEquations,
-      req,
-      stateMgr.getStateInfoStruct(),
-      stkMeshStruct->getMeshSpecs()[0]->worksetSize);
+      commT, discretizationParameterList, numberOfEquations, req, stateMgr.getStateInfoStruct(), stkMeshStruct->getMeshSpecs()[0]->worksetSize);
 
-  Teuchos::RCP<Albany::AbstractDiscretization> discretization =
-      Teuchos::rcp(new Albany::STKDiscretization(discretizationParameterList, stkMeshStruct, commT));
-  auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discretization);
+  Teuchos::RCP<Albany::AbstractDiscretization> discretization = Teuchos::rcp(new Albany::STKDiscretization(discretizationParameterList, stkMeshStruct, commT));
+  auto&                                        stk_disc       = static_cast<Albany::STKDiscretization&>(*discretization);
   stk_disc.updateMesh();
 
   // Associate the discretization with the StateManager
@@ -291,8 +280,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   // Record the bubble density
   double expected_density(0.0);
   for (size_type cell = 0; cell < workset_size; ++cell)
-    for (size_type pt = 0; pt < num_pts; ++pt)
-      TEST_COMPARE(fabs(tot_bub_density(cell, pt) - expected_density), <=, tolerance);
+    for (size_type pt = 0; pt < num_pts; ++pt) TEST_COMPARE(fabs(tot_bub_density(cell, pt) - expected_density), <=, tolerance);
 
   // Pull the bubble volume fraction
   PHX::MDField<ScalarT, Cell, QuadPoint> bub_vol_frac("Bubble Volume Fraction", dl->qp_scalar);
@@ -301,8 +289,7 @@ TEUCHOS_UNIT_TEST(HeliumODEs, test1)
   // Record the bubble volume fraction
   double expected_vol_frac(0.0);
   for (size_type cell = 0; cell < workset_size; ++cell)
-    for (size_type pt = 0; pt < num_pts; ++pt)
-      TEST_COMPARE(fabs(bub_vol_frac(cell, pt) - expected_vol_frac), <=, tolerance);
+    for (size_type pt = 0; pt < num_pts; ++pt) TEST_COMPARE(fabs(bub_vol_frac(cell, pt) - expected_vol_frac), <=, tolerance);
 }
 
 }  // namespace

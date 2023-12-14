@@ -46,10 +46,7 @@ class ResponseUtilities
   //! Utility for parsing response requests and creating response field manager
   //! (Convenience overload in the absence of parameters list from problem)
   Teuchos::RCP<const PHX::FieldTag>
-  constructResponses(
-      PHX::FieldManager<PHAL::AlbanyTraits>& fm0,
-      Teuchos::ParameterList&                responseList,
-      Albany::StateManager&                  stateMgr)
+  constructResponses(PHX::FieldManager<PHAL::AlbanyTraits>& fm0, Teuchos::ParameterList& responseList, Albany::StateManager& stateMgr)
   {
     return constructResponses(fm0, responseList, Teuchos::null, stateMgr);
   }

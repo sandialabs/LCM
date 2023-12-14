@@ -13,9 +13,7 @@ namespace PHAL {
 
 //**********************************************************************
 template <typename EvalT, typename Traits>
-SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : residual(p.get<std::string>("Residual Variable Name"), dl->node_scalar)
 {
   sideSetEquation = p.get<bool>("Side Equation");
@@ -35,8 +33,7 @@ SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(
     BF        = PHX::MDField<RealType>(p.get<std::string>("BF Variable Name"), dl_side->node_qp_scalar);
     GradBF    = PHX::MDField<MeshScalarT>(p.get<std::string>("Gradient BF Variable Name"), dl_side->node_qp_gradient);
     w_measure = PHX::MDField<MeshScalarT>(p.get<std::string>("Weighted Measure Variable Name"), dl_side->qp_scalar);
-    metric    = PHX::MDField<MeshScalarT, Cell, Side, QuadPoint, Dim, Dim>(
-        p.get<std::string>("Metric Name"), dl_side->qp_tensor);
+    metric    = PHX::MDField<MeshScalarT, Cell, Side, QuadPoint, Dim, Dim>(p.get<std::string>("Metric Name"), dl_side->qp_tensor);
     this->addDependentField(metric.fieldTag());
 
     int numSides = dl_side->cell_gradient->extent(1);
@@ -53,8 +50,7 @@ SideLaplacianResidual<EvalT, Traits>::SideLaplacianResidual(
       // different number of nodes (e.g., Wedge)
       int thisSideNodes = cellType->getNodeCount(sideDim, side);
       sideNodes[side].resize(thisSideNodes);
-      for (int node = 0; node < thisSideNodes; ++node)
-        sideNodes[side][node] = cellType->getNodeMap(sideDim, side, node);
+      for (int node = 0; node < thisSideNodes; ++node) sideNodes[side][node] = cellType->getNodeMap(sideDim, side, node);
     }
   } else {
     u         = PHX::MDField<ScalarT>(p.get<std::string>("Solution QP Variable Name"), dl->qp_scalar);
@@ -126,8 +122,8 @@ SideLaplacianResidual<EvalT, Traits>::evaluateFieldsSide(typename Traits::EvalDa
       for (int qp = 0; qp < numQPs; ++qp) {
         for (int idim(0); idim < gradDim; ++idim) {
           for (int jdim(0); jdim < gradDim; ++jdim) {
-            residual(cell, sideNodes[side][node]) -= grad_u(cell, side, qp, idim) * metric(cell, side, qp, idim, jdim) *
-                                                     GradBF(cell, side, node, qp, jdim) * w_measure(cell, side, qp);
+            residual(cell, sideNodes[side][node]) -=
+                grad_u(cell, side, qp, idim) * metric(cell, side, qp, idim, jdim) * GradBF(cell, side, node, qp, jdim) * w_measure(cell, side, qp);
           }
         }
         residual(cell, sideNodes[side][node]) += 1.0 * BF(cell, side, node, qp) * w_measure(cell, side, qp);

@@ -28,8 +28,7 @@ main(int ac, char* av[])
   using namespace std;
 
   if (ac == 3) {
-    std::cout << "Generating .msh boundary files with mesh " << av[1] << " and normals from file: " << av[2]
-              << std::endl;
+    std::cout << "Generating .msh boundary files with mesh " << av[1] << " and normals from file: " << av[2] << std::endl;
     stringstream ss1;
     stringstream ss2;
     ss1 << av[1];       // insert the char
@@ -44,8 +43,7 @@ main(int ac, char* av[])
       throw(0);
     }
   } else {
-    std::cout << "Usage:BoundarySurfaceOutput Mesh.exo Normals.txt"
-              << std::endl;  // USAGE OF THIS FILE FROM THE COMMAND LINE
+    std::cout << "Usage:BoundarySurfaceOutput Mesh.exo Normals.txt" << std::endl;  // USAGE OF THIS FILE FROM THE COMMAND LINE
     return 1;
   }
 
@@ -87,8 +85,7 @@ main(int ac, char* av[])
   // Extract the numbers from the matrix that contains the normals
   std::vector<std::vector<int>> BoundaryVector;
   for (int i = 0; i < numberNormals_; i++) {
-    std::string file_name = "Boundary_" + file_name2 + "_" + itoa(i + 1) +
-                            ".msh";  // file_name2 comes from the second input in the command line
+    std::string file_name = "Boundary_" + file_name2 + "_" + itoa(i + 1) + ".msh";  // file_name2 comes from the second input in the command line
 
     ofstream mshFile(file_name.c_str(), std::ofstream::out);
     if (mshFile.is_open()) {
@@ -143,8 +140,7 @@ main(int ac, char* av[])
 
       for (I_setOfNodes = setOfNodes.begin(); I_setOfNodes != setOfNodes.end(); ++I_setOfNodes) {
         std::vector<double> nodeCoordinates = topology.findCoordinates(*I_setOfNodes);
-        mshFile << nodeCoordinates[0] << " " << nodeCoordinates[1] << " " << nodeCoordinates[2]
-                << endl;  // Coordinates list OUTPUT
+        mshFile << nodeCoordinates[0] << " " << nodeCoordinates[1] << " " << nodeCoordinates[2] << endl;  // Coordinates list OUTPUT
         node_map[*I_setOfNodes] = counter;
 
         counter++;

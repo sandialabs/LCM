@@ -20,9 +20,7 @@
 #include "Albany_ThyraUtils.hpp"
 #include "Phalanx_DataLayout_MDALayout.hpp"
 
-#define loop(a, i, dim)                                                                                               \
-  for (PHX::MDField<RealType>::size_type i = 0; i < static_cast<PHX::MDField<RealType>::size_type>(a.dimension(dim)); \
-       ++i)
+#define loop(a, i, dim) for (PHX::MDField<RealType>::size_type i = 0; i < static_cast<PHX::MDField<RealType>::size_type>(a.dimension(dim)); ++i)
 
 namespace AAdapt {
 namespace rc {
@@ -52,9 +50,7 @@ read(const Albany::MDArray& mda, PHX::MDField<RealType>& f)
   switch (f.rank()) {
     case 2: loop(mda, cell, 0) loop(f, qp, 1) f(cell, qp) = mda(cell, qp); break;
     case 3: loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) f(cell, qp, i0) = mda(cell, qp, i0); break;
-    case 4:
-      loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3) f(cell, qp, i0, i1) = mda(cell, qp, i0, i1);
-      break;
+    case 4: loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3) f(cell, qp, i0, i1) = mda(cell, qp, i0, i1); break;
     default: ALBANY_ABORT("dims.size() \notin {2,3,4}.");
   }
 }
@@ -66,9 +62,7 @@ write(Albany::MDArray& mda, const MDArray& f)
   switch (f.rank()) {
     case 2: loop(mda, cell, 0) loop(f, qp, 1) mda(cell, qp) = f(cell, qp); break;
     case 3: loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) mda(cell, qp, i0) = f(cell, qp, i0); break;
-    case 4:
-      loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3) mda(cell, qp, i0, i1) = f(cell, qp, i0, i1);
-      break;
+    case 4: loop(mda, cell, 0) loop(f, qp, 1) loop(f, i0, 2) loop(f, i1, 3) mda(cell, qp, i0, i1) = f(cell, qp, i0, i1); break;
     default: ALBANY_ABORT("dims.size() \notin {2,3,4}.");
   }
 }
@@ -119,11 +113,7 @@ calc_right_polar_LieR_LieS_g2G(minitensor::Tensor<RealType>& R, minitensor::Tens
 }
 
 void
-transformStateArray(
-    const Direction::Enum      dir,
-    const Transformation::Enum transformation,
-    Albany::MDArray&           mda1,
-    Albany::MDArray&           mda2)
+transformStateArray(const Direction::Enum dir, const Transformation::Enum transformation, Albany::MDArray& mda1, Albany::MDArray& mda2)
 {
   switch (transformation) {
     case Transformation::none: {
@@ -189,20 +179,11 @@ class Projector
   void
   fillMassMatrix(const PHAL::Workset& workset, const BasisField& bf, const BasisField& wbf);
   void
-  fillRhs(
-      const PHX::MDField<const RealType>& f_G_qp,
-      Manager::Field&                     f,
-      const PHAL::Workset&                workset,
-      const BasisField&                   wbf);
+  fillRhs(const PHX::MDField<const RealType>& f_G_qp, Manager::Field& f, const PHAL::Workset& workset, const BasisField& wbf);
   void
   project(Manager::Field& f);
   void
-  interp(
-      const Manager::Field& f,
-      const PHAL::Workset&  workset,
-      const BasisField&     bf,
-      Albany::MDArray&      mda1,
-      Albany::MDArray&      mda2);
+  interp(const Manager::Field& f, const PHAL::Workset& workset, const BasisField& bf, Albany::MDArray& mda1, Albany::MDArray& mda2);
   // For testing.
   Teuchos::RCP<Thyra_VectorSpace const> const&
   get_node_vs() const
@@ -221,17 +202,15 @@ class Projector
 };
 
 void
-Projector::init(
-    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-    Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
+Projector::init(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
 {
   node_vs_                  = node_vs;
   ol_node_vs_               = ol_node_vs;
   int const max_num_entries = 27;  // Enough for first-order hex.
-  M_factory_   = Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(ol_node_vs_, ol_node_vs_, max_num_entries));
-  M_           = Teuchos::null;
-  cas_manager_ = Albany::createCombineAndScatterManager(node_vs_, ol_node_vs_);
-  P_           = Teuchos::null;
+  M_factory_                = Teuchos::rcp(new Albany::ThyraCrsMatrixFactory(ol_node_vs_, ol_node_vs_, max_num_entries));
+  M_                        = Teuchos::null;
+  cas_manager_              = Albany::createCombineAndScatterManager(node_vs_, ol_node_vs_);
+  P_                        = Teuchos::null;
   filled_.clear();
 }
 
@@ -270,14 +249,9 @@ Projector::fillMassMatrix(const PHAL::Workset& workset, const BasisField& bf, co
 }
 
 void
-Projector::fillRhs(
-    const PHX::MDField<const RealType>& f_G_qp,
-    Manager::Field&                     f,
-    const PHAL::Workset&                workset,
-    const BasisField&                   wbf)
+Projector::fillRhs(const PHX::MDField<const RealType>& f_G_qp, Manager::Field& f, const PHAL::Workset& workset, const BasisField& wbf)
 {
-  int const rank = f.layout->rank() - 2, num_node = wbf.dimension(1), num_qp = wbf.dimension(2),
-            ndim = rank >= 1 ? f_G_qp.dimension(2) : 1;
+  int const rank = f.layout->rank() - 2, num_node = wbf.dimension(1), num_qp = wbf.dimension(2), ndim = rank >= 1 ? f_G_qp.dimension(2) : 1;
 
   if (f.data_->mv[0].is_null()) {
     int const ncol = rank == 0 ? 1 : rank == 1 ? ndim : ndim * ndim;
@@ -363,15 +337,9 @@ Projector::project(Manager::Field& f)
 }
 
 void
-Projector::interp(
-    const Manager::Field& f,
-    const PHAL::Workset&  workset,
-    const BasisField&     bf,
-    Albany::MDArray&      mda1,
-    Albany::MDArray&      mda2)
+Projector::interp(const Manager::Field& f, const PHAL::Workset& workset, const BasisField& bf, Albany::MDArray& mda1, Albany::MDArray& mda2)
 {
-  int const rank = f.layout->rank() - 2, num_node = bf.dimension(1), num_qp = bf.dimension(2),
-            ndim = rank >= 1 ? mda1.dimension(2) : 1;
+  int const rank = f.layout->rank() - 2, num_node = bf.dimension(1), num_qp = bf.dimension(2), ndim = rank >= 1 ? mda1.dimension(2) : 1;
 
   Albany::MDArray* mdas[2];
   mdas[0]       = &mda1;
@@ -434,17 +402,11 @@ class ProjectorTester
       const Manager::BasisField&                          wbf,
       const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp);
   void
-  fillRhs(
-      const PHAL::Workset&                                workset,
-      const Manager::BasisField&                          wbf,
-      const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp);
+  fillRhs(const PHAL::Workset& workset, const Manager::BasisField& wbf, const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp);
   void
   project();
   void
-  interp(
-      const PHAL::Workset&                                workset,
-      const Manager::BasisField&                          bf,
-      const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp);
+  interp(const PHAL::Workset& workset, const Manager::BasisField& bf, const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp);
   void
   finish();
 };
@@ -478,8 +440,7 @@ struct Manager::Impl
   std::vector<short>               is_g_;
 
  public:
-  Impl(const Teuchos::RCP<Albany::StateManager>& state_mgr, bool const use_projection, bool const do_transform)
-      : state_mgr_(state_mgr)
+  Impl(const Teuchos::RCP<Albany::StateManager>& state_mgr, bool const use_projection, bool const do_transform) : state_mgr_(state_mgr)
   {
     init(use_projection, do_transform);
   }
@@ -538,25 +499,20 @@ struct Manager::Impl
   }
 
   void
-  endAdapt(
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
+  endAdapt(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
   {
     init_g(state_mgr_->getStateArrays().elemStateArrays.size(), true);
     if (Teuchos::nonnull(proj_)) {
       proj_->init(node_vs, ol_node_vs);
       for (Map::iterator it = field_map_.begin(); it != field_map_.end(); ++it) {
         Field& f = *it->second;
-        for (int i = 0; i < f.num_g_fields; ++i)
-          f.data_->mv[i] = Thyra::createMembers(ol_node_vs, f.data_->mv[i]->domain()->dim());
+        for (int i = 0; i < f.num_g_fields; ++i) f.data_->mv[i] = Thyra::createMembers(ol_node_vs, f.data_->mv[i]->domain()->dim());
       }
     }
   }
 
   void
-  initProjector(
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
+  initProjector(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
   {
     if (Teuchos::nonnull(proj_)) {
       proj_->init(node_vs, ol_node_vs);
@@ -757,10 +713,7 @@ Manager::init_x_if_not(Teuchos::RCP<Thyra_VectorSpace const> const& vs)
 }
 
 static void
-update_x(
-    const Teuchos::ArrayRCP<double>&                    x,
-    const Teuchos::ArrayRCP<double const>&              s,
-    const Teuchos::RCP<Albany::AbstractDiscretization>& disc)
+update_x(const Teuchos::ArrayRCP<double>& x, const Teuchos::ArrayRCP<double const>& s, const Teuchos::RCP<Albany::AbstractDiscretization>& disc)
 {
   int const spdim = disc->getNumDim(), neq = disc->getNumEq();
   for (int i = 0; i < x.size(); i += neq)
@@ -805,15 +758,12 @@ Manager::createEvaluators(PHX::FieldManager<PHAL::AlbanyTraits>& fm, const Teuch
 
 template <>
 void
-Manager::createEvaluators<PHAL::AlbanyTraits::Residual>(
-    PHX::FieldManager<PHAL::AlbanyTraits>& fm,
-    const Teuchos::RCP<Albany::Layouts>&   dl)
+Manager::createEvaluators<PHAL::AlbanyTraits::Residual>(PHX::FieldManager<PHAL::AlbanyTraits>& fm, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   typedef PHAL::AlbanyTraits::Residual Residual;
   fm.registerEvaluator<Residual>(Teuchos::rcp(new Reader<Residual, PHAL::AlbanyTraits>(Teuchos::rcp(this, false), dl)));
   if (impl_->building_sfm()) {
-    Teuchos::RCP<Writer<Residual, PHAL::AlbanyTraits>> writer =
-        Teuchos::rcp(new Writer<Residual, PHAL::AlbanyTraits>(Teuchos::rcp(this, false), dl));
+    Teuchos::RCP<Writer<Residual, PHAL::AlbanyTraits>> writer = Teuchos::rcp(new Writer<Residual, PHAL::AlbanyTraits>(Teuchos::rcp(this, false), dl));
     fm.registerEvaluator<Residual>(writer);
     fm.requireField<Residual>(*writer->getNoOutputTag());
   }
@@ -932,17 +882,13 @@ Manager::beginAdapt()
   impl_->beginAdapt();
 }
 void
-Manager::endAdapt(
-    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-    Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
+Manager::endAdapt(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
 {
   impl_->endAdapt(node_vs, ol_node_vs);
 }
 
 void
-Manager::initProjector(
-    Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-    Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
+Manager::initProjector(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
 {
   impl_->initProjector(node_vs, ol_node_vs);
 }
@@ -953,17 +899,12 @@ Manager::usingProjection() const
   return Teuchos::nonnull(impl_->proj_);
 }
 
-Manager::Manager(
-    const Teuchos::RCP<Albany::StateManager>& state_mgr,
-    bool const                                use_projection,
-    bool const                                do_transform)
+Manager::Manager(const Teuchos::RCP<Albany::StateManager>& state_mgr, bool const use_projection, bool const do_transform)
     : impl_(Teuchos::rcp(new Impl(state_mgr, use_projection, do_transform)))
 {
 }
 
-#define eti_fn(EvalT)                             \
-  template void Manager::createEvaluators<EvalT>( \
-      PHX::FieldManager<PHAL::AlbanyTraits> & fm, const Teuchos::RCP<Albany::Layouts>& dl);
+#define eti_fn(EvalT) template void Manager::createEvaluators<EvalT>(PHX::FieldManager<PHAL::AlbanyTraits> & fm, const Teuchos::RCP<Albany::Layouts>& dl);
 aadapt_rc_apply_to_all_eval_types(eti_fn)
 #undef eti_fn
 
@@ -1081,11 +1022,9 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
 
     // Set up the data containers.
     typedef PHX::MDALayout<Cell, QuadPoint, Dim, Dim> Layout;
-    Teuchos::RCP<Layout>                              layout =
-        Teuchos::rcp(new Layout(workset.numCells, coord_qp.dimension(1), coord_qp.dimension(2), coord_qp.dimension(2)));
-    PHX::MDField<RealType> f_mdf = PHX::MDField<RealType>("f_mdf", layout);
-    auto f_mdf_data = PHX::KokkosViewFactory<RealType, typename PHX::DevLayout<RealType>::type, PHX::Device>::buildView(
-        f_mdf.fieldTag());
+    Teuchos::RCP<Layout>   layout     = Teuchos::rcp(new Layout(workset.numCells, coord_qp.dimension(1), coord_qp.dimension(2), coord_qp.dimension(2)));
+    PHX::MDField<RealType> f_mdf      = PHX::MDField<RealType>("f_mdf", layout);
+    auto                   f_mdf_data = PHX::KokkosViewFactory<RealType, typename PHX::DevLayout<RealType>::type, PHX::Device>::buildView(f_mdf.fieldTag());
     f_mdf.setFieldData(f_mdf_data);
 
     std::vector<Albany::MDArray> mda;
@@ -1094,12 +1033,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       typedef Albany::MDArray::size_type size_t;
       mda_data[i].resize(f_mdf.dimension(0) * f_mdf.dimension(1) * f_mdf.dimension(2) * f_mdf.dimension(3));
       shards::Array<RealType, shards::NaturalOrder, Cell, QuadPoint, Dim, Dim> a;
-      a.assign(
-          &mda_data[i][0],
-          (size_t)f_mdf.dimension(0),
-          (size_t)f_mdf.dimension(1),
-          (size_t)f_mdf.dimension(2),
-          (size_t)f_mdf.dimension(3));
+      a.assign(&mda_data[i][0], (size_t)f_mdf.dimension(0), (size_t)f_mdf.dimension(1), (size_t)f_mdf.dimension(2), (size_t)f_mdf.dimension(3));
       mda.push_back(a);
     }
 
@@ -1119,8 +1053,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
       if (test == 0) {
         f.data_->transformation = Transformation::none;
         f.num_g_fields          = 1;
-        loop(f_mdf, cell, 0) loop(f_mdf, qp, 1) for (unsigned i = 0, k = 0; i < f_mdf.dimension(2);
-                                                     ++i) for (unsigned j = 0; j < f_mdf.dimension(3); ++j, ++k)
+        loop(f_mdf, cell, 0) loop(f_mdf, qp, 1) for (unsigned i = 0, k = 0; i < f_mdf.dimension(2); ++i) for (unsigned j = 0; j < f_mdf.dimension(3); ++j, ++k)
             f_mdf(cell, qp, i, j) = eval_f(coord_qp(cell, qp, 0), coord_qp(cell, qp, 1), coord_qp(cell, qp, 2), k);
       } else {
         f.data_->transformation = Transformation::right_polar_LieR_LieS;
@@ -1158,8 +1091,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
             const LO lid = indexer->getLocalElement(gid);
             if (!evaled[lid]) {
               for (int k = 0; k < ncol; ++k)
-                f_true[ncol * lid + k] =
-                    eval_f(coord_vert(cell, node, 0), coord_vert(cell, node, 1), coord_vert(cell, node, 2), k);
+                f_true[ncol * lid + k] = eval_f(coord_vert(cell, node, 0), coord_vert(cell, node, 1), coord_vert(cell, node, 2), k);
               evaled[lid] = true;
             }
           }
@@ -1178,8 +1110,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
           }
         printf("err np (test %d):", test);
         int const n = f_mdf.dimension(0) * f_mdf.dimension(1);
-        for (int k = 0; k < 9; ++k)
-          printf(" %1.2e %1.2e (%1.2e)", err1[k] / (n * scale[k]), errmax[k] / scale[k], scale[k]);
+        for (int k = 0; k < 9; ++k) printf(" %1.2e %1.2e (%1.2e)", err1[k] / (n * scale[k]), errmax[k] / scale[k], scale[k]);
         std::cout << "\n";
       }
 
@@ -1192,9 +1123,8 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         for (int k = 0; k < 9; ++k) {
           err1[k] = errmax[k] = scale[k] = 0;
         }
-        loop(f_mdf, cell, 0)
-            loop(f_mdf, qp, 1) for (int i = 0, k = 0; i < static_cast<int>(f_mdf.dimension(2));
-                                    ++i) for (int j = 0; j < static_cast<int>(f_mdf.dimension(3)); ++j, ++k)
+        loop(f_mdf, cell, 0) loop(f_mdf, qp, 1) for (int i = 0, k = 0; i < static_cast<int>(f_mdf.dimension(2));
+                                                     ++i) for (int j = 0; j < static_cast<int>(f_mdf.dimension(3)); ++j, ++k)
         {
           double const d = std::abs(mda[0]((int)cell, (int)qp, i, j) - f_mdf(cell, qp, i, j));
           err1[k] += d;
@@ -1203,8 +1133,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
         }
         printf("err ip (test %d):", test);
         int const n = f_mdf.dimension(0) * f_mdf.dimension(1);
-        for (int k = 0; k < 9; ++k)
-          printf(" %1.2e %1.2e (%1.2e)", err1[k] / (n * scale[k]), errmax[k] / scale[k], scale[k]);
+        for (int k = 0; k < 9; ++k) printf(" %1.2e %1.2e (%1.2e)", err1[k] / (n * scale[k]), errmax[k] / scale[k], scale[k]);
         std::cout << "\n";
       }
     }
@@ -1263,9 +1192,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
   }
 
   void
-  ProjectorTester::init(
-      Teuchos::RCP<Thyra_VectorSpace const> const& node_vs,
-      Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
+  ProjectorTester::init(Teuchos::RCP<Thyra_VectorSpace const> const& node_vs, Teuchos::RCP<Thyra_VectorSpace const> const& ol_node_vs)
   {
     d->p.init(node_vs, ol_node_vs);
     d->projected = d->finished = false;
@@ -1307,18 +1234,14 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
   }
 
   void
-  ProjectorTester::fillRhs(
-      const PHAL::Workset&                                workset,
-      const Manager::BasisField&                          wbf,
-      const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
+  ProjectorTester::fillRhs(const PHAL::Workset& workset, const Manager::BasisField& wbf, const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
   {
     int const num_qp = coord_qp.dimension(1), num_dim = coord_qp.dimension(2);
 
     typedef PHX::MDALayout<Cell, QuadPoint, Dim, Dim> Layout;
-    Teuchos::RCP<Layout>   layout = Teuchos::rcp(new Layout(workset.numCells, num_qp, num_dim, num_dim));
-    PHX::MDField<RealType> f_mdf  = PHX::MDField<RealType>("f_mdf", layout);
-    auto f_mdf_data = PHX::KokkosViewFactory<RealType, typename PHX::DevLayout<RealType>::type, PHX::Device>::buildView(
-        f_mdf.fieldTag());
+    Teuchos::RCP<Layout>                              layout = Teuchos::rcp(new Layout(workset.numCells, num_qp, num_dim, num_dim));
+    PHX::MDField<RealType>                            f_mdf  = PHX::MDField<RealType>("f_mdf", layout);
+    auto f_mdf_data = PHX::KokkosViewFactory<RealType, typename PHX::DevLayout<RealType>::type, PHX::Device>::buildView(f_mdf.fieldTag());
     f_mdf.setFieldData(f_mdf_data);
 
     for (int test = 0; test < Impl::ntests; ++test) {
@@ -1359,10 +1282,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
   }
 
   void
-  ProjectorTester::interp(
-      const PHAL::Workset&                                workset,
-      const Manager::BasisField&                          bf,
-      const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
+  ProjectorTester::interp(const PHAL::Workset& workset, const Manager::BasisField& bf, const PHX::MDField<RealType, Cell, QuadPoint, Dim>& coord_qp)
   {
     int const num_qp = coord_qp.dimension(1), num_dim = coord_qp.dimension(2);
 
@@ -1439,8 +1359,7 @@ aadapt_rc_apply_to_all_eval_types(eti_fn)
 
       if (comm->getRank() == 0) {
         printf("err ip (test %d):", test);
-        for (int k = 0; k < 9; ++k)
-          printf(" %1.2e %1.2e (%1.2e)", gerr1[k] / (gn * gscale[k]), gerrmax[k] / gscale[k], gscale[k]);
+        for (int k = 0; k < 9; ++k) printf(" %1.2e %1.2e (%1.2e)", gerr1[k] / (gn * gscale[k]), gerrmax[k] / gscale[k], gscale[k]);
         std::cout << "\n";
       }
 

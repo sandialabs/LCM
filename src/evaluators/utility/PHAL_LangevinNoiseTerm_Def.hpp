@@ -12,9 +12,7 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(Teuchos::ParameterList const& p)
     : rho(p.get<std::string>("Rho QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      noiseTerm(
-          p.get<std::string>("Langevin Noise Term"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      noiseTerm(p.get<std::string>("Langevin Noise Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       duration(2),
       rng(seedgen())  // seed the rng
 
@@ -72,9 +70,7 @@ LangevinNoiseTerm<EvalT, Traits>::getValue(std::string const& n)
     return sd;
 
   else {
-    ALBANY_ABORT(
-        std::endl
-        << "Error! Logic error in getting parameter " << n << " in LangevinNoiseTerm::getValue()" << std::endl);
+    ALBANY_ABORT(std::endl << "Error! Logic error in getting parameter " << n << " in LangevinNoiseTerm::getValue()" << std::endl);
     return sd;
   }
 }

@@ -65,10 +65,7 @@ template <typename EvalT, typename Traits>
 class SaveNodalField : public SaveNodalFieldBase<EvalT, Traits>
 {
  public:
-  SaveNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : SaveNodalFieldBase<EvalT, Traits>(p, dl)
-  {
-  }
+  SaveNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl) : SaveNodalFieldBase<EvalT, Traits>(p, dl) {}
 
   void preEvaluate(typename Traits::PreEvalData /* d */) {}
   void postEvaluate(typename Traits::PostEvalData /* d */) {}
@@ -85,8 +82,7 @@ class SaveNodalField : public SaveNodalFieldBase<EvalT, Traits>
 // Residual
 // **************************************************************
 template <typename Traits>
-class SaveNodalField<PHAL::AlbanyTraits::Residual, Traits>
-    : public SaveNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>
+class SaveNodalField<PHAL::AlbanyTraits::Residual, Traits> : public SaveNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   SaveNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl);

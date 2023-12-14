@@ -28,9 +28,7 @@ LoadStateFieldBase<EvalT, Traits, ScalarType>::LoadStateFieldBase(Teuchos::Param
 // **********************************************************************
 template <typename EvalT, typename Traits, typename ScalarType>
 void
-LoadStateFieldBase<EvalT, Traits, ScalarType>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+LoadStateFieldBase<EvalT, Traits, ScalarType>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(data, fm);
 

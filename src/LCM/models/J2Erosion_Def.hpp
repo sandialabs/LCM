@@ -8,10 +8,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
-    ConstitutiveModel<EvalT, Traits>&    model,
-    Teuchos::ParameterList*              p,
-    Teuchos::RCP<Albany::Layouts> const& dl)
+J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl)
     : BaseKernel(model)
 {
   this->setIntegrationPointLocationFlag(true);
@@ -111,16 +108,12 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(
     addStateVariable(source_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
 
-  addStateVariable(
-      "failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
+  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
 }
 
 template <typename EvalT, typename Traits>
 void
-J2ErosionKernel<EvalT, Traits>::init(
-    Workset&                 workset,
-    FieldMap<ScalarT const>& dep_fields,
-    FieldMap<ScalarT>&       eval_fields)
+J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields)
 {
   std::string cauchy_str     = field_name_map_["Cauchy_Stress"];
   std::string Fp_str         = field_name_map_["Fp"];
@@ -187,14 +180,7 @@ class J2ErosionNLS : public minitensor::Function_Base<J2ErosionNLS<EvalT, M>, ty
   using S = typename EvalT::ScalarT;
 
  public:
-  J2ErosionNLS(
-      RealType sat_mod,
-      RealType sat_exp,
-      RealType eqps_old,
-      S const& K,
-      S const& smag,
-      S const& mubar,
-      S const& Y)
+  J2ErosionNLS(RealType sat_mod, RealType sat_exp, RealType eqps_old, S const& K, S const& smag, S const& mubar, S const& Y)
       : sat_mod_(sat_mod), sat_exp_(sat_exp), eqps_old_(eqps_old), K_(K), smag_(smag), mubar_(mubar), Y_(Y)
   {
   }
@@ -344,11 +330,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   ScalarT const ice_saturation = ice_saturation_(cell, pt);
 
-  auto const peat =
-      peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) : 0.0;
-  auto const porosity = porosity_from_file_.size() > 0 ?
-                            interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) :
-                            bulk_porosity_;
+  auto const peat     = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) : 0.0;
+  auto const porosity = porosity_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) : bulk_porosity_;
   ScalarT    ne{1.0};
   ScalarT    ny{1.0};
   ScalarT    nk{1.0};
@@ -421,9 +404,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // check yield condition
   ScalarT const smag = minitensor::norm(s);
-  ScalarT const ys =
-      SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
-  ScalarT const f = smag - ys;
+  ScalarT const ys   = SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+  ScalarT const f    = smag - ys;
 
   // update for output
   yield_surf_(cell, pt) = ys;
@@ -435,7 +417,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   cosine                = cosine < -1.0 ? -1.0 : cosine;
   auto const theta      = std::acos(cosine);
   tilt_angle_(cell, pt) = theta;
- 
+
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;
 
@@ -474,8 +456,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
     // mechanical source
     if (have_temperature_ == true && delta_time_(0) > 0.0) {
-      source_(cell, pt) =
-          (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
+      source_(cell, pt) = (SQ23 * dgam / delta_time_(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
     }
 
     // exponential map to get Fpnew
@@ -517,9 +498,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     auto          sig = Sacado::Value<decltype(sigma)>::eval(sigma);
     decltype(sig) V(num_dims_);
     decltype(sig) S(num_dims_);
-    std::tie(V, S) = minitensor::eig_sym(sig);
-    bool const tension_failure =
-        S(0, 0) >= tensile_strength || S(1, 1) >= tensile_strength || S(2, 2) >= tensile_strength;
+    std::tie(V, S)             = minitensor::eig_sym(sig);
+    bool const tension_failure = S(0, 0) >= tensile_strength || S(1, 1) >= tensile_strength || S(2, 2) >= tensile_strength;
     if (tension_failure == true) {
       failed += 1.0;
     }

@@ -76,8 +76,7 @@ bool
 NoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)::Print() const
 {
   std::cout << "Projected ";
-  const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)& basenode =
-      dynamic_cast<const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)&>(*this);
+  const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)& basenode = dynamic_cast<const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)&>(*this);
   std::cout << basenode;
   if (pseg_) {
     std::cout << "is on ";

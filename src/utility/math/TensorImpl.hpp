@@ -75,7 +75,7 @@ BasicTensor<T, Order>::BasicTensor (BasicTensor<T, Order>&& other)
 
 template <typename T, index_t Order>
 KOKKOS_INLINE_FUNCTION BasicTensor<T, Order>&
-BasicTensor<T, Order>::operator=(const BasicTensor<T, Order>& other)
+                       BasicTensor<T, Order>::operator=(const BasicTensor<T, Order>& other)
 {
   dim_ = other.dim_;
   // delete[] data_;

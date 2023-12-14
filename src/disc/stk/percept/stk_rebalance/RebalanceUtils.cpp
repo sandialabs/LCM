@@ -58,10 +58,7 @@ stk::rebalance::check_balance(
 }
 
 bool
-stk::rebalance::verify_dependent_ownership(
-    stk::mesh::BulkData&         bulk_data,
-    const stk::mesh::EntityRank& parent_rank,
-    stk::mesh::EntityVector&     entities)
+stk::rebalance::verify_dependent_ownership(stk::mesh::BulkData& bulk_data, const stk::mesh::EntityRank& parent_rank, stk::mesh::EntityVector& entities)
 {
   bool is_with_elem = true;
   for (size_t i = 0; i < entities.size(); ++i) {
@@ -95,8 +92,7 @@ stk::rebalance::check_ownership(mesh::BulkData& bulk_data, stk::mesh::EntityVect
   for (unsigned entity_iter = 0; entity_iter < entity_iter_len; ++entity_iter) {
     mesh::Entity mesh_ent = entities[entity_iter];
     if (bulk_data.parallel_owner_rank(mesh_ent) != bulk_data.parallel_rank()) {
-      std::cout << "check_ownership: an input mesh entity is not owned msg= " + msg
-                << " key= " << bulk_data.entity_key(mesh_ent) << std::endl;
+      std::cout << "check_ownership: an input mesh entity is not owned msg= " + msg << " key= " << bulk_data.entity_key(mesh_ent) << std::endl;
       throw std::runtime_error("check_ownership: an input mesh entity is not owned msg= " + msg);
     }
   }

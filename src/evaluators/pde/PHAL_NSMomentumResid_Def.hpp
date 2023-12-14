@@ -12,19 +12,12 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 NSMomentumResid<EvalT, Traits>::NSMomentumResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      pGrad(
-          p.get<std::string>("Pressure Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      VGrad(
-          p.get<std::string>("Velocity Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      pGrad(p.get<std::string>("Pressure Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      VGrad(p.get<std::string>("Velocity Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       P(p.get<std::string>("Pressure QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       Rm(p.get<std::string>("Rm Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      mu(p.get<std::string>("Viscosity QP Variable Name"),
-         p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      mu(p.get<std::string>("Viscosity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       MResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout")),
       haveSUPG(p.get<bool>("Have SUPG"))
 {
@@ -41,12 +34,9 @@ NSMomentumResid<EvalT, Traits>::NSMomentumResid(Teuchos::ParameterList const& p)
   this->addDependentField(Rm.fieldTag());
   this->addDependentField(mu.fieldTag());
   if (haveSUPG) {
-    V = decltype(V)(
-        p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"));
-    rho = decltype(rho)(
-        p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
-    TauM =
-        decltype(TauM)(p.get<std::string>("Tau M Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    V    = decltype(V)(p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout"));
+    rho  = decltype(rho)(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    TauM = decltype(TauM)(p.get<std::string>("Tau M Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(V.fieldTag());
     this->addDependentField(rho.fieldTag());
     this->addDependentField(TauM.fieldTag());
@@ -54,7 +44,7 @@ NSMomentumResid<EvalT, Traits>::NSMomentumResid(Teuchos::ParameterList const& p)
 
   this->addEvaluatedField(MResidual);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numNodes = dims[1];
@@ -95,11 +85,9 @@ NSMomentumResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
       for (std::size_t i = 0; i < numDims; i++) {
         MResidual(cell, node, i) = 0.0;
         for (std::size_t qp = 0; qp < numQPs; ++qp) {
-          MResidual(cell, node, i) +=
-              (Rm(cell, qp, i) - pGrad(cell, qp, i)) * wBF(cell, node, qp) - P(cell, qp) * wGradBF(cell, node, qp, i);
+          MResidual(cell, node, i) += (Rm(cell, qp, i) - pGrad(cell, qp, i)) * wBF(cell, node, qp) - P(cell, qp) * wGradBF(cell, node, qp, i);
           for (std::size_t j = 0; j < numDims; ++j) {
-            MResidual(cell, node, i) +=
-                mu(cell, qp) * (VGrad(cell, qp, i, j) + VGrad(cell, qp, j, i)) * wGradBF(cell, node, qp, j);
+            MResidual(cell, node, i) += mu(cell, qp) * (VGrad(cell, qp, i, j) + VGrad(cell, qp, j, i)) * wGradBF(cell, node, qp, j);
             //	      mu(cell,qp)*VGrad(cell,qp,i,j)*wGradBF(cell,node,qp,j);
           }
         }
@@ -113,8 +101,7 @@ NSMomentumResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
         for (std::size_t i = 0; i < numDims; i++) {
           for (std::size_t qp = 0; qp < numQPs; ++qp) {
             for (std::size_t j = 0; j < numDims; ++j) {
-              MResidual(cell, node, i) +=
-                  rho(cell, qp) * TauM(cell, qp) * Rm(cell, qp, j) * V(cell, qp, j) * wGradBF(cell, node, qp, j);
+              MResidual(cell, node, i) += rho(cell, qp) * TauM(cell, qp) * Rm(cell, qp, j) * V(cell, qp, j) * wGradBF(cell, node, qp, j);
             }
           }
         }

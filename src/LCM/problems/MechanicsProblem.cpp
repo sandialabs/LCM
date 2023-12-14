@@ -58,18 +58,11 @@ MechanicsProblem::MechanicsProblem(
 
   getVariableType(params->sublist("Temperature"), "None", temperature_type_, have_temperature_, have_temperature_eq_);
 
-  getVariableType(
-      params->sublist("ACE Temperature"), "None", temperature_type_, have_ace_temperature_, have_ace_temperature_eq_);
+  getVariableType(params->sublist("ACE Temperature"), "None", temperature_type_, have_ace_temperature_, have_ace_temperature_eq_);
 
-  getVariableType(
-      params->sublist("DislocationDensity"),
-      "None",
-      dislocation_density_type_,
-      have_dislocation_density_,
-      have_dislocation_density_eq_);
+  getVariableType(params->sublist("DislocationDensity"), "None", dislocation_density_type_, have_dislocation_density_, have_dislocation_density_eq_);
 
-  getVariableType(
-      params->sublist("Pore Pressure"), "None", pore_pressure_type_, have_pore_pressure_, have_pore_pressure_eq_);
+  getVariableType(params->sublist("Pore Pressure"), "None", pore_pressure_type_, have_pore_pressure_, have_pore_pressure_eq_);
 
   getVariableType(params->sublist("Transport"), "None", transport_type_, have_transport_, have_transport_eq_);
 
@@ -77,8 +70,7 @@ MechanicsProblem::MechanicsProblem(
 
   getVariableType(params->sublist("Damage"), "None", damage_type_, have_damage_, have_damage_eq_);
 
-  getVariableType(
-      params->sublist("Stabilized Pressure"), "None", stab_pressure_type_, have_stab_pressure_, have_stab_pressure_eq_);
+  getVariableType(params->sublist("Stabilized Pressure"), "None", stab_pressure_type_, have_stab_pressure_, have_stab_pressure_eq_);
 
   bool const have_both_temps = (have_temperature_ == true) && (have_ace_temperature_ == true);
   ALBANY_ASSERT(have_both_temps == false, "Cannot have two temperatures");
@@ -184,7 +176,7 @@ MechanicsProblem::MechanicsProblem(
 
   // Check whether we are doing mesh adaptation
   have_adaptation_ = params->isSublist("Adaptation");
-  bool       have_erosion{false};
+  bool have_erosion{false};
 
   if (have_adaptation_ == true) {
     Teuchos::ParameterList const& adapt_params = params->sublist("Adaptation");
@@ -208,8 +200,7 @@ MechanicsProblem::MechanicsProblem(
   bool requireLatticeOrientationOnMesh = false;
 
   if (Teuchos::nonnull(material_db_)) {
-    std::vector<bool> readOrientationFromMesh =
-        material_db_->getAllMatchingParams<bool>("Read Lattice Orientation From Mesh");
+    std::vector<bool> readOrientationFromMesh = material_db_->getAllMatchingParams<bool>("Read Lattice Orientation From Mesh");
 
     for (unsigned int i = 0; i < readOrientationFromMesh.size(); i++) {
       if (readOrientationFromMesh[i]) {
@@ -335,11 +326,9 @@ MechanicsProblem::applyProblemSpecificSolverSettings(Teuchos::RCP<Teuchos::Param
 
     bool constexpr throw_on_fail{true};
 
-    Teuchos::RCP<LCM::SolutionSniffer> status_test_op =
-        Teuchos::rcp_dynamic_cast<LCM::SolutionSniffer>(ppo, throw_on_fail);
+    Teuchos::RCP<LCM::SolutionSniffer> status_test_op = Teuchos::rcp_dynamic_cast<LCM::SolutionSniffer>(ppo, throw_on_fail);
 
-    Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> status_test =
-        Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(nox_status_test_);
+    Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> status_test = Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(nox_status_test_);
 
     status_test_op->setStatusTest(status_test);
   }

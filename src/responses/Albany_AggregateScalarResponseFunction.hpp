@@ -18,9 +18,7 @@ class AggregateScalarResponseFunction : public SamplingBasedScalarResponseFuncti
 {
  public:
   //! Default constructor
-  AggregateScalarResponseFunction(
-      const Teuchos::RCP<Teuchos_Comm const>&                     comm,
-      const Teuchos::Array<Teuchos::RCP<ScalarResponseFunction>>& responses);
+  AggregateScalarResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm, const Teuchos::Array<Teuchos::RCP<ScalarResponseFunction>>& responses);
 
   //! Setup response function
   void

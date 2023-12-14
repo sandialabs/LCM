@@ -116,8 +116,7 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
   // The following is for LandIce problems.
   validPL->set<int>("Number RBMs for ML", 0, "Number of RBMs provided to ML");
   validPL->set<int>("Number of Spatial Processors", -1, "Number of spatial processors in multi-level parallelism");
-  validPL->set<int>(
-      "Phalanx Graph Visualization Detail", 0, "Flag to select outpuy of Phalanx Graph and level of detail");
+  validPL->set<int>("Phalanx Graph Visualization Detail", 0, "Flag to select outpuy of Phalanx Graph and level of detail");
   validPL->set<bool>(
       "Use Physics-Based Preconditioner",
       false,
@@ -127,8 +126,7 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
   Teuchos::RCP<Albany::Application> dummy_app;
   validPL->set<Teuchos::RCP<Albany::Application>>("Application", dummy_app, "Application to couple to");
 
-  validPL->set<Teuchos::Array<std::string>>(
-      "Required Fields", Teuchos::Array<std::string>(), "List of field requirements");
+  validPL->set<Teuchos::Array<std::string>>("Required Fields", Teuchos::Array<std::string>(), "List of field requirements");
   validPL->sublist("Initial Condition", false, "");
   validPL->sublist("ACE Thermal Parameters", false, "");
   validPL->sublist("Initial Condition Dot", false, "");
@@ -153,10 +151,7 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
   validPL->set<int>("Number Of Time Derivatives", 1, "Number of time derivatives in use in the problem");
 
   validPL->set<bool>("Use MDField Memoization", false, "Use memoization to avoid recomputing MDFields");
-  validPL->set<bool>(
-      "Use MDField Memoization For Parameters",
-      false,
-      "Use memoization to avoid recomputing MDFields dependent on parameters");
+  validPL->set<bool>("Use MDField Memoization For Parameters", false, "Use memoization to avoid recomputing MDFields dependent on parameters");
   validPL->set<bool>(
       "Ignore Residual In Jacobian",
       false,
@@ -196,8 +191,7 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
       "and a NOX solver");
 
   validPL->set<bool>("ACE Sequential Thermomechanical", false, "ACE Sequential Thermomechanical Problem");
-  validPL->set<double>(
-      "ACE Thermomechanical Problem Current Time", 0.0, "Current Time in ACE Sequential Thermomechanical Problem");
+  validPL->set<double>("ACE Thermomechanical Problem Current Time", 0.0, "Current Time in ACE Sequential Thermomechanical Problem");
 
   return validPL;
 }

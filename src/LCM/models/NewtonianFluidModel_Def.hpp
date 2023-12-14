@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl), mu_(p->get<RealType>("Shear Viscosity", 1.0))
 {
   // retrive appropriate field name strings
@@ -46,10 +44,7 @@ NewtonianFluidModel<EvalT, Traits>::NewtonianFluidModel(
 }
 template <typename EvalT, typename Traits>
 void
-NewtonianFluidModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+NewtonianFluidModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   std::string F_string      = (*field_name_map_)["F"];
   std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];

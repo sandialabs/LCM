@@ -14,9 +14,7 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 Time<EvalT, Traits>::Time(Teuchos::ParameterList& p)
     : time(p.get<std::string>("Time Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Workset Scalar Data Layout")),
-      deltaTime(
-          p.get<std::string>("Delta Time Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Workset Scalar Data Layout")),
+      deltaTime(p.get<std::string>("Delta Time Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Workset Scalar Data Layout")),
       timeValue(0.0)
 {
   if (p.isType<bool>("Disable Transient"))

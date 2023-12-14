@@ -20,11 +20,9 @@ StatelessObserverImpl::getTimeParamValueOrDefault(RealType defaultValue) const
 {
   std::string const label("Time");
   // IKT, NOTE: solMethod == 2 corresponds to TransientTempus
-  bool const use_time_param = (app_->getParamLib()->isParameter(label) == true) &&
-                              (app_->getSchwarzAlternating() == false) && (app_->getSolutionMethod() != 2);
+  bool const use_time_param = (app_->getParamLib()->isParameter(label) == true) && (app_->getSchwarzAlternating() == false) && (app_->getSolutionMethod() != 2);
 
-  double const this_time =
-      use_time_param == true ? app_->getParamLib()->getRealValue<PHAL::AlbanyTraits::Residual>(label) : defaultValue;
+  double const this_time = use_time_param == true ? app_->getParamLib()->getRealValue<PHAL::AlbanyTraits::Residual>(label) : defaultValue;
 
   return this_time;
 }
@@ -42,11 +40,9 @@ StatelessObserverImpl::observeSolution(
     const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot)
 {
   Teuchos::TimeMonitor                   timer(*solOutTime_);
-  Teuchos::RCP<Thyra_Vector const> const overlappedSolution =
-      app_->getAdaptSolMgr()->updateAndReturnOverlapSolution(nonOverlappedSolution);
+  Teuchos::RCP<Thyra_Vector const> const overlappedSolution = app_->getAdaptSolMgr()->updateAndReturnOverlapSolution(nonOverlappedSolution);
   if (nonOverlappedSolutionDot != Teuchos::null) {
-    Teuchos::RCP<Thyra_Vector const> const overlappedSolutionDot =
-        app_->getAdaptSolMgr()->updateAndReturnOverlapSolutionDot(*nonOverlappedSolutionDot);
+    Teuchos::RCP<Thyra_Vector const> const overlappedSolutionDot = app_->getAdaptSolMgr()->updateAndReturnOverlapSolutionDot(*nonOverlappedSolutionDot);
     app_->getDiscretization()->writeSolution(
         *overlappedSolution,
         *overlappedSolutionDot,
@@ -65,11 +61,9 @@ StatelessObserverImpl::observeSolution(
     const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDotDot)
 {
   Teuchos::TimeMonitor                   timer(*solOutTime_);
-  Teuchos::RCP<Thyra_Vector const> const overlappedSolution =
-      app_->getAdaptSolMgr()->updateAndReturnOverlapSolution(nonOverlappedSolution);
+  Teuchos::RCP<Thyra_Vector const> const overlappedSolution = app_->getAdaptSolMgr()->updateAndReturnOverlapSolution(nonOverlappedSolution);
   if (nonOverlappedSolutionDot != Teuchos::null) {
-    Teuchos::RCP<Thyra_Vector const> const overlappedSolutionDot =
-        app_->getAdaptSolMgr()->updateAndReturnOverlapSolutionDot(*nonOverlappedSolutionDot);
+    Teuchos::RCP<Thyra_Vector const> const overlappedSolutionDot = app_->getAdaptSolMgr()->updateAndReturnOverlapSolutionDot(*nonOverlappedSolutionDot);
     if (nonOverlappedSolutionDotDot != Teuchos::null) {
       Teuchos::RCP<Thyra_Vector const> const overlappedSolutionDotDot =
           app_->getAdaptSolMgr()->updateAndReturnOverlapSolutionDotDot(*nonOverlappedSolutionDotDot);
@@ -95,8 +89,7 @@ void
 StatelessObserverImpl::observeSolution(double stamp, const Thyra_MultiVector& nonOverlappedSolution)
 {
   Teuchos::TimeMonitor                        timer(*solOutTime_);
-  const Teuchos::RCP<const Thyra_MultiVector> overlappedSolution =
-      app_->getAdaptSolMgr()->updateAndReturnOverlapSolutionMV(nonOverlappedSolution);
+  const Teuchos::RCP<const Thyra_MultiVector> overlappedSolution = app_->getAdaptSolMgr()->updateAndReturnOverlapSolutionMV(nonOverlappedSolution);
   app_->getDiscretization()->writeSolutionMV(*overlappedSolution, stamp, /*overlapped =*/true);
 }
 

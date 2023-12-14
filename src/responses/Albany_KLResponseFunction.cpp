@@ -9,9 +9,7 @@
 
 namespace Albany {
 
-KLResponseFunction::KLResponseFunction(
-    const Teuchos::RCP<Albany::AbstractResponseFunction>& response_,
-    Teuchos::ParameterList&                               responseParams)
+KLResponseFunction::KLResponseFunction(const Teuchos::RCP<Albany::AbstractResponseFunction>& response_, Teuchos::ParameterList& responseParams)
     : response(response_), responseParams(responseParams), out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   num_kl = responseParams.get("Number of KL Terms", 5);

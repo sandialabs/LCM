@@ -23,8 +23,7 @@ DirichletCoordFunction_Base<EvalT, Traits /*, cfunc_traits*/>::DirichletCoordFun
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits /*, typename cfunc_traits*/>
-DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>::DirichletCoordFunction(
-    Teuchos::ParameterList& p)
+DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>::DirichletCoordFunction(Teuchos::ParameterList& p)
     : DirichletCoordFunction_Base<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>(p)
 {
 }
@@ -32,8 +31,7 @@ DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>:
 // **********************************************************************
 template <typename Traits /*, typename cfunc_traits*/>
 void
-DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f = dirichletWorkset.f;
@@ -67,16 +65,14 @@ DirichletCoordFunction<PHAL::AlbanyTraits::Residual, Traits /*, cfunc_traits*/>:
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits /*, typename cfunc_traits*/>
-DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>::DirichletCoordFunction(
-    Teuchos::ParameterList& p)
+DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>::DirichletCoordFunction(Teuchos::ParameterList& p)
     : DirichletCoordFunction_Base<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>(p)
 {
 }
 // **********************************************************************
 template <typename Traits /*, typename cfunc_traits*/>
 void
-DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>::evaluateFields(
-    typename Traits::EvalData dirichletWorkset)
+DirichletCoordFunction<PHAL::AlbanyTraits::Jacobian, Traits /*, cfunc_traits*/>::evaluateFields(typename Traits::EvalData dirichletWorkset)
 {
   Teuchos::RCP<Thyra_Vector const> x   = dirichletWorkset.x;
   Teuchos::RCP<Thyra_Vector>       f   = dirichletWorkset.f;

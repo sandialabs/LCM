@@ -200,13 +200,12 @@ class MemoryAnalyzer
   {
     if (comm_->getRank() != 0) return;
     std::stringstream msg;
-#define smsg(name)                                                                                     \
-  do {                                                                                                 \
-    if (stats_.min[name] != 0 || stats_.med[name] != 0 || stats_.max[name] != 0) {                     \
-      msg << std::setw(16) << #name << " " << std::setw(15) << stats_.min[name] << " " << std::setw(4) \
-          << stats_.min_i[name] << " " << std::setw(15) << stats_.med[name] << " " << std::setw(15)    \
-          << stats_.max[name] << " " << std::setw(4) << stats_.max_i[name] << " " << std::endl;        \
-    }                                                                                                  \
+#define smsg(name)                                                                                                                                   \
+  do {                                                                                                                                               \
+    if (stats_.min[name] != 0 || stats_.med[name] != 0 || stats_.max[name] != 0) {                                                                   \
+      msg << std::setw(16) << #name << " " << std::setw(15) << stats_.min[name] << " " << std::setw(4) << stats_.min_i[name] << " " << std::setw(15) \
+          << stats_.med[name] << " " << std::setw(15) << stats_.max[name] << " " << std::setw(4) << stats_.max_i[name] << " " << std::endl;          \
+    }                                                                                                                                                \
   } while (0)
 
     msg << ">>> Albany Memory Analysis" << std::endl;

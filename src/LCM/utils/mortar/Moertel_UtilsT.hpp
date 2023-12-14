@@ -51,12 +51,7 @@ FillComplete() will not be called on B upon exit by this method.
 */
 template <class ST, class LO, class GO, class N>
 int
-MatrixMatrixAdd(
-    const Tpetra::CrsMatrix<ST, LO, GO, N>& A,
-    bool                                    transposeA,
-    double                                  scalarA,
-    Tpetra::CrsMatrix<ST, LO, GO, N>&       B,
-    double                                  scalarB);
+MatrixMatrixAdd(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, bool transposeA, double scalarA, Tpetra::CrsMatrix<ST, LO, GO, N>& B, double scalarB);
 
 /*!
 \brief Multiply matrices A*B
@@ -72,12 +67,7 @@ The user is responsible for freeing the returned result.
 */
 template <class ST, class LO, class GO, class N>
 Teuchos::RCP<Tpetra::CrsMatrix<ST, LO, GO, N>>
-MatMatMult(
-    const Tpetra::CrsMatrix<ST, LO, GO, N>& A,
-    bool                                    transA,
-    const Tpetra::CrsMatrix<ST, LO, GO, N>& B,
-    bool                                    transB,
-    int                                     outlevel);
+MatMatMult(const Tpetra::CrsMatrix<ST, LO, GO, N>& A, bool transA, const Tpetra::CrsMatrix<ST, LO, GO, N>& B, bool transB, int outlevel);
 
 /*!
 \brief Allocate and return a matrix padded with val on the diagonal.
@@ -166,10 +156,7 @@ SplitVector(
 */
 template <class ST, class LO, class GO, class N>
 bool
-MergeVector(
-    const Tpetra::Vector<ST, LO, GO, N>& x1,
-    const Tpetra::Vector<ST, LO, GO, N>& x2,
-    Tpetra::Vector<ST, LO, GO, N>&       xresult);
+MergeVector(const Tpetra::Vector<ST, LO, GO, N>& x1, const Tpetra::Vector<ST, LO, GO, N>& x2, Tpetra::Vector<ST, LO, GO, N>& xresult);
 
 /*!
 \brief Print matrix to file

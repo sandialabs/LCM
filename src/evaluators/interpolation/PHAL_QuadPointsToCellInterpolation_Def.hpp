@@ -31,9 +31,7 @@ QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::QuadPointsToCellInter
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field_qp, fm);
   this->utils.setFieldData(w_measure, fm);
@@ -74,8 +72,7 @@ QuadPointsToCellInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typena
       for (int dim0(0); dim0 < qp_dims[2]; ++dim0)
         for (int dim1(0); dim1 < qp_dims[3]; ++dim1) {
           field_cell(cell, dim0, dim1) = 0;
-          for (int qp(0); qp < numQPs; ++qp)
-            field_cell(cell, dim0, dim1) += field_qp(cell, qp, dim0, dim1) * w_measure(cell, qp);
+          for (int qp(0); qp < numQPs; ++qp) field_cell(cell, dim0, dim1) += field_qp(cell, qp, dim0, dim1) * w_measure(cell, qp);
           field_cell(cell, dim0, dim1) /= meas;
         }
     }

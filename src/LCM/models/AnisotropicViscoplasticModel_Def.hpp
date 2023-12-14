@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   // retrive appropriate field name strings
@@ -101,10 +99,7 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(
 }
 template <typename EvalT, typename Traits>
 void
-AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+AnisotropicViscoplasticModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
   std::string Fp_string     = (*field_name_map_)["Fp"];
@@ -238,8 +233,8 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
           ALBANY_PANIC(
               count == 30,
               std::endl
-                  << "Error in return mapping, count = " << count << "\nres = " << res << "\nrelres = " << res / f
-                  << "\ng = " << F[0] << "\ndg = " << dFdX[0] << "\nalpha = " << alpha << std::endl);
+                  << "Error in return mapping, count = " << count << "\nres = " << res << "\nrelres = " << res / f << "\ng = " << F[0] << "\ndg = " << dFdX[0]
+                  << "\nalpha = " << alpha << std::endl);
         }
         solver.computeFadInfo(dFdX, X, F);
         dgam = X[0];
@@ -255,8 +250,7 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(
 
         // mechanical source
         if (have_temperature_ && delta_time(0) > 0) {
-          source(cell, pt) =
-              (sq23 * dgam / delta_time(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
+          source(cell, pt) = (sq23 * dgam / delta_time(0) * (Y + H + temperature_(cell, pt))) / (density_ * heat_capacity_);
         }
 
         // exponential map to get Fpnew

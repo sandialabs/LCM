@@ -35,10 +35,7 @@ struct LayeredMeshNumbering
   Teuchos::ArrayRCP<double> layers_ratio;
   T                         numLevels, numLayers;
 
-  LayeredMeshNumbering(
-      const T                          _stride,
-      const LayeredMeshOrdering        _ordering,
-      const Teuchos::ArrayRCP<double>& _layers_ratio)
+  LayeredMeshNumbering(const T _stride, const LayeredMeshOrdering _ordering, const Teuchos::ArrayRCP<double>& _layers_ratio)
   {
     stride       = _stride;
     ordering     = _ordering;
@@ -50,8 +47,7 @@ struct LayeredMeshNumbering
   T
   getId(const T column_id, const T level_index) const
   {
-    return (ordering == LayeredMeshOrdering::LAYER) ? column_id + level_index * stride :
-                                                      column_id * stride + level_index;
+    return (ordering == LayeredMeshOrdering::LAYER) ? column_id + level_index * stride : column_id * stride + level_index;
   }
 
   void

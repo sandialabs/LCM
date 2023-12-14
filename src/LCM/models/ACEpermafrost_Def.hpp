@@ -112,8 +112,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
         "ACE Peat File must match.");
   }
 
-  ALBANY_ASSERT(
-      time_.size() == sea_level_.size(), "*** ERROR: Number of times and number of sea level values must match.");
+  ALBANY_ASSERT(time_.size() == sea_level_.size(), "*** ERROR: Number of times and number of sea level values must match.");
 
   // retrieve appropriate field name strings
   auto const cauchy_string       = field_name_map_["Cauchy_Stress"];
@@ -162,39 +161,28 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
 
   // yield surface
-  addStateVariable(
-      yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
+  addStateVariable(yieldSurface_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
 
   // ACE Bluff salinity
-  addStateVariable(
-      "ACE_Bluff_Salinity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Bluff_Salinity", false));
+  addStateVariable("ACE_Bluff_Salinity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Bluff_Salinity", false));
 
   // ACE Ice saturation
-  addStateVariable(
-      "ACE_Ice_Saturation",
-      dl->qp_scalar,
-      "scalar",
-      ice_saturation_init_,
-      true,
-      p->get<bool>("Output ACE_Ice_Saturation", false));
+  addStateVariable("ACE_Ice_Saturation", dl->qp_scalar, "scalar", ice_saturation_init_, true, p->get<bool>("Output ACE_Ice_Saturation", false));
 
   // ACE_Density
   addStateVariable("ACE_Density", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Density", false));
 
   // ACE_Heat_Capacity
-  addStateVariable(
-      "ACE_Heat_Capacity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Heat_Capacity", false));
+  addStateVariable("ACE_Heat_Capacity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Heat_Capacity", false));
 
   // ACE_Therm_Cond
   addStateVariable("ACE_Therm_Cond", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Therm_Cond", false));
 
   // ACE_Thermal_Inertia
-  addStateVariable(
-      "ACE_Thermal_Inertia", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Thermal_Inertia", false));
+  addStateVariable("ACE_Thermal_Inertia", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE_Thermal_Inertia", false));
 
   // ACE_Water_Saturation
-  addStateVariable(
-      "ACE_Water_Saturation", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE_Water_Saturation", false));
+  addStateVariable("ACE_Water_Saturation", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE_Water_Saturation", false));
 
   // ACE_Porosity
   addStateVariable("ACE_Porosity", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE_Porosity", false));
@@ -202,23 +190,18 @@ ACEpermafrostMiniKernel<EvalT, Traits>::ACEpermafrostMiniKernel(
   // ACE Temperature is already registered in Mechanics Problem.
 
   // ACE Temperature Dot
-  addStateVariable(
-      "ACE Temperature Dot", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE Temperature Dot", false));
+  addStateVariable("ACE Temperature Dot", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("ACE Temperature Dot", false));
 
   // failed state
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output failure_state", true));
 
   // exposure time
-  addStateVariable(
-      "ACE Exposure Time", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Exposure Time", true));
+  addStateVariable("ACE Exposure Time", dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output ACE Exposure Time", true));
 }
 
 template <typename EvalT, typename Traits>
 void
-ACEpermafrostMiniKernel<EvalT, Traits>::init(
-    Workset&                 workset,
-    FieldMap<ScalarT const>& input_fields,
-    FieldMap<ScalarT>&       output_fields)
+ACEpermafrostMiniKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& input_fields, FieldMap<ScalarT>& output_fields)
 {
   auto const cauchy_string       = field_name_map_["Cauchy_Stress"];
   auto const Fp_string           = field_name_map_["Fp"];
@@ -364,8 +347,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   auto const pressure_fixed = 1.0;
   // Tmelt is in Kelvin
-  ScalarT const Tmelt =
-      -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal - 0.000753 / 10000.0 * pressure_fixed + 273.15;
+  ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal - 0.000753 / 10000.0 * pressure_fixed + 273.15;
 
   // Calculate temperature change
   auto const dTemp = Tcurr - Told;
@@ -421,8 +403,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   bool sediment_given = false;
-  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) && (silt_from_file_.size() > 0) &&
-      (peat_from_file_.size() > 0)) {
+  if ((sand_from_file_.size() > 0) && (clay_from_file_.size() > 0) && (silt_from_file_.size() > 0) && (peat_from_file_.size() > 0)) {
     sediment_given = true;
   }
 
@@ -485,31 +466,26 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Update the effective material density
   if (sediment_given == true) {
-    density_(cell, pt) =
-        (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) + ((1.0 - porosity) * calc_soil_density);
+    density_(cell, pt) = (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) + ((1.0 - porosity) * calc_soil_density);
 
   } else {
-    density_(cell, pt) =
-        (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) + ((1.0 - porosity) * soil_density_);
+    density_(cell, pt) = (porosity * ((ice_density_ * icurr) + (water_density_ * wcurr))) + ((1.0 - porosity) * soil_density_);
   }
 
   // Update the effective material heat capacity
   if (sediment_given == true) {
-    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) + (water_heat_capacity_ * wcurr))) +
-                               ((1.0 - porosity) * calc_soil_heat_capacity);
+    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) + (water_heat_capacity_ * wcurr))) + ((1.0 - porosity) * calc_soil_heat_capacity);
   } else {
-    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) + (water_heat_capacity_ * wcurr))) +
-                               ((1.0 - porosity) * soil_heat_capacity_);
+    heat_capacity_(cell, pt) = (porosity * ((ice_heat_capacity_ * icurr) + (water_heat_capacity_ * wcurr))) + ((1.0 - porosity) * soil_heat_capacity_);
   }
 
   // Update the effective material thermal conductivity
   if (sediment_given == true) {
-    thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
-                              pow(water_thermal_cond_, (wcurr * porosity)) *
-                              pow(calc_soil_thermal_cond, (1.0 - porosity));
+    thermal_cond_(cell, pt) =
+        pow(ice_thermal_cond_, (icurr * porosity)) * pow(water_thermal_cond_, (wcurr * porosity)) * pow(calc_soil_thermal_cond, (1.0 - porosity));
   } else {
-    thermal_cond_(cell, pt) = pow(ice_thermal_cond_, (icurr * porosity)) *
-                              pow(water_thermal_cond_, (wcurr * porosity)) * pow(soil_thermal_cond_, (1.0 - porosity));
+    thermal_cond_(cell, pt) =
+        pow(ice_thermal_cond_, (icurr * porosity)) * pow(water_thermal_cond_, (wcurr * porosity)) * pow(soil_thermal_cond_, (1.0 - porosity));
   }
 
   // Update the material thermal inertia term
@@ -550,8 +526,7 @@ ACEpermafrostMiniKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // check yield condition
   ScalarT const smag = minitensor::norm(s);
-  ScalarT const f =
-      smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
+  ScalarT const f    = smag - SQ23 * (Y + K * eqps_old_(cell, pt) + sat_mod_ * (1.0 - std::exp(-sat_exp_ * eqps_old_(cell, pt))));
 
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;

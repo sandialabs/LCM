@@ -20,9 +20,7 @@ template <typename EvalT, typename Traits>
 CahnHillChemTerm<EvalT, Traits>::CahnHillChemTerm(Teuchos::ParameterList const& p)
     : rho(p.get<std::string>("Rho QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       w(p.get<std::string>("W QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      chemTerm(
-          p.get<std::string>("Chemical Energy Term"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+      chemTerm(p.get<std::string>("Chemical Energy Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 
 {
   b = p.get<double>("b Value");
@@ -77,9 +75,7 @@ CahnHillChemTerm<EvalT, Traits>::getValue(std::string const& n)
     return b;
 
   else {
-    ALBANY_ABORT(
-        std::endl
-        << "Error! Logic error in getting parameter " << n << " in CahnHillChemTerm::getValue()" << std::endl);
+    ALBANY_ABORT(std::endl << "Error! Logic error in getting parameter " << n << " in CahnHillChemTerm::getValue()" << std::endl);
     return b;
   }
 }

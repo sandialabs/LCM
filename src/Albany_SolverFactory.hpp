@@ -26,9 +26,7 @@ class SolverFactory
   //! Default constructor
   SolverFactory(std::string const& inputfile, const Teuchos::RCP<Teuchos_Comm const>& comm);
 
-  SolverFactory(
-      const Teuchos::RCP<Teuchos::ParameterList>& input_appParams,
-      const Teuchos::RCP<Teuchos_Comm const>&     comm);
+  SolverFactory(const Teuchos::RCP<Teuchos::ParameterList>& input_appParams, const Teuchos::RCP<Teuchos_Comm const>& comm);
 
   //! Destructor
   virtual ~SolverFactory() = default;
@@ -109,11 +107,8 @@ class SolverFactory
 
  public:
   int
-  checkSolveTestResults(
-      int                                          response_index,
-      int                                          parameter_index,
-      Teuchos::RCP<Thyra_Vector const> const&      g,
-      const Teuchos::RCP<const Thyra_MultiVector>& dgdp) const;
+  checkSolveTestResults(int response_index, int parameter_index, Teuchos::RCP<Thyra_Vector const> const& g, const Teuchos::RCP<const Thyra_MultiVector>& dgdp)
+      const;
 
   /** \brief Function that does regression testing for Dakota runs. */
   int

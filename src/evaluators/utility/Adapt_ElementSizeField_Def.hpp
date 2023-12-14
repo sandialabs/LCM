@@ -20,9 +20,7 @@ Sqr(T num)
 namespace Adapt {
 
 template <typename EvalT, typename Traits>
-ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : coordVec(p.get<std::string>("Coordinate Vector Name"), dl->qp_vector),
       coordVec_vertices(p.get<std::string>("Coordinate Vector Name"), dl->vertices_vector),
       qp_weights("Weights", dl->qp_scalar)
@@ -61,18 +59,15 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
 
   if (outputCellAverage) {
     if (isAnisotropic)  // An-isotropic
-      this->pStateMgr->registerStateVariable(
-          className + "_Cell", dl->cell_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
+      this->pStateMgr->registerStateVariable(className + "_Cell", dl->cell_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
     else
-      this->pStateMgr->registerStateVariable(
-          className + "_Cell", dl->cell_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
+      this->pStateMgr->registerStateVariable(className + "_Cell", dl->cell_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
   }
 
   if (outputQPData) {
     //    if(isAnisotropic) //An-isotropic
     //    Always anisotropic?
-    this->pStateMgr->registerStateVariable(
-        className + "_QP", dl->qp_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
+    this->pStateMgr->registerStateVariable(className + "_QP", dl->qp_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
     //    else
     //      this->pStateMgr->registerStateVariable(className + "_QP",
     //      dl->qp_scalar, dl->dummy, "all",
@@ -87,19 +82,16 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
     // interprocessor synchronization
 
     if (isAnisotropic) {  // An-isotropic
-      this->pStateMgr->registerNodalVectorStateVariable(
-          className + "_Node", dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
+      this->pStateMgr->registerNodalVectorStateVariable(className + "_Node", dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
 
     } else {
-      this->pStateMgr->registerNodalVectorStateVariable(
-          className + "_Node", dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
+      this->pStateMgr->registerNodalVectorStateVariable(className + "_Node", dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
     }
 
     // The value of the weights used in the projection
     // Initialize to zero - should give us nan's during the division step if
     // something is wrong
-    this->pStateMgr->registerNodalVectorStateVariable(
-        className + "_NodeWgt", dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
+    this->pStateMgr->registerNodalVectorStateVariable(className + "_NodeWgt", dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, outputToExodus);
   }
 
   // Create field tag
@@ -111,9 +103,7 @@ ElementSizeFieldBase<EvalT, Traits>::ElementSizeFieldBase(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-ElementSizeFieldBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& fm)
+ElementSizeFieldBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& fm)
 {
   //  this->utils.setFieldData(field,fm);
   this->utils.setFieldData(qp_weights, fm);
@@ -127,9 +117,7 @@ ElementSizeFieldBase<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename Traits>
 
-ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::ElementSizeField(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::ElementSizeField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : ElementSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>(p, dl)
 {
 }
@@ -140,8 +128,7 @@ void ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typenam
   // Note that we only need to initialize the vectors when dealing with node
   // data, as we assume the vectors are initialized to zero
   if (this->outputNodeData) {
-    Teuchos::RCP<NodalDataVector> node_data =
-        this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+    Teuchos::RCP<NodalDataVector> node_data = this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
     node_data->initializeVectors(0.0);
   }
 }
@@ -200,8 +187,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename 
                                // be scattered and summed
 
     // Get the node data block container
-    Teuchos::RCP<NodalDataVector> node_data =
-        this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+    Teuchos::RCP<NodalDataVector>            node_data     = this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
     Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID    = workset.wsElNodeID;
     auto                                     owned_node_vs = node_data->getOwnedVectorSpace();
     auto                                     node_indexer  = Albany::createGlobalLocalIndexer(owned_node_vs);
@@ -284,8 +270,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(typename Tr
     // Note: we are in postEvaluate so all PEs call this
 
     // Get the node data block container
-    Teuchos::RCP<NodalDataVector> node_data =
-        this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+    Teuchos::RCP<NodalDataVector>            node_data       = this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
     Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID      = workset.wsElNodeID;
     auto                                     overlap_node_vs = node_data->getOverlappedVectorSpace();
 
@@ -330,8 +315,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(typename Tr
 
 template <typename EvalT, typename Traits>
 void
-ElementSizeFieldBase<EvalT, Traits>::getCellRadius(std::size_t const cell, typename EvalT::MeshScalarT& cellRadius)
-    const
+ElementSizeFieldBase<EvalT, Traits>::getCellRadius(std::size_t const cell, typename EvalT::MeshScalarT& cellRadius) const
 {
   std::vector<MeshScalarT> maxCoord(3, -1e10);
   std::vector<MeshScalarT> minCoord(3, +1e10);

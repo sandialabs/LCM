@@ -98,7 +98,7 @@ main(int ac, char* av[])
   //   Redefine connectivity and coordinate arrays with updated values.
   //   Mesh must only have relations between elements and nodes.
   Teuchos::RCP<Albany::AbstractDiscretization> discretization_ptr = topology.get_discretization();
-  Albany::STKDiscretization& stk_discretization = static_cast<Albany::STKDiscretization&>(*discretization_ptr);
+  Albany::STKDiscretization&                   stk_discretization = static_cast<Albany::STKDiscretization&>(*discretization_ptr);
 
   Teuchos::ArrayRCP<double> coordinates = stk_discretization.getCoordinates();
 

@@ -16,9 +16,7 @@
 #include "Albany_TmplSTKMeshStruct.hpp"
 #include "Topology_Utils.hpp"
 
-Albany::DiscretizationFactory::DiscretizationFactory(
-    const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams,
-    const Teuchos::RCP<Teuchos_Comm const>&     commT_)
+Albany::DiscretizationFactory::DiscretizationFactory(const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams, const Teuchos::RCP<Teuchos_Comm const>& commT_)
     : commT(commT_)
 {
   discParams = Teuchos::sublist(topLevelParams, "Discretization", true);
@@ -42,9 +40,7 @@ Albany::DiscretizationFactory::DiscretizationFactory(
 namespace {
 
 void
-createInterfaceParts(
-    Teuchos::RCP<Teuchos::ParameterList> const& adapt_params,
-    Teuchos::RCP<Albany::AbstractMeshStruct>&   mesh_struct)
+createInterfaceParts(Teuchos::RCP<Teuchos::ParameterList> const& adapt_params, Teuchos::RCP<Albany::AbstractMeshStruct>& mesh_struct)
 {
   // Top mod uses BGL
   bool const do_adaptation = adapt_params.is_null() == false;
@@ -72,8 +68,7 @@ createInterfaceParts(
 
   shards::CellTopology const interface_cell_topology = LCM::interfaceCellTopogyFromBulkCellTopogy(bulk_cell_topology);
 
-  stk::mesh::EntityRank const interface_dimension =
-      static_cast<stk::mesh::EntityRank>(interface_cell_topology.getDimension());
+  stk::mesh::EntityRank const interface_dimension = static_cast<stk::mesh::EntityRank>(interface_cell_topology.getDimension());
 
   stk::mesh::Part& interface_part = meta_data.declare_part(interface_part_name, interface_dimension);
 
@@ -169,7 +164,7 @@ Albany::DiscretizationFactory::createMeshStruct(
   } else if (method == "Hacky Ascii2D") {
     // FixME very hacky! needed for printing 2d mesh
     Teuchos::RCP<Albany::GenericSTKMeshStruct> meshStruct2D;
-    meshStruct2D = Teuchos::rcp(new Albany::AsciiSTKMesh2D(disc_params, comm));
+    meshStruct2D                                                   = Teuchos::rcp(new Albany::AsciiSTKMesh2D(disc_params, comm));
     Teuchos::RCP<Albany::StateInfoStruct>                      sis = Teuchos::rcp(new Albany::StateInfoStruct);
     Albany::AbstractFieldContainer::FieldContainerRequirements req;
     int                                                        neq = 2;
@@ -203,8 +198,7 @@ Albany::DiscretizationFactory::createDiscretization(
     const AbstractFieldContainer::FieldContainerRequirements& req,
     const Teuchos::RCP<Albany::RigidBodyModes>&               rigidBodyModes)
 {
-  return createDiscretization(
-      neq, empty_side_set_equations, sis, empty_side_set_sis, req, empty_side_set_req, rigidBodyModes);
+  return createDiscretization(neq, empty_side_set_equations, sis, empty_side_set_sis, req, empty_side_set_req, rigidBodyModes);
 }
 
 Teuchos::RCP<Albany::AbstractDiscretization>
@@ -220,8 +214,7 @@ Albany::DiscretizationFactory::createDiscretization(
   ALBANY_PANIC(meshStruct == Teuchos::null, "meshStruct accessed, but it has not been constructed" << std::endl);
 
   setupInternalMeshStruct(neq, sis, side_set_sis, req, side_set_req);
-  Teuchos::RCP<Albany::AbstractDiscretization> result =
-      createDiscretizationFromInternalMeshStruct(sideSetEquations, rigidBodyModes);
+  Teuchos::RCP<Albany::AbstractDiscretization> result = createDiscretizationFromInternalMeshStruct(sideSetEquations, rigidBodyModes);
 
   // Wrap the discretization in the catalyst decorator if needed.
 
@@ -252,13 +245,11 @@ Albany::DiscretizationFactory::setupInternalMeshStruct(
     const AbstractFieldContainer::FieldContainerRequirements&                        req,
     std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
-  meshStruct->setFieldAndBulkData(
-      commT, discParams, neq, req, sis, meshStruct->getMeshSpecs()[0]->worksetSize, side_set_sis, side_set_req);
+  meshStruct->setFieldAndBulkData(commT, discParams, neq, req, sis, meshStruct->getMeshSpecs()[0]->worksetSize, side_set_sis, side_set_req);
 }
 
 Teuchos::RCP<Albany::AbstractDiscretization>
-Albany::DiscretizationFactory::createDiscretizationFromInternalMeshStruct(
-    const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes)
+Albany::DiscretizationFactory::createDiscretizationFromInternalMeshStruct(const Teuchos::RCP<Albany::RigidBodyModes>& rigidBodyModes)
 {
   return createDiscretizationFromInternalMeshStruct(empty_side_set_equations, rigidBodyModes);
 }

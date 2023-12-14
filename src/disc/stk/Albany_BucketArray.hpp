@@ -13,7 +13,7 @@
 #include <stk_mesh/base/FindRestriction.hpp>
 #include <stk_mesh/base/MetaData.hpp>
 
-//#define IKT_DEBUG
+// #define IKT_DEBUG
 
 namespace Albany {
 
@@ -60,9 +60,8 @@ struct BucketArray<stk::mesh::Field<ScalarType, void, void, void, void, void, vo
   operator=(const BucketArray&);
 
  public:
-  typedef stk::mesh::Field<ScalarType, void, void, void, void, void, void, void> field_type;
-  typedef shards::Array<ScalarType, shards::FortranOrder, EntityDimension, void, void, void, void, void, void>
-      array_type;
+  typedef stk::mesh::Field<ScalarType, void, void, void, void, void, void, void>                               field_type;
+  typedef shards::Array<ScalarType, shards::FortranOrder, EntityDimension, void, void, void, void, void, void> array_type;
 
   BucketArray(const field_type& f, const stk::mesh::Bucket& k)
   {
@@ -98,9 +97,7 @@ get_size<stk::mesh::Cartesian>(stk::mesh::Bucket const& b)
  */
 template <typename ScalarType, class Tag1, class Tag2, class Tag3, class Tag4, class Tag5, class Tag6, class Tag7>
 struct BucketArray<stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>>
-    : public shards::ArrayAppend<
-          shards::Array<ScalarType, shards::FortranOrder, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>,
-          EntityDimension>::type
+    : public shards::ArrayAppend<shards::Array<ScalarType, shards::FortranOrder, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>, EntityDimension>::type
 {
  private:
   typedef unsigned char* byte_p;
@@ -112,9 +109,8 @@ struct BucketArray<stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Ta
  public:
   typedef stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7> field_type;
 
-  typedef typename shards::ArrayAppend<
-      shards::Array<ScalarType, shards::FortranOrder, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>,
-      EntityDimension>::type array_type;
+  typedef
+      typename shards::ArrayAppend<shards::Array<ScalarType, shards::FortranOrder, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>, EntityDimension>::type array_type;
 
   BucketArray(const field_type& f, const stk::mesh::Bucket& b)
   {
@@ -154,8 +150,7 @@ struct BucketArray<stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Ta
         assert(false);
       }
 
-      array_type::assign_stride(
-          (ScalarType*)(b.field_data_location(f)), stride, (typename array_type::size_type)b.size());
+      array_type::assign_stride((ScalarType*)(b.field_data_location(f)), stride, (typename array_type::size_type)b.size());
     }
   }
 };

@@ -92,10 +92,7 @@ class Partition
    *                         processors. Can be NULL.
    */
   virtual void
-  set_mesh_info(
-      std::vector<mesh::Entity> const& mesh_entities,
-      const VectorField*               nodal_coord_ref,
-      const ScalarField*               elem_weight_ref = NULL) = 0;
+  set_mesh_info(std::vector<mesh::Entity> const& mesh_entities, const VectorField* nodal_coord_ref, const ScalarField* elem_weight_ref = NULL) = 0;
 
   /** \brief Destructor. */
   virtual ~Partition();

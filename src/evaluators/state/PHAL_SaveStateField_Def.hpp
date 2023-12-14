@@ -22,9 +22,7 @@ SaveStateField<EvalT, Traits>::SaveStateField(Teuchos::ParameterList const& /* p
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SaveStateField<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& /* fm */)
+SaveStateField<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& /* fm */)
 {
   // States Not Saved for Generic Type, only Specializations
 }
@@ -66,9 +64,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::SaveStateField(Teuchos::Pa
 // **********************************************************************
 template <typename Traits>
 void
-SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field, fm);
 
@@ -106,10 +102,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveElemState(typename Tra
   Albany::StateArray::const_iterator it;
   it = workset.stateArrayPtr->find(stateName);
 
-  ALBANY_PANIC(
-      (it == workset.stateArrayPtr->end()),
-      std::endl
-          << "Error: cannot locate " << stateName << " in PHAL_SaveStateField_Def" << std::endl);
+  ALBANY_PANIC((it == workset.stateArrayPtr->end()), std::endl << "Error: cannot locate " << stateName << " in PHAL_SaveStateField_Def" << std::endl);
 
   Albany::MDArray                         sta = it->second;
   std::vector<PHX::DataLayout::size_type> dims;
@@ -156,10 +149,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveWorksetState(typename 
   Albany::StateArray::const_iterator it;
   it = workset.stateArrayPtr->find(stateName);
 
-  ALBANY_PANIC(
-      (it == workset.stateArrayPtr->end()),
-      std::endl
-          << "Error: cannot locate " << stateName << " in PHAL_SaveStateField_Def" << std::endl);
+  ALBANY_PANIC((it == workset.stateArrayPtr->end()), std::endl << "Error: cannot locate " << stateName << " in PHAL_SaveStateField_Def" << std::endl);
 
   Albany::MDArray                         sta = it->second;
   std::vector<PHX::DataLayout::size_type> dims;
@@ -194,8 +184,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typename Tra
   Teuchos::RCP<Albany::AbstractDiscretization> disc = workset.disc;
   ALBANY_PANIC(disc == Teuchos::null, "Error! Discretization is needed to save nodal state.\n");
 
-  Teuchos::RCP<Albany::AbstractSTKMeshStruct> mesh =
-      Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(disc->getMeshStruct());
+  Teuchos::RCP<Albany::AbstractSTKMeshStruct> mesh = Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(disc->getMeshStruct());
   ALBANY_PANIC(mesh == Teuchos::null, "Error! Save nodal states available only for stk meshes.\n");
 
   stk::mesh::MetaData& metaData = *mesh->metaData;

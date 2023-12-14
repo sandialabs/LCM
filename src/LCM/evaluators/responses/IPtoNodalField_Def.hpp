@@ -152,10 +152,8 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::IPtoNodalField(
   // Initialize manager.
   bool first;
   {
-    std::string const key_suffix =
-        field_name_prefix +
-        (this->number_of_fields_ > 0 ? plist->get<std::string>(Albany::strint("IP Field Name", 0)) : "");
-    std::string const                        key = "IPtoNodalField_" + key_suffix;
+    std::string const key_suffix = field_name_prefix + (this->number_of_fields_ > 0 ? plist->get<std::string>(Albany::strint("IP Field Name", 0)) : "");
+    std::string const key        = "IPtoNodalField_" + key_suffix;
     const Teuchos::RCP<Adapt::NodalDataBase> ndb = this->p_state_mgr_->getNodalDataBase();
     first                                        = !ndb->isManagerRegistered(key);
     if (first) {
@@ -172,34 +170,13 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::IPtoNodalField(
   for (int field(0); field < this->number_of_fields_; ++field) {
     if (this->ip_field_layouts_[field] == "Scalar") {
       this->p_state_mgr_->registerNodalVectorStateVariable(
-          this->nodal_field_names_[field],
-          dl->node_node_scalar,
-          dl->dummy,
-          "all",
-          "scalar",
-          0.0,
-          false,
-          this->output_to_exodus_);
+          this->nodal_field_names_[field], dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, this->output_to_exodus_);
     } else if (this->ip_field_layouts_[field] == "Vector") {
       this->p_state_mgr_->registerNodalVectorStateVariable(
-          this->nodal_field_names_[field],
-          dl->node_node_vector,
-          dl->dummy,
-          "all",
-          "scalar",
-          0.0,
-          false,
-          this->output_to_exodus_);
+          this->nodal_field_names_[field], dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, this->output_to_exodus_);
     } else if (this->ip_field_layouts_[field] == "Tensor") {
       this->p_state_mgr_->registerNodalVectorStateVariable(
-          this->nodal_field_names_[field],
-          dl->node_node_tensor,
-          dl->dummy,
-          "all",
-          "scalar",
-          0.0,
-          false,
-          this->output_to_exodus_);
+          this->nodal_field_names_[field], dl->node_node_tensor, dl->dummy, "all", "scalar", 0.0, false, this->output_to_exodus_);
     }
   }
 
@@ -208,12 +185,10 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::IPtoNodalField(
   // the weight vectors would be the same, coordination would be required to
   // prevent multiple sums.
   nodal_weights_name_ = "nw_" + this->ip_field_names_[0];
-  this->p_state_mgr_->registerNodalVectorStateVariable(
-      nodal_weights_name_, dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, true);
+  this->p_state_mgr_->registerNodalVectorStateVariable(nodal_weights_name_, dl->node_node_scalar, dl->dummy, "all", "scalar", 0.0, false, true);
 
   if (first) {
-    this->mgr_->ndb_numvecs =
-        this->p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getVecsize() - this->mgr_->ndb_start;
+    this->mgr_->ndb_numvecs = this->p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getVecsize() - this->mgr_->ndb_start;
   }
 }
 
@@ -225,9 +200,8 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Trait
   bool const am_first = ctr == 1;
   if (!am_first) return;
 
-  const Teuchos::RCP<Adapt::NodalDataVector> node_data =
-      this->p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
-  this->mgr_->nodal_field = Thyra::createMembers(node_data->getOwnedVectorSpace(), this->mgr_->ndb_numvecs);
+  const Teuchos::RCP<Adapt::NodalDataVector> node_data = this->p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+  this->mgr_->nodal_field                              = Thyra::createMembers(node_data->getOwnedVectorSpace(), this->mgr_->ndb_numvecs);
   (this->mgr_->nodal_field)->assign(0.0);
 }
 
@@ -243,8 +217,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>> wsElNodeID       = workset.wsElNodeID;
   Teuchos::RCP<Thyra_VectorSpace const>    local_node_space = data->col(0)->space();
 
-  const Teuchos::RCP<Adapt::NodalDataVector> node_data =
-      this->p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+  const Teuchos::RCP<Adapt::NodalDataVector> node_data = this->p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
 
   int num_nodes = this->num_nodes_;
   int num_dims  = this->num_dims_;
@@ -286,13 +259,11 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
         for (int pt = 0; pt < num_pts; ++pt) {
           if (this->ip_field_layouts_[field] == "Scalar") {
             // save the scalar component
-            data_nonconstView[node_var_offset][local_row] +=
-                this->ip_fields_[field](cell, pt) * this->weights_(cell, pt);
+            data_nonconstView[node_var_offset][local_row] += this->ip_fields_[field](cell, pt) * this->weights_(cell, pt);
           } else if (this->ip_field_layouts_[field] == "Vector") {
             for (int i = 0; i < num_dims; ++i) {
               // save the vector component
-              data_nonconstView[node_var_offset + i][local_row] +=
-                  this->ip_fields_[field](cell, pt, i) * this->weights_(cell, pt);
+              data_nonconstView[node_var_offset + i][local_row] += this->ip_fields_[field](cell, pt, i) * this->weights_(cell, pt);
             }
           } else if (this->ip_field_layouts_[field] == "Tensor") {
             for (int i = 0; i < num_dims; ++i) {
@@ -321,16 +292,14 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(typename Trai
   this->mgr_->initCounters();
 
   // Get the node data vector container.
-  Teuchos::RCP<Adapt::NodalDataVector> node_data =
-      this->p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+  Teuchos::RCP<Adapt::NodalDataVector> node_data = this->p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
 
   // Export the data from the local to overlapped decomposition.
   Teuchos::RCP<Thyra_VectorSpace const> const overlap_node_space = node_data->getOverlappedVectorSpace();
-  Teuchos::RCP<Thyra_MultiVector> const       data = Thyra::createMembers(overlap_node_space, this->mgr_->ndb_numvecs);
+  Teuchos::RCP<Thyra_MultiVector> const       data               = Thyra::createMembers(overlap_node_space, this->mgr_->ndb_numvecs);
   data->assign(0.0);
   // IKT, note to self: cas_manager arguments are (owned, overlapped)
-  auto cas_manager =
-      Albany::createCombineAndScatterManager(this->mgr_->nodal_field->col(0)->space(), overlap_node_space);
+  auto cas_manager = Albany::createCombineAndScatterManager(this->mgr_->nodal_field->col(0)->space(), overlap_node_space);
   // IKT, note to self: scatter is from unique -> overlap space
   // Arguments are (src, tgt)
   cas_manager->scatter(this->mgr_->nodal_field, data, Albany::CombineMode::ADD);

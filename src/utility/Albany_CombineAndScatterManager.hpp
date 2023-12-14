@@ -25,9 +25,7 @@ enum class CombineMode
 class CombineAndScatterManager
 {
  public:
-  CombineAndScatterManager(
-      Teuchos::RCP<Thyra_VectorSpace const> const& owned,
-      Teuchos::RCP<Thyra_VectorSpace const> const& overlapped);
+  CombineAndScatterManager(Teuchos::RCP<Thyra_VectorSpace const> const& owned, Teuchos::RCP<Thyra_VectorSpace const> const& overlapped);
 
   virtual ~CombineAndScatterManager() = default;
 
@@ -81,16 +79,11 @@ class CombineAndScatterManager
   combine(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM) const = 0;
 
   virtual void
-  combine(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM)
-      const = 0;
+  combine(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM) const = 0;
   virtual void
-  combine(
-      const Teuchos::RCP<const Thyra_MultiVector>& src,
-      Teuchos::RCP<Thyra_MultiVector> const&       dst,
-      const CombineMode                            CM) const = 0;
+  combine(const Teuchos::RCP<const Thyra_MultiVector>& src, Teuchos::RCP<Thyra_MultiVector> const& dst, const CombineMode CM) const = 0;
   virtual void
-  combine(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM)
-      const = 0;
+  combine(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM) const = 0;
 
   // Scatter methods
   virtual void
@@ -101,16 +94,11 @@ class CombineAndScatterManager
   scatter(const Thyra_LinearOp& src, Thyra_LinearOp& dst, const CombineMode CM) const = 0;
 
   virtual void
-  scatter(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM)
-      const = 0;
+  scatter(Teuchos::RCP<Thyra_Vector const> const& src, Teuchos::RCP<Thyra_Vector> const& dst, const CombineMode CM) const = 0;
   virtual void
-  scatter(
-      const Teuchos::RCP<const Thyra_MultiVector>& src,
-      Teuchos::RCP<Thyra_MultiVector> const&       dst,
-      const CombineMode                            CM) const = 0;
+  scatter(const Teuchos::RCP<const Thyra_MultiVector>& src, Teuchos::RCP<Thyra_MultiVector> const& dst, const CombineMode CM) const = 0;
   virtual void
-  scatter(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM)
-      const = 0;
+  scatter(const Teuchos::RCP<const Thyra_LinearOp>& src, const Teuchos::RCP<Thyra_LinearOp>& dst, const CombineMode CM) const = 0;
 
  protected:
   void
@@ -190,9 +178,7 @@ CombineAndScatterManager::getOwnedAuraUsers() const
 // Utility function that returns a concrete manager, depending on the concrete
 // type of the input vector spaces.
 Teuchos::RCP<CombineAndScatterManager>
-createCombineAndScatterManager(
-    Teuchos::RCP<Thyra_VectorSpace const> const& owned,
-    Teuchos::RCP<Thyra_VectorSpace const> const& overlapped);
+createCombineAndScatterManager(Teuchos::RCP<Thyra_VectorSpace const> const& owned, Teuchos::RCP<Thyra_VectorSpace const> const& overlapped);
 
 }  // namespace Albany
 

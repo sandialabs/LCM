@@ -16,9 +16,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFGradInterpolationBase<EvalT, Traits, ScalarT>::DOFGradInterpolationBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+DOFGradInterpolationBase<EvalT, Traits, ScalarT>::DOFGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : val_node(p.get<std::string>("Variable Name"), dl->node_scalar),
       GradBF(p.get<std::string>("Gradient BF Name"), dl->node_qp_gradient),
       grad_val_qp(p.get<std::string>("Gradient Variable Name"), dl->qp_gradient)
@@ -40,9 +38,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::DOFGradInterpolationBase(
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_node, fm);
   this->utils.setFieldData(GradBF, fm);
@@ -59,9 +55,8 @@ KOKKOS_INLINE_FUNCTION void
 DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(const team_member& thread) const
 {
   int const thread_idx = thread.league_rank() * threads_per_team;
-  int const end_loop =
-      thread_idx + threads_per_team > (numCells * numQPs) ? (numCells * numQPs) : (thread_idx + threads_per_team);
-  ScalarT gradVal_tmp;
+  int const end_loop   = thread_idx + threads_per_team > (numCells * numQPs) ? (numCells * numQPs) : (thread_idx + threads_per_team);
+  ScalarT   gradVal_tmp;
 
   Kokkos::parallel_for(Kokkos::TeamThreadRange(thread, thread_idx, end_loop), [=](int& indx) {
     int const cell = indx / numCells;
@@ -92,9 +87,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(const team_member& 
 #else
 template <typename EvalT, typename Traits, typename ScalarT>
 KOKKOS_INLINE_FUNCTION void
-DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
-    const DOFGradInterpolationBase_Residual_Tag& tag,
-    int const&                                   cell) const
+DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(const DOFGradInterpolationBase_Residual_Tag& tag, int const& cell) const
 {
   for (int qp = 0; qp < numQPs; ++qp) {
     for (int dim = 0; dim < numDims; dim++) {
@@ -152,21 +145,16 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits
 // Kokkos kernel for Jacobian
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-FastSolutionGradInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-operator()(const FastSolutionGradInterpolationBase_Jacobian_Tag& tag, int const& cell) const
+FastSolutionGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::operator()(
+    const FastSolutionGradInterpolationBase_Jacobian_Tag& tag,
+    int const&                                            cell) const
 {
   for (int qp = 0; qp < this->numQPs; ++qp) {
     for (int dim = 0; dim < this->numDims; dim++) {
-      this->grad_val_qp(cell, qp, dim) =
-          ScalarT(num_dof, this->val_node(cell, 0).val() * this->GradBF(cell, 0, qp, dim));
-      (this->grad_val_qp(cell, qp, dim)).fastAccessDx(offset) =
-          this->val_node(cell, 0).fastAccessDx(offset) * this->GradBF(cell, 0, qp, dim);
+      this->grad_val_qp(cell, qp, dim)                        = ScalarT(num_dof, this->val_node(cell, 0).val() * this->GradBF(cell, 0, qp, dim));
+      (this->grad_val_qp(cell, qp, dim)).fastAccessDx(offset) = this->val_node(cell, 0).fastAccessDx(offset) * this->GradBF(cell, 0, qp, dim);
       for (int node = 1; node < this->numNodes; ++node) {
-        (this->grad_val_qp(cell, qp, dim)).val() +=
-            this->val_node(cell, node).val() * this->GradBF(cell, node, qp, dim);
+        (this->grad_val_qp(cell, qp, dim)).val() += this->val_node(cell, node).val() * this->GradBF(cell, node, qp, dim);
         (this->grad_val_qp(cell, qp, dim)).fastAccessDx(neq * node + offset) +=
             this->val_node(cell, node).fastAccessDx(neq * node + offset) * this->GradBF(cell, node, qp, dim);
       }
@@ -177,10 +165,8 @@ operator()(const FastSolutionGradInterpolationBase_Jacobian_Tag& tag, int const&
 
 template <typename Traits>
 void
-FastSolutionGradInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(typename Traits::EvalData workset)
+FastSolutionGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(
+    typename Traits::EvalData workset)
 {
   // Intrepid2 Version:
   // for (int i=0; i < grad_val_qp.size() ; i++) grad_val_qp[i] = 0.0;

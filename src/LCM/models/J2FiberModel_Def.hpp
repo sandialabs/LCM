@@ -142,10 +142,7 @@ J2FiberModel<EvalT, Traits>::J2FiberModel(Teuchos::ParameterList* p, const Teuch
 }
 template <typename EvalT, typename Traits>
 void
-J2FiberModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+J2FiberModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto                                                  def_grad          = *dep_fields["F"];
@@ -310,9 +307,7 @@ J2FiberModel<EvalT, Traits>::computeState(
       sigma_m = s / J(cell, pt) + p * I;
 
       // compute energy for matrix
-      energy_m(cell, pt) =
-          volume_fraction_m_ *
-          (0.5 * kappa * (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) + 0.5 * mu * (trbe - 3.0));
+      energy_m(cell, pt) = volume_fraction_m_ * (0.5 * kappa * (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) + 0.5 * mu * (trbe - 3.0));
 
       // damage term in matrix
       alpha_m = energy_m_old(cell, pt);
@@ -329,8 +324,7 @@ J2FiberModel<EvalT, Traits>::computeState(
       if (local_coord_flag_) {
         // compute fiber orientation based on local coordinates
         // special case of plane strain M1(3) = 0; M2(3) = 0;
-        minitensor::Vector<ScalarT> gpt(
-            ScalarT(gpt_location(cell, pt, 0)), ScalarT(gpt_location(cell, pt, 1)), ScalarT(gpt_location(cell, pt, 2)));
+        minitensor::Vector<ScalarT> gpt(ScalarT(gpt_location(cell, pt, 0)), ScalarT(gpt_location(cell, pt, 1)), ScalarT(gpt_location(cell, pt, 2)));
         minitensor::Vector<ScalarT> OA(gpt(0) - ring_center_[0], gpt(1) - ring_center_[1], 0);
 
         M1    = OA / minitensor::norm(OA);

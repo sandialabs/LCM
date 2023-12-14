@@ -93,8 +93,7 @@ Porosity<EvalT, Traits>::Porosity(Teuchos::ParameterList& p, const Teuchos::RCP<
     this->addDependentField(Temperature);
 
     if (p.isType<std::string>("Skeleton Thermal Expansion Name")) {
-      skeletonThermalExpansion =
-          decltype(skeletonThermalExpansion)(p.get<std::string>("Skeleton Thermal Expansion Name"), dl->qp_scalar);
+      skeletonThermalExpansion = decltype(skeletonThermalExpansion)(p.get<std::string>("Skeleton Thermal Expansion Name"), dl->qp_scalar);
       this->addDependentField(skeletonThermalExpansion);
 
       if (p.isType<std::string>("Reference Temperature Name")) {
@@ -151,9 +150,8 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
           Teuchos::Array<MeshScalarT> point(numDims);
 
           for (int i = 0; i < numDims; i++) {
-            porosity(cell, qp) =
-                initialPorosityValue + biotCoefficient(cell, qp) * strain(cell, qp, i, i) +
-                porePressure(cell, qp) * (biotCoefficient(cell, qp) - initialPorosityValue) / GrainBulkModulus;
+            porosity(cell, qp) = initialPorosityValue + biotCoefficient(cell, qp) * strain(cell, qp, i, i) +
+                                 porePressure(cell, qp) * (biotCoefficient(cell, qp) - initialPorosityValue) / GrainBulkModulus;
           }
           // Set Warning message
           if (porosity(cell, qp) < 0) {
@@ -175,26 +173,22 @@ Porosity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         for (int qp = 0; qp < numQPs; ++qp) {
           if (hasTemp == false) {
             porosity(cell, qp) =
-                initialPorosityValue *
-                std::exp(
-                    GrainBulkModulus / (porePressure(cell, qp) + GrainBulkModulus) * biotCoefficient(cell, qp) *
-                        std::log(J(cell, qp)) +
-                    biotCoefficient(cell, qp) / (porePressure(cell, qp) + GrainBulkModulus) * porePressure(cell, qp));
+                initialPorosityValue * std::exp(
+                                           GrainBulkModulus / (porePressure(cell, qp) + GrainBulkModulus) * biotCoefficient(cell, qp) * std::log(J(cell, qp)) +
+                                           biotCoefficient(cell, qp) / (porePressure(cell, qp) + GrainBulkModulus) * porePressure(cell, qp));
           } else {
-            temp = 1.0 + porePressure(cell, qp) / GrainBulkModulus -
-                   3.0 * skeletonThermalExpansion(cell, qp) * (Temperature(cell, qp) - refTemperature(cell, qp));
+            temp =
+                1.0 + porePressure(cell, qp) / GrainBulkModulus - 3.0 * skeletonThermalExpansion(cell, qp) * (Temperature(cell, qp) - refTemperature(cell, qp));
 
             //          ALBANY_PANIC(J(cell,qp) <= 0,
             //              " negative / zero volume detected in
             //              Porosity_def.hpp line " + __LINE__);
             // Note - J(cell, qp) equal to zero causes an FPE (GAH)
 
-            porosity(cell, qp) =
-                initialPorosityValue * std::exp(
-                                           biotCoefficient(cell, qp) * std::log(J(cell, qp)) +
-                                           biotCoefficient(cell, qp) / GrainBulkModulus * porePressure(cell, qp) -
-                                           3.0 * J(cell, qp) * skeletonThermalExpansion(cell, qp) *
-                                               (Temperature(cell, qp) - refTemperature(cell, qp)) / temp);
+            porosity(cell, qp) = initialPorosityValue *
+                                 std::exp(
+                                     biotCoefficient(cell, qp) * std::log(J(cell, qp)) + biotCoefficient(cell, qp) / GrainBulkModulus * porePressure(cell, qp) -
+                                     3.0 * J(cell, qp) * skeletonThermalExpansion(cell, qp) * (Temperature(cell, qp) - refTemperature(cell, qp)) / temp);
           }
 
           // Set Warning message

@@ -195,8 +195,7 @@ Albany::HMCProblem::constructEvaluators(
   std::string eb_name = meshSpecs.ebName;
 
   // get the name of the material model to be used (and make sure there is one)
-  std::string material_model_name =
-      material_db_->getElementBlockSublist(eb_name, "Material Model").get<std::string>("Model Name");
+  std::string material_model_name = material_db_->getElementBlockSublist(eb_name, "Material Model").get<std::string>("Model Name");
   ALBANY_PANIC(material_model_name.length() == 0, "A material model must be defined for block: " + eb_name);
 
 #if defined(ALBANY_VERBOSE)
@@ -212,15 +211,14 @@ Albany::HMCProblem::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numDim      = cubature->getDimension();
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
 
-  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-       << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
+  *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPts
+       << ", Dim= " << numDim << std::endl;
 
   // volume average pressure
   bool volume_average_pressure(false);
@@ -229,9 +227,7 @@ Albany::HMCProblem::constructEvaluators(
 
   // Construct standard FEM evaluators with standard field names
   dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
-  ALBANY_PANIC(
-      dl->vectorAndGradientLayoutsAreEquivalent == false,
-      "Data Layout Usage in Mechanics problems assume vecDim = numDim");
+  ALBANY_PANIC(dl->vectorAndGradientLayoutsAreEquivalent == false, "Data Layout Usage in Mechanics problems assume vecDim = numDim");
 
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
 
@@ -444,8 +440,8 @@ Albany::HMCProblem::constructEvaluators(
   \end{text}*/
 
   int vectorRank = 1;
-  fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_withAcceleration(
-      vectorRank, macro_dof_names, Teuchos::null, macro_dof_names_dotdot));
+  fm0.template registerEvaluator<EvalT>(
+      evalUtils.constructGatherSolutionEvaluator_withAcceleration(vectorRank, macro_dof_names, Teuchos::null, macro_dof_names_dotdot));
 
   // Gather Solution (microstrains and micro accelerations)
   /*\begin{text}
@@ -520,8 +516,7 @@ Albany::HMCProblem::constructEvaluators(
    dims(cell,I=nNodes,p=nQPs,j=spcDim)\\
       \end{tabular} \\
    \end{text}*/
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   // Project displacements to Gauss points
   /*\begin{text}
@@ -566,8 +561,7 @@ Albany::HMCProblem::constructEvaluators(
     \end{tabular} \\
   \end{text}*/
   for (int i = 0; i < numMicroScales; i++)
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFTensorInterpolationEvaluator(micro_dof_names[i][0], dof_offset + i * dof_stride));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFTensorInterpolationEvaluator(micro_dof_names[i][0], dof_offset + i * dof_stride));
 
   // Project accelerations to Gauss points
   /*\begin{text}
@@ -613,8 +607,7 @@ Albany::HMCProblem::constructEvaluators(
     \end{tabular} \\
   \end{text}*/
   for (int i = 0; i < numMicroScales; i++)
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFTensorInterpolationEvaluator(micro_dof_names_dotdot[i][0], dof_offset + i * dof_stride));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFTensorInterpolationEvaluator(micro_dof_names_dotdot[i][0], dof_offset + i * dof_stride));
 
   // Project nodal coordinates to Gauss points
   /*\begin{text}
@@ -680,8 +673,7 @@ Albany::HMCProblem::constructEvaluators(
     \end{tabular} \\
   \end{text}*/
   for (int i = 0; i < numMicroScales; i++) {
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructDOFTensorGradInterpolationEvaluator(micro_dof_names[i][0], dof_offset + i * dof_stride));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFTensorGradInterpolationEvaluator(micro_dof_names[i][0], dof_offset + i * dof_stride));
 
     std::string strMSGrad_Inc = micro_dof_names[i][0] + " Gradient";
     std::string msGrad        = Albany::strint(strMicrostrain, i) + " Gradient";
@@ -860,8 +852,7 @@ Albany::HMCProblem::constructEvaluators(
     // pass through material properties
     p->set<Teuchos::ParameterList*>("Material Parameters", &param_list);
 
-    RCP<LCM::ConstitutiveModelParameters<EvalT, AlbanyTraits>> cmpEv =
-        rcp(new LCM::ConstitutiveModelParameters<EvalT, AlbanyTraits>(*p, dl));
+    RCP<LCM::ConstitutiveModelParameters<EvalT, AlbanyTraits>> cmpEv = rcp(new LCM::ConstitutiveModelParameters<EvalT, AlbanyTraits>(*p, dl));
     fm0.template registerEvaluator<EvalT>(cmpEv);
   }
 
@@ -909,8 +900,7 @@ Albany::HMCProblem::constructEvaluators(
       p->set<std::string>("Weights Name", "Weights");
     }
 
-    RCP<LCM::ConstitutiveModelInterface<EvalT, AlbanyTraits>> cmiEv =
-        rcp(new LCM::ConstitutiveModelInterface<EvalT, AlbanyTraits>(*p, dl));
+    RCP<LCM::ConstitutiveModelInterface<EvalT, AlbanyTraits>> cmiEv = rcp(new LCM::ConstitutiveModelInterface<EvalT, AlbanyTraits>(*p, dl));
     fm0.template registerEvaluator<EvalT>(cmiEv);
 
     registerStateVariables(cmiEv, fm0, stateMgr, eb_name, numDim);
@@ -1017,8 +1007,7 @@ Albany::HMCProblem::constructEvaluators(
   int numTensorFields = numDim * numDim;
   int dofOffset       = numDim;
   for (int i = 0; i < numMicroScales; i++) {  // Micro forces
-    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(
-        tensorRank, micro_resid_names[i], dofOffset, micro_scatter_names[i][0]));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(tensorRank, micro_resid_names[i], dofOffset, micro_scatter_names[i][0]));
     dofOffset += numTensorFields;
   }
 

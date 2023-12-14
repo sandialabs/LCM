@@ -18,8 +18,8 @@ Schwarz_CoupledJacobian::Schwarz_CoupledJacobian(Teuchos::RCP<Teuchos_Comm const
 
 Schwarz_CoupledJacobian::~Schwarz_CoupledJacobian() { return; }
 
-//#define USE_OFF_DIAGONAL
-//#define EXPLICIT_OFF_DIAGONAL
+// #define USE_OFF_DIAGONAL
+// #define EXPLICIT_OFF_DIAGONAL
 
 // getThyraCoupledJacobian method is similar to getThyraMatrix in panzer
 //(Panzer_BlockedTpetraLinearObjFactory_impl.hpp).
@@ -46,8 +46,7 @@ Schwarz_CoupledJacobian::getThyraCoupledJacobian(
 #if defined(USE_OFF_DIAGONAL)
 #if defined(EXPLICIT_OFF_DIAGONAL)
 
-        Teuchos::RCP<Schwarz_BoundaryJacobian> jac_boundary =
-            Teuchos::rcp(new Schwarz_BoundaryJacobian(comm_, ca, jacs, i, j));
+        Teuchos::RCP<Schwarz_BoundaryJacobian> jac_boundary = Teuchos::rcp(new Schwarz_BoundaryJacobian(comm_, ca, jacs, i, j));
 
         Teuchos::RCP<Thyra_LinearOp> exp_jac = jac_boundary->getExplicitOperator();
 

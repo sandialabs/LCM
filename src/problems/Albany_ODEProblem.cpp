@@ -10,10 +10,7 @@
 #include "PHAL_FactoryTraits.hpp"
 #include "Shards_CellTopology.hpp"
 
-Albany::ODEProblem::ODEProblem(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<ParamLib>&               paramLib_,
-    int const                                   numDim_)
+Albany::ODEProblem::ODEProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
     : Albany::AbstractProblem(params_, paramLib_, 2), numDim(numDim_), use_sdbcs_(false)
 {
 }
@@ -21,9 +18,7 @@ Albany::ODEProblem::ODEProblem(
 Albany::ODEProblem::~ODEProblem() {}
 
 void
-Albany::ODEProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::ODEProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");

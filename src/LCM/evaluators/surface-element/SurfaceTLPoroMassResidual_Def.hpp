@@ -13,9 +13,7 @@ namespace LCM {
 
 //*****
 template <typename EvalT, typename Traits>
-SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : thickness(p.get<double>("thickness")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       intrepidBasis(p.get<Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>>("Intrepid2 Basis")),
@@ -87,9 +85,7 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::SurfaceTLPoroMassResidual(
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceTLPoroMassResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceTLPoroMassResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(scalarGrad, fm);
   this->utils.setFieldData(surface_Grad_BF, fm);
@@ -191,11 +187,10 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
                                          (porePressure(cell, pt) - porePressureold(cell, pt)) / biotModulus(cell, pt)) *
                                         refArea(cell, pt);
 
-        poroMassResidual(cell, topNode) -=
-            refValues(node, pt) *
-            (std::log(J(cell, pt) / Jold(cell, pt)) * biotCoefficient(cell, pt) +
-             (porePressure(cell, pt) - porePressureold(cell, pt)) / biotModulus(cell, pt)) *
-            refArea(cell, pt);
+        poroMassResidual(cell, topNode) -= refValues(node, pt) *
+                                           (std::log(J(cell, pt) / Jold(cell, pt)) * biotCoefficient(cell, pt) +
+                                            (porePressure(cell, pt) - porePressureold(cell, pt)) / biotModulus(cell, pt)) *
+                                           refArea(cell, pt);
 
       }  // end integrartion point loop
     }    //  end plane node loop
@@ -207,11 +202,9 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
 
       for (int pt = 0; pt < numQPs; ++pt) {
         for (int dim = 0; dim < numDims; ++dim) {
-          poroMassResidual(cell, node) -=
-              flux(cell, pt, dim) * dt * surface_Grad_BF(cell, node, pt, dim) * refArea(cell, pt);
+          poroMassResidual(cell, node) -= flux(cell, pt, dim) * dt * surface_Grad_BF(cell, node, pt, dim) * refArea(cell, pt);
 
-          poroMassResidual(cell, topNode) -=
-              flux(cell, pt, dim) * dt * surface_Grad_BF(cell, topNode, pt, dim) * refArea(cell, pt);
+          poroMassResidual(cell, topNode) -= flux(cell, pt, dim) * dt * surface_Grad_BF(cell, topNode, pt, dim) * refArea(cell, pt);
         }
       }
     }

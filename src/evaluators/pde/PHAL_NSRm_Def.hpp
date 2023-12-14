@@ -11,23 +11,13 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 NSRm<EvalT, Traits>::NSRm(Teuchos::ParameterList const& p)
-    : pGrad(
-          p.get<std::string>("Pressure Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      VGrad(
-          p.get<std::string>("Velocity Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+    : pGrad(p.get<std::string>("Pressure Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      VGrad(p.get<std::string>("Velocity Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       V(p.get<std::string>("Velocity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      V_Dot(
-          p.get<std::string>("Velocity Dot QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      rho(p.get<std::string>("Density QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      phi(p.get<std::string>("Porosity QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      force(
-          p.get<std::string>("Body Force QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      V_Dot(p.get<std::string>("Velocity Dot QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      rho(p.get<std::string>("Density QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      phi(p.get<std::string>("Porosity QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      force(p.get<std::string>("Body Force QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       permTerm(p.get<std::string>("Permeability Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       ForchTerm(p.get<std::string>("Forchheimer Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       Rm(p.get<std::string>("Rm Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
@@ -52,7 +42,7 @@ NSRm<EvalT, Traits>::NSRm(Teuchos::ParameterList const& p)
   }
   this->addEvaluatedField(Rm);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   numNodes = dims[1];

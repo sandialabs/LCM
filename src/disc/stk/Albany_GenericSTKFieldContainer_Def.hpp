@@ -115,9 +115,8 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
         qptensor_states.push_back(&metaData->declare_field<QPTFT>(stk::topology::ELEMENT_RANK, st.name));
         // Multi-dim order is Fortran Ordering, so reversed here
         if (dim[1] == 4) {
-	  auto num_tens_entries = dim[2]*dim[1];
-	  stk::mesh::put_field_on_mesh(
-            *qptensor_states.back(), metaData->universal_part(), dim[3], dim[2]*dim[1], nullptr);
+          auto num_tens_entries = dim[2] * dim[1];
+          stk::mesh::put_field_on_mesh(*qptensor_states.back(), metaData->universal_part(), dim[3], dim[2] * dim[1], nullptr);
         } else {
           // IKT, 12/20/18: this changes the way the qp_tensor field
           // for 1D and 3D problems appears in the output exodus field.
@@ -126,9 +125,8 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
           // more clear which entry corresponds to which component/quad point.
           // I believe for 2D problems the original layout is correct, hence
           // the if statement above here.
-	  auto num_tens_entries = dim[3]*dim[2];
-          stk::mesh::put_field_on_mesh(*qptensor_states.back() ,
-                         metaData->universal_part(), num_tens_entries, dim[1], nullptr);
+          auto num_tens_entries = dim[3] * dim[2];
+          stk::mesh::put_field_on_mesh(*qptensor_states.back(), metaData->universal_part(), num_tens_entries, dim[1], nullptr);
         }
         stk::io::set_field_role(*qptensor_states.back(), role_type(st.output));
       }
@@ -139,8 +137,8 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
     // Single scalar at center of the workset
     else if (dim.size() == 1 && st.entity == StateStruct::WorksetValue) {  // A single value that applies over
                                                                            // the entire workset (time)
-      scalarValue_states.push_back(&st.name);  // Just save a pointer to the name allocated in st
-    }                                          // End scalar at center of element
+      scalarValue_states.push_back(&st.name);                              // Just save a pointer to the name allocated in st
+    }                                                                      // End scalar at center of element
     else if (
         (st.entity == StateStruct::NodalData) || (st.entity == StateStruct::NodalDataToElemNode) ||
         (st.entity == StateStruct::NodalDistParameter)) {  // Data at the node points
@@ -170,9 +168,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
     if (st.layered) {
       std::string tmp_str = st.name + "_NLC";
 
-      ALBANY_PANIC(
-          mesh_vector_states.find(tmp_str) != mesh_vector_states.end(),
-          "Error! Another layered state with the same name already exists.\n");
+      ALBANY_PANIC(mesh_vector_states.find(tmp_str) != mesh_vector_states.end(), "Error! Another layered state with the same name already exists.\n");
       mesh_vector_states[tmp_str] = std::vector<double>(dim.back());
     }
   }

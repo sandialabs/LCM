@@ -220,13 +220,7 @@ J2HMCModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
   }
 
   computeTrialState(
-      workset,
-      delta_macroStrain,
-      delta_strainDifference,
-      delta_microStrainGradient,
-      updated_macroStress,
-      updated_microStress,
-      updated_doubleStress);
+      workset, delta_macroStrain, delta_strainDifference, delta_microStrainGradient, updated_macroStress, updated_microStress, updated_doubleStress);
 
   // extract states to be updated (i.e., state at N+1):
   PHX::MDField<ScalarT>              updated_macroBackStress = *eval_fields[updated_macroBackStressName];
@@ -258,10 +252,7 @@ J2HMCModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
 /******************************************************************************/
 template <typename EvalT, typename Traits>
 void
-J2HMCModel<EvalT, Traits>::computeStateParallel(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+J2HMCModel<EvalT, Traits>::computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 /******************************************************************************/
 {
   ALBANY_ABORT("computeStateParallel not implemented");
@@ -481,24 +472,21 @@ J2HMCModel<EvalT, Traits>::radialReturn(
         // macro scale
         new_macroAlpha(cell, qp) = current_macroAlpha(cell, qp);
         for (std::size_t i = 0; i < num_dims_; i++)
-          for (std::size_t j = 0; j < num_dims_; j++)
-            new_macroBackStress(cell, qp, i, j) = current_macroBackStress(cell, qp, i, j);
+          for (std::size_t j = 0; j < num_dims_; j++) new_macroBackStress(cell, qp, i, j) = current_macroBackStress(cell, qp, i, j);
         // Micro scales
         for (int ims = 0; ims < numMicroScales; ims++) {
           // micro
           {
             new_microAlpha[ims](cell, qp) = current_microAlpha[ims](cell, qp);
             for (std::size_t i = 0; i < num_dims_; i++)
-              for (std::size_t j = 0; j < num_dims_; j++)
-                new_microBackStress[ims](cell, qp, i, j) = current_microBackStress[ims](cell, qp, i, j);
+              for (std::size_t j = 0; j < num_dims_; j++) new_microBackStress[ims](cell, qp, i, j) = current_microBackStress[ims](cell, qp, i, j);
           }
           // double
           {
             new_doubleAlpha[ims](cell, qp) = current_doubleAlpha[ims](cell, qp);
             for (std::size_t i = 0; i < num_dims_; i++)
               for (std::size_t j = 0; j < num_dims_; j++)
-                for (std::size_t k = 0; k < num_dims_; k++)
-                  new_doubleBackStress[ims](cell, qp, i, j, k) = current_doubleBackStress[ims](cell, qp, i, j, k);
+                for (std::size_t k = 0; k < num_dims_; k++) new_doubleBackStress[ims](cell, qp, i, j, k) = current_doubleBackStress[ims](cell, qp, i, j, k);
           }
         }
       }
@@ -579,8 +567,7 @@ J2HMCModel<EvalT, Traits>::computeResidualandJacobian(
     DFadType                     Kval = macroYieldStress0 + macroIsotropicModulus * alphaNew;
     minitensor::Tensor<DFadType> backStressNew(num_dims_);
     for (size_t i = 0; i < num_dims_; i++)
-      for (size_t j = 0; j < num_dims_; j++)
-        backStressNew(i, j) = macroBackStress(i, j) + sq32 * dGamma * Hval * returnDir(i, j);
+      for (size_t j = 0; j < num_dims_; j++) backStressNew(i, j) = macroBackStress(i, j) + sq32 * dGamma * Hval * returnDir(i, j);
     Rfad[0] = sq32 * devMag(stressNew - backStressNew) - Kval;
   }
 
@@ -596,8 +583,7 @@ J2HMCModel<EvalT, Traits>::computeResidualandJacobian(
       DFadType                     dGamma    = Xfad[xIndex];
       minitensor::Tensor<DFadType> stressNew(num_dims_);
       for (size_t i = 0; i < num_dims_; i++)
-        for (size_t j = 0; j < num_dims_; j++)
-          stressNew(i, j) = elTrialMicroStress[ims](i, j) - dGamma * stressDir(i, j);
+        for (size_t j = 0; j < num_dims_; j++) stressNew(i, j) = elTrialMicroStress[ims](i, j) - dGamma * stressDir(i, j);
       DFadType alphaNew = microAlpha[ims] + dGamma;
       //  JR: todo: create a plasticity submodel object to encapsulate this.
       //  DFadType Hval = microKinematicHardening[ims]->(alphaNew);
@@ -606,8 +592,7 @@ J2HMCModel<EvalT, Traits>::computeResidualandJacobian(
       DFadType                     Kval = microYieldStress0[ims] + microIsotropicModulus[ims] * alphaNew;
       minitensor::Tensor<DFadType> microBackStressNew(num_dims_);
       for (size_t i = 0; i < num_dims_; i++)
-        for (size_t j = 0; j < num_dims_; j++)
-          microBackStressNew(i, j) = microBackStress[ims](i, j) + sq32 * dGamma * Hval * returnDir(i, j);
+        for (size_t j = 0; j < num_dims_; j++) microBackStressNew(i, j) = microBackStress[ims](i, j) + sq32 * dGamma * Hval * returnDir(i, j);
       Rfad[xIndex] = sq32 * devMag(stressNew - microBackStressNew) - Kval;
     }
 
@@ -625,8 +610,7 @@ J2HMCModel<EvalT, Traits>::computeResidualandJacobian(
       minitensor::Tensor3<DFadType> stressNew(num_dims_);
       for (size_t i = 0; i < num_dims_; i++)
         for (size_t j = 0; j < num_dims_; j++)
-          for (size_t k = 0; k < num_dims_; k++)
-            stressNew(i, j, k) = elTrialDoubleStress[ims](i, j, k) - dGamma * stressDir(i, j, k);
+          for (size_t k = 0; k < num_dims_; k++) stressNew(i, j, k) = elTrialDoubleStress[ims](i, j, k) - dGamma * stressDir(i, j, k);
       DFadType alphaNew = doubleAlpha[ims] + dGamma;
       //  JR: todo: create a plasticity submodel object to encapsulate this.
       //     DFadType Hval = doubleKinematicHardening[ims]->(alphaNew);
@@ -636,8 +620,7 @@ J2HMCModel<EvalT, Traits>::computeResidualandJacobian(
       minitensor::Tensor3<DFadType> doubleBackStressNew(num_dims_);
       for (size_t i = 0; i < num_dims_; i++)
         for (size_t j = 0; j < num_dims_; j++)
-          for (size_t k = 0; k < num_dims_; k++)
-            doubleBackStressNew(i, j, k) = doubleBackStress[ims](i, j, k) + sq32 * dGamma * Hval * returnDir(i, j, k);
+          for (size_t k = 0; k < num_dims_; k++) doubleBackStressNew(i, j, k) = doubleBackStress[ims](i, j, k) + sq32 * dGamma * Hval * returnDir(i, j, k);
       ScalarT aOverL = a / lengthScale[ims];
       Rfad[xIndex]   = aOverL * devMag(stressNew - doubleBackStressNew) - Kval;
     }
@@ -853,16 +836,13 @@ J2HMCModel<EvalT, Traits>::computeTrialState(
     // Compute Stress (uniaxial strain)
     for (std::size_t cell = 0; cell < numCells; ++cell)
       for (std::size_t qp = 0; qp < num_pts_; ++qp)
-        updated_macroStress(cell, qp, 0, 0) =
-            ScalarT(current_macroStress(cell, qp, zero, zero)) + C11 * delta_macroStrain(cell, qp, 0, 0);
+        updated_macroStress(cell, qp, 0, 0) = ScalarT(current_macroStress(cell, qp, zero, zero)) + C11 * delta_macroStrain(cell, qp, 0, 0);
   } else if (num_dims_ == 2) {
     // Compute Stress (plane strain)
     for (std::size_t cell = 0; cell < numCells; ++cell) {
       for (std::size_t qp = 0; qp < num_pts_; ++qp) {
-        ScalarT const &de1 = delta_macroStrain(cell, qp, 0, 0), &de2 = delta_macroStrain(cell, qp, 1, 1),
-                      &de3 = delta_macroStrain(cell, qp, 0, 1);
-        ScalarT s1(current_macroStress(cell, qp, zero, zero)), s2(current_macroStress(cell, qp, one, one)),
-            s3(current_macroStress(cell, qp, zero, one));
+        ScalarT const &de1 = delta_macroStrain(cell, qp, 0, 0), &de2 = delta_macroStrain(cell, qp, 1, 1), &de3 = delta_macroStrain(cell, qp, 0, 1);
+        ScalarT        s1(current_macroStress(cell, qp, zero, zero)), s2(current_macroStress(cell, qp, one, one)), s3(current_macroStress(cell, qp, zero, one));
         updated_macroStress(cell, qp, 0, 0) = s1 + C11 * de1 + C12 * de2;
         updated_macroStress(cell, qp, 1, 1) = s2 + C12 * de1 + C11 * de2;
         updated_macroStress(cell, qp, 0, 1) = s3 + C44 * de3;
@@ -876,9 +856,8 @@ J2HMCModel<EvalT, Traits>::computeTrialState(
       ScalarT beta = betaParameter[i];
       for (std::size_t cell = 0; cell < numCells; ++cell) {
         for (std::size_t qp = 0; qp < num_pts_; ++qp) {
-          ScalarT const &de1 = dsd(cell, qp, 0, 0), &de2 = dsd(cell, qp, 1, 1), &de3 = dsd(cell, qp, 0, 1),
-                        &de4 = dsd(cell, qp, 1, 0);
-          ScalarT s1(current_microStress[i](cell, qp, zero, zero)), s2(current_microStress[i](cell, qp, one, one)),
+          ScalarT const &de1 = dsd(cell, qp, 0, 0), &de2 = dsd(cell, qp, 1, 1), &de3 = dsd(cell, qp, 0, 1), &de4 = dsd(cell, qp, 1, 0);
+          ScalarT        s1(current_microStress[i](cell, qp, zero, zero)), s2(current_microStress[i](cell, qp, one, one)),
               s3(current_microStress[i](cell, qp, zero, one)), s4(current_microStress[i](cell, qp, one, zero));
           ms(cell, qp, 0, 0) = s1 + beta * (C11 * de1 + C12 * de2);
           ms(cell, qp, 1, 1) = s2 + beta * (C12 * de1 + C11 * de2);
@@ -895,12 +874,9 @@ J2HMCModel<EvalT, Traits>::computeTrialState(
       for (std::size_t cell = 0; cell < numCells; ++cell) {
         for (std::size_t qp = 0; qp < num_pts_; ++qp) {
           for (std::size_t k = 0; k < num_dims_; ++k) {
-            ScalarT const &de1 = dmsg(cell, qp, 0, 0, k), &de2 = dmsg(cell, qp, 1, 1, k),
-                          &de3 = dmsg(cell, qp, 0, 1, k), &de4 = dmsg(cell, qp, 1, 0, k);
-            ScalarT ds1(current_doubleStress[i](cell, qp, zero, zero, k)),
-                ds2(current_doubleStress[i](cell, qp, one, one, k)),
-                ds3(current_doubleStress[i](cell, qp, zero, one, k)),
-                ds4(current_doubleStress[i](cell, qp, one, zero, k));
+            ScalarT const &de1 = dmsg(cell, qp, 0, 0, k), &de2 = dmsg(cell, qp, 1, 1, k), &de3 = dmsg(cell, qp, 0, 1, k), &de4 = dmsg(cell, qp, 1, 0, k);
+            ScalarT        ds1(current_doubleStress[i](cell, qp, zero, zero, k)), ds2(current_doubleStress[i](cell, qp, one, one, k)),
+                ds3(current_doubleStress[i](cell, qp, zero, one, k)), ds4(current_doubleStress[i](cell, qp, one, zero, k));
             ds(cell, qp, 0, 0, k) = ds1 + beta * (C11 * de1 + C12 * de2);
             ds(cell, qp, 1, 1, k) = ds2 + beta * (C12 * de1 + C11 * de2);
             ds(cell, qp, 0, 1, k) = ds3 + beta * (C44 * de3);
@@ -913,12 +889,10 @@ J2HMCModel<EvalT, Traits>::computeTrialState(
     // Compute Stress
     for (std::size_t cell = 0; cell < numCells; ++cell) {
       for (std::size_t qp = 0; qp < num_pts_; ++qp) {
-        ScalarT const &de1 = delta_macroStrain(cell, qp, 0, 0), &de2 = delta_macroStrain(cell, qp, 1, 1),
-                      &de3 = delta_macroStrain(cell, qp, 2, 2), &de4 = delta_macroStrain(cell, qp, 1, 2),
-                      &de5 = delta_macroStrain(cell, qp, 0, 2), &de6 = delta_macroStrain(cell, qp, 0, 1);
-        ScalarT cms1(current_macroStress(cell, qp, zero, zero)), cms2(current_macroStress(cell, qp, one, one)),
-            cms3(current_macroStress(cell, qp, two, two)), cms4(current_macroStress(cell, qp, one, two)),
-            cms5(current_macroStress(cell, qp, zero, two)), cms6(current_macroStress(cell, qp, zero, one));
+        ScalarT const &de1 = delta_macroStrain(cell, qp, 0, 0), &de2 = delta_macroStrain(cell, qp, 1, 1), &de3 = delta_macroStrain(cell, qp, 2, 2),
+                      &de4 = delta_macroStrain(cell, qp, 1, 2), &de5 = delta_macroStrain(cell, qp, 0, 2), &de6 = delta_macroStrain(cell, qp, 0, 1);
+        ScalarT cms1(current_macroStress(cell, qp, zero, zero)), cms2(current_macroStress(cell, qp, one, one)), cms3(current_macroStress(cell, qp, two, two)),
+            cms4(current_macroStress(cell, qp, one, two)), cms5(current_macroStress(cell, qp, zero, two)), cms6(current_macroStress(cell, qp, zero, one));
         updated_macroStress(cell, qp, 0, 0) = cms1 + C11 * de1 + C12 * de2 + C23 * de3;
         updated_macroStress(cell, qp, 1, 1) = cms2 + C12 * de1 + C11 * de2 + C23 * de3;
         updated_macroStress(cell, qp, 2, 2) = cms3 + C23 * de1 + C23 * de2 + C33 * de3;
@@ -940,7 +914,7 @@ J2HMCModel<EvalT, Traits>::computeTrialState(
           ScalarT const &de1 = dsd(cell, qp, 0, 0), &de2 = dsd(cell, qp, 1, 1), &de3 = dsd(cell, qp, 2, 2);
           ScalarT const &de4 = dsd(cell, qp, 1, 2), &de5 = dsd(cell, qp, 0, 2), &de6 = dsd(cell, qp, 0, 1);
           ScalarT const &de7 = dsd(cell, qp, 2, 1), &de8 = dsd(cell, qp, 2, 0), &de9 = dsd(cell, qp, 1, 0);
-          ScalarT cms1(current_microStress[i](cell, qp, zero, zero)), cms2(current_microStress[i](cell, qp, one, one)),
+          ScalarT        cms1(current_microStress[i](cell, qp, zero, zero)), cms2(current_microStress[i](cell, qp, one, one)),
               cms3(current_microStress[i](cell, qp, two, two)), cms4(current_microStress[i](cell, qp, one, two)),
               cms5(current_microStress[i](cell, qp, zero, two)), cms6(current_microStress[i](cell, qp, zero, one)),
               cms7(current_microStress[i](cell, qp, two, one)), cms8(current_microStress[i](cell, qp, two, zero)),
@@ -965,20 +939,13 @@ J2HMCModel<EvalT, Traits>::computeTrialState(
       for (std::size_t cell = 0; cell < numCells; ++cell) {
         for (std::size_t qp = 0; qp < num_pts_; ++qp) {
           for (std::size_t k = 0; k < num_dims_; ++k) {
-            ScalarT const &de1 = dmsg(cell, qp, 0, 0, k), &de2 = dmsg(cell, qp, 1, 1, k),
-                          &de3 = dmsg(cell, qp, 2, 2, k);
-            ScalarT const &de4 = dmsg(cell, qp, 1, 2, k), &de5 = dmsg(cell, qp, 0, 2, k),
-                          &de6 = dmsg(cell, qp, 0, 1, k);
-            ScalarT const &de7 = dmsg(cell, qp, 2, 1, k), &de8 = dmsg(cell, qp, 2, 0, k),
-                          &de9 = dmsg(cell, qp, 1, 0, k);
-            ScalarT cds1(current_doubleStress[i](cell, qp, zero, zero, k)),
-                cds2(current_doubleStress[i](cell, qp, one, one, k)),
-                cds3(current_doubleStress[i](cell, qp, two, two, k)),
-                cds4(current_doubleStress[i](cell, qp, one, two, k)),
-                cds5(current_doubleStress[i](cell, qp, zero, two, k)),
-                cds6(current_doubleStress[i](cell, qp, zero, one, k)),
-                cds7(current_doubleStress[i](cell, qp, two, one, k)),
-                cds8(current_doubleStress[i](cell, qp, two, zero, k)),
+            ScalarT const &de1 = dmsg(cell, qp, 0, 0, k), &de2 = dmsg(cell, qp, 1, 1, k), &de3 = dmsg(cell, qp, 2, 2, k);
+            ScalarT const &de4 = dmsg(cell, qp, 1, 2, k), &de5 = dmsg(cell, qp, 0, 2, k), &de6 = dmsg(cell, qp, 0, 1, k);
+            ScalarT const &de7 = dmsg(cell, qp, 2, 1, k), &de8 = dmsg(cell, qp, 2, 0, k), &de9 = dmsg(cell, qp, 1, 0, k);
+            ScalarT        cds1(current_doubleStress[i](cell, qp, zero, zero, k)), cds2(current_doubleStress[i](cell, qp, one, one, k)),
+                cds3(current_doubleStress[i](cell, qp, two, two, k)), cds4(current_doubleStress[i](cell, qp, one, two, k)),
+                cds5(current_doubleStress[i](cell, qp, zero, two, k)), cds6(current_doubleStress[i](cell, qp, zero, one, k)),
+                cds7(current_doubleStress[i](cell, qp, two, one, k)), cds8(current_doubleStress[i](cell, qp, two, zero, k)),
                 cds9(current_doubleStress[i](cell, qp, one, zero, k));
             ds(cell, qp, 0, 0, k) = cds1 + beta * (C11 * de1 + C12 * de2 + C23 * de3);
             ds(cell, qp, 1, 1, k) = cds1 + beta * (C12 * de1 + C11 * de2 + C23 * de3);
@@ -1047,10 +1014,7 @@ J2HMCModel<EvalT, Traits>::initializeElasticConstants()
 /******************************************************************************/
 template <typename EvalT, typename Traits>
 void
-J2HMCModel<EvalT, Traits>::computeVolumeAverage(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+J2HMCModel<EvalT, Traits>::computeVolumeAverage(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 /******************************************************************************/
 {
   minitensor::Tensor<ScalarT> sig(num_dims_);

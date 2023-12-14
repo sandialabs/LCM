@@ -111,8 +111,7 @@ main(int ac, char* av[])
   // Get the name of the material model to be used (and make sure there is one)
   std::string element_block_name = "Block0";
   std::string material_model_name;
-  material_model_name =
-      material_db->getElementBlockSublist(element_block_name, "Material Model").get<std::string>("Model Name");
+  material_model_name = material_db->getElementBlockSublist(element_block_name, "Material Model").get<std::string>("Model Name");
   ALBANY_PANIC(material_model_name.length() == 0, "A material model must be defined for block: " + element_block_name);
 
   // Preloading stage setup
@@ -123,8 +122,7 @@ main(int ac, char* av[])
   int const                           num_dims     = 3;
   int const                           num_vertices = 8;
   int const                           num_nodes    = 8;
-  const Teuchos::RCP<Albany::Layouts> dl =
-      Teuchos::rcp(new Albany::Layouts(workset_size, num_vertices, num_nodes, num_pts, num_dims));
+  const Teuchos::RCP<Albany::Layouts> dl           = Teuchos::rcp(new Albany::Layouts(workset_size, num_vertices, num_nodes, num_pts, num_dims));
 
   // create field name strings
   LCM::FieldNameMap                                field_name_map(false);
@@ -270,15 +268,12 @@ main(int ac, char* av[])
   if (have_temperature) {
     cmiPL.set<std::string>("Temperature Name", "Temperature");
   }
-  Teuchos::RCP<LCM::ConstitutiveModelInterface<Residual, Traits>> CMI =
-      Teuchos::rcp(new LCM::ConstitutiveModelInterface<Residual, Traits>(cmiPL, dl));
+  Teuchos::RCP<LCM::ConstitutiveModelInterface<Residual, Traits>> CMI = Teuchos::rcp(new LCM::ConstitutiveModelInterface<Residual, Traits>(cmiPL, dl));
   fieldManager.registerEvaluator<Residual>(CMI);
   stateFieldManager.registerEvaluator<Residual>(CMI);
 
   // Set the evaluated fields as required
-  for (std::vector<Teuchos::RCP<PHX::FieldTag>>::const_iterator it = CMI->evaluatedFields().begin();
-       it != CMI->evaluatedFields().end();
-       ++it) {
+  for (std::vector<Teuchos::RCP<PHX::FieldTag>>::const_iterator it = CMI->evaluatedFields().begin(); it != CMI->evaluatedFields().end(); ++it) {
     fieldManager.requireField<Residual>(**it);
   }
 
@@ -288,14 +283,7 @@ main(int ac, char* av[])
   for (int sv(0); sv < CMI->getNumStateVars(); ++sv) {
     CMI->fillStateVariableStruct(sv);
     p = stateMgr.registerStateVariable(
-        CMI->getName(),
-        CMI->getLayout(),
-        dl->dummy,
-        element_block_name,
-        CMI->getInitType(),
-        CMI->getInitValue(),
-        CMI->getStateFlag(),
-        CMI->getOutputFlag());
+        CMI->getName(), CMI->getLayout(), dl->dummy, element_block_name, CMI->getInitType(), CMI->getInitValue(), CMI->getStateFlag(), CMI->getOutputFlag());
     ev = Teuchos::rcp(new PHAL::SaveStateField<Residual, Traits>(*p));
     fieldManager.registerEvaluator<Residual>(ev);
     stateFieldManager.registerEvaluator<Residual>(ev);
@@ -317,28 +305,24 @@ main(int ac, char* av[])
     bcPL.set<std::string>("Ellipticity Flag Name", "Ellipticity_Flag");
     bcPL.set<std::string>("Bifurcation Direction Name", "Direction");
     bcPL.set<std::string>("Min detA Name", "Min detA");
-    Teuchos::RCP<LCM::BifurcationCheck<Residual, Traits>> BC =
-        Teuchos::rcp(new LCM::BifurcationCheck<Residual, Traits>(bcPL, dl));
+    Teuchos::RCP<LCM::BifurcationCheck<Residual, Traits>> BC = Teuchos::rcp(new LCM::BifurcationCheck<Residual, Traits>(bcPL, dl));
     fieldManager.registerEvaluator<Residual>(BC);
     stateFieldManager.registerEvaluator<Residual>(BC);
 
     // register the ellipticity flag
-    p = stateMgr.registerStateVariable(
-        "Ellipticity_Flag", dl->qp_scalar, dl->dummy, element_block_name, "scalar", 0.0, false, true);
+    p  = stateMgr.registerStateVariable("Ellipticity_Flag", dl->qp_scalar, dl->dummy, element_block_name, "scalar", 0.0, false, true);
     ev = Teuchos::rcp(new PHAL::SaveStateField<Residual, Traits>(*p));
     fieldManager.registerEvaluator<Residual>(ev);
     stateFieldManager.registerEvaluator<Residual>(ev);
 
     // register the direction
-    p = stateMgr.registerStateVariable(
-        "Direction", dl->qp_vector, dl->dummy, element_block_name, "scalar", 0.0, false, true);
+    p  = stateMgr.registerStateVariable("Direction", dl->qp_vector, dl->dummy, element_block_name, "scalar", 0.0, false, true);
     ev = Teuchos::rcp(new PHAL::SaveStateField<Residual, Traits>(*p));
     fieldManager.registerEvaluator<Residual>(ev);
     stateFieldManager.registerEvaluator<Residual>(ev);
 
     // register min(det(A))
-    p = stateMgr.registerStateVariable(
-        "Min detA", dl->qp_scalar, dl->dummy, element_block_name, "scalar", 0.0, false, true);
+    p  = stateMgr.registerStateVariable("Min detA", dl->qp_scalar, dl->dummy, element_block_name, "scalar", 0.0, false, true);
     ev = Teuchos::rcp(new PHAL::SaveStateField<Residual, Traits>(*p));
     fieldManager.registerEvaluator<Residual>(ev);
     stateFieldManager.registerEvaluator<Residual>(ev);
@@ -352,8 +336,7 @@ main(int ac, char* av[])
   stateFieldManager.registerEvaluator<Residual>(ev);
   // std::cout << "// register small strain tensor"
   // << std::endl;
-  p = stateMgr.registerStateVariable(
-      "Strain", dl->qp_tensor, dl->dummy, element_block_name, "scalar", 0.0, false, true);
+  p  = stateMgr.registerStateVariable("Strain", dl->qp_tensor, dl->dummy, element_block_name, "scalar", 0.0, false, true);
   ev = Teuchos::rcp(new PHAL::SaveStateField<Residual, Traits>(*p));
   fieldManager.registerEvaluator<Residual>(ev);
   stateFieldManager.registerEvaluator<Residual>(ev);
@@ -381,8 +364,7 @@ main(int ac, char* av[])
   std::string output_file = mpsParams.get<std::string>("Output File Name", "output.exo");
 
   // Create discretization, as required by the StateManager
-  Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList =
-      Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
+  Teuchos::RCP<Teuchos::ParameterList> discretizationParameterList = Teuchos::rcp(new Teuchos::ParameterList("Discretization"));
   discretizationParameterList->set<int>("1D Elements", workset_size);
   discretizationParameterList->set<int>("2D Elements", 1);
   discretizationParameterList->set<int>("3D Elements", 1);
@@ -391,8 +373,7 @@ main(int ac, char* av[])
   discretizationParameterList->set<std::string>("Exodus Output File Name", output_file);
   discretizationParameterList->set<int>("Workset Size", workset_size);
 
-  Teuchos::RCP<Thyra_VectorSpace const> space =
-      Albany::createLocallyReplicatedVectorSpace(workset_size * num_dims * num_nodes, commT);
+  Teuchos::RCP<Thyra_VectorSpace const> space = Albany::createLocallyReplicatedVectorSpace(workset_size * num_dims * num_nodes, commT);
 
   Teuchos::RCP<Thyra_Vector> solution_vector = Thyra::createMember(space);
   solution_vector->assign(0.0);
@@ -400,19 +381,12 @@ main(int ac, char* av[])
   int                                                        numberOfEquations = 3;
   Albany::AbstractFieldContainer::FieldContainerRequirements req;
 
-  Teuchos::RCP<Albany::AbstractSTKMeshStruct> stkMeshStruct =
-      Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(discretizationParameterList, Teuchos::null, commT));
+  Teuchos::RCP<Albany::AbstractSTKMeshStruct> stkMeshStruct = Teuchos::rcp(new Albany::TmplSTKMeshStruct<3>(discretizationParameterList, Teuchos::null, commT));
   stkMeshStruct->setFieldAndBulkData(
-      commT,
-      discretizationParameterList,
-      numberOfEquations,
-      req,
-      stateMgr.getStateInfoStruct(),
-      stkMeshStruct->getMeshSpecs()[0]->worksetSize);
+      commT, discretizationParameterList, numberOfEquations, req, stateMgr.getStateInfoStruct(), stkMeshStruct->getMeshSpecs()[0]->worksetSize);
 
-  Teuchos::RCP<Albany::AbstractDiscretization> discretization =
-      Teuchos::rcp(new Albany::STKDiscretization(discretizationParameterList, stkMeshStruct, commT));
-  auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discretization);
+  Teuchos::RCP<Albany::AbstractDiscretization> discretization = Teuchos::rcp(new Albany::STKDiscretization(discretizationParameterList, stkMeshStruct, commT));
+  auto&                                        stk_disc       = static_cast<Albany::STKDiscretization&>(*discretization);
   stk_disc.updateMesh();
 
   // Associate the discretization with the StateManager

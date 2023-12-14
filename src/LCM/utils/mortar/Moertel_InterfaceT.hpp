@@ -878,9 +878,7 @@ class InterfaceT
   setting dual shape functions as primal functions is a bad idea.
   */
   bool
-  SetFunctionTypes(
-      MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType primal,
-      MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType dual);
+  SetFunctionTypes(MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType primal, MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType dual);
 
   /*!
   \brief Set functions from function types
@@ -967,27 +965,21 @@ class InterfaceT
   // integrate the overlap of 2 segments in 2D (master/slave contribution)
   //  bool Integrate_2D_Section(MOERTEL::Segment& sseg,MOERTEL::Segment& mseg,
   //                            Tpetra_CrsMatrix& M,Tpetra_CrsMatrix& D);
-  bool Integrate_2D_Section(
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg);
+  bool Integrate_2D_Section(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg);
 
   // control routine of the integration of the master/slave side in 3D
   bool
   Integrate_3D();
 
   // integrate the overlap of 2 segments in 3D (master/slave contribution)
-  bool Integrate_3D_Section(
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg);
+  bool Integrate_3D_Section(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg);
 
   // Assemble values from integration this interface (3D problem)
   bool
   Assemble_3D(Tpetra::CrsMatrix<ST, LO, GO, N>& D, Tpetra::CrsMatrix<ST, LO, GO, N>& M);
 
   // Check and see if the master seg and slave seg are even close to each other
-  bool QuickOverlapTest_2D(
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg,
-      MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg);
+  bool QuickOverlapTest_2D(MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & sseg, MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT) & mseg);
 
  private:
   int  Id_;                                             // the interface Id
@@ -1002,22 +994,16 @@ class InterfaceT
   ProjectionType                        ptype_;         // type of projection used
   Teuchos::RCP<Teuchos::ParameterList>  intparams_;     // parameter list holding integration parameters
 
-  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>
-      seg_[2];  // local segments of interface (both sides)
-  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>>
-                     rseg_[2];  // global segments of interface (both sides)
-  std::map<int, int> segPID_;   // maps all global seg ids to process holding segment
+  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>> seg_[2];   // local segments of interface (both sides)
+  std::map<int, Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)>> rseg_[2];  // global segments of interface (both sides)
+  std::map<int, int>                                                      segPID_;   // maps all global seg ids to process holding segment
 
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>
-      node_[2];  // local nodes of interface (both sides)
-  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>
-                     rnode_[2];  // global nodes of interface (both sides)
-  std::map<int, int> nodePID_;   // maps all global node ids to process holding the node
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>> node_[2];   // local nodes of interface (both sides)
+  std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>> rnode_[2];  // global nodes of interface (both sides)
+  std::map<int, int>                                                   nodePID_;   // maps all global node ids to process holding the node
 
-  MoertelT::MOERTEL_TEMPLATE_CLASS(
-      FunctionT)::FunctionType primal_;  // the type of functions to be set as trace space function
-  MoertelT::MOERTEL_TEMPLATE_CLASS(
-      FunctionT)::FunctionType dual_;  // the type of functions to be set as LM space function
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType primal_;  // the type of functions to be set as trace space function
+  MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT)::FunctionType dual_;    // the type of functions to be set as LM space function
 };
 
 // Now, the explicit template function declarations (templated on dimension)

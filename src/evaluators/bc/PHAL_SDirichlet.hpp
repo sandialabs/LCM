@@ -29,8 +29,7 @@ class SDirichlet
 
 // Residual
 template <typename Traits>
-class SDirichlet<PHAL::AlbanyTraits::Residual, Traits>
-    : public PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
+class SDirichlet<PHAL::AlbanyTraits::Residual, Traits> : public PHAL::DirichletBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   using ScalarT = typename PHAL::AlbanyTraits::Residual::ScalarT;
@@ -46,8 +45,7 @@ class SDirichlet<PHAL::AlbanyTraits::Residual, Traits>
 
 // Jacobian
 template <typename Traits>
-class SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits> : public PHAL::DirichletBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   using ScalarT = typename PHAL::AlbanyTraits::Jacobian::ScalarT;

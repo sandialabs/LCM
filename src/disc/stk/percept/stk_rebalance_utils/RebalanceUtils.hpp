@@ -41,17 +41,10 @@ void
 check_ownership(mesh::BulkData& bulk_data, stk::mesh::EntityVector& entities, std::string const& msg);
 
 double
-check_balance(
-    mesh::BulkData&             bulk_data,
-    const mesh::Field<double>*  load_measure,
-    const stk::mesh::EntityRank rank,
-    const mesh::Selector*       selector = NULL);
+check_balance(mesh::BulkData& bulk_data, const mesh::Field<double>* load_measure, const stk::mesh::EntityRank rank, const mesh::Selector* selector = NULL);
 
 bool
-verify_dependent_ownership(
-    mesh::BulkData&              bulk_data,
-    const stk::mesh::EntityRank& parent_rank,
-    stk::mesh::EntityVector&     entities);
+verify_dependent_ownership(mesh::BulkData& bulk_data, const stk::mesh::EntityRank& parent_rank, stk::mesh::EntityVector& entities);
 
 }  // namespace rebalance
 }  // namespace stk

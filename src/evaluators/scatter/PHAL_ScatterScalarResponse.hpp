@@ -20,8 +20,7 @@ namespace PHAL {
  * Base implementation useable by specializations below
  */
 template <typename EvalT, typename Traits>
-class ScatterScalarResponseBase : public virtual PHX::EvaluatorWithBaseImpl<Traits>,
-                                  public virtual PHX::EvaluatorDerived<EvalT, Traits>
+class ScatterScalarResponseBase : public virtual PHX::EvaluatorWithBaseImpl<Traits>, public virtual PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ScatterScalarResponseBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -79,8 +78,7 @@ class ScatterScalarResponse
 // Residual
 // **************************************************************
 template <typename Traits>
-class ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits>
-    : public ScatterScalarResponseBase<PHAL::AlbanyTraits::Residual, Traits>
+class ScatterScalarResponse<PHAL::AlbanyTraits::Residual, Traits> : public ScatterScalarResponseBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ScatterScalarResponse(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

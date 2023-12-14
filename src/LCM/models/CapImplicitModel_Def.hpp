@@ -113,10 +113,7 @@ CapImplicitModel<EvalT, Traits>::CapImplicitModel(Teuchos::ParameterList* p, con
 //*****
 template <typename EvalT, typename Traits>
 void
-CapImplicitModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+CapImplicitModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto strain          = *dep_fields["Strain"];
@@ -152,25 +149,21 @@ CapImplicitModel<EvalT, Traits>::computeState(
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < num_pts_; ++qp) {
       // local parameters
-      ScalarT lame = elastic_modulus(cell, qp) * poissons_ratio(cell, qp) / (1.0 + poissons_ratio(cell, qp)) /
-                     (1.0 - 2.0 * poissons_ratio(cell, qp));
+      ScalarT lame        = elastic_modulus(cell, qp) * poissons_ratio(cell, qp) / (1.0 + poissons_ratio(cell, qp)) / (1.0 - 2.0 * poissons_ratio(cell, qp));
       ScalarT mu          = elastic_modulus(cell, qp) / 2.0 / (1.0 + poissons_ratio(cell, qp));
       ScalarT bulkModulus = lame + (2. / 3.) * mu;
 
       // elastic matrix
       minitensor::Tensor4<ScalarT> Celastic =
-          lame * minitensor::identity_3<ScalarT>(3) +
-          mu * (minitensor::identity_1<ScalarT>(3) + minitensor::identity_2<ScalarT>(3));
+          lame * minitensor::identity_3<ScalarT>(3) + mu * (minitensor::identity_1<ScalarT>(3) + minitensor::identity_2<ScalarT>(3));
 
       // elastic compliance tangent matrix
       minitensor::Tensor4<ScalarT> compliance =
           (1. / bulkModulus / 9.) * minitensor::identity_3<ScalarT>(3) +
-          (1. / mu / 2.) * (0.5 * (minitensor::identity_1<ScalarT>(3) + minitensor::identity_2<ScalarT>(3)) -
-                            (1. / 3.) * minitensor::identity_3<ScalarT>(3));
+          (1. / mu / 2.) * (0.5 * (minitensor::identity_1<ScalarT>(3) + minitensor::identity_2<ScalarT>(3)) - (1. / 3.) * minitensor::identity_3<ScalarT>(3));
 
       // previous state
-      minitensor::Tensor<ScalarT> sigmaN(3, minitensor::Filler::ZEROS), alphaN(3, minitensor::Filler::ZEROS),
-          strainN(3, minitensor::Filler::ZEROS);
+      minitensor::Tensor<ScalarT> sigmaN(3, minitensor::Filler::ZEROS), alphaN(3, minitensor::Filler::ZEROS), strainN(3, minitensor::Filler::ZEROS);
 
       // incremental strain tensor
       minitensor::Tensor<ScalarT> depsilon(3);
@@ -361,8 +354,7 @@ CapImplicitModel<EvalT, Traits>::compute_f(minitensor::Tensor<T>& sigma, miniten
   T Gamma = 1.0;
 
   if (psi != 0 && J2 != 0)
-    Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
-                   (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) + (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
 
   T Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
 
@@ -381,11 +373,7 @@ CapImplicitModel<EvalT, Traits>::compute_f(minitensor::Tensor<T>& sigma, miniten
 template <typename EvalT, typename Traits>
 std::vector<typename CapImplicitModel<EvalT, Traits>::ScalarT>
 // std::vector<typename EvalT::ScalarT>
-CapImplicitModel<EvalT, Traits>::initialize(
-    minitensor::Tensor<ScalarT>& sigmaVal,
-    minitensor::Tensor<ScalarT>& alphaVal,
-    ScalarT&                     kappaVal,
-    ScalarT&                     dgammaVal)
+CapImplicitModel<EvalT, Traits>::initialize(minitensor::Tensor<ScalarT>& sigmaVal, minitensor::Tensor<ScalarT>& alphaVal, ScalarT& kappaVal, ScalarT& dgammaVal)
 {
   std::vector<ScalarT> XX(13);
 
@@ -577,8 +565,7 @@ CapImplicitModel<EvalT, Traits>::compute_g(minitensor::Tensor<T>& sigma, miniten
   T Gamma = 1.0;
 
   if (psi != 0 && J2 != 0)
-    Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
-                   (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
+    Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) + (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
 
   T Ff_I1 = A - C * std::exp(L * I1) - phi * I1;
 
@@ -919,8 +906,7 @@ CapImplicitModel<EvalT, Traits>::compute_Cep(
   ScalarT dedkappa    = compute_dedkappa(kappa);
   hkappa              = compute_hkappa(I1_dgdsigma, dedkappa);
 
-  chi = minitensor::dotdot(minitensor::dotdot(dfdsigma, Celastic), dgdsigma) - minitensor::dotdot(dfdalpha, halpha) -
-        dfdkappa * hkappa;
+  chi = minitensor::dotdot(minitensor::dotdot(dfdsigma, Celastic), dgdsigma) - minitensor::dotdot(dfdalpha, halpha) - dfdkappa * hkappa;
 
   if (chi == 0) {
     std::cout << "Chi equals to 0 error during computing elasto-plastic tangent" << std::endl;
@@ -928,8 +914,7 @@ CapImplicitModel<EvalT, Traits>::compute_Cep(
   }
 
   // compute tangent
-  Cep = Celastic -
-        1.0 / chi * minitensor::dotdot(Celastic, minitensor::tensor(dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
+  Cep = Celastic - 1.0 / chi * minitensor::dotdot(Celastic, minitensor::tensor(dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
 
   return Cep;
 }  // end compute tangent function
@@ -982,8 +967,7 @@ CapImplicitModel<EvalT, Traits>::compute_Cepp(
   }
 
   // compute tangent
-  Cepp = Celastic -
-         1.0 / chi * minitensor::dotdot(Celastic, minitensor::tensor(dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
+  Cepp = Celastic - 1.0 / chi * minitensor::dotdot(Celastic, minitensor::tensor(dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
 
   return Cepp;
 }  // end compute tangent function

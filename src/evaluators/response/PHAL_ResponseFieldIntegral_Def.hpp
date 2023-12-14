@@ -21,9 +21,7 @@ split(std::string const& s, char delim, std::vector<std::string>& elems)
 }  // namespace PHAL
 
 template <typename EvalT, typename Traits>
-PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : coordVec("Coord Vec", dl->qp_gradient), weights("Weights", dl->qp_scalar)
 {
   // get and validate Response parameter list
@@ -34,8 +32,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
   // Get field type and corresponding layouts
   std::string field_name = plist->get<std::string>("Field Name");
   std::string fieldType  = plist->get<std::string>("Field Type", "Scalar");
-  if (plist->isType<Teuchos::Array<int>>("Field Components"))
-    field_components = plist->get<Teuchos::Array<int>>("Field Components");
+  if (plist->isType<Teuchos::Array<int>>("Field Components")) field_components = plist->get<Teuchos::Array<int>>("Field Components");
   Teuchos::RCP<PHX::DataLayout> field_layout;
   Teuchos::RCP<PHX::DataLayout> local_response_layout;
   Teuchos::RCP<PHX::DataLayout> global_response_layout;
@@ -135,9 +132,7 @@ PHAL::ResponseFieldIntegral<EvalT, Traits>::ResponseFieldIntegral(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::ResponseFieldIntegral<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+PHAL::ResponseFieldIntegral<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field, fm);
   this->utils.setFieldData(coordVec, fm);
@@ -220,9 +215,8 @@ template <typename EvalT, typename Traits>
 Teuchos::RCP<Teuchos::ParameterList const>
 PHAL::ResponseFieldIntegral<EvalT, Traits>::getValidResponseParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("Valid ResponseFieldIntegral Params"));
-  Teuchos::RCP<Teuchos::ParameterList const> baseValidPL =
-      PHAL::SeparableScatterScalarResponse<EvalT, Traits>::getValidResponseParameters();
+  Teuchos::RCP<Teuchos::ParameterList>       validPL     = rcp(new Teuchos::ParameterList("Valid ResponseFieldIntegral Params"));
+  Teuchos::RCP<Teuchos::ParameterList const> baseValidPL = PHAL::SeparableScatterScalarResponse<EvalT, Traits>::getValidResponseParameters();
   validPL->setParameters(*baseValidPL);
 
   validPL->set<std::string>("Name", "", "Name of response function");

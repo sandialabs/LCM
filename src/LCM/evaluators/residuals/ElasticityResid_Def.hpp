@@ -6,7 +6,7 @@
 #include "Intrepid2_FunctionSpaceTools.hpp"
 #include "Phalanx_DataLayout.hpp"
 
-//#define HARD_CODED_BODY_FORCE_ELASTICITY_RESID
+// #define HARD_CODED_BODY_FORCE_ELASTICITY_RESID
 
 namespace LCM {
 
@@ -14,9 +14,7 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 ElasticityResid<EvalT, Traits>::ElasticityResid(Teuchos::ParameterList& p)
     : Stress(p.get<std::string>("Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
       ExResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
   this->addDependentField(Stress);
@@ -37,24 +35,23 @@ ElasticityResid<EvalT, Traits>::ElasticityResid(Teuchos::ParameterList& p)
     if (p.isParameter("Density Name")) {
       hasDensity                                   = true;
       Teuchos::RCP<PHX::DataLayout> cell_scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Cell Scalar Data Layout");
-      density = decltype(density)(p.get<std::string>("Density Name"), cell_scalar_dl);
+      density                                      = decltype(density)(p.get<std::string>("Density Name"), cell_scalar_dl);
       this->addDependentField(density);
     }
 
     Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
-    uDotDot = decltype(uDotDot)(p.get<std::string>("Time Dependent Variable Name"), vector_dl);
+    uDotDot                                 = decltype(uDotDot)(p.get<std::string>("Time Dependent Variable Name"), vector_dl);
     this->addDependentField(uDotDot);
   }
 
 #if defined(HARD_CODED_BODY_FORCE_ELASTICITY_RESID)
   Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
-  wBF = decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
+  wBF                                             = decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
   this->addDependentField(wBF);
 #else
   if (enableTransient) {
-    Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl =
-        p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
-    wBF = decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
+    Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
+    wBF                                             = decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
     this->addDependentField(wBF);
   }
 #endif

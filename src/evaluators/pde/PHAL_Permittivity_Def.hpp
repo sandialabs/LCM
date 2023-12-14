@@ -23,9 +23,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 Permittivity<EvalT, Traits>::Permittivity(Teuchos::ParameterList& p)
-    : permittivity(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+    : permittivity(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   randField = CONSTANT;
 
@@ -130,8 +128,7 @@ Permittivity<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
       for (std::size_t qp = 0; qp < numQPs; ++qp) {
         Teuchos::Array<MeshScalarT> point(numDims);
-        for (std::size_t i = 0; i < numDims; i++)
-          point[i] = Sacado::ScalarValue<MeshScalarT>::eval(coordVec(cell, qp, i));
+        for (std::size_t i = 0; i < numDims; i++) point[i] = Sacado::ScalarValue<MeshScalarT>::eval(coordVec(cell, qp, i));
       }
     }
   }
@@ -149,9 +146,7 @@ Permittivity<EvalT, Traits>::getValue(std::string const& n)
   for (int i = 0; i < rv.size(); i++) {
     if (n == Albany::strint("Permittivity KL Random Variable", i)) return rv[i];
   }
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in Permittivity::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in Permittivity::getValue()" << std::endl);
   return constant_value;
 }
 

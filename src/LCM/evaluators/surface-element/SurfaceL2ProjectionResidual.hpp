@@ -23,8 +23,7 @@ namespace LCM {
 **/
 
 template <typename EvalT, typename Traits>
-class SurfaceL2ProjectionResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                    public PHX::EvaluatorDerived<EvalT, Traits>
+class SurfaceL2ProjectionResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   SurfaceL2ProjectionResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

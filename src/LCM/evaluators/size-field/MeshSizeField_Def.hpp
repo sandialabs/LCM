@@ -16,9 +16,7 @@ Sqr(ScalarT const& num)
 namespace LCM {
 
 template <typename Traits>
-IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::IsoMeshSizeField(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::IsoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>(dl),
       currentCoords(p.get<std::string>("Current Coordinates Name"), dl->node_vector),
       isoMeshSizeField(p.get<std::string>("IsoTropic MeshSizeField Name"), dl->qp_scalar),
@@ -52,9 +50,7 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::IsoMeshSizeField(
 
 template <typename Traits>
 void
-IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(isoMeshSizeField, fm);
   this->utils.setFieldData(currentCoords, fm);
@@ -124,9 +120,7 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename 
 }
 
 template <typename Traits>
-AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::AnisoMeshSizeField(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::AnisoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>(dl),
       currentCoords(p.get<std::string>("Current Coordinates Name"), dl->node_vector),
       anisoMeshSizeField(p.get<std::string>("AnisoTropic MeshSizeField Name"), dl->qp_scalar),
@@ -160,9 +154,7 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::AnisoMeshSizeField(
 
 template <typename Traits>
 void
-AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(anisoMeshSizeField, fm);
   this->utils.setFieldData(currentCoords, fm);

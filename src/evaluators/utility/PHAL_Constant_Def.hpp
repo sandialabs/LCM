@@ -9,8 +9,7 @@ namespace PHAL {
 //*****
 template <typename EvalT, typename Traits>
 Constant<EvalT, Traits>::Constant(Teuchos::ParameterList& p)
-    : value(p.get<RealType>("Value")),
-      constant(p.get<std::string>("Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"))
+    : value(p.get<RealType>("Value")), constant(p.get<std::string>("Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Data Layout"))
 {
   this->addEvaluatedField(constant);
 

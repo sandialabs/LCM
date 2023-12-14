@@ -36,12 +36,11 @@ class TypeKeyMap
   template <typename T>
   struct GetObjectTypeAndPos
   {
-    typedef typename Sacado::mpl::
-        find_if<TypeMap, boost::is_same<Sacado::mpl::first<Sacado::mpl::placeholders::_1>, T>>::type Iter;
-    typedef typename Sacado::mpl::deref<Iter>::type                                                  Pair;
-    typedef typename Sacado::mpl::second<Pair>::type                                                 type;
-    typedef typename Iter::pos                                                                       pos;
-    static int const                                                                                 value = pos::value;
+    typedef typename Sacado::mpl::find_if<TypeMap, boost::is_same<Sacado::mpl::first<Sacado::mpl::placeholders::_1>, T>>::type Iter;
+    typedef typename Sacado::mpl::deref<Iter>::type                                                                            Pair;
+    typedef typename Sacado::mpl::second<Pair>::type                                                                           type;
+    typedef typename Iter::pos                                                                                                 pos;
+    static int const                                                                                                           value = pos::value;
   };
 
   //! Meta-function for getting the object reference type indexed by T
@@ -152,8 +151,7 @@ struct ZipMap
     };
   };
 
-  typedef typename Sacado::mpl::
-      transform<KeySeq, ElemSeq, CreatePair, Sacado::mpl::back_inserter<Sacado::mpl::vector<>>>::type type;
+  typedef typename Sacado::mpl::transform<KeySeq, ElemSeq, CreatePair, Sacado::mpl::back_inserter<Sacado::mpl::vector<>>>::type type;
 };
 
 /*!

@@ -309,8 +309,7 @@ cartesian_sweep(minitensor::Tensor4<double, 3> const& CC)
 minitensor::Vector<D2FadType, 3>
 spherical_get_normal(minitensor::Vector<D2FadType, 2>& parameters)
 {
-  minitensor::Vector<D2FadType, 3> normal(
-      sin(parameters[0]) * sin(parameters[1]), cos(parameters[0]), sin(parameters[0]) * cos(parameters[1]));
+  minitensor::Vector<D2FadType, 3> normal(sin(parameters[0]) * sin(parameters[1]), cos(parameters[0]), sin(parameters[0]) * cos(parameters[1]));
 
   return normal;
 }
@@ -653,8 +652,7 @@ projective_newton_raphson(
     }
     n = projective_get_normal(Xfad2_sub);
 
-    detA = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n))) +
-           Xfad2[3] * (Xfad2[0] * Xfad2[0] + Xfad2[1] * Xfad2[1] + Xfad2[2] * Xfad2[2] - 1);
+    detA = minitensor::det(minitensor::dot2(n, minitensor::dot(tangent, n))) + Xfad2[3] * (Xfad2[0] * Xfad2[0] + Xfad2[1] * Xfad2[1] + Xfad2[2] * Xfad2[2] - 1);
 
     std::cout << "parameters: " << Xval << std::endl;
     std::cout << "determinant: " << (detA.val()).val() << std::endl;
@@ -957,14 +955,11 @@ main(int ac, char* av[])
 
   double const mu = 7.6e10;
 
-  minitensor::Tensor4<double, 3> const I1 =
-      minitensor::identity_1<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
+  minitensor::Tensor4<double, 3> const I1 = minitensor::identity_1<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
 
-  minitensor::Tensor4<double, 3> const I2 =
-      minitensor::identity_2<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
+  minitensor::Tensor4<double, 3> const I2 = minitensor::identity_2<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
 
-  minitensor::Tensor4<double, 3> const I3 =
-      minitensor::identity_3<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
+  minitensor::Tensor4<double, 3> const I3 = minitensor::identity_3<double, 3>() + 0.1 * minitensor::Tensor4<double, 3>(minitensor::Filler::RANDOM_NORMAL);
 
   tangent = lambda * I3 + mu * (I1 + I2);
 

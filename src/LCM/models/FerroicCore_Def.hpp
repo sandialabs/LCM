@@ -95,18 +95,7 @@ FM::DomainSwitching<EvalT, M>::gradient(minitensor::Vector<T, N> const& xi) cons
   // compute new residual
   auto const               num_unknowns = xi.get_dimension();
   minitensor::Vector<T, N> residual(num_unknowns);
-  computeResidual(
-      residual,
-      fractionsNew,
-      m_transitionMap,
-      m_transitions,
-      m_crystalVariants,
-      m_transBarriers,
-      m_aMatrix,
-      X,
-      linear_x,
-      E,
-      linear_D);
+  computeResidual(residual, fractionsNew, m_transitionMap, m_transitions, m_crystalVariants, m_transBarriers, m_aMatrix, X, linear_x, E, linear_D);
 
   return residual;
 }
@@ -136,8 +125,7 @@ FM::changeBasis(
           for (int q = 0; q < num_dims; q++)
             for (int r = 0; r < num_dims; r++)
               for (int s = 0; s < num_dims; s++)
-                for (int t = 0; t < num_dims; t++)
-                  inMatlBasis(i, j, k, l) += inGlobalBasis(q, r, s, t) * R(i, q) * R(j, r) * R(k, s) * R(l, t);
+                for (int t = 0; t < num_dims; t++) inMatlBasis(i, j, k, l) += inGlobalBasis(q, r, s, t) * R(i, q) * R(j, r) * R(k, s) * R(l, t);
 }
 /******************************************************************************/
 template <typename DataT>
@@ -155,8 +143,7 @@ FM::changeBasis(
       for (int k = 0; k < num_dims; k++)
         for (int q = 0; q < num_dims; q++)
           for (int r = 0; r < num_dims; r++)
-            for (int s = 0; s < num_dims; s++)
-              inMatlBasis(i, j, k) += inGlobalBasis(q, r, s) * R(i, q) * R(j, r) * R(k, s);
+            for (int s = 0; s < num_dims; s++) inMatlBasis(i, j, k) += inGlobalBasis(q, r, s) * R(i, q) * R(j, r) * R(k, s);
 }
 /******************************************************************************/
 template <typename DataT>

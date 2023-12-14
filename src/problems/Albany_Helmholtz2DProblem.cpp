@@ -8,9 +8,7 @@
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_Utils.hpp"
 
-Albany::Helmholtz2DProblem::Helmholtz2DProblem(
-    const Teuchos::RCP<Teuchos::ParameterList>& params_,
-    const Teuchos::RCP<ParamLib>&               paramLib_)
+Albany::Helmholtz2DProblem::Helmholtz2DProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_)
     : Albany::AbstractProblem(params_, paramLib_, 2), use_sdbcs_(false)
 {
   std::string& method = params->get("Name", "Helmholtz 2D Problem");
@@ -24,9 +22,7 @@ Albany::Helmholtz2DProblem::Helmholtz2DProblem(
 Albany::Helmholtz2DProblem::~Helmholtz2DProblem() {}
 
 void
-Albany::Helmholtz2DProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::Helmholtz2DProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");

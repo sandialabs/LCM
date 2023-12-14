@@ -146,22 +146,17 @@ DECLARE_EVAL_SCALAR_TYPES(Jacobian, FadType, RealType)
 // Define macros for explicit template instantiation
 
 // 1. Basic cases: depend only on EvalT and Traits
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_RESIDUAL(name) \
-  template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_JACOBIAN(name) \
-  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_RESIDUAL(name) template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_JACOBIAN(name) template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits>;
 
 // 2. Versatile cases: after EvalT and Traits, accept any number of args
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_RESIDUAL(name, ...) \
-  template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, __VA_ARGS__>;
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_JACOBIAN(name, ...) \
-  template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, __VA_ARGS__>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_RESIDUAL(name, ...) template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, __VA_ARGS__>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_EXTRA_ARGS_JACOBIAN(name, ...) template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, __VA_ARGS__>;
 
 // 3. Scalar dependent cases: after EvalT and Traits, accept one or two scalar
 // types
 //    NOTE: *always* allow RealType for the scalar type(s)
-#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_RESIDUAL(name) \
-  template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, RealType>;
+#define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_RESIDUAL(name) template class name<PHAL::AlbanyTraits::Residual, PHAL::AlbanyTraits, RealType>;
 
 #define PHAL_INSTANTIATE_TEMPLATE_CLASS_WITH_ONE_SCALAR_TYPE_JACOBIAN(name)       \
   template class name<PHAL::AlbanyTraits::Jacobian, PHAL::AlbanyTraits, FadType>; \

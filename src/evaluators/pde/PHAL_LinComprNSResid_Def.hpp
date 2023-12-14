@@ -12,16 +12,10 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 LinComprNSResid<EvalT, Traits>::LinComprNSResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Gradient Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Gradient Data Layout")),
       qFluct(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      qFluctGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      qFluctDot(
-          p.get<std::string>("QP Time Derivative Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      qFluctGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+      qFluctDot(p.get<std::string>("QP Time Derivative Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       force(p.get<std::string>("Body Force Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       Residual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
@@ -91,16 +85,14 @@ LinComprNSResid<EvalT, Traits>::LinComprNSResid(Teuchos::ParameterList const& p)
     ALBANY_ABORT(
         std::endl
         << "Error in PHAL::LinComprNS constructor:  "
-        << "Invalid Parameter vecDim.  vecDim should be numDims + 1 = " << numDims + 1 << " for Euler equations."
-        << std::endl);
+        << "Invalid Parameter vecDim.  vecDim should be numDims + 1 = " << numDims + 1 << " for Euler equations." << std::endl);
   }
 
   if ((eqn_type == NS) & (vecDim != numDims + 2)) {
     ALBANY_ABORT(
         std::endl
         << "Error in PHAL::LinComprNS constructor:  "
-        << "Invalid Parameter vecDim.  vecDim should be numDims + 2 = " << numDims + 2
-        << " for Navier-Stokes equations." << std::endl);
+        << "Invalid Parameter vecDim.  vecDim should be numDims + 2 = " << numDims + 2 << " for Navier-Stokes equations." << std::endl);
   }
 }
 
@@ -141,8 +133,7 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
                 }
               }
             for (std::size_t qp = 0; qp < numQPs; ++qp) {
-              Residual(cell, node, 0) += ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) +
-                                         zetabar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) +
+              Residual(cell, node, 0) += ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) + zetabar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) +
                                          force(cell, qp, 0) * wBF(cell, node, qp);  // ubar*du'/dx + zetabar*dp'/dx + f0
               Residual(cell, node, 1) += gamma_gas * pbar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) +
                                          ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) +
@@ -194,22 +185,18 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
                 }
               }
             for (std::size_t qp = 0; qp < numQPs; ++qp) {
-              Residual(cell, node, 0) += ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) +
-                                         vbar * qFluctGrad(cell, qp, 0, 1) * wBF(cell, node, qp) +
+              Residual(cell, node, 0) += ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 0, 1) * wBF(cell, node, qp) +
                                          zetabar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) +
                                          force(cell, qp, 0) * wBF(cell, node, qp);  // ubar*du'/dx + vbar*du'/dy +
                                                                                     // zetabar*dp'/dx + f0
-              Residual(cell, node, 1) += ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) +
-                                         vbar * qFluctGrad(cell, qp, 1, 1) * wBF(cell, node, qp) +
+              Residual(cell, node, 1) += ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 1, 1) * wBF(cell, node, qp) +
                                          zetabar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
                                          force(cell, qp, 1) * wBF(cell, node, qp);  // ubar*dv'/dx + vbar*dv'/dy +
                                                                                     // zetabar*dp'/dy + f1
-              Residual(cell, node, 2) +=
-                  gamma_gas * pbar * (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1)) * wBF(cell, node, qp) +
-                  ubar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) +
-                  vbar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
-                  force(cell, qp, 2) * wBF(cell, node, qp);  // gamma*pbar*div(u') + ubar*dp'/dx
-                                                             // + vbar*dp'/dy + f2
+              Residual(cell, node, 2) += gamma_gas * pbar * (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1)) * wBF(cell, node, qp) +
+                                         ubar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
+                                         force(cell, qp, 2) * wBF(cell, node, qp);  // gamma*pbar*div(u') + ubar*dp'/dx
+                                                                                    // + vbar*dp'/dy + f2
             }
           }
         }
@@ -226,22 +213,18 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
               }
             for (std::size_t qp = 0; qp < numQPs; ++qp) {
               Residual(cell, node, 0) += -1.0 * ubar * qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 0) -
-                                         vbar * qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 1) -
-                                         zetabar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 0) +
+                                         vbar * qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 1) - zetabar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 0) +
                                          force(cell, qp, 0) * wBF(cell, node, qp);  // ubar*du'/dx + vbar*du'/dy +
                                                                                     // zetabar*dp'/dx + f0
               Residual(cell, node, 1) += -1.0 * ubar * qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 0) -
-                                         vbar * qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 1) -
-                                         zetabar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 1) +
+                                         vbar * qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 1) - zetabar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 1) +
                                          force(cell, qp, 1) * wBF(cell, node, qp);  // ubar*dv'/dx + vbar*dv'/dy +
                                                                                     // zetabar*dp'/dy + f1
-              Residual(cell, node, 2) += -1.0 * gamma_gas * pbar *
-                                             (qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 0) +
-                                              qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 1)) -
-                                         ubar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 0) -
-                                         vbar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 1) +
-                                         force(cell, qp, 2) * wBF(cell, node, qp);  // gamma*pbar*div(u') + ubar*dp'/dx
-                                                                                    // + vbar*dp'/dy + f2
+              Residual(cell, node, 2) +=
+                  -1.0 * gamma_gas * pbar * (qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 0) + qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 1)) -
+                  ubar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 0) - vbar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 1) +
+                  force(cell, qp, 2) * wBF(cell, node, qp);  // gamma*pbar*div(u') + ubar*dp'/dx
+                                                             // + vbar*dp'/dy + f2
             }
           }
         }
@@ -264,33 +247,23 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
                 }
               }
             for (std::size_t qp = 0; qp < numQPs; ++qp) {
-              Residual(cell, node, 0) += ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) +
-                                         vbar * qFluctGrad(cell, qp, 0, 1) * wBF(cell, node, qp) +
-                                         wbar * qFluctGrad(cell, qp, 0, 2) * wBF(cell, node, qp) +
-                                         zetabar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
+              Residual(cell, node, 0) += ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 0, 1) * wBF(cell, node, qp) +
+                                         wbar * qFluctGrad(cell, qp, 0, 2) * wBF(cell, node, qp) + zetabar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
                                          force(cell, qp, 0) * wBF(cell, node, qp);  // ubar*du'/dx + vbar*du'/dy +
                                                                                     // wbar*du'/dz + zetabar*dp'/dx + f0
-              Residual(cell, node, 1) += ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) +
-                                         vbar * qFluctGrad(cell, qp, 1, 1) * wBF(cell, node, qp) +
-                                         wbar * qFluctGrad(cell, qp, 1, 2) * wBF(cell, node, qp) +
-                                         zetabar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
+              Residual(cell, node, 1) += ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 1, 1) * wBF(cell, node, qp) +
+                                         wbar * qFluctGrad(cell, qp, 1, 2) * wBF(cell, node, qp) + zetabar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
                                          force(cell, qp, 1) * wBF(cell, node, qp);  // ubar*dv'/dx + vbar*dv'/dy +
                                                                                     // wbar*dv'/dz + zetabar*dp'/dy + f1
-              Residual(cell, node, 2) += ubar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) +
-                                         vbar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
-                                         wbar * qFluctGrad(cell, qp, 2, 2) * wBF(cell, node, qp) +
-                                         zetabar * qFluctGrad(cell, qp, 3, 2) * wBF(cell, node, qp) +
+              Residual(cell, node, 2) += ubar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
+                                         wbar * qFluctGrad(cell, qp, 2, 2) * wBF(cell, node, qp) + zetabar * qFluctGrad(cell, qp, 3, 2) * wBF(cell, node, qp) +
                                          force(cell, qp, 2) * wBF(cell, node, qp);  // ubar*dw'/dx + vbar*dw'/dy +
                                                                                     // wbar*dw'/dz + zetabar*dp'/dz + f2
               Residual(cell, node, 3) +=
-                  gamma_gas * pbar *
-                      (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1) + qFluctGrad(cell, qp, 2, 2)) *
-                      wBF(cell, node, qp) +
-                  ubar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
-                  vbar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
-                  wbar * qFluctGrad(cell, qp, 3, 2) * wBF(cell, node, qp) +
-                  force(cell, qp, 3) * wBF(cell, node, qp);  // gamma*pbar*div(u') + ubar*dp'/dx
-                                                             // + vbar*dp'/dy + wbar*dp'/dz + f3
+                  gamma_gas * pbar * (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1) + qFluctGrad(cell, qp, 2, 2)) * wBF(cell, node, qp) +
+                  ubar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
+                  wbar * qFluctGrad(cell, qp, 3, 2) * wBF(cell, node, qp) + force(cell, qp, 3) * wBF(cell, node, qp);  // gamma*pbar*div(u') + ubar*dp'/dx
+                                                                                                                       // + vbar*dp'/dy + wbar*dp'/dz + f3
             }
           }
         }
@@ -307,29 +280,24 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
               }
             for (std::size_t qp = 0; qp < numQPs; ++qp) {
               Residual(cell, node, 0) += -1.0 * ubar * qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 0) -
-                                         vbar * qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 1) -
-                                         wbar * qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 2) -
+                                         vbar * qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 1) - wbar * qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 2) -
                                          zetabar * qFluct(cell, qp, 3) * wGradBF(cell, node, qp, 0) +
                                          force(cell, qp, 0) * wBF(cell, node, qp);  // ubar*du'/dx + vbar*du'/dy +
                                                                                     // wbar*du'/dz + zetabar*dp'/dx + f0
               Residual(cell, node, 1) += -1.0 * ubar * qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 0) -
-                                         vbar * qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 1) -
-                                         wbar * qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 2) -
+                                         vbar * qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 1) - wbar * qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 2) -
                                          zetabar * qFluct(cell, qp, 3) * wGradBF(cell, node, qp, 1) +
                                          force(cell, qp, 1) * wBF(cell, node, qp);  // ubar*dv'/dx + vbar*dv'/dy +
                                                                                     // wbar*dv'/dz + zetabar*dp'/dy + f1
               Residual(cell, node, 2) += -1.0 * ubar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 0) -
-                                         vbar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 1) -
-                                         wbar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 2) -
+                                         vbar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 1) - wbar * qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 2) -
                                          zetabar * qFluct(cell, qp, 3) * wGradBF(cell, node, qp, 2) +
                                          force(cell, qp, 2) * wBF(cell, node, qp);  // ubar*dw'/dx + vbar*dw'/dy +
                                                                                     // wbar*dw'/dz + zetabar*dp'/dz + f2
               Residual(cell, node, 3) += -1.0 * gamma_gas * pbar *
-                                             (qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 0) +
-                                              qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 1) +
+                                             (qFluct(cell, qp, 0) * wGradBF(cell, node, qp, 0) + qFluct(cell, qp, 1) * wGradBF(cell, node, qp, 1) +
                                               qFluct(cell, qp, 2) * wGradBF(cell, node, qp, 2)) -
-                                         ubar * qFluct(cell, qp, 3) * wGradBF(cell, node, qp, 0) -
-                                         vbar * qFluct(cell, qp, 3) * wGradBF(cell, node, qp, 1) -
+                                         ubar * qFluct(cell, qp, 3) * wGradBF(cell, node, qp, 0) - vbar * qFluct(cell, qp, 3) * wGradBF(cell, node, qp, 1) -
                                          wbar * qFluct(cell, qp, 3) * wGradBF(cell, node, qp, 2) +
                                          force(cell, qp, 3) * wBF(cell, node, qp);  // gamma*pbar*div(u') + ubar*dp'/dx
                                                                                     // + vbar*dp'/dy + wbar*dp'/dz + f3
@@ -356,14 +324,11 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
             }
           for (std::size_t qp = 0; qp < numQPs; ++qp) {
             Residual(cell, node, 0) +=
-                rhobar * ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) +
-                rhobar * vbar * qFluctGrad(cell, qp, 0, 1) * wBF(cell, node, qp) +
-                rhobar * Rgas * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) +
-                Rgas * Tbar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
+                rhobar * ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) + rhobar * vbar * qFluctGrad(cell, qp, 0, 1) * wBF(cell, node, qp) +
+                rhobar * Rgas * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) + Rgas * Tbar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
                 1.0 / Re *
                     ((2.0 * mu + lambda) * qFluctGrad(cell, qp, 0, 0) * wGradBF(cell, node, qp, 0) +
-                     lambda * qFluctGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 0) +
-                     mu * qFluctGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 1) +
+                     lambda * qFluctGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 0) + mu * qFluctGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 1) +
                      mu * qFluctGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 1)) +
                 force(cell, qp, 0) * wBF(cell,
                                          node,
@@ -373,13 +338,10 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
                                                // lambda*dv'/dy) + d/dy*(mu*dv'/dx + mu*du'/dy))
                                                // + f0
             Residual(cell, node, 1) +=
-                rhobar * ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) +
-                rhobar * vbar * qFluctGrad(cell, qp, 1, 1) * wBF(cell, node, qp) +
-                rhobar * Rgas * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
-                Rgas * Tbar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
+                rhobar * ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) + rhobar * vbar * qFluctGrad(cell, qp, 1, 1) * wBF(cell, node, qp) +
+                rhobar * Rgas * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) + Rgas * Tbar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
                 1.0 / Re *
-                    (mu * qFluctGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 0) +
-                     mu * qFluctGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 0) +
+                    (mu * qFluctGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 0) + mu * qFluctGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 0) +
                      lambda * qFluctGrad(cell, qp, 0, 0) * wGradBF(cell, node, qp, 1) +
                      (2.0 * mu + lambda) * qFluctGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 1)) +
                 force(cell, qp, 1) * wBF(cell,
@@ -389,27 +351,22 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
                                                // 1/Re*(d/dx(mu*dv'/dx + mu*du'/dy) +
                                                // d/dy(lambda*du'/dx + (2*mu + lambda)*dv'/dy)) +
                                                // f1
-            Residual(cell, node, 2) += rhobar * Tbar * (gamma_gas - 1.0) *
-                                           (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1)) *
-                                           wBF(cell, node, qp) +
-                                       rhobar * ubar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) +
-                                       rhobar * vbar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
-                                       1.0 / Re *
-                                           (gamma_gas * kappa / Pr *
-                                            (qFluctGrad(cell, qp, 2, 0) * wGradBF(cell, node, qp, 0) +
-                                             qFluctGrad(cell, qp, 2, 1) * wGradBF(cell, node, qp, 1))) +
-                                       force(cell, qp, 2) * wBF(cell,
-                                                                node,
-                                                                qp);  // rhobar*Tbar*(gamma-1)*div(u') +
-                                                                      // rhobar*ubar*dT'/dx + rhobar*vbar*dT'/dy +
-                                                                      // 1/Re*(d/dx(gamma*kappa/Pr*dT'/dx) +
-                                                                      // d/dy(gamma*kappa/Pr*dT'/dy) + f2
-            Residual(cell, node, 3) +=
-                rhobar * (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1)) * wBF(cell, node, qp) +
-                ubar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
-                vbar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
-                force(cell, qp, 3) * wBF(cell, node, qp);  // rhobar*div(u') + ubar*drho'/dx +
-                                                           // vbar*drho'/dy + f3
+            Residual(cell, node, 2) +=
+                rhobar * Tbar * (gamma_gas - 1.0) * (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1)) * wBF(cell, node, qp) +
+                rhobar * ubar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) + rhobar * vbar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
+                1.0 / Re *
+                    (gamma_gas * kappa / Pr *
+                     (qFluctGrad(cell, qp, 2, 0) * wGradBF(cell, node, qp, 0) + qFluctGrad(cell, qp, 2, 1) * wGradBF(cell, node, qp, 1))) +
+                force(cell, qp, 2) * wBF(cell,
+                                         node,
+                                         qp);  // rhobar*Tbar*(gamma-1)*div(u') +
+                                               // rhobar*ubar*dT'/dx + rhobar*vbar*dT'/dy +
+                                               // 1/Re*(d/dx(gamma*kappa/Pr*dT'/dx) +
+                                               // d/dy(gamma*kappa/Pr*dT'/dy) + f2
+            Residual(cell, node, 3) += rhobar * (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1)) * wBF(cell, node, qp) +
+                                       ubar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
+                                       force(cell, qp, 3) * wBF(cell, node, qp);  // rhobar*div(u') + ubar*drho'/dx +
+                                                                                  // vbar*drho'/dy + f3
           }
         }
       }
@@ -431,19 +388,14 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
             }
           for (std::size_t qp = 0; qp < numQPs; ++qp) {
             Residual(cell, node, 0) +=
-                rhobar * ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) +
-                rhobar * vbar * qFluctGrad(cell, qp, 0, 1) * wBF(cell, node, qp) +
-                rhobar * wbar * qFluctGrad(cell, qp, 0, 2) * wBF(cell, node, qp) +
-                rhobar * Rgas * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
+                rhobar * ubar * qFluctGrad(cell, qp, 0, 0) * wBF(cell, node, qp) + rhobar * vbar * qFluctGrad(cell, qp, 0, 1) * wBF(cell, node, qp) +
+                rhobar * wbar * qFluctGrad(cell, qp, 0, 2) * wBF(cell, node, qp) + rhobar * Rgas * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
                 Rgas * Tbar * qFluctGrad(cell, qp, 4, 0) * wBF(cell, node, qp) +
                 1.0 / Re *
                     ((2.0 * mu + lambda) * qFluctGrad(cell, qp, 0, 0) * wGradBF(cell, node, qp, 0) +
-                     lambda * qFluctGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 0) +
-                     lambda * qFluctGrad(cell, qp, 2, 2) * wGradBF(cell, node, qp, 0) +
-                     mu * qFluctGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 1) +
-                     mu * qFluctGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 1) +
-                     mu * qFluctGrad(cell, qp, 2, 0) * wGradBF(cell, node, qp, 2) +
-                     mu * qFluctGrad(cell, qp, 0, 2) * wGradBF(cell, node, qp, 2)) +
+                     lambda * qFluctGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 0) + lambda * qFluctGrad(cell, qp, 2, 2) * wGradBF(cell, node, qp, 0) +
+                     mu * qFluctGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 1) + mu * qFluctGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 1) +
+                     mu * qFluctGrad(cell, qp, 2, 0) * wGradBF(cell, node, qp, 2) + mu * qFluctGrad(cell, qp, 0, 2) * wGradBF(cell, node, qp, 2)) +
                 force(cell, qp, 0) * wBF(cell,
                                          node,
                                          qp);  // rhobar*ubar*du'/dx + rhobar*vbar*du'/dy +
@@ -454,18 +406,14 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
                                                // mu*du'/dy))
                                                // + d/dz(mu*dw'/dx + mu*du'/dz)) + f0
             Residual(cell, node, 1) +=
-                rhobar * ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) +
-                rhobar * vbar * qFluctGrad(cell, qp, 1, 1) * wBF(cell, node, qp) +
-                rhobar * wbar * qFluctGrad(cell, qp, 1, 2) * wBF(cell, node, qp) +
-                rhobar * Rgas * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
+                rhobar * ubar * qFluctGrad(cell, qp, 1, 0) * wBF(cell, node, qp) + rhobar * vbar * qFluctGrad(cell, qp, 1, 1) * wBF(cell, node, qp) +
+                rhobar * wbar * qFluctGrad(cell, qp, 1, 2) * wBF(cell, node, qp) + rhobar * Rgas * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
                 Rgas * Tbar * qFluctGrad(cell, qp, 4, 1) * wBF(cell, node, qp) +
                 1.0 / Re *
-                    (mu * qFluctGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 0) +
-                     mu * qFluctGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 0) +
+                    (mu * qFluctGrad(cell, qp, 1, 0) * wGradBF(cell, node, qp, 0) + mu * qFluctGrad(cell, qp, 0, 1) * wGradBF(cell, node, qp, 0) +
                      lambda * qFluctGrad(cell, qp, 0, 0) * wGradBF(cell, node, qp, 1) +
                      (2.0 * mu + lambda) * qFluctGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 1) +
-                     lambda * qFluctGrad(cell, qp, 2, 2) * wGradBF(cell, node, qp, 1) +
-                     mu * qFluctGrad(cell, qp, 2, 1) * wGradBF(cell, node, qp, 2) +
+                     lambda * qFluctGrad(cell, qp, 2, 2) * wGradBF(cell, node, qp, 1) + mu * qFluctGrad(cell, qp, 2, 1) * wGradBF(cell, node, qp, 2) +
                      mu * qFluctGrad(cell, qp, 1, 2) * wGradBF(cell, node, qp, 2)) +
                 force(cell, qp, 1) * wBF(cell,
                                          node,
@@ -477,18 +425,13 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
                                                // d/dz(mu*dw'/dy
                                                // + mu*dv'/dz)) + f1
             Residual(cell, node, 2) +=
-                rhobar * ubar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) +
-                rhobar * vbar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
-                rhobar * wbar * qFluctGrad(cell, qp, 2, 2) * wBF(cell, node, qp) +
-                rhobar * Rgas * qFluctGrad(cell, qp, 3, 2) * wBF(cell, node, qp) +
+                rhobar * ubar * qFluctGrad(cell, qp, 2, 0) * wBF(cell, node, qp) + rhobar * vbar * qFluctGrad(cell, qp, 2, 1) * wBF(cell, node, qp) +
+                rhobar * wbar * qFluctGrad(cell, qp, 2, 2) * wBF(cell, node, qp) + rhobar * Rgas * qFluctGrad(cell, qp, 3, 2) * wBF(cell, node, qp) +
                 Rgas * Tbar * qFluctGrad(cell, qp, 4, 2) * wBF(cell, node, qp) +
                 1.0 / Re *
-                    (mu * qFluctGrad(cell, qp, 2, 0) * wGradBF(cell, node, qp, 0) +
-                     mu * qFluctGrad(cell, qp, 0, 2) * wGradBF(cell, node, qp, 0) +
-                     mu * qFluctGrad(cell, qp, 2, 1) * wGradBF(cell, node, qp, 1) +
-                     mu * qFluctGrad(cell, qp, 1, 2) * wGradBF(cell, node, qp, 1) +
-                     lambda * qFluctGrad(cell, qp, 0, 0) * wGradBF(cell, node, qp, 2) +
-                     lambda * qFluctGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 2) +
+                    (mu * qFluctGrad(cell, qp, 2, 0) * wGradBF(cell, node, qp, 0) + mu * qFluctGrad(cell, qp, 0, 2) * wGradBF(cell, node, qp, 0) +
+                     mu * qFluctGrad(cell, qp, 2, 1) * wGradBF(cell, node, qp, 1) + mu * qFluctGrad(cell, qp, 1, 2) * wGradBF(cell, node, qp, 1) +
+                     lambda * qFluctGrad(cell, qp, 0, 0) * wGradBF(cell, node, qp, 2) + lambda * qFluctGrad(cell, qp, 1, 1) * wGradBF(cell, node, qp, 2) +
                      (2.0 * mu + lambda) * qFluctGrad(cell, qp, 2, 2) * wGradBF(cell, node, qp, 2)) +
                 force(cell, qp, 2) * wBF(cell,
                                          node,
@@ -498,33 +441,27 @@ LinComprNSResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset
                                                // mu*du'/dz) + d/dy(mu*dw'/dy + mu*dv'/dz) +
                                                // d/dz(lambda*du'/dx + lambda*dv'/dy + (2*mu +
                                                // lambda)*dw'/dz)) + f2
-            Residual(cell, node, 3) +=
-                rhobar * Tbar * (gamma_gas - 1.0) *
-                    (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1) + qFluctGrad(cell, qp, 2, 2)) *
-                    wBF(cell, node, qp) +
-                rhobar * ubar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
-                rhobar * vbar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
-                1.0 / Re *
-                    (gamma_gas * kappa / Pr *
-                     (qFluctGrad(cell, qp, 3, 0) * wGradBF(cell, node, qp, 0) +
-                      qFluctGrad(cell, qp, 3, 1) * wGradBF(cell, node, qp, 1) +
-                      qFluctGrad(cell, qp, 3, 2) * wGradBF(cell, node, qp, 2))) +
-                force(cell, qp, 3) * wBF(cell,
-                                         node,
-                                         qp);  // rhobar*Tbar*(gamma-1)*div(u') +
-                                               // rhobar*ubar*dT'/dx + rhobar*vbar*dT'/dy +
-                                               // rhobar*wbar*dT'/dz +
-                                               // 1/Re*(d/dx(gamma*kappa/Pr*dT'/dx) +
-                                               // d/dy(gamma*kappa/Pr*dT'/dy) +
-                                               // d/dz(gamma*kappa/Pr*dT'/dz + f3
-            Residual(cell, node, 4) +=
-                rhobar * (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1) + qFluctGrad(cell, qp, 2, 2)) *
-                    wBF(cell, node, qp) +
-                ubar * qFluctGrad(cell, qp, 4, 0) * wBF(cell, node, qp) +
-                vbar * qFluctGrad(cell, qp, 4, 1) * wBF(cell, node, qp) +
-                wbar * qFluctGrad(cell, qp, 4, 2) * wBF(cell, node, qp) +
-                force(cell, qp, 4) * wBF(cell, node, qp);  // rhobar*div(u') + ubar*drho'/dx +
-                                                           // vbar*drho'/dy + wbar*drho'/dz + f4
+            Residual(cell, node, 3) += rhobar * Tbar * (gamma_gas - 1.0) *
+                                           (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1) + qFluctGrad(cell, qp, 2, 2)) * wBF(cell, node, qp) +
+                                       rhobar * ubar * qFluctGrad(cell, qp, 3, 0) * wBF(cell, node, qp) +
+                                       rhobar * vbar * qFluctGrad(cell, qp, 3, 1) * wBF(cell, node, qp) +
+                                       1.0 / Re *
+                                           (gamma_gas * kappa / Pr *
+                                            (qFluctGrad(cell, qp, 3, 0) * wGradBF(cell, node, qp, 0) + qFluctGrad(cell, qp, 3, 1) * wGradBF(cell, node, qp, 1) +
+                                             qFluctGrad(cell, qp, 3, 2) * wGradBF(cell, node, qp, 2))) +
+                                       force(cell, qp, 3) * wBF(cell,
+                                                                node,
+                                                                qp);  // rhobar*Tbar*(gamma-1)*div(u') +
+                                                                      // rhobar*ubar*dT'/dx + rhobar*vbar*dT'/dy +
+                                                                      // rhobar*wbar*dT'/dz +
+                                                                      // 1/Re*(d/dx(gamma*kappa/Pr*dT'/dx) +
+                                                                      // d/dy(gamma*kappa/Pr*dT'/dy) +
+                                                                      // d/dz(gamma*kappa/Pr*dT'/dz + f3
+            Residual(cell, node, 4) += rhobar * (qFluctGrad(cell, qp, 0, 0) + qFluctGrad(cell, qp, 1, 1) + qFluctGrad(cell, qp, 2, 2)) * wBF(cell, node, qp) +
+                                       ubar * qFluctGrad(cell, qp, 4, 0) * wBF(cell, node, qp) + vbar * qFluctGrad(cell, qp, 4, 1) * wBF(cell, node, qp) +
+                                       wbar * qFluctGrad(cell, qp, 4, 2) * wBF(cell, node, qp) +
+                                       force(cell, qp, 4) * wBF(cell, node, qp);  // rhobar*div(u') + ubar*drho'/dx +
+                                                                                  // vbar*drho'/dy + wbar*drho'/dz + f4
           }
         }
       }

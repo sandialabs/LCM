@@ -126,10 +126,7 @@ bounds_and_sum_subset(std::vector<minitensor::Vector<double>> const& points, std
 // Return the index of the center closest to the point among the
 // indexed centers.
 minitensor::Index
-closest_subset(
-    minitensor::Vector<double> const&  point,
-    std::vector<ClusterCenter> const&  centers,
-    std::set<minitensor::Index> const& indices)
+closest_subset(minitensor::Vector<double> const& point, std::vector<ClusterCenter> const& centers, std::set<minitensor::Index> const& indices)
 {
   ALBANY_EXPECT(centers.size() > 0);
   ALBANY_EXPECT(indices.size() > 0);
@@ -216,8 +213,7 @@ split_box(std::vector<minitensor::Vector<double>> const& points, std::set<minite
   // Check whether splitting the box will result in one box of
   // the same volume as the original and another one of zero volume.
   // If so, split the original box into two of equal volume.
-  bool const box_unchanged =
-      split_coordinate == lower_corner(largest_dimension) || split_coordinate == upper_corner(largest_dimension);
+  bool const box_unchanged = split_coordinate == lower_corner(largest_dimension) || split_coordinate == upper_corner(largest_dimension);
 
   if (box_unchanged == true) {
     std::sort(coordinates.begin(), coordinates.end());
@@ -315,8 +311,7 @@ createKDTreeNode(
     } break;
 
     default: {
-      std::tie(node->lower_corner, node->upper_corner, node->weighted_centroid) =
-          bounds_and_sum_subset(points, points_indices);
+      std::tie(node->lower_corner, node->upper_corner, node->weighted_centroid) = bounds_and_sum_subset(points, points_indices);
 
       std::set<minitensor::Index> indices_left;
 
@@ -417,8 +412,7 @@ OutputVisitor<Node>::post_stop(Node const& node) const
 
 // Constructor for filtering visitor
 template <typename Node, typename Center>
-FilterVisitor<Node, Center>::FilterVisitor(std::vector<minitensor::Vector<double>>& p, std::vector<Center>& c)
-    : points(p), centers(c)
+FilterVisitor<Node, Center>::FilterVisitor(std::vector<minitensor::Vector<double>>& p, std::vector<Center>& c) : points(p), centers(c)
 {
 }
 
@@ -426,11 +420,7 @@ namespace {
 
 template <typename Center, typename Iterator>
 minitensor::Index
-closest_center_from_subset(
-    minitensor::Vector<double> const& point,
-    std::vector<Center> const&        centers,
-    Iterator                          begin,
-    Iterator                          end)
+closest_center_from_subset(minitensor::Vector<double> const& point, std::vector<Center> const& centers, Iterator begin, Iterator end)
 {
   ALBANY_EXPECT(std::distance(begin, end) > 0);
 
@@ -540,8 +530,7 @@ FilterVisitor<Node, Center>::operator()(Node const& node) const
     minitensor::Vector<double> const& point = points[point_index];
 
     // Find closest center to it
-    minitensor::Index index_closest =
-        closest_center_from_subset(point, centers, node->candidate_centers.begin(), node->candidate_centers.end());
+    minitensor::Index index_closest = closest_center_from_subset(point, centers, node->candidate_centers.begin(), node->candidate_centers.end());
 
     // Update closest center
     Center& closest_center = centers[index_closest];
@@ -558,8 +547,7 @@ FilterVisitor<Node, Center>::operator()(Node const& node) const
 
     std::set<minitensor::Index> candidate_indices;
 
-    std::tie(index_closest_midcell, candidate_indices) =
-        box_proximity_to_centers(node->lower_corner, node->upper_corner, centers, node->candidate_centers);
+    std::tie(index_closest_midcell, candidate_indices) = box_proximity_to_centers(node->lower_corner, node->upper_corner, centers, node->candidate_centers);
 
     node->candidate_centers = candidate_indices;
 
@@ -729,8 +717,7 @@ ConnectivityArray::ConnectivityArray(std::string const& input_file, std::string 
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<int>>>::size_type workset = 0;
 
   for (workset = 0; workset < element_connectivity.size(); ++workset) {
-    for (Teuchos::ArrayRCP<Teuchos::ArrayRCP<int>>::size_type cell = 0; cell < element_connectivity[workset].extent(0);
-         ++cell, ++element_number) {
+    for (Teuchos::ArrayRCP<Teuchos::ArrayRCP<int>>::size_type cell = 0; cell < element_connectivity[workset].extent(0); ++cell, ++element_number) {
       IDList nodes_element(nodes_per_element);
 
       for (Teuchos::ArrayRCP<int>::size_type node = 0; node < vertices_per_element; ++node) {
@@ -906,17 +893,12 @@ ConnectivityArray::getVolumes() const
 
       case minitensor::ELEMENT::TRIANGULAR: volume = minitensor::area(points[0], points[1], points[2]); break;
 
-      case minitensor::ELEMENT::QUADRILATERAL:
-        volume = minitensor::area(points[0], points[1], points[2], points[3]);
-        break;
+      case minitensor::ELEMENT::QUADRILATERAL: volume = minitensor::area(points[0], points[1], points[2], points[3]); break;
 
-      case minitensor::ELEMENT::TETRAHEDRAL:
-        volume = minitensor::volume(points[0], points[1], points[2], points[3]);
-        break;
+      case minitensor::ELEMENT::TETRAHEDRAL: volume = minitensor::volume(points[0], points[1], points[2], points[3]); break;
 
       case minitensor::ELEMENT::HEXAHEDRAL:
-        volume =
-            minitensor::volume(points[0], points[1], points[2], points[3], points[4], points[5], points[6], points[7]);
+        volume = minitensor::volume(points[0], points[1], points[2], points[3], points[4], points[5], points[6], points[7]);
         break;
 
       default:
@@ -1407,13 +1389,9 @@ ConnectivityArray::isInsideMeshByElement(minitensor::Vector<double> const& point
     }
 
     switch (type_) {
-      case minitensor::ELEMENT::TETRAHEDRAL:
-        return in_tetrahedron(point, nodes[0], nodes[1], nodes[2], nodes[3]);
-        break;
+      case minitensor::ELEMENT::TETRAHEDRAL: return in_tetrahedron(point, nodes[0], nodes[1], nodes[2], nodes[3]); break;
 
-      case minitensor::ELEMENT::HEXAHEDRAL:
-        return in_hexahedron(point, nodes[0], nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6], nodes[7]);
-        break;
+      case minitensor::ELEMENT::HEXAHEDRAL: return in_hexahedron(point, nodes[0], nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6], nodes[7]); break;
 
       default:
         std::cerr << "Unknown element type in K-means partition." << '\n';
@@ -2277,15 +2255,7 @@ ConnectivityArray::getNumberOfObjects(void* data, int* ierr)
 
 // Zoltan interface, return relevant object properties
 void
-ConnectivityArray::getObjectList(
-    void*         data,
-    int           sizeGID,
-    int           sizeLID,
-    ZOLTAN_ID_PTR globalID,
-    ZOLTAN_ID_PTR localID,
-    int           wgt_dim,
-    float*        obj_wgts,
-    int*          ierr)
+ConnectivityArray::getObjectList(void* data, int sizeGID, int sizeLID, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID, int wgt_dim, float* obj_wgts, int* ierr)
 {
   ConnectivityArray& connectivity_array = *(static_cast<ConnectivityArray*>(data));
 
@@ -2986,15 +2956,7 @@ ZoltanHyperGraph::getNumberOfObjects(void* data, int* ierr)
 
 // Zoltan interface, return relevant object properties
 void
-ZoltanHyperGraph::getObjectList(
-    void*         data,
-    int           sizeGID,
-    int           sizeLID,
-    ZOLTAN_ID_PTR globalID,
-    ZOLTAN_ID_PTR localID,
-    int           wgt_dim,
-    float*        obj_wgts,
-    int*          ierr)
+ZoltanHyperGraph::getObjectList(void* data, int sizeGID, int sizeLID, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID, int wgt_dim, float* obj_wgts, int* ierr)
 {
   ZoltanHyperGraph& zoltan_hypergraph = *(static_cast<ZoltanHyperGraph*>(data));
 

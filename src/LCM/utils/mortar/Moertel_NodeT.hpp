@@ -575,8 +575,7 @@ class NodeT
   Teuchos::RCP<std::map<int, ST>>              Mrow_;     // a nodal block row of D
   Teuchos::RCP<std::vector<std::map<int, ST>>> Mmodrow_;  // scalar rows of Mmod
 
-  std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>>
-      pnode_;  // the projected node on some segment
+  std::vector<Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)>> pnode_;  // the projected node on some segment
 
   double gap_;  // distance between projection and source node "the gap"
 };

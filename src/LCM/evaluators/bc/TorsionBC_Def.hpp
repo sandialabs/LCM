@@ -15,10 +15,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 TorsionBC_Base<EvalT, Traits>::TorsionBC_Base(Teuchos::ParameterList& p)
-    : PHAL::DirichletBase<EvalT, Traits>(p),
-      thetaDot(p.get<RealType>("Theta Dot")),
-      X0(p.get<RealType>("X0")),
-      Y0(p.get<RealType>("Y0"))
+    : PHAL::DirichletBase<EvalT, Traits>(p), thetaDot(p.get<RealType>("Theta Dot")), X0(p.get<RealType>("X0")), Y0(p.get<RealType>("Y0"))
 {
 }
 
@@ -40,8 +37,7 @@ TorsionBC_Base<EvalT, Traits>::computeBCs(double* coord, ScalarT& Xval, ScalarT&
 // Specialization: Residual
 // **********************************************************************
 template <typename Traits>
-TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::TorsionBC(Teuchos::ParameterList& p)
-    : TorsionBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
+TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::TorsionBC(Teuchos::ParameterList& p) : TorsionBC_Base<PHAL::AlbanyTraits::Residual, Traits>(p)
 {
 }
 
@@ -86,8 +82,7 @@ TorsionBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits:
 // Specialization: Jacobian
 // **********************************************************************
 template <typename Traits>
-TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>::TorsionBC(Teuchos::ParameterList& p)
-    : TorsionBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
+TorsionBC<PHAL::AlbanyTraits::Jacobian, Traits>::TorsionBC(Teuchos::ParameterList& p) : TorsionBC_Base<PHAL::AlbanyTraits::Jacobian, Traits>(p)
 {
 }
 // **********************************************************************

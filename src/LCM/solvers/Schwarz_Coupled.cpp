@@ -34,8 +34,7 @@ SchwarzCoupled::SchwarzCoupled(
   Teuchos::ParameterList& coupled_system_params = app_params->sublist("Coupled System");
 
   // Get names of individual model input files from problem parameterlist
-  Teuchos::Array<std::string> model_filenames =
-      coupled_system_params.get<Teuchos::Array<std::string>>("Model Input Files");
+  Teuchos::Array<std::string> model_filenames = coupled_system_params.get<Teuchos::Array<std::string>>("Model Input Files");
 
   // number of models
   num_models_ = model_filenames.size();
@@ -59,13 +58,11 @@ SchwarzCoupled::SchwarzCoupled(
   w_prec_supports_ = false;
 
   // Check if problem is matrix-free
-  std::string const jacob_op =
-      piroPL.isParameter("Jacobian Operator") == true ? piroPL.get<std::string>("Jacobian Operator") : "";
+  std::string const jacob_op = piroPL.isParameter("Jacobian Operator") == true ? piroPL.get<std::string>("Jacobian Operator") : "";
 
   // Get matrix-free preconditioner from input file
-  std::string const mf_prec = coupled_system_params.isParameter("Matrix-Free Preconditioner") == true ?
-                                  coupled_system_params.get<std::string>("Matrix-Free Preconditioner") :
-                                  "None";
+  std::string const mf_prec =
+      coupled_system_params.isParameter("Matrix-Free Preconditioner") == true ? coupled_system_params.get<std::string>("Matrix-Free Preconditioner") : "None";
 
   if (mf_prec == "None") {
     mf_prec_type_ = NONE;
@@ -114,11 +111,9 @@ SchwarzCoupled::SchwarzCoupled(
 
   Teuchos::RCP<NOX::Abstract::PrePostOperator> pre_post_operator = Teuchos::rcp(new LCM::SolutionSniffer);
 
-  Teuchos::RCP<LCM::SolutionSniffer> nox_solver_pre_post_operator =
-      Teuchos::rcp_dynamic_cast<LCM::SolutionSniffer>(pre_post_operator);
+  Teuchos::RCP<LCM::SolutionSniffer> nox_solver_pre_post_operator = Teuchos::rcp_dynamic_cast<LCM::SolutionSniffer>(pre_post_operator);
 
-  Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> status_test =
-      Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(nox_status_test);
+  Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> status_test = Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(nox_status_test);
 
   // Acquire the NOX "Solver Options" and "Status Tests" parameter lists
   Teuchos::RCP<Teuchos::ParameterList> solver_options_pl;
@@ -187,8 +182,7 @@ SchwarzCoupled::SchwarzCoupled(
   if (problem_params.isSublist("Parameters")) {
     parameter_params = Teuchos::rcp(&(problem_params.sublist("Parameters")), false);
 
-    auto const num_parameters =
-        parameter_params->isType<int>("Number") == true ? parameter_params->get<int>("Number") : 0;
+    auto const num_parameters = parameter_params->isType<int>("Number") == true ? parameter_params->get<int>("Number") : 0;
 
     bool const using_old_parameter_list = num_parameters > 0 ? true : false;
 
@@ -197,10 +191,9 @@ SchwarzCoupled::SchwarzCoupled(
     // Get parameter names
     param_names_.resize(num_params_total_);
     for (auto l = 0; l < num_params_total_; ++l) {
-      Teuchos::RCP<Teuchos::ParameterList const> p_list =
-          using_old_parameter_list == true ?
-              Teuchos::rcp(new Teuchos::ParameterList(*parameter_params)) :
-              Teuchos::rcp(&(parameter_params->sublist(Albany::strint("Parameter Vector", l))), false);
+      Teuchos::RCP<Teuchos::ParameterList const> p_list = using_old_parameter_list == true ?
+                                                              Teuchos::rcp(new Teuchos::ParameterList(*parameter_params)) :
+                                                              Teuchos::rcp(&(parameter_params->sublist(Albany::strint("Parameter Vector", l))), false);
 
       auto const num_parameters = p_list->get<int>("Number");
 
@@ -227,8 +220,7 @@ SchwarzCoupled::SchwarzCoupled(
   if (problem_params.isSublist("Response Functions")) {
     response_params = Teuchos::rcp(&(problem_params.sublist("Response Functions")), false);
 
-    auto const num_parameters =
-        response_params->isType<int>("Number") == true ? response_params->get<int>("Number") : 0;
+    auto const num_parameters = response_params->isType<int>("Number") == true ? response_params->get<int>("Number") : 0;
 
     bool const using_old_response_list = num_parameters > 0 ? true : false;
 
@@ -239,10 +231,9 @@ SchwarzCoupled::SchwarzCoupled(
     response_names.resize(num_responses_total_);
 
     for (auto l = 0; l < num_responses_total_; ++l) {
-      Teuchos::RCP<Teuchos::ParameterList const> p_list =
-          using_old_response_list == true ?
-              Teuchos::rcp(new Teuchos::ParameterList(*response_params)) :
-              Teuchos::rcp(&(response_params->sublist(Albany::strint("Response Vector", l))), false);
+      Teuchos::RCP<Teuchos::ParameterList const> p_list = using_old_response_list == true ?
+                                                              Teuchos::rcp(new Teuchos::ParameterList(*response_params)) :
+                                                              Teuchos::rcp(&(response_params->sublist(Albany::strint("Response Vector", l))), false);
 
       auto const num_params = p_list->get<int>("Number") == true ? p_list->get<int>("Number") : 0;
 
@@ -294,8 +285,7 @@ SchwarzCoupled::SchwarzCoupled(
       if (problem_params_m->isSublist("Parameters")) {
         std::cout << "parameters!" << '\n';
         ALBANY_ABORT(
-            "Error in CoupledSchwarz! Model input file " << model_filenames[m]
-                                                         << " cannot have a 'Parameters' section!  "
+            "Error in CoupledSchwarz! Model input file " << model_filenames[m] << " cannot have a 'Parameters' section!  "
                                                          << "Parameters must be specified in the 'master' input file "
                                                          << "driving the coupled problem.\n");
       }
@@ -310,8 +300,7 @@ SchwarzCoupled::SchwarzCoupled(
     if (response_params != Teuchos::null) {
       if (problem_params_m->isSublist("Response Functions")) {
         ALBANY_ABORT(
-            "Error in CoupledSchwarz! Model input file " << model_filenames[m]
-                                                         << " cannot have a 'Response Functions' section!  "
+            "Error in CoupledSchwarz! Model input file " << model_filenames[m] << " cannot have a 'Response Functions' section!  "
                                                          << "Responses must be specified in the 'master' input file "
                                                          << "driving the coupled problem.\n");
       }
@@ -367,8 +356,7 @@ SchwarzCoupled::SchwarzCoupled(
     models_[m] = Teuchos::rcp(new Albany::ModelEvaluator(apps_[m], model_app_params_[m].create_weak()));
 
     // create array of individual model jacobians
-    Teuchos::RCP<Thyra_LinearOp> const jac_temp =
-        Teuchos::nonnull(models_[m]->create_W_op()) ? models_[m]->create_W_op() : Teuchos::null;
+    Teuchos::RCP<Thyra_LinearOp> const jac_temp = Teuchos::nonnull(models_[m]->create_W_op()) ? models_[m]->create_W_op() : Teuchos::null;
 
     jacs_[m] = Teuchos::nonnull(jac_temp) ? Teuchos::rcp_dynamic_cast<Thyra_LinearOp>(jac_temp, true) : Teuchos::null;
 
@@ -658,9 +646,7 @@ SchwarzCoupled::createInArgs() const
 }
 
 void
-SchwarzCoupled::reportFinalPoint(
-    Thyra::ModelEvaluatorBase::InArgs<ST> const& /* final_point */,
-    bool const /* was_solved */)
+SchwarzCoupled::reportFinalPoint(Thyra::ModelEvaluatorBase::InArgs<ST> const& /* final_point */, bool const /* was_solved */)
 {
   ALBANY_ABORT("Calling reportFinalPoint");
 }
@@ -707,8 +693,7 @@ SchwarzCoupled::allocateVectors()
   nominal_values_.set_x(xT_prod_vec);
 
   if (supports_xdot_) {
-    Teuchos::RCP<Thyra::DefaultProductVector<ST>> x_dotT_prod_vec =
-        Thyra::defaultProductVector<ST>(space, x_dotT_vecs());
+    Teuchos::RCP<Thyra::DefaultProductVector<ST>> x_dotT_prod_vec = Thyra::defaultProductVector<ST>(space, x_dotT_vecs());
     nominal_values_.set_x_dot(x_dotT_prod_vec);
   }
 }
@@ -748,17 +733,15 @@ SchwarzCoupled::createOutArgsImpl() const
   result.setSupports(Thyra::ModelEvaluatorBase::OUT_ARG_W_op, true);
   result.setSupports(Thyra::ModelEvaluatorBase::OUT_ARG_W_prec, w_prec_supports_);
 
-  result.set_W_properties(Thyra::ModelEvaluatorBase::DerivativeProperties(
-      Thyra::ModelEvaluatorBase::DERIV_LINEARITY_UNKNOWN, Thyra::ModelEvaluatorBase::DERIV_RANK_FULL, true));
+  result.set_W_properties(
+      Thyra::ModelEvaluatorBase::DerivativeProperties(Thyra::ModelEvaluatorBase::DERIV_LINEARITY_UNKNOWN, Thyra::ModelEvaluatorBase::DERIV_RANK_FULL, true));
 
   return result;
 }
 
 /// Evaluate model on InArgs
 void
-SchwarzCoupled::evalModelImpl(
-    Thyra::ModelEvaluatorBase::InArgs<ST> const&  in_args,
-    Thyra::ModelEvaluatorBase::OutArgs<ST> const& out_args) const
+SchwarzCoupled::evalModelImpl(Thyra::ModelEvaluatorBase::InArgs<ST> const& in_args, Thyra::ModelEvaluatorBase::OutArgs<ST> const& out_args) const
 {
   // Get x and x_dot from in_args
   Teuchos::RCP<const Thyra_ProductVector> x, x_dot, x_dotdot;
@@ -851,8 +834,7 @@ SchwarzCoupled::evalModelImpl(
   if (!W_op_out.is_null()) {
     for (auto m = 0; m < num_models_; ++m) {
       // computeGlobalJacobianT sets fTs_out[m] and jacs_[m]
-      apps_[m]->computeGlobalJacobian(
-          alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
+      apps_[m]->computeGlobalJacobian(alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
       fs_already_computed[m] = true;
     }
     // FIXME: create coupled W matrix from array of model W matrices
@@ -884,8 +866,7 @@ SchwarzCoupled::evalModelImpl(
         if (mf_prec_type_ == JACOBI) {
           // With matrix-free, W_op_out is null, so computeJacobian does not
           // get called earlier.  We need to call it here to get the Jacobians.
-          apps_[m]->computeGlobalJacobian(
-              alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
+          apps_[m]->computeGlobalJacobian(alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
           // Get diagonal of jacs_[m]
           Teuchos::RCP<Thyra_Vector> diag = Thyra::createMember(jacs_[m]->range());
           Albany::getDiagonalCopy(jacs_[m], diag);
@@ -908,8 +889,7 @@ SchwarzCoupled::evalModelImpl(
         } else if (mf_prec_type_ == ABS_ROW_SUM) {
           // With matrix-free, W_op_outT is null, so computeJacobianT does not
           // get called earlier.  We need to call it here to get the Jacobians.
-          apps_[m]->computeGlobalJacobian(
-              alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
+          apps_[m]->computeGlobalJacobian(alpha, beta, omega, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], fs_out[m], jacs_[m]);
           // Create vector to store absrowsum
           Teuchos::RCP<Thyra_Vector> absrowsum = Thyra::createMember(jacs_[m]->range());
           absrowsum->assign(0.0);
@@ -927,8 +907,7 @@ SchwarzCoupled::evalModelImpl(
           // Invert absrowsum
           Teuchos::RCP<Thyra_Vector> invabsrowsum = Thyra::createMember(jacs_[m]->range());
           invabsrowsum->reciprocal(*absrowsum);
-          auto invabsrowsum_constView =
-              Albany::getLocalData(Teuchos::rcp_dynamic_cast<Thyra_Vector const>(invabsrowsum));
+          auto invabsrowsum_constView = Albany::getLocalData(Teuchos::rcp_dynamic_cast<Thyra_Vector const>(invabsrowsum));
           // Zero out precs_[m]
           Albany::resumeFill(precs_[m]);
           Albany::scale(precs_[m], 0.0);
@@ -974,8 +953,7 @@ SchwarzCoupled::evalModelImpl(
       for (auto m = 0; m < num_models_; ++m) {
         for (auto l = 0; l < out_args.Np(); ++l) {
           // sets g_out
-          apps_[m]->evaluateResponse(
-              l, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], g_out->getNonconstVectorBlock(m));
+          apps_[m]->evaluateResponse(l, curr_time, xs[m], x_dots[m], x_dotdot, sacado_param_vecs_[m], g_out->getNonconstVectorBlock(m));
         }
       }
     }

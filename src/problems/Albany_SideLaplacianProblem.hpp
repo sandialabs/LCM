@@ -27,10 +27,7 @@ class SideLaplacian : public Albany::AbstractProblem
 {
  public:
   //! Default constructor
-  SideLaplacian(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<ParamLib>&               paramLib,
-      int const                                   numDimensions);
+  SideLaplacian(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numDimensions);
 
   //! Destructor
   virtual ~SideLaplacian();
@@ -297,8 +294,7 @@ SideLaplacian::constructEvaluators3D(
   fm0.template registerEvaluator<EvalT>(ev);
 
   //---- Restrict vertex coordinates from cell-based to cell-side-based
-  ev = evalUtils.getMSTUtils().constructDOFCellToSideEvaluator(
-      "Coord Vec", sideSetName, "Vertex Vector", cellType, "Coord Vec " + sideSetName);
+  ev = evalUtils.getMSTUtils().constructDOFCellToSideEvaluator("Coord Vec", sideSetName, "Vertex Vector", cellType, "Coord Vec " + sideSetName);
   fm0.template registerEvaluator<EvalT>(ev);
 
   // ------- Side Laplacian Residual -------- //

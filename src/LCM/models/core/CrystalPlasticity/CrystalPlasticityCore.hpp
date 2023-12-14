@@ -82,14 +82,7 @@ struct StateMechanical
   using InputTensorType = minitensor::Tensor<RealType, NumDimT>;
 
   StateMechanical(int num_dim, InputTensorType const& F_n, InputTensorType const& Fp_n, TensorType const& F_np1)
-      : num_dim_(num_dim),
-        F_n_(F_n),
-        Fp_n_(Fp_n),
-        F_np1_(F_np1),
-        Fp_np1_(num_dim),
-        Lp_np1_(num_dim),
-        sigma_np1_(num_dim),
-        S_np1_(num_dim)
+      : num_dim_(num_dim), F_n_(F_n), Fp_n_(Fp_n), F_np1_(F_np1), Fp_np1_(num_dim), Lp_np1_(num_dim), sigma_np1_(num_dim), S_np1_(num_dim)
   {
   }
 
@@ -219,14 +212,7 @@ computeStress(
 //! Construct elasticity tensor
 template <minitensor::Index NumDimT, typename DataT, typename ArgT>
 void
-computeElasticityTensor(
-    DataT                               c11,
-    DataT                               c12,
-    DataT                               c13,
-    DataT                               c33,
-    DataT                               c44,
-    DataT                               c66,
-    minitensor::Tensor4<ArgT, NumDimT>& C);
+computeElasticityTensor(DataT c11, DataT c12, DataT c13, DataT c33, DataT c44, DataT c66, minitensor::Tensor4<ArgT, NumDimT>& C);
 
 }  // namespace CP
 

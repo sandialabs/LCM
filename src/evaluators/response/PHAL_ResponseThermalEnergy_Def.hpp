@@ -9,9 +9,7 @@
 #include "Teuchos_VerboseObject.hpp"
 
 template <typename EvalT, typename Traits>
-PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : coordVec("Coord Vec", dl->qp_gradient), weights("Weights", dl->qp_scalar)
 //  time("Time",dl->workset_scalar),
 //  deltaTime("Delta Time",dl->workset_scalar)
@@ -22,8 +20,7 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
   plist->validateParameters(*reflist, 0);
 
   // get parameters from problem
-  Teuchos::RCP<Teuchos::ParameterList> pFromProb =
-      p.get<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem");
+  Teuchos::RCP<Teuchos::ParameterList> pFromProb = p.get<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem");
   // get properties
   density       = pFromProb->get<RealType>("Density");
   heat_capacity = pFromProb->get<RealType>("Heat Capacity");
@@ -75,9 +72,7 @@ PHAL::ResponseThermalEnergy<EvalT, Traits>::ResponseThermalEnergy(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-PHAL::ResponseThermalEnergy<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+PHAL::ResponseThermalEnergy<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field, fm);
   this->utils.setFieldData(coordVec, fm);
@@ -132,9 +127,8 @@ template <typename EvalT, typename Traits>
 Teuchos::RCP<Teuchos::ParameterList const>
 PHAL::ResponseThermalEnergy<EvalT, Traits>::getValidResponseParameters() const
 {
-  Teuchos::RCP<Teuchos::ParameterList> validPL = rcp(new Teuchos::ParameterList("Valid ResponseThermalEnergy Params"));
-  Teuchos::RCP<Teuchos::ParameterList const> baseValidPL =
-      PHAL::SeparableScatterScalarResponse<EvalT, Traits>::getValidResponseParameters();
+  Teuchos::RCP<Teuchos::ParameterList>       validPL     = rcp(new Teuchos::ParameterList("Valid ResponseThermalEnergy Params"));
+  Teuchos::RCP<Teuchos::ParameterList const> baseValidPL = PHAL::SeparableScatterScalarResponse<EvalT, Traits>::getValidResponseParameters();
   validPL->setParameters(*baseValidPL);
 
   validPL->set<std::string>("Name", "", "Name of response function");

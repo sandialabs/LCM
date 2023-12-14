@@ -60,10 +60,8 @@ class ResponseFactory
 
   //! Create individual response function
   void
-  createResponseFunction(
-      std::string const&                                      name,
-      Teuchos::ParameterList&                                 responseParams,
-      Teuchos::Array<Teuchos::RCP<AbstractResponseFunction>>& responses) const;
+  createResponseFunction(std::string const& name, Teuchos::ParameterList& responseParams, Teuchos::Array<Teuchos::RCP<AbstractResponseFunction>>& responses)
+      const;
 };
 
 }  // namespace Albany

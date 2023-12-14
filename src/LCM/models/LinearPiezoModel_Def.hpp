@@ -120,10 +120,7 @@ LinearPiezoModel<EvalT, Traits>::LinearPiezoModel(Teuchos::ParameterList* p, con
 /******************************************************************************/
 template <typename EvalT, typename Traits>
 void
-LinearPiezoModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+LinearPiezoModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 /******************************************************************************/
 {
   auto strain = *dep_fields[strainName];
@@ -143,8 +140,8 @@ LinearPiezoModel<EvalT, Traits>::computeState(
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < num_pts_; ++qp) {
         if (test) {
-          ScalarT const &x1 = strain(cell, qp, 0, 0), &x2 = strain(cell, qp, 1, 1), &x3 = strain(cell, qp, 2, 2),
-                        &x4 = strain(cell, qp, 1, 2), &x5 = strain(cell, qp, 0, 2), &x6 = strain(cell, qp, 0, 1);
+          ScalarT const &x1 = strain(cell, qp, 0, 0), &x2 = strain(cell, qp, 1, 1), &x3 = strain(cell, qp, 2, 2), &x4 = strain(cell, qp, 1, 2),
+                        &x5 = strain(cell, qp, 0, 2), &x6 = strain(cell, qp, 0, 1);
           ScalarT const &E1 = -Gradp(cell, qp, 0), &E2 = -Gradp(cell, qp, 1), &E3 = -Gradp(cell, qp, 2);
 
           stress(cell, qp, 0, 0) = C11 * x1 + C12 * x2 + C23 * x3 - e31 * E3;
@@ -181,10 +178,7 @@ LinearPiezoModel<EvalT, Traits>::computeState(
 /******************************************************************************/
 template <typename EvalT, typename Traits>
 void
-LinearPiezoModel<EvalT, Traits>::computeStateParallel(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+LinearPiezoModel<EvalT, Traits>::computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 /******************************************************************************/
 {
   ALBANY_ABORT("computeStateParallel not implemented");
@@ -247,8 +241,7 @@ LinearPiezoModel<EvalT, Traits>::initializeConstants()
           for (int q = 0; q < num_dims_; q++)
             for (int r = 0; r < num_dims_; r++)
               for (int s = 0; s < num_dims_; s++)
-                for (int t = 0; t < num_dims_; t++)
-                  C(i, j, k, l) += Ctmp(q, r, s, t) * R(i, q) * R(j, r) * R(k, s) * R(l, t);
+                for (int t = 0; t < num_dims_; t++) C(i, j, k, l) += Ctmp(q, r, s, t) * R(i, q) * R(j, r) * R(k, s) * R(l, t);
         for (int q = 0; q < num_dims_; q++)
           for (int r = 0; r < num_dims_; r++)
             for (int s = 0; s < num_dims_; s++) e(i, j, k) += etmp(q, r, s) * R(i, q) * R(j, r) * R(k, s);

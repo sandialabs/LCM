@@ -43,7 +43,7 @@ GeomDecomp::entity_coordinates(
     // Loop over node relations in mesh entities
     const percept::MyPairIterRelation nr(bulk_data, entity, NODE_RANK);
 
-    const unsigned ndim = stk::mesh::field_scalars_per_entity(nodal_coor,entity);
+    const unsigned      ndim = stk::mesh::field_scalars_per_entity(nodal_coor, entity);
     std::vector<double> temp(ndim);
 
     for (unsigned inr = 0; inr < nr.size(); ++inr) {
@@ -52,7 +52,7 @@ GeomDecomp::entity_coordinates(
       // USES relation
       if (bulk_data.entity_rank(rel.entity()) == NODE_RANK) {  // %fixme: need to check for USES relation
         const mesh::Entity nent = rel.entity();
-        double*        coor = mesh::field_data(nodal_coor, nent);
+        double*            coor = mesh::field_data(nodal_coor, nent);
         if (!coor) {
           throw std::runtime_error(
               "GeomDecomp::entity_coordinates Error: The coordinate field does "
@@ -159,11 +159,7 @@ apply_rotation(std::vector<double>& coor)
 //: Convert a mesh entity to a single point
 //: in cartesian coordinates (x,y,z)
 void
-GeomDecomp::entity_to_point(
-    stk::mesh::BulkData& bulk_data,
-    const mesh::Entity&  entity,
-    const VectorField&   nodeCoord,
-    std::vector<double>& coor)
+GeomDecomp::entity_to_point(stk::mesh::BulkData& bulk_data, const mesh::Entity& entity, const VectorField& nodeCoord, std::vector<double>& coor)
 {
   compute_entity_centroid(bulk_data, entity, nodeCoord, coor);
   apply_rotation(coor);

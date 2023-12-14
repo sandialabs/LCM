@@ -15,12 +15,8 @@ TLPoroStress<EvalT, Traits>::TLPoroStress(Teuchos::ParameterList const& p)
     : stress(p.get<std::string>("Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       defGrad(p.get<std::string>("DefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      biotCoefficient(
-          p.get<std::string>("Biot Coefficient Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      porePressure(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      biotCoefficient(p.get<std::string>("Biot Coefficient Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      porePressure(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       totstress(p.get<std::string>("Total Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout"))
 {
   // Pull out numQPs and numDims from a Layout
@@ -72,8 +68,7 @@ TLPoroStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   typedef Intrepid2::RealSpaceTools<PHX::Device>     RST;
 
   if (numDims == 1) {
-    Intrepid2::FunctionSpaceTools<PHX::Device>::scalarMultiplyDataData(
-        totstress.get_view(), J.get_view(), stress.get_view());
+    Intrepid2::FunctionSpaceTools<PHX::Device>::scalarMultiplyDataData(totstress.get_view(), J.get_view(), stress.get_view());
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {
         for (int dim = 0; dim < numDims; ++dim) {

@@ -13,9 +13,7 @@ namespace LCM {
 // propagation analysis
 
 template <typename EvalT, typename Traits>
-OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       delta_c(p->get<RealType>("delta_c", 1.0)),
       sigma_c(p->get<RealType>("sigma_c", 1.0)),
@@ -86,10 +84,7 @@ OrtizPandolfiModel<EvalT, Traits>::OrtizPandolfiModel(
 }
 template <typename EvalT, typename Traits>
 void
-OrtizPandolfiModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+OrtizPandolfiModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto mdf_jump  = *dep_fields["Vector Jump"];

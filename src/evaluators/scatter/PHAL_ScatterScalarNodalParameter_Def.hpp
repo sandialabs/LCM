@@ -13,9 +13,7 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-ScatterScalarNodalParameterBase<EvalT, Traits>::ScatterScalarNodalParameterBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ScatterScalarNodalParameterBase<EvalT, Traits>::ScatterScalarNodalParameterBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   param_name             = p.get<std::string>("Parameter Name");
   std::string field_name = p.isParameter("Field Name") ? p.get<std::string>("Field Name") : param_name;
@@ -30,9 +28,7 @@ ScatterScalarNodalParameterBase<EvalT, Traits>::ScatterScalarNodalParameterBase(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-ScatterScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& fm)
+ScatterScalarNodalParameterBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val, fm);
   numNodes = val.extent(1);
@@ -82,7 +78,7 @@ ScatterScalarNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::evaluateField
   Teuchos::RCP<Thyra_Vector> pvec      = workset.distParamLib->get(this->param_name)->vector();
   Teuchos::ArrayRCP<ST>      pvec_view = Albany::getNonconstLocalData(pvec);
 
-  const Albany::IDArray& wsElDofs = workset.distParamLib->get(this->param_name)->workset_elem_dofs()[workset.wsIndex];
+  const Albany::IDArray& wsElDofs         = workset.distParamLib->get(this->param_name)->workset_elem_dofs()[workset.wsIndex];
   auto                   param_overlap_vs = workset.distParamLib->get(this->param_name)->overlap_vector_space();
   auto                   param_vs         = pvec->range();
 
@@ -116,8 +112,7 @@ ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::Sca
 
 template <typename Traits>
 void
-ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(
-    typename Traits::EvalData workset)
+ScatterScalarExtruded2DNodalParameter<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   // TODO: find a way to abstract away from the map concept. Perhaps using
   // Panzer::ConnManager?

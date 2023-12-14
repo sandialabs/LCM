@@ -10,9 +10,7 @@
 
 namespace Albany {
 
-SolutionResponseFunction::SolutionResponseFunction(
-    const Teuchos::RCP<Albany::Application>& application,
-    Teuchos::ParameterList const&            responseParams)
+SolutionResponseFunction::SolutionResponseFunction(const Teuchos::RCP<Albany::Application>& application, Teuchos::ParameterList const& responseParams)
     : solution_vs(getSpmdVectorSpace(application->getVectorSpace()))
 {
   // Build list of DOFs we want to keep
@@ -128,9 +126,7 @@ SolutionResponseFunction::evaluateGradient(
 }
 
 void
-SolutionResponseFunction::cullSolution(
-    const Teuchos::RCP<const Thyra_MultiVector>& x,
-    Teuchos::RCP<Thyra_MultiVector> const&       x_culled) const
+SolutionResponseFunction::cullSolution(const Teuchos::RCP<const Thyra_MultiVector>& x, Teuchos::RCP<Thyra_MultiVector> const& x_culled) const
 {
   cull_op->apply(Thyra::EOpTransp::NOTRANS, *x, x_culled.ptr(), 1.0, 0.0);
 }

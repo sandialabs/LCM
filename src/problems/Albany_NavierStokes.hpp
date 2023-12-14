@@ -21,10 +21,7 @@ class NavierStokes : public AbstractProblem
 {
  public:
   //! Default constructor
-  NavierStokes(
-      const Teuchos::RCP<Teuchos::ParameterList>& params,
-      const Teuchos::RCP<ParamLib>&               paramLib,
-      int const                                   numDim_);
+  NavierStokes(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numDim_);
 
   //! Destructor
   ~NavierStokes();
@@ -42,7 +39,7 @@ class NavierStokes : public AbstractProblem
   {
     return use_sdbcs_;
   }
-  
+
   ///
   /// Get boolean telling code if Adaptation is utilized
   ///
@@ -51,7 +48,6 @@ class NavierStokes : public AbstractProblem
   {
     return false;
   }
-
 
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
@@ -105,12 +101,7 @@ class NavierStokes : public AbstractProblem
   };
 
   void
-  getVariableType(
-      Teuchos::ParameterList& paramList,
-      std::string const&      defaultType,
-      NS_VAR_TYPE&            variableType,
-      bool&                   haveVariable,
-      bool&                   haveEquation);
+  getVariableType(Teuchos::ParameterList& paramList, std::string const& defaultType, NS_VAR_TYPE& variableType, bool& haveVariable, bool& haveEquation);
   std::string
   variableTypeToString(const NS_VAR_TYPE variableType);
 
@@ -197,8 +188,7 @@ Albany::NavierStokes::constructEvaluators(
   int const worksetSize = meshSpecs.worksetSize;
 
   Intrepid2::DefaultCubatureFactory     cubFactory;
-  RCP<Intrepid2::Cubature<PHX::Device>> cubature =
-      cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
+  RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cellType, meshSpecs.cubatureDegree);
 
   int const numQPts     = cubature->getNumPoints();
   int const numVertices = cellType->getNodeCount();
@@ -207,13 +197,11 @@ Albany::NavierStokes::constructEvaluators(
 
   if (boost::is_same<EvalT, PHAL::AlbanyTraits::Residual>::value)
 
-    *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes
-         << ", QuadPts= " << numQPts << ", Dim= " << numDim << std::endl;
+    *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPts
+         << ", Dim= " << numDim << std::endl;
 
   dl = rcp(new Albany::Layouts(worksetSize, numVertices, numNodes, numQPts, numDim));
-  ALBANY_PANIC(
-      dl->vectorAndGradientLayoutsAreEquivalent == false,
-      "Data Layout Usage in NavierStokes problem assumes vecDim = numDim");
+  ALBANY_PANIC(dl->vectorAndGradientLayoutsAreEquivalent == false, "Data Layout Usage in NavierStokes problem assumes vecDim = numDim");
 
   Albany::EvaluatorUtils<EvalT, PHAL::AlbanyTraits> evalUtils(dl);
   bool                                              supportsTransient = true;
@@ -239,21 +227,17 @@ Albany::NavierStokes::constructEvaluators(
     resid_names[0] = "Momentum Residual";
 
     if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(true, dof_names, dof_names_dot, offset));
     else
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(true, dof_names, offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names[0], offset));
 
-    if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dot[0], offset));
+    if (number_of_time_deriv > 0) fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecInterpolationEvaluator(dof_names_dot[0], offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFVecGradInterpolationEvaluator(dof_names[0], offset));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter Momentum"));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(true, resid_names, offset, "Scatter Momentum"));
     offset += numDim;
   } else if (haveFlow) {  // Constant velocity
     RCP<ParameterList> p = rcp(new ParameterList);
@@ -280,21 +264,17 @@ Albany::NavierStokes::constructEvaluators(
     resid_names[0] = "Continuity Residual";
 
     if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot, offset));
     else
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[0], offset));
 
-    if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[0], offset));
+    if (number_of_time_deriv > 0) fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[0], offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[0], offset));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Continuity"));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Continuity"));
     offset++;
   }
 
@@ -306,21 +286,17 @@ Albany::NavierStokes::constructEvaluators(
     if (number_of_time_deriv > 0) dof_names_dot[0] = dof_names[0] + "_dot";
     resid_names[0] = dof_names[0] + " Residual";
     if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot, offset));
     else
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[0], offset));
 
-    if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[0], offset));
+    if (number_of_time_deriv > 0) fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[0], offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[0], offset));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Temperature"));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Temperature"));
     offset++;
   } else if (haveHeat) {  // Constant temperature
     RCP<ParameterList> p = rcp(new ParameterList);
@@ -346,21 +322,17 @@ Albany::NavierStokes::constructEvaluators(
     if (number_of_time_deriv > 0) dof_names_dot[0] = dof_names[0] + "_dot";
     resid_names[0] = dof_names[0] + " Residual";
     if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator(false, dof_names, dof_names_dot, offset));
     else
-      fm0.template registerEvaluator<EvalT>(
-          evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
+      fm0.template registerEvaluator<EvalT>(evalUtils.constructGatherSolutionEvaluator_noTransient(false, dof_names, offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names[0], offset));
 
-    if (number_of_time_deriv > 0)
-      fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[0], offset));
+    if (number_of_time_deriv > 0) fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFInterpolationEvaluator(dof_names_dot[0], offset));
 
     fm0.template registerEvaluator<EvalT>(evalUtils.constructDOFGradInterpolationEvaluator(dof_names[0], offset));
 
-    fm0.template registerEvaluator<EvalT>(
-        evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Neutron"));
+    fm0.template registerEvaluator<EvalT>(evalUtils.constructScatterResidualEvaluator(false, resid_names, offset, "Scatter Neutron"));
     offset++;
   } else if (haveNeut) {  // Constant neutron flux
     RCP<ParameterList> p = rcp(new ParameterList);
@@ -382,8 +354,7 @@ Albany::NavierStokes::constructEvaluators(
 
   fm0.template registerEvaluator<EvalT>(evalUtils.constructMapToPhysicalFrameEvaluator(cellType, cubature));
 
-  fm0.template registerEvaluator<EvalT>(
-      evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
+  fm0.template registerEvaluator<EvalT>(evalUtils.constructComputeBasisFunctionsEvaluator(cellType, intrepidBasis, cubature));
 
   if (havePSPG || haveSUPG) {  // Compute Contravarient Metric Tensor
     RCP<ParameterList> p = rcp(new ParameterList("Contravarient Metric Tensor"));

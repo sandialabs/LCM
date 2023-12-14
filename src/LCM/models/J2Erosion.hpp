@@ -15,10 +15,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  J2ErosionKernel(
-      ConstitutiveModel<EvalT, Traits>&    model,
-      Teuchos::ParameterList*              p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  J2ErosionKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// No copy constructor

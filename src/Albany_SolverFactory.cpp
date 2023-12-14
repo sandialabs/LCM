@@ -38,7 +38,6 @@
 
 namespace {
 
-
 void
 enableMueLu(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 {
@@ -58,8 +57,7 @@ enableFROSch(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 
 namespace Albany {
 
-SolverFactory::SolverFactory(std::string const& inputFile, const Teuchos::RCP<Teuchos_Comm const>& comm)
-    : out(Teuchos::VerboseObjectBase::getDefaultOStream())
+SolverFactory::SolverFactory(std::string const& inputFile, const Teuchos::RCP<Teuchos_Comm const>& comm) : out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   // Set up application parameters: read and broadcast input file, and set
   // defaults
@@ -93,9 +91,7 @@ SolverFactory::SolverFactory(std::string const& inputFile, const Teuchos::RCP<Te
   }
 }
 
-SolverFactory::SolverFactory(
-    const Teuchos::RCP<Teuchos::ParameterList>& input_appParams,
-    const Teuchos::RCP<Teuchos_Comm const>&     comm)
+SolverFactory::SolverFactory(const Teuchos::RCP<Teuchos::ParameterList>& input_appParams, const Teuchos::RCP<Teuchos_Comm const>& comm)
     : appParams(input_appParams), out(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
   // do not set default solver parameters for ATO::Solver
@@ -161,8 +157,7 @@ SolverFactory::createAndGetAlbanyApp(
 
     const Teuchos::RCP<Thyra_LOWS_Factory> lowsFactory = createLinearSolveStrategy(linearSolverBuilder);
 
-    const Teuchos::RCP<LCM::SchwarzCoupled> coupled_model_with_solve =
-        Teuchos::rcp(new LCM::SchwarzCoupled(appParams, solverComm, initial_guess, lowsFactory));
+    const Teuchos::RCP<LCM::SchwarzCoupled> coupled_model_with_solve = Teuchos::rcp(new LCM::SchwarzCoupled(appParams, solverComm, initial_guess, lowsFactory));
 
     observer_ = Teuchos::rcp(new LCM::Schwarz_PiroObserver(coupled_model_with_solve));
 
@@ -302,14 +297,12 @@ SolverFactory::checkSolveTestResults(
     ALBANY_ASSERT(g != Teuchos::null, "There are Response Tests but the response vector is null!");
     ALBANY_ASSERT(
         numResponseTests <= g->space()->dim(),
-        "Number of Response Tests (" << numResponseTests << ") greater than number of responses (" << g->space()->dim()
-                                     << ") !");
+        "Number of Response Tests (" << numResponseTests << ") greater than number of responses (" << g->space()->dim() << ") !");
     Teuchos::Array<double> testValues = testParams->get<Teuchos::Array<double>>("Test Values");
 
     ALBANY_ASSERT(
         numResponseTests == testValues.size(),
-        "Number of Response Tests (" << numResponseTests << ") != number of Test Values (" << testValues.size()
-                                     << ") !");
+        "Number of Response Tests (" << numResponseTests << ") != number of Test Values (" << testValues.size() << ") !");
 
     Teuchos::ArrayRCP<const ST> g_view = getLocalData(g);
     for (int i = 0; i < testValues.size(); i++) {
@@ -332,22 +325,18 @@ SolverFactory::checkSolveTestResults(
   }
   if (numSensTests > 0) {
     ALBANY_ASSERT(
-        dgdp != Teuchos::null,
-        "There are Sensitivity Tests but the sensitivity vector (" << response_index << ", " << parameter_index
-                                                                   << ") is null!");
+        dgdp != Teuchos::null, "There are Sensitivity Tests but the sensitivity vector (" << response_index << ", " << parameter_index << ") is null!");
     ALBANY_ASSERT(
         numSensTests <= dgdp->range()->dim(),
-        "Number of sensitivity tests (" << numSensTests << ") != number of sensitivities [" << response_index << "]["
-                                        << parameter_index << "] (" << dgdp->range()->dim() << ") !");
+        "Number of sensitivity tests (" << numSensTests << ") != number of sensitivities [" << response_index << "][" << parameter_index << "] ("
+                                        << dgdp->range()->dim() << ") !");
   }
   for (int i = 0; i < numSensTests; i++) {
-    int const              numVecs = dgdp->domain()->dim();
-    Teuchos::Array<double> testSensValues =
-        sensitivityParams->get<Teuchos::Array<double>>(strint("Sensitivity Test Values", i));
+    int const              numVecs        = dgdp->domain()->dim();
+    Teuchos::Array<double> testSensValues = sensitivityParams->get<Teuchos::Array<double>>(strint("Sensitivity Test Values", i));
     ALBANY_ASSERT(
         numVecs == testSensValues.size(),
-        "Number of Sensitivity Test Values (" << testSensValues.size() << " != number of sensitivity vectors ("
-                                              << numVecs << ") !");
+        "Number of Sensitivity Test Values (" << testSensValues.size() << " != number of sensitivity vectors (" << numVecs << ") !");
     auto dgdp_view = getLocalData(dgdp);
     for (int jvec = 0; jvec < numVecs; jvec++) {
       auto s = std::string("Sensitivity Test ") + std::to_string(i) + "," + std::to_string(jvec);
@@ -373,9 +362,7 @@ SolverFactory::checkDakotaTestResults(int response_index, const Teuchos::SerialD
 
   int const numDakotaTests = testParams->get<int>("Number of Dakota Comparisons");
   if (numDakotaTests > 0 && drdv != NULL) {
-    ALBANY_ASSERT(
-        numDakotaTests <= drdv->length(),
-        "more Dakota Tests (" << numDakotaTests << ") than derivatives (" << drdv->length() << ") !\n");
+    ALBANY_ASSERT(numDakotaTests <= drdv->length(), "more Dakota Tests (" << numDakotaTests << ") than derivatives (" << drdv->length() << ") !\n");
     // Read accepted test results
     Teuchos::Array<double> testValues = testParams->get<Teuchos::Array<double>>("Dakota Test Values");
 
@@ -407,9 +394,7 @@ SolverFactory::checkAnalysisTestResults(int response_index, const Teuchos::RCP<T
     // Create indexable thyra vector
     ::Thyra::DetachedVectorView<double> p(tvec);
 
-    ALBANY_ASSERT(
-        numPiroTests <= p.subDim(),
-        "more Piro Analysis Comparisons (" << numPiroTests << ") than values (" << p.subDim() << ") !\n");
+    ALBANY_ASSERT(numPiroTests <= p.subDim(), "more Piro Analysis Comparisons (" << numPiroTests << ") than values (" << p.subDim() << ") !\n");
     // Read accepted test results
     Teuchos::Array<double> testValues = testParams->get<Teuchos::Array<double>>("Piro Analysis Test Values");
 
@@ -444,9 +429,7 @@ SolverFactory::getTestParameters(int response_index) const
     result = &(appParams->sublist(strint("Regression Results", response_index)));
   }
 
-  ALBANY_PANIC(
-      result->isType<std::string>("Test Values"),
-      "Array information in input file must now be of type Array(double)\n");
+  ALBANY_PANIC(result->isType<std::string>("Test Values"), "Array information in input file must now be of type Array(double)\n");
   result->validateParametersAndSetDefaults(*getValidRegressionResultsParameters(), 0);
 
   return result;
@@ -490,9 +473,8 @@ SolverFactory::setSolverParamDefaults(Teuchos::ParameterList* appParams_, int my
   printParams.set("Output Processor", 0);
   printParams.set(
       "Output Information",
-      NOX::Utils::OuterIteration + NOX::Utils::OuterIterationStatusTest + NOX::Utils::InnerIteration +
-          NOX::Utils::Parameters + NOX::Utils::Details + NOX::Utils::LinearSolverDetails + NOX::Utils::Warning +
-          NOX::Utils::Error);
+      NOX::Utils::OuterIteration + NOX::Utils::OuterIterationStatusTest + NOX::Utils::InnerIteration + NOX::Utils::Parameters + NOX::Utils::Details +
+          NOX::Utils::LinearSolverDetails + NOX::Utils::Warning + NOX::Utils::Error);
 
   // Sublist for line search
   Teuchos::ParameterList& searchParams = noxParams.sublist("Line Search");
@@ -519,13 +501,10 @@ SolverFactory::getValidAppParameters() const
   validPL->sublist("Debug Output", false, "Debug Output sublist");
   validPL->sublist("Scaling", false, "Jacobian/Residual Scaling sublist");
   validPL->sublist("DataTransferKit", false, "DataTransferKit sublist");
-  validPL->sublist("DataTransferKit", false, "DataTransferKit sublist")
-      .sublist("Consistent Interpolation", false, "DTK Consistent Interpolation sublist");
+  validPL->sublist("DataTransferKit", false, "DataTransferKit sublist").sublist("Consistent Interpolation", false, "DTK Consistent Interpolation sublist");
   validPL->sublist("DataTransferKit", false, "DataTransferKit sublist").sublist("Search", false, "DTK Search sublist");
-  validPL->sublist("DataTransferKit", false, "DataTransferKit sublist")
-      .sublist("L2 Projection", false, "DTK L2 Projection sublist");
-  validPL->sublist("DataTransferKit", false, "DataTransferKit sublist")
-      .sublist("Point Cloud", false, "DTK Point Cloud sublist");
+  validPL->sublist("DataTransferKit", false, "DataTransferKit sublist").sublist("L2 Projection", false, "DTK L2 Projection sublist");
+  validPL->sublist("DataTransferKit", false, "DataTransferKit sublist").sublist("Point Cloud", false, "DTK Point Cloud sublist");
   validPL->sublist("Discretization", false, "Discretization sublist");
   validPL->sublist("Quadrature", false, "Quadrature sublist");
   validPL->sublist("Regression Results", false, "Regression Results sublist");
@@ -554,10 +533,7 @@ SolverFactory::getValidDebugParameters() const
   validPL->set<int>("Write Residual to Standard Output", 0, "Residual Number to Dump to Standard Output");
   validPL->set<int>("Derivative Check", 0, "Derivative check");
   validPL->set<int>("Write Solution to MatrixMarket", 0, "Solution Number to Dump to MatrixMarket");
-  validPL->set<bool>(
-      "Write Distributed Solution and Map to MatrixMarket",
-      false,
-      "Flag to Write Distributed Solution and Map to MatrixMarket");
+  validPL->set<bool>("Write Distributed Solution and Map to MatrixMarket", false, "Flag to Write Distributed Solution and Map to MatrixMarket");
   validPL->set<int>("Write Solution to Standard Output", 0, "Solution Number to Dump to  Standard Output");
   validPL->set<bool>("Analyze Memory", false, "Flag to Analyze Memory");
   return validPL;
@@ -592,47 +568,31 @@ SolverFactory::getValidRegressionResultsParameters() const
 
   int const maxSensTests = 10;
   for (int i = 0; i < maxSensTests; i++) {
-    validPL->set<Array<double>>(
-        strint("Sensitivity Test Values", i),
-        ta,
-        strint("Array of regression values for Sensitivities w.r.t parameter", i));
+    validPL->set<Array<double>>(strint("Sensitivity Test Values", i), ta, strint("Array of regression values for Sensitivities w.r.t parameter", i));
     validPL->sublist(strint("Sensitivity Comparisons", i), false, "Sensitivity Comparisons sublist");
   }
 
   validPL->set<int>("Number of Dakota Comparisons", 0, "Number of parameters from Dakota runs to regress against");
-  validPL->set<Array<double>>(
-      "Dakota Test Values", ta, "Array of regression values for final parameters from Dakota runs");
+  validPL->set<Array<double>>("Dakota Test Values", ta, "Array of regression values for final parameters from Dakota runs");
 
   validPL->set<int>("Number of Piro Analysis Comparisons", 0, "Number of parameters from Analysis to regress against");
   validPL->set<bool>("Piro Analysis Test Two Norm", false, "Test l2 norm of final parameters from Analysis runs");
-  validPL->set<Array<double>>(
-      "Piro Analysis Test Values", ta, "Array of regression values for final parameters from Analysis runs");
+  validPL->set<Array<double>>("Piro Analysis Test Values", ta, "Array of regression values for final parameters from Analysis runs");
 
   // Should deprecate these options, but need to remove them from all input
   // files
-  validPL->set<int>(
-      "Number of Stochastic Galerkin Comparisons", 0, "Number of stochastic Galerkin expansions to regress against");
+  validPL->set<int>("Number of Stochastic Galerkin Comparisons", 0, "Number of stochastic Galerkin expansions to regress against");
 
   int const maxSGTests = 10;
   for (int i = 0; i < maxSGTests; i++) {
     validPL->set<Array<double>>(
-        strint("Stochastic Galerkin Expansion Test Values", i),
-        ta,
-        strint("Array of regression values for stochastic Galerkin expansions", i));
+        strint("Stochastic Galerkin Expansion Test Values", i), ta, strint("Array of regression values for stochastic Galerkin expansions", i));
   }
 
-  validPL->set<int>(
-      "Number of Stochastic Galerkin Mean Comparisons", 0, "Number of SG mean responses to regress against");
-  validPL->set<Array<double>>(
-      "Stochastic Galerkin Mean Test Values", ta, "Array of regression values for SG mean responses");
-  validPL->set<int>(
-      "Number of Stochastic Galerkin Standard Deviation Comparisons",
-      0,
-      "Number of SG standard deviation responses to regress against");
-  validPL->set<Array<double>>(
-      "Stochastic Galerkin Standard Deviation Test Values",
-      ta,
-      "Array of regression values for SG standard deviation responses");
+  validPL->set<int>("Number of Stochastic Galerkin Mean Comparisons", 0, "Number of SG mean responses to regress against");
+  validPL->set<Array<double>>("Stochastic Galerkin Mean Test Values", ta, "Array of regression values for SG mean responses");
+  validPL->set<int>("Number of Stochastic Galerkin Standard Deviation Comparisons", 0, "Number of SG standard deviation responses to regress against");
+  validPL->set<Array<double>>("Stochastic Galerkin Standard Deviation Test Values", ta, "Array of regression values for SG standard deviation responses");
   // End of deprecated Stochastic Galerkin Options
 
   // These two are typically not set on input, just output.
@@ -675,9 +635,7 @@ SolverFactory::getValidResponseParameters() const
   validPL->set<int>("Responses Observation Frequency", 1);
   Teuchos::Array<unsigned int> defaultDataUnsignedInt;
   validPL->set<Teuchos::Array<unsigned int>>(
-      "Relative Responses Markers",
-      defaultDataUnsignedInt,
-      "Array of responses for which relative change will be obtained");
+      "Relative Responses Markers", defaultDataUnsignedInt, "Array of responses for which relative change will be obtained");
 
   validPL->set<int>("Number", 0);
   validPL->set<int>("Equation", 0);

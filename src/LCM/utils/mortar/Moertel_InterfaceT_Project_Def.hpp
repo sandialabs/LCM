@@ -197,8 +197,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_NormalF
         mindist   = dist;
         closenode = mnode;
       }
-      std::cout << "snode " << snode->Id() << " mnode " << mnode->Id() << " mindist " << mindist << " dist " << dist
-                << std::endl;
+      std::cout << "snode " << snode->Id() << " mnode " << mnode->Id() << " mindist " << mindist << " dist " << dist << std::endl;
     }
     if (closenode == Teuchos::null) {
       std::stringstream oss;
@@ -260,10 +259,9 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_NormalF
           }
           // it's better in one direction and 'in' in the other
           else if (
-              (sqrt((xi[0] - third) * (xi[0] - third)) < sqrt((bestdist[0] - third) * (bestdist[0] - third)) &&
-               xi[1] <= abs(1. - xi[0]) + tol && xi[1] >= 0. - tol) ||
-              (sqrt((xi[1] - third) * (xi[1] - third)) < sqrt((bestdist[1] - third) * (bestdist[1] - third)) &&
-               xi[0] <= 1. + tol && xi[0] >= 0. - tol)) {
+              (sqrt((xi[0] - third) * (xi[0] - third)) < sqrt((bestdist[0] - third) * (bestdist[0] - third)) && xi[1] <= abs(1. - xi[0]) + tol &&
+               xi[1] >= 0. - tol) ||
+              (sqrt((xi[1] - third) * (xi[1] - third)) < sqrt((bestdist[1] - third) * (bestdist[1] - third)) && xi[0] <= 1. + tol && xi[0] >= 0. - tol)) {
             bestdist[0] = xi[0];
             bestdist[1] = xi[1];
             bestseg     = segs[i];
@@ -279,21 +277,17 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_NormalF
     if (IsOneDimensional()) {
       if (abs(bestdist[0]) < 1.2) ok = true;
     } else {
-      if (bestdist[0] <= 1. + tol && bestdist[1] <= abs(1. - bestdist[0]) + tol && bestdist[0] >= 0. - tol &&
-          bestdist[1] >= 0. - tol)
-        ok = true;
+      if (bestdist[0] <= 1. + tol && bestdist[1] <= abs(1. - bestdist[0]) + tol && bestdist[0] >= 0. - tol && bestdist[1] >= 0. - tol) ok = true;
     }
 
     if (ok)  // the projection is good
     {
       // create a projected node and store it in snode
-      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-          new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, bestdist, bestseg);
+      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, bestdist, bestseg);
       snode->SetProjectedNode(pnode);
       snode->SetGap(bestgap);
     } else {
-      if (OutLevel() > 6)
-        std::cout << "MoertelT: ***WRN***: Projection s->m: Node " << snode->Id() << " does not have projection\n";
+      if (OutLevel() > 6) std::cout << "MoertelT: ***WRN***: Projection s->m: Node " << snode->Id() << " does not have projection\n";
       snode->SetProjectedNode(NULL);
     }
   }  // for (scurr=rnode_[sside].begin(); scurr!=rnode_[sside].end(); ++scurr)
@@ -360,8 +354,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_NormalF
               << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           throw MoertelT::ReportError(oss);
         }
-        MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-            new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, xi, seg.get());
+        MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, xi, seg.get());
         snode->SetProjectedNode(pnode);
         snode->SetGap(gap);
       }
@@ -417,8 +410,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_NormalF
       std::cout << "Node without projection:\n" << *snode;
       std::cout << "...get's lagrange multipliers\n\n";
 #endif
-      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-          new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, NULL, NULL);
+      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, NULL, NULL);
       snode->SetProjectedNode(pnode);
       snode->SetGap(0.);
     }
@@ -529,10 +521,9 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_NormalF
           }
           // it's better in one direction and 'in' in the other
           else if (
-              (sqrt((xi[0] - third) * (xi[0] - third)) < sqrt((bestdist[0] - third) * (bestdist[0] - third)) &&
-               xi[1] <= abs(1. - xi[0]) + tol && xi[1] >= 0. - tol) ||
-              (sqrt((xi[1] - third) * (xi[1] - third)) < sqrt((bestdist[1] - third) * (bestdist[1] - third)) &&
-               xi[0] <= 1. + tol && xi[0] >= 0. - tol)) {
+              (sqrt((xi[0] - third) * (xi[0] - third)) < sqrt((bestdist[0] - third) * (bestdist[0] - third)) && xi[1] <= abs(1. - xi[0]) + tol &&
+               xi[1] >= 0. - tol) ||
+              (sqrt((xi[1] - third) * (xi[1] - third)) < sqrt((bestdist[1] - third) * (bestdist[1] - third)) && xi[0] <= 1. + tol && xi[0] >= 0. - tol)) {
             bestdist[0] = xi[0];
             bestdist[1] = xi[1];
             bestseg     = segs[i];
@@ -548,9 +539,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_NormalF
     if (IsOneDimensional()) {
       if (abs(bestdist[0]) < 1.1) ok = true;
     } else {
-      if (bestdist[0] <= 1. + tol && bestdist[1] <= abs(1. - bestdist[0]) + tol && bestdist[0] >= 0. - tol &&
-          bestdist[1] >= 0. - tol)
-        ok = true;
+      if (bestdist[0] <= 1. + tol && bestdist[1] <= abs(1. - bestdist[0]) + tol && bestdist[0] >= 0. - tol && bestdist[1] >= 0. - tol) ok = true;
     }
 
     if (ok)  // the projection is good
@@ -570,14 +559,12 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_NormalF
       mnode->SetN(NN);
 
       // create projected node and store it in mnode
-      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-          new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*mnode, bestdist, bestseg);
+      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*mnode, bestdist, bestseg);
       mnode->SetProjectedNode(pnode);
       mnode->SetGap(bestgap);
     } else  // this mnode does not have a valid projection
     {
-      if (OutLevel() > 6)
-        std::cout << "MoertelT: ***WRN***: Projection m->s: Node " << mnode->Id() << " does not have projection\n";
+      if (OutLevel() > 6) std::cout << "MoertelT: ***WRN***: Projection m->s: Node " << mnode->Id() << " does not have projection\n";
       mnode->SetProjectedNode(NULL);
     }
   }  // for (scurr=rnode_[mside].begin(); scurr!=rnode_[mside].end(); ++scurr)
@@ -656,8 +643,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_NormalF
           throw MoertelT::ReportError(oss);
         }
         mnode->SetN(n);
-        MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-            new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*mnode, xi, seg.get());
+        MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*mnode, xi, seg.get());
         mnode->SetProjectedNode(pnode);
         mnode->SetGap(gap);
       }
@@ -809,8 +795,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_Orthogo
     if (ok)  // the projection is good
     {
       // create a projected node and store it in mnode
-      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-          new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*mnode, bestdist, bestseg);
+      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*mnode, bestdist, bestseg);
       mnode->SetProjectedNode(pnode);
       mnode->SetGap(bestgap);
     } else  // this mnode does not have a valid projection
@@ -877,8 +862,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_Orthogo
               << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           throw MoertelT::ReportError(oss);
         }
-        MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-            new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*mnode, xi, seg.get());
+        MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*mnode, xi, seg.get());
         mnode->SetProjectedNode(pnode);
         mnode->SetGap(gap);
       }
@@ -993,8 +977,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_Orthogo
         if (ok)  // the projection is good
         {
           // create a projected node and store it in snode
-          MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-              new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, xi, msegs[i], ssegs[j]->Id());
+          MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, xi, msegs[i], ssegs[j]->Id());
           snode->SetProjectedNode(pnode);
           snode->SetGap(gap);
 #if 0
@@ -1072,8 +1055,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_Orthogo
             double gap = bcast[i];
             ++i;
             Teuchos::RCP<MoertelT::SEGMENT_TEMPLATE_CLASS(SegmentT)> seg = GetSegmentView(sid);
-            MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-                new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, xi, seg.get(), orthseg);
+            MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode      = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, xi, seg.get(), orthseg);
             snode->SetProjectedNode(pnode);
             snode->SetGap(gap);
           }
@@ -1129,8 +1111,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_Orthogo
       std::cout << "Node without projection:\n" << *snode;        
       std::cout << "...get's lagrange multipliers\n\n";
 #endif
-      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode =
-          new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, NULL, NULL);
+      MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)* pnode = new MoertelT::MOERTEL_TEMPLATE_CLASS(ProjectedNodeT)(*snode, NULL, NULL);
       snode->SetProjectedNode(pnode);
       snode->SetGap(0.);
     }

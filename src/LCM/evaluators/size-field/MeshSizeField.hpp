@@ -64,10 +64,7 @@ class IsoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
   ///
   /// Constructor
   ///
-  IsoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : MeshSizeFieldBase<EvalT, Traits>(dl)
-  {
-  }
+  IsoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl) : MeshSizeFieldBase<EvalT, Traits>(dl) {}
 
   ///
   /// Phalanx method to allocate space
@@ -96,8 +93,7 @@ class IsoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
 
 // The residual specialization of the MeshSizeField
 template <typename Traits>
-class IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
-    : public MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>
+class IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits> : public MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ///
@@ -181,10 +177,7 @@ class AnisoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
   ///
   /// Constructor
   ///
-  AnisoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : MeshSizeFieldBase<EvalT, Traits>(dl)
-  {
-  }
+  AnisoMeshSizeField(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl) : MeshSizeFieldBase<EvalT, Traits>(dl) {}
 
   ///
   /// Phalanx method to allocate space
@@ -213,8 +206,7 @@ class AnisoMeshSizeField : public MeshSizeFieldBase<EvalT, Traits>
 
 // The residual specialization of the MeshSizeField
 template <typename Traits>
-class AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>
-    : public MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>
+class AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits> : public MeshSizeFieldBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   ///

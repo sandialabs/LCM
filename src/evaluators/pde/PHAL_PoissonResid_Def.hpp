@@ -9,9 +9,7 @@
 
 //*****
 template <typename EvalT, typename Traits>
-PHAL::PoissonResid<EvalT, Traits>::PoissonResid(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+PHAL::PoissonResid<EvalT, Traits>::PoissonResid(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       Potential(p.get<std::string>("QP Variable Name"), dl->qp_scalar),
       Permittivity(p.get<std::string>("Permittivity Name"), dl->qp_scalar),

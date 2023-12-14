@@ -12,9 +12,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFVecInterpolationBase<EvalT, Traits, ScalarT>::DOFVecInterpolationBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+DOFVecInterpolationBase<EvalT, Traits, ScalarT>::DOFVecInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : val_node(p.get<std::string>("Variable Name"), dl->node_vector),
       BF(p.get<std::string>("BF Name"), dl->node_qp_scalar),
       val_qp(p.get<std::string>("Variable Name"), dl->qp_vector)
@@ -36,9 +34,7 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::DOFVecInterpolationBase(
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFVecInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFVecInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_node, fm);
   this->utils.setFieldData(BF, fm);
@@ -90,9 +86,7 @@ DOFVecInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits:
 #endif
 
   Kokkos::parallel_for(
-      workset.numCells,
-      VecInterpolation<PHX::Device, decltype(BF), decltype(val_node), decltype(val_qp)>(
-          BF, val_node, val_qp, numQPs, numNodes, vecDim));
+      workset.numCells, VecInterpolation<PHX::Device, decltype(BF), decltype(val_node), decltype(val_qp)>(BF, val_node, val_qp, numQPs, numNodes, vecDim));
 
 #if defined(ALBANY_TIMER)
   PHX::Device::fence();
@@ -124,23 +118,8 @@ class VecInterpolationJacob
  public:
   typedef Device device_type;
 
-  VecInterpolationJacob(
-      MDFieldType&     BF,
-      MDFieldTypeFad1& val_node,
-      MDFieldTypeFad2& U,
-      int              numNodes,
-      int              numQPs,
-      int              vecDims,
-      int              num_dof,
-      int              offset)
-      : BF_(BF),
-        val_node_(val_node),
-        U_(U),
-        numNodes_(numNodes),
-        numQPs_(numQPs),
-        vecDims_(vecDims),
-        num_dof_(num_dof),
-        offset_(offset)
+  VecInterpolationJacob(MDFieldType& BF, MDFieldTypeFad1& val_node, MDFieldTypeFad2& U, int numNodes, int numQPs, int vecDims, int num_dof, int offset)
+      : BF_(BF), val_node_(val_node), U_(U), numNodes_(numNodes), numQPs_(numQPs), vecDims_(vecDims), num_dof_(num_dof), offset_(offset)
   {
   }
 
@@ -155,8 +134,7 @@ class VecInterpolationJacob
         (U_(i, qp, vec)).fastAccessDx(offset_ + vec) = val_node_(i, 0, vec).fastAccessDx(offset_ + vec) * BF_(i, 0, qp);
         for (int node = 1; node < numNodes_; ++node) {
           (U_(i, qp, vec)).val() += val_node_(i, node, vec).val() * BF_(i, node, qp);
-          (U_(i, qp, vec)).fastAccessDx(neq * node + offset_ + vec) +=
-              val_node_(i, node, vec).fastAccessDx(neq * node + offset_ + vec) * BF_(i, node, qp);
+          (U_(i, qp, vec)).fastAccessDx(neq * node + offset_ + vec) += val_node_(i, node, vec).fastAccessDx(neq * node + offset_ + vec) * BF_(i, node, qp);
         }
       }
     }
@@ -166,8 +144,8 @@ class VecInterpolationJacob
 //*****
 template <typename Traits>
 void
-FastSolutionVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-    evaluateFields(typename Traits::EvalData workset)
+FastSolutionVecInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(
+    typename Traits::EvalData workset)
 {
   int num_dof = this->val_node(0, 0, 0).size();
   Kokkos::parallel_for(

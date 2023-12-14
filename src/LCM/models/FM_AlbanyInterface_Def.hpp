@@ -11,8 +11,7 @@ namespace LCM {
 
 /******************************************************************************/
 template <typename EvalT, typename Traits>
-FerroicDriver<EvalT, Traits>::FerroicDriver(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
-    : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
+FerroicDriver<EvalT, Traits>::FerroicDriver(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl) : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 /******************************************************************************/
 {
   ALBANY_PANIC(num_dims_ != FM::THREE_D, ">>> ERROR (FerroicModel): Only valid for 3D.");
@@ -82,9 +81,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(Teuchos::ParameterList* p, const Teu
     int                           transitionIndex = 0;
     for (int i = 0; i < nVariants; i++) {
       Teuchos::Array<RealType> array = cParams.get<Teuchos::Array<RealType>>(Albany::strint("Variant", i + 1));
-      ALBANY_PANIC(
-          array.size() != nVariants,
-          ">>> ERROR (FerroicModel): List of critical values for variant " << i + 1 << " is wrong length");
+      ALBANY_PANIC(array.size() != nVariants, ">>> ERROR (FerroicModel): List of critical values for variant " << i + 1 << " is wrong length");
       for (int j = 0; j < nVariants; j++) {
         tBarrier[transitionIndex] = array[j];
         transitionIndex++;
@@ -164,10 +161,7 @@ FerroicDriver<EvalT, Traits>::FerroicDriver(Teuchos::ParameterList* p, const Teu
 /******************************************************************************/
 template <typename EvalT, typename Traits>
 void
-FerroicDriver<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+FerroicDriver<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 /******************************************************************************/
 {
   auto strain = *dep_fields[strainName];
@@ -223,10 +217,7 @@ FerroicDriver<EvalT, Traits>::computeState(
 /******************************************************************************/
 template <typename EvalT, typename Traits>
 void
-FerroicDriver<EvalT, Traits>::computeStateParallel(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+FerroicDriver<EvalT, Traits>::computeStateParallel(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 /******************************************************************************/
 {
   ALBANY_PANIC(false, ">>> ERROR (FerroicDriver): computeStateParallel not implemented");
@@ -350,8 +341,7 @@ parseCrystalVariant(const Teuchos::Array<Teuchos::RCP<FM::CrystalPhase>>& phases
   } else
     ALBANY_ABORT(">>> ERROR (FerroicModel): Crystal variants require a phase.");
 
-  ALBANY_PANIC(
-      phaseIndex < 0 || phaseIndex >= phases.size(), ">>> ERROR (FerroicModel): Requested phase has not been defined.");
+  ALBANY_PANIC(phaseIndex < 0 || phaseIndex >= phases.size(), ">>> ERROR (FerroicModel): Requested phase has not been defined.");
 
   if (vParam.isType<Teuchos::ParameterList>("Crystallographic Basis")) {
     cv.R.set_dimension(phases[phaseIndex]->C.get_dimension());

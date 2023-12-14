@@ -140,9 +140,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
   if (source_field != 0) {
     *out << "   Field with name " << source_field_name << " found in source mesh file!" << std::endl;
   } else {
-    ALBANY_ABORT(
-        std::endl
-        << "   Field with name " << source_field_name << " NOT found in source mesh file!" << std::endl);
+    ALBANY_ABORT(std::endl << "   Field with name " << source_field_name << " NOT found in source mesh file!" << std::endl);
   }
 
   auto neq = source_field->max_size();
@@ -152,27 +150,24 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
   // Load the target mesh.
   stk::io::StkMeshIoBroker tgt_broker(parallel_machine);
-  std::size_t tgt_input_index = tgt_broker.add_mesh_database(target_mesh_input_file, "exodus", stk::io::READ_MESH);
+  std::size_t              tgt_input_index = tgt_broker.add_mesh_database(target_mesh_input_file, "exodus", stk::io::READ_MESH);
   tgt_broker.set_active_mesh(tgt_input_index);
   tgt_broker.create_input_mesh();
   tgt_broker.add_all_mesh_fields_as_input_fields(tmo);
 
   // Put fields on target mesh
   // Add a nodal field to the interpolated target part.
-  FieldType& target_interp_field =
-      tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, tgt_interp_field_name);
+  FieldType& target_interp_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, tgt_interp_field_name);
 
   stk::mesh::put_field_on_mesh(target_interp_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
 
   // Add a absolute error nodal field to the target part.
-  FieldType& target_abs_error_field =
-      tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, abs_err_field_name);
+  FieldType& target_abs_error_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, abs_err_field_name);
 
   stk::mesh::put_field_on_mesh(target_abs_error_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
 
   // Add a relative error nodal field to the target part.
-  FieldType& target_rel_error_field =
-      tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, rel_err_field_name);
+  FieldType& target_rel_error_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, rel_err_field_name);
 
   stk::mesh::put_field_on_mesh(target_rel_error_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
 
@@ -189,9 +184,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
     *out << "   Field with name " << target_field_name;
     *out << " found in target mesh file!" << std::endl;
   } else {
-    ALBANY_ABORT(
-        std::endl
-        << "   Field with name " << target_field_name << " NOT found in target mesh file!" << std::endl);
+    ALBANY_ABORT(std::endl << "   Field with name " << target_field_name << " NOT found in target mesh file!" << std::endl);
   }
 
   auto tgt_io_region = tgt_broker.get_input_ioss_region();
@@ -216,14 +209,12 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
   }
   if ((src_snap_no == -1) && (tgt_snap_no == -1)) {
     if (tgt_timestep_count < src_timestep_count) {
-      *out << "\n Number of snapshots in target mesh file = " << tgt_timestep_count
-           << " < number of snapshots in source mesh file (= " << src_timestep_count
+      *out << "\n Number of snapshots in target mesh file = " << tgt_timestep_count << " < number of snapshots in source mesh file (= " << src_timestep_count
            << ").\n  Errors will be computed only up to snapshot #" << tgt_timestep_count << ".\n \n";
       src_timestep_count = tgt_timestep_count;
     }
     if (src_timestep_count < tgt_timestep_count) {
-      *out << "\n Number of snapshots in source mesh file = " << src_timestep_count
-           << " < number of snapshots in target mesh file (= " << tgt_timestep_count
+      *out << "\n Number of snapshots in source mesh file = " << src_timestep_count << " < number of snapshots in target mesh file (= " << tgt_timestep_count
            << ").\n  Errors will be computed only up to snapshot #" << src_timestep_count << ".\n \n";
       tgt_timestep_count = src_timestep_count;
     }
@@ -244,26 +235,20 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
     if (src_snap_no > src_timestep_count) {
       ALBANY_ABORT(
           std::endl
-          << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no << " > total number of snapshots in "
-          << source_mesh_input_file << " = " << src_timestep_count << "." << std::endl);
+          << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no << " > total number of snapshots in " << source_mesh_input_file << " = "
+          << src_timestep_count << "." << std::endl);
     }
     if (tgt_snap_no > tgt_timestep_count) {
       ALBANY_ABORT(
           std::endl
-          << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no << " > total number of snapshots in "
-          << target_mesh_input_file << " = " << tgt_timestep_count << "." << std::endl);
+          << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no << " > total number of snapshots in " << target_mesh_input_file << " = "
+          << tgt_timestep_count << "." << std::endl);
     }
     if ((src_snap_no == 0) || (src_snap_no < -1)) {
-      ALBANY_ABORT(
-          std::endl
-          << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no << "; valid values are -1 and >0."
-          << std::endl);
+      ALBANY_ABORT(std::endl << "Invalid value of Source Mesh Snapshot Number = " << src_snap_no << "; valid values are -1 and >0." << std::endl);
     }
     if ((tgt_snap_no == 0) || (tgt_snap_no < -1)) {
-      ALBANY_ABORT(
-          std::endl
-          << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no << "; valid values are -1 and >0 ."
-          << std::endl);
+      ALBANY_ABORT(std::endl << "Invalid value of Target Mesh Snapshot Number = " << tgt_snap_no << "; valid values are -1 and >0 ." << std::endl);
     }
     tgt_time_step_indices.resize(1);
     src_time_step_indices.resize(1);
@@ -282,15 +267,14 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
   stk::mesh::get_selected_entities(src_stk_selector, src_part_buckets, src_part_nodes);
 
-  Intrepid::FieldContainer<double> src_node_coords = DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(
-      Teuchos::Array<stk::mesh::Entity>(src_part_nodes), *src_bulk_data);
+  Intrepid::FieldContainer<double> src_node_coords =
+      DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(Teuchos::Array<stk::mesh::Entity>(src_part_nodes), *src_bulk_data);
 
   for (int index = 0; index < tgt_time_step_indices.size(); index++) {
     double time = src_io_region->get_state_time(src_time_step_indices[index]);
     if (src_time_step_indices[index] == src_timestep_count) interpolation_intervals = 1;
 
-    int    step_end = src_time_step_indices[index] < src_timestep_count ? src_time_step_indices[index] + 1 :
-                                                                          src_time_step_indices[index];
+    int    step_end = src_time_step_indices[index] < src_timestep_count ? src_time_step_indices[index] + 1 : src_time_step_indices[index];
     double tend     = src_io_region->get_state_time(step_end);
     double tbeg     = time;
     double delta    = (tend - tbeg) / static_cast<double>(interpolation_intervals);
@@ -305,8 +289,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
       interpolation_intervals = 1;
     }
 
-    step_end = tgt_time_step_indices[index] < tgt_timestep_count ? tgt_time_step_indices[index] + 1 :
-                                                                   tgt_time_step_indices[index];
+    step_end = tgt_time_step_indices[index] < tgt_timestep_count ? tgt_time_step_indices[index] + 1 : tgt_time_step_indices[index];
     tend     = tgt_io_region->get_state_time(step_end);
     tbeg     = time;
     delta    = (tend - tbeg) / static_cast<double>(interpolation_intervals);
@@ -343,8 +326,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
     Teuchos::ParameterList&             dtk_list = plist->sublist("DataTransferKit");
     DataTransferKit::MapOperatorFactory op_factory;
 
-    Teuchos::RCP<DataTransferKit::MapOperator> map_op =
-        op_factory.create(src_vector->getMap(), tgt_vector->getMap(), dtk_list);
+    Teuchos::RCP<DataTransferKit::MapOperator> map_op = op_factory.create(src_vector->getMap(), tgt_vector->getMap(), dtk_list);
 
     // Setup the map operator. This creates the underlying linear operators.
     map_op->setup(src_manager.functionSpace(), tgt_manager.functionSpace());
@@ -364,11 +346,10 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
     std::vector<stk::mesh::Entity> tgt_ownednodes;
 
-    stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(tgt_broker.meta_data().universal_part()) &
-                                               stk::mesh::Selector(tgt_broker.meta_data().locally_owned_part());
+    stk::mesh::Selector select_owned_in_part =
+        stk::mesh::Selector(tgt_broker.meta_data().universal_part()) & stk::mesh::Selector(tgt_broker.meta_data().locally_owned_part());
 
-    stk::mesh::get_selected_entities(
-        select_owned_in_part, tgt_broker.bulk_data().buckets(stk::topology::NODE_RANK), tgt_ownednodes);
+    stk::mesh::get_selected_entities(select_owned_in_part, tgt_broker.bulk_data().buckets(stk::topology::NODE_RANK), tgt_ownednodes);
 
     int tgt_num_owned_nodes = tgt_ownednodes.size();  // number owned nodes
 
@@ -378,8 +359,8 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
     stk::mesh::get_selected_entities(tgt_stk_selector, tgt_part_buckets, tgt_part_nodes);
 
-    Intrepid::FieldContainer<double> tgt_node_coords = DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(
-        Teuchos::Array<stk::mesh::Entity>(tgt_part_nodes), *tgt_bulk_data);
+    Intrepid::FieldContainer<double> tgt_node_coords =
+        DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(Teuchos::Array<stk::mesh::Entity>(tgt_part_nodes), *tgt_bulk_data);
 
     int num_tgt_part_nodes = tgt_part_nodes.size();  // number nodes (owned + overlap)
 
@@ -448,8 +429,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
         }
       }
 
-      *out << "  Target Snapshot = " << tgt_time_step_indices[index]
-           << ", Source Snapshot = " << src_time_step_indices[index] << std::endl;
+      *out << "  Target Snapshot = " << tgt_time_step_indices[index] << ", Source Snapshot = " << src_time_step_indices[index] << std::endl;
       *out << "      Dof = " << component << ", |e|_2 (abs error): " << error_l2_norm_global << std::endl;
       *out << "      Dof = " << component << ", |f|_2 (norm ref soln): " << field_l2_norm_global << std::endl;
       *out << "      Dof = " << component << ", |e|_2 / |f|_2 (rel error): " << rel_error_l2_norm_global << std::endl;
@@ -467,8 +447,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
       rel_error_l2_norm_global_vec = 0.0;
     }
 
-    *out << "  Target Snapshot = " << tgt_time_step_indices[index]
-         << ", Source Snapshot = " << src_time_step_indices[index] << std::endl;
+    *out << "  Target Snapshot = " << tgt_time_step_indices[index] << ", Source Snapshot = " << src_time_step_indices[index] << std::endl;
     *out << "      All dofs, |e|_2 (abs error): " << error_l2_norm_global_vec << std::endl;
     *out << "      All dofs, |f|_2 (norm ref soln): " << field_l2_norm_global_vec << std::endl;
     *out << "      All dofs, |e|_2 / |f|_2 (rel error): " << rel_error_l2_norm_global_vec << std::endl;

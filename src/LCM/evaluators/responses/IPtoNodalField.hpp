@@ -27,10 +27,7 @@ class IPtoNodalFieldBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX
   using ScalarT     = typename EvalT::ScalarT;
   using MeshScalarT = typename EvalT::MeshScalarT;
 
-  IPtoNodalFieldBase(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl,
-      Albany::MeshSpecsStruct const*       mesh_specs);
+  IPtoNodalFieldBase(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl, Albany::MeshSpecsStruct const* mesh_specs);
 
   void
   postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
@@ -81,10 +78,7 @@ template <typename EvalT, typename Traits>
 class IPtoNodalField : public IPtoNodalFieldBase<EvalT, Traits>
 {
  public:
-  IPtoNodalField(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl,
-      Albany::MeshSpecsStruct const*       mesh_specs)
+  IPtoNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl, Albany::MeshSpecsStruct const* mesh_specs)
       : IPtoNodalFieldBase<EvalT, Traits>(p, dl, mesh_specs)
   {
   }
@@ -116,18 +110,14 @@ class IPtoNodalField : public IPtoNodalFieldBase<EvalT, Traits>
 // **************************************************************
 
 template <typename Traits>
-class IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
-    : public IPtoNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>
+class IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits> : public IPtoNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   typedef IPtoNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits> Base;
   typedef typename Base::ScalarT                                   ScalarT;
   typedef typename Base::MeshScalarT                               MeshScalarT;
 
-  IPtoNodalField(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl,
-      Albany::MeshSpecsStruct const*       mesh_specs);
+  IPtoNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl, Albany::MeshSpecsStruct const* mesh_specs);
   void
   preEvaluate(typename Traits::PreEvalData d);
   void

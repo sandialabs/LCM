@@ -28,9 +28,7 @@
 namespace Albany {
 
 // Constructor for meshes read from ASCII file
-AsciiSTKMeshStruct::AsciiSTKMeshStruct(
-    const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<Teuchos_Comm const>&     comm)
+AsciiSTKMeshStruct::AsciiSTKMeshStruct(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<Teuchos_Comm const>& comm)
     : GenericSTKMeshStruct(params, Teuchos::null, 3),
       out(Teuchos::VerboseObjectBase::getDefaultOStream()),
       periodic(false),
@@ -94,9 +92,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   FILE* meshfile = fopen(meshfilename, "r");
   if (meshfile == NULL) {  // check if coordinates file exists
     *out << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename << " not found!" << std::endl;
-    ALBANY_ABORT(
-        std::endl
-        << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename << " not found!" << std::endl);
+    ALBANY_ABORT(std::endl << "Error in AsciiSTKMeshStruct: coordinates file " << meshfilename << " not found!" << std::endl);
   }
   double temp;
   fseek(meshfile, 0, SEEK_SET);
@@ -145,9 +141,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   FILE* confile = fopen(confilename, "r");
   if (confile == NULL) {  // check if element connectivity file exists
     *out << "Error in AsciiSTKMeshStruct: element connectivity file " << confilename << " not found!" << std::endl;
-    ALBANY_ABORT(
-        std::endl
-        << "Error in AsciiSTKMeshStruct: element connectivity file " << confilename << " not found!" << std::endl);
+    ALBANY_ABORT(std::endl << "Error in AsciiSTKMeshStruct: element connectivity file " << confilename << " not found!" << std::endl);
   }
   fseek(confile, 0, SEEK_SET);
   safe_fscanf(1, confile, "%lf", &temp);
@@ -156,18 +150,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   safe_fgets(buffer, 100, confile);
   for (int i = 0; i < NumEles; i++) {
     safe_fgets(buffer, 100, confile);
-    safe_sscanf(
-        8,
-        buffer,
-        "%i %i %i %i %i %i %i %i",
-        &eles[i][0],
-        &eles[i][1],
-        &eles[i][2],
-        &eles[i][3],
-        &eles[i][4],
-        &eles[i][5],
-        &eles[i][6],
-        &eles[i][7]);
+    safe_sscanf(8, buffer, "%i %i %i %i %i %i %i %i", &eles[i][0], &eles[i][1], &eles[i][2], &eles[i][3], &eles[i][4], &eles[i][5], &eles[i][6], &eles[i][7]);
     //*out << "elt # " << i << ": " << eles[i][0] << " " << eles[i][1] << " " <<
     // eles[i][2] << " " << eles[i][3] << " " << eles[i][4] << " "
     //                  << eles[i][5] << " " << eles[i][6] << " " << eles[i][7]
@@ -209,9 +192,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     FILE* geIDsfile = fopen(geIDsfilename, "r");
     if (geIDsfile == NULL) {  // check if global element IDs file exists
       *out << "Error in AsciiSTKMeshStruct: global element IDs file " << geIDsfilename << " not found!" << std::endl;
-      ALBANY_ABORT(
-          std::endl
-          << "Error in AsciiSTKMeshStruct: global element IDs file " << geIDsfilename << " not found!" << std::endl);
+      ALBANY_ABORT(std::endl << "Error in AsciiSTKMeshStruct: global element IDs file " << geIDsfilename << " not found!" << std::endl);
     }
     fseek(geIDsfile, 0, SEEK_SET);
     safe_fgets(buffer, 100, geIDsfile);
@@ -239,9 +220,7 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     FILE* gnIDsfile = fopen(gnIDsfilename, "r");
     if (gnIDsfile == NULL) {  // check if global node IDs file exists
       *out << "Error in AsciiSTKMeshStruct: global node IDs file " << gnIDsfilename << " not found!" << std::endl;
-      ALBANY_ABORT(
-          std::endl
-          << "Error in AsciiSTKMeshStruct: global node IDs file " << gnIDsfilename << " not found!" << std::endl);
+      ALBANY_ABORT(std::endl << "Error in AsciiSTKMeshStruct: global node IDs file " << gnIDsfilename << " not found!" << std::endl);
     }
     fseek(gnIDsfile, 0, SEEK_SET);
     safe_fgets(buffer, 100, gnIDsfile);
@@ -329,21 +308,12 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
     }
   }
 
-  elem_mapT       = Teuchos::rcp(new Tpetra_Map(
-      NumEles,
-      globalElesID(),
-      0,
-      comm));  // Distribute the elements according to the global element IDs
-  node_mapT       = Teuchos::rcp(new Tpetra_Map(
-      NumNodes,
-      globalNodesID(),
-      0,
-      comm));  // Distribute the nodes according to the global node IDs
-  basal_face_mapT = Teuchos::rcp(new Tpetra_Map(
-      NumBasalFaces,
-      basalFacesID(),
-      0,
-      comm));  // Distribute the elements according to the basal face IDs
+  elem_mapT       = Teuchos::rcp(new Tpetra_Map(NumEles, globalElesID(), 0,
+                                          comm));  // Distribute the elements according to the global element IDs
+  node_mapT       = Teuchos::rcp(new Tpetra_Map(NumNodes, globalNodesID(), 0,
+                                          comm));  // Distribute the nodes according to the global node IDs
+  basal_face_mapT = Teuchos::rcp(new Tpetra_Map(NumBasalFaces, basalFacesID(), 0,
+                                                comm));  // Distribute the elements according to the basal face IDs
 
   params->validateParameters(*getValidDiscretizationParameters(), 0);
 
@@ -402,8 +372,8 @@ AsciiSTKMeshStruct::AsciiSTKMeshStruct(
   shards::CellTopology    shards_ctd    = stk::mesh::get_cell_topology(stk_topo_data);
   const CellTopologyData& ctd           = *shards_ctd.getCellTopologyData();
 
-  this->meshSpecs[0] = Teuchos::rcp(new MeshSpecsStruct(
-      ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
+  this->meshSpecs[0] =
+      Teuchos::rcp(new MeshSpecsStruct(ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
 
   // Create a mesh specs object for EACH side set
   this->initializeSideSetMeshSpecs(comm);
@@ -445,13 +415,11 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
 
   typedef AbstractSTKFieldContainer::ScalarFieldType ScalarFieldType;
 
-  AbstractSTKFieldContainer::VectorFieldType* coordinates_field = fieldContainer->getCoordinatesField();
-  ScalarFieldType*                            surfaceHeight_field =
-      metaData->get_field<ScalarFieldType>(stk::topology::NODE_RANK, "surface_height");
-  ScalarFieldType* flowFactor_field  = metaData->get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, "flow_factor");
-  ScalarFieldType* temperature_field = metaData->get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, "temperature");
-  ScalarFieldType* basal_friction_field =
-      metaData->get_field<ScalarFieldType>(stk::topology::NODE_RANK, "basal_friction");
+  AbstractSTKFieldContainer::VectorFieldType* coordinates_field    = fieldContainer->getCoordinatesField();
+  ScalarFieldType*                            surfaceHeight_field  = metaData->get_field<ScalarFieldType>(stk::topology::NODE_RANK, "surface_height");
+  ScalarFieldType*                            flowFactor_field     = metaData->get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, "flow_factor");
+  ScalarFieldType*                            temperature_field    = metaData->get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, "temperature");
+  ScalarFieldType*                            basal_friction_field = metaData->get_field<ScalarFieldType>(stk::topology::NODE_RANK, "basal_friction");
 
   if (!surfaceHeight_field) have_sh = false;
   if (!flowFactor_field) have_flwa = false;

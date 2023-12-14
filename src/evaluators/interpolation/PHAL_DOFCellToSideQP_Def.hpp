@@ -12,14 +12,10 @@ namespace PHAL {
 
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : sideSetName(p.get<std::string>("Side Set Name"))
 {
-  ALBANY_PANIC(
-      dl->side_layouts.find(sideSetName) == dl->side_layouts.end(),
-      "Error! Layout for side set " << sideSetName << " not found.\n");
+  ALBANY_PANIC(dl->side_layouts.find(sideSetName) == dl->side_layouts.end(), "Error! Layout for side set " << sideSetName << " not found.\n");
 
   Teuchos::RCP<Albany::Layouts> dl_side         = dl->side_layouts.at(sideSetName);
   std::string                   layout_str      = p.get<std::string>("Data Layout");
@@ -92,9 +88,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::DOFCellToSideQPBase(
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFCellToSideQPBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFCellToSideQPBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_cell, fm);
   this->utils.setFieldData(val_side_qp, fm);
@@ -172,8 +166,7 @@ DOFCellToSideQPBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits::Eva
             for (int j = 0; j < dims_side[4]; ++j) {
               val_side_qp(cell, side, qp, i, j) = 0;
               for (int node = 0; node < num_side_nodes; ++node) {
-                val_side_qp(cell, side, qp, i, j) +=
-                    val_cell(cell, sideNodes[side][node], i, j) * BF(cell, side, node, qp);
+                val_side_qp(cell, side, qp, i, j) += val_cell(cell, sideNodes[side][node], i, j) * BF(cell, side, node, qp);
               }
             }
           }

@@ -13,9 +13,7 @@ namespace PHAL {
 
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
-DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::DOFVecGradInterpolationBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::DOFVecGradInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : val_node(p.get<std::string>("Variable Name"), dl->node_vector),
       GradBF(p.get<std::string>("Gradient BF Name"), dl->node_qp_gradient),
       grad_val_qp(p.get<std::string>("Gradient Variable Name"), dl->qp_vecgradient)
@@ -39,9 +37,7 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::DOFVecGradInterpolationBase
 //*****
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_node, fm);
   this->utils.setFieldData(GradBF, fm);
@@ -54,9 +50,7 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits, typename ScalarT>
 KOKKOS_INLINE_FUNCTION void
-DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(
-    const DOFVecGradInterpolationBase_Residual_Tag& tag,
-    const int&                                      cell) const
+DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(const DOFVecGradInterpolationBase_Residual_Tag& tag, const int& cell) const
 {
   for (int qp = 0; qp < numQPs; ++qp)
     for (int i = 0; i < vecDim; i++)
@@ -102,23 +96,18 @@ DOFVecGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Tra
 #ifndef ALBANY_MESH_DEPENDS_ON_SOLUTION
 template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
-FastSolutionVecGradInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::
-operator()(const FastSolutionVecGradInterpolationBase_Jacobian_Tag& tag, const int& cell) const
+FastSolutionVecGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::operator()(
+    const FastSolutionVecGradInterpolationBase_Jacobian_Tag& tag,
+    const int&                                               cell) const
 {
   for (int qp = 0; qp < this->numQPs; ++qp) {
     for (int i = 0; i < this->vecDim; i++) {
       for (int dim = 0; dim < this->numDims; dim++) {
         // For node==0, overwrite. Then += for 1 to numNodes.
-        this->grad_val_qp(cell, qp, i, dim) =
-            ScalarT(num_dof, this->val_node(cell, 0, i).val() * this->GradBF(cell, 0, qp, dim));
-        (this->grad_val_qp(cell, qp, i, dim)).fastAccessDx(offset + i) =
-            this->val_node(cell, 0, i).fastAccessDx(offset + i) * this->GradBF(cell, 0, qp, dim);
+        this->grad_val_qp(cell, qp, i, dim)                            = ScalarT(num_dof, this->val_node(cell, 0, i).val() * this->GradBF(cell, 0, qp, dim));
+        (this->grad_val_qp(cell, qp, i, dim)).fastAccessDx(offset + i) = this->val_node(cell, 0, i).fastAccessDx(offset + i) * this->GradBF(cell, 0, qp, dim);
         for (int node = 1; node < this->numNodes; ++node) {
-          (this->grad_val_qp(cell, qp, i, dim)).val() +=
-              this->val_node(cell, node, i).val() * this->GradBF(cell, node, qp, dim);
+          (this->grad_val_qp(cell, qp, i, dim)).val() += this->val_node(cell, node, i).val() * this->GradBF(cell, node, qp, dim);
           (this->grad_val_qp(cell, qp, i, dim)).fastAccessDx(neq * node + offset + i) +=
               this->val_node(cell, node, i).fastAccessDx(neq * node + offset + i) * this->GradBF(cell, node, qp, dim);
         }
@@ -129,10 +118,8 @@ operator()(const FastSolutionVecGradInterpolationBase_Jacobian_Tag& tag, const i
 //*****
 template <typename Traits>
 void
-FastSolutionVecGradInterpolationBase<
-    PHAL::AlbanyTraits::Jacobian,
-    Traits,
-    typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(typename Traits::EvalData workset)
+FastSolutionVecGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename PHAL::AlbanyTraits::Jacobian::ScalarT>::evaluateFields(
+    typename Traits::EvalData workset)
 {
 #if defined(ALBANY_TIMER)
   auto start = std::chrono::high_resolution_clock::now();

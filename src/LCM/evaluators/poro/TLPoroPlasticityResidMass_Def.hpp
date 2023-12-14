@@ -14,44 +14,22 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(Teuchos::ParameterList& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      porePressure(
-          p.get<std::string>("QP Pore Pressure Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      elementLength(
-          p.get<std::string>("Element Length Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Tdot(
-          p.get<std::string>("QP Time Derivative Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      ThermalCond(
-          p.get<std::string>("Thermal Conductivity Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      kcPermeability(
-          p.get<std::string>("Kozeny-Carman Permeability Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      porePressure(p.get<std::string>("QP Pore Pressure Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      elementLength(p.get<std::string>("Element Length Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Tdot(p.get<std::string>("QP Time Derivative Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      ThermalCond(p.get<std::string>("Thermal Conductivity Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      kcPermeability(p.get<std::string>("Kozeny-Carman Permeability Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       porosity(p.get<std::string>("Porosity Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      biotCoefficient(
-          p.get<std::string>("Biot Coefficient Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      biotModulus(
-          p.get<std::string>("Biot Modulus Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      TGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      biotCoefficient(p.get<std::string>("Biot Coefficient Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      biotModulus(p.get<std::string>("Biot Modulus Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      TGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       Source(p.get<std::string>("Source Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      coordVec(
-          p.get<std::string>("Coordinate Vector Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Coordinate Data Layout")),
+      coordVec(p.get<std::string>("Coordinate Vector Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Coordinate Data Layout")),
       cubature(p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature")),
       cellType(p.get<Teuchos::RCP<shards::CellTopology>>("Cell Type")),
       weights(p.get<std::string>("Weights Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      deltaTime(
-          p.get<std::string>("Delta Time Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Workset Scalar Data Layout")),
+      deltaTime(p.get<std::string>("Delta Time Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Workset Scalar Data Layout")),
       TResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       haveSource(p.get<bool>("Have Source")),
       haveConvection(false),
@@ -83,8 +61,7 @@ TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(Teuchos::Par
   this->addDependentField(wGradBF);
   if (haveSource) this->addDependentField(Source);
   if (haveAbsorption) {
-    Absorption = decltype(Absorption)(
-        p.get<std::string>("Absorption Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    Absorption = decltype(Absorption)(p.get<std::string>("Absorption Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(Absorption);
   }
 
@@ -103,7 +80,7 @@ TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(Teuchos::Par
 
   this->addEvaluatedField(TResidual);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
 
@@ -124,8 +101,7 @@ TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(Teuchos::Par
     haveConvection = true;
     if (p.isType<bool>("Have Rho Cp")) haverhoCp = p.get<bool>("Have Rho Cp");
     if (haverhoCp) {
-      rhoCp = decltype(rhoCp)(
-          p.get<std::string>("Rho Cp Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+      rhoCp = decltype(rhoCp)(p.get<std::string>("Rho Cp Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
       this->addDependentField(rhoCp);
     }
   }
@@ -136,9 +112,7 @@ TLPoroPlasticityResidMass<EvalT, Traits>::TLPoroPlasticityResidMass(Teuchos::Par
 //*****
 template <typename EvalT, typename Traits>
 void
-TLPoroPlasticityResidMass<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+TLPoroPlasticityResidMass<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   // this->utils.setFieldData(stabParameter,fm);
   this->utils.setFieldData(elementLength, fm);
@@ -210,13 +184,11 @@ TLPoroPlasticityResidMass<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
       for (int qp = 0; qp < numQPs; ++qp) {
         // Volumetric Constraint Term
         if (haveMechanics) {
-          TResidual(cell, node) -=
-              biotCoefficient(cell, qp) * (std::log(J(cell, qp) / Jold(cell, qp))) * wBF(cell, node, qp);
+          TResidual(cell, node) -= biotCoefficient(cell, qp) * (std::log(J(cell, qp) / Jold(cell, qp))) * wBF(cell, node, qp);
         }
 
         // Pore-fluid Resistance Term
-        TResidual(cell, node) -=
-            (porePressure(cell, qp) - porePressureold(cell, qp)) / biotModulus(cell, qp) * wBF(cell, node, qp);
+        TResidual(cell, node) -= (porePressure(cell, qp) - porePressureold(cell, qp)) / biotModulus(cell, qp) * wBF(cell, node, qp);
       }
     }
   }

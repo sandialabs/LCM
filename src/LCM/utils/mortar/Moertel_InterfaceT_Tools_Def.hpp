@@ -12,8 +12,7 @@
  |  ctor (public)                                            mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(
-    InterfaceT)::InterfaceT(int Id, bool oneD, const Teuchos::RCP<const Teuchos::Comm<LO>>& comm, int outlevel)
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::InterfaceT(int Id, bool oneD, const Teuchos::RCP<const Teuchos::Comm<LO>>& comm, int outlevel)
     : Id_(Id),
       outlevel_(outlevel),
       oneD_(oneD),
@@ -61,14 +60,12 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::InterfaceT(const MoertelT::MOERTEL
     // the local node map
     std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::const_iterator node_curr;
     for (node_curr = old.node_[i].begin(); node_curr != old.node_[i].end(); ++node_curr) {
-      Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> tmpnode =
-          Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(*(node_curr->second)));
+      Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> tmpnode = Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(*(node_curr->second)));
       node_[i].insert(std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>(tmpnode->Id(), tmpnode));
     }
     // the global node map
     for (node_curr = old.rnode_[i].begin(); node_curr != old.rnode_[i].end(); ++node_curr) {
-      Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> tmpnode =
-          Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(*(node_curr->second)));
+      Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> tmpnode = Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(*(node_curr->second)));
       rnode_[i].insert(std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>(tmpnode->Id(), tmpnode));
     }
   }
@@ -337,8 +334,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AddNode(MoertelT::MOERTEL_TEMPLATE
   }
 
   // copy the node
-  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> tmp =
-      Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(node));
+  Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> tmp = Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(node));
 
   // add node
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>* n = 0;
@@ -360,8 +356,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AddNode(MoertelT::MOERTEL_TEMPLATE
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 bool
-MoertelT::MOERTEL_TEMPLATE_CLASS(
-    InterfaceT)::SetFunctionAllSegmentsSide(int side, int id, MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT) * func)
+MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SetFunctionAllSegmentsSide(int side, int id, MoertelT::MOERTEL_TEMPLATE_CLASS(FunctionT) * func)
 {
   if (side != 0 && side != 1) {
     std::cout << "***ERR*** MoertelT::InterfaceT::SetFunctionAllSegmentsSide:\n"
@@ -544,8 +539,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::NodePID(int nid) const
   if (lcomm_ == Teuchos::null) {
     if (OutLevel() > 0)
       std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::NodePID:\n"
-                << "MoertelT: ***WRN*** Proc " << gcomm_->getRank() << " not part of intra-communicator of interface "
-                << Id() << "\n"
+                << "MoertelT: ***WRN*** Proc " << gcomm_->getRank() << " not part of intra-communicator of interface " << Id() << "\n"
                 << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return (-1);
   }
@@ -555,8 +549,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::NodePID(int nid) const
     return (curr->second);
   else {
     std::cout << "***ERR*** MoertelT::Interface::NodePID:\n"
-              << "***ERR*** Proc/Intra-Proc " << gcomm_->getRank() << "/" << lcomm_->getRank() << ": Cannot find node "
-              << nid << " on interface " << Id() << "\n"
+              << "***ERR*** Proc/Intra-Proc " << gcomm_->getRank() << "/" << lcomm_->getRank() << ": Cannot find node " << nid << " on interface " << Id()
+              << "\n"
               << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return (-1);
   }
@@ -580,8 +574,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SegPID(int sid) const
   if (lcomm_ == Teuchos::null) {
     if (OutLevel() > 0)
       std::cout << "MoertelT: ***WRN*** MoertelT::InterfaceT::NodePID:\n"
-                << "MoertelT: ***WRN*** Proc " << gcomm_->getRank() << " not part of intra-communicator of interface "
-                << Id() << "\n"
+                << "MoertelT: ***WRN*** Proc " << gcomm_->getRank() << " not part of intra-communicator of interface " << Id() << "\n"
                 << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return (-1);
   }
@@ -591,8 +584,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::SegPID(int sid) const
     return (curr->second);
   else {
     std::cout << "***ERR*** MoertelT::InterfaceT::SegPID:\n"
-              << "***ERR*** Proc/Intra-Proc " << gcomm_->getRank() << "/" << lcomm_->getRank()
-              << ": Cannot find segment " << sid << "on interface " << Id() << "\n"
+              << "***ERR*** Proc/Intra-Proc " << gcomm_->getRank() << "/" << lcomm_->getRank() << ": Cannot find segment " << sid << "on interface " << Id()
+              << "\n"
               << "***ERR*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
     return (-1);
   }
@@ -672,7 +665,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) * *MoertelT::MOERTEL_TEMPLATE_CLASS(Inte
   }
   if (lcomm_ == Teuchos::null) return NULL;
 
-  MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** view = new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*[GlobalNnode()];
+  MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)** view                                       = new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)*[GlobalNnode()];
   int                                                                            count = 0;
   std::map<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>::iterator curr;
   for (int i = 0; i < 2; ++i)
@@ -1020,8 +1013,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::RedundantNodes(int side)
       if (lcomm_->getRank() != proc) {
         int count = 0;
         for (int i = 0; i < nnode; ++i) {
-          Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> tmp =
-              Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(OutLevel()));
+          Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)> tmp = Teuchos::rcp(new MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)(OutLevel()));
           tmp->UnPack(&(bcast[count]));
           count += (int)bcast[count];
           rmap->insert(std::pair<int, Teuchos::RCP<MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)>>(tmp->Id(), tmp));

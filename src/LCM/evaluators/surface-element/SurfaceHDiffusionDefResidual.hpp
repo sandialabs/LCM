@@ -22,8 +22,7 @@ namespace LCM {
 **/
 
 template <typename EvalT, typename Traits>
-class SurfaceHDiffusionDefResidual : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                     public PHX::EvaluatorDerived<EvalT, Traits>
+class SurfaceHDiffusionDefResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   SurfaceHDiffusionDefResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

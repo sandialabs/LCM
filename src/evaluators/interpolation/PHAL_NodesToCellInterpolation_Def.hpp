@@ -9,11 +9,8 @@ namespace PHAL {
 
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
-NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::NodesToCellInterpolationBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
-    : BF(p.get<std::string>("BF Variable Name"), dl->node_qp_scalar),
-      w_measure(p.get<std::string>("Weighted Measure Name"), dl->qp_scalar)
+NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::NodesToCellInterpolationBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
+    : BF(p.get<std::string>("BF Variable Name"), dl->node_qp_scalar), w_measure(p.get<std::string>("Weighted Measure Name"), dl->qp_scalar)
 {
   isVectorField = p.get<bool>("Is Vector Field");
   if (isVectorField) {
@@ -41,9 +38,7 @@ NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::NodesToCellInterpolationBa
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+NodesToCellInterpolationBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(field_node, fm);
   this->utils.setFieldData(BF, fm);

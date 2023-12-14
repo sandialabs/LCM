@@ -8,9 +8,7 @@
 
 //*****
 template <typename EvalT, typename Traits>
-PNP::ConcentrationResid<EvalT, Traits>::ConcentrationResid(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+PNP::ConcentrationResid<EvalT, Traits>::ConcentrationResid(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : wBF(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       wGradBF(p.get<std::string>("Weighted Gradient BF Name"), dl->node_qp_gradient),
       Concentration("Concentration", dl->qp_vector),
@@ -55,9 +53,7 @@ PNP::ConcentrationResid<EvalT, Traits>::ConcentrationResid(
 //*****
 template <typename EvalT, typename Traits>
 void
-PNP::ConcentrationResid<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+PNP::ConcentrationResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(wBF, fm);
   this->utils.setFieldData(wGradBF, fm);
@@ -90,9 +86,7 @@ PNP::ConcentrationResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData
         for (std::size_t j = 0; j < numSpecies; ++j) {
           for (std::size_t dim = 0; dim < numDims; ++dim) {
             ConcentrationResidual(cell, node, j) +=
-                D[j] *
-                (ConcentrationGrad(cell, qp, j, dim) +
-                 beta[j] * Concentration(cell, qp, j) * PotentialGrad(cell, qp, dim)) *
+                D[j] * (ConcentrationGrad(cell, qp, j, dim) + beta[j] * Concentration(cell, qp, j) * PotentialGrad(cell, qp, dim)) *
                 wGradBF(cell, node, qp, dim);
           }
         }

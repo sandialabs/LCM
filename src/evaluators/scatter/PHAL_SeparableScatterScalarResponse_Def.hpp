@@ -18,18 +18,14 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-SeparableScatterScalarResponseBase<EvalT, Traits>::SeparableScatterScalarResponseBase(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SeparableScatterScalarResponseBase<EvalT, Traits>::SeparableScatterScalarResponseBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   setup(p, dl);
 }
 
 template <typename EvalT, typename Traits>
 void
-SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& fm)
+SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(local_response, fm);
   if (!this->stand_alone) {
@@ -39,9 +35,7 @@ SeparableScatterScalarResponseBase<EvalT, Traits>::postRegistrationSetup(
 
 template <typename EvalT, typename Traits>
 void
-SeparableScatterScalarResponseBase<EvalT, Traits>::setup(
-    Teuchos::ParameterList const& p,
-    const Teuchos::RCP<Albany::Layouts>& /* dl */)
+SeparableScatterScalarResponseBase<EvalT, Traits>::setup(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& /* dl */)
 {
   this->stand_alone = p.get<bool>("Stand-alone Evaluator");
 
@@ -153,11 +147,11 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::evaluate2D
   }
   auto dg_data = Albany::getNonconstLocalData(dg);
 
-  int const                               neq           = workset.wsElNodeEqID.extent(2);
-  const Albany::NodalDOFManager&          solDOFManager = workset.disc->getOverlapDOFManager("ordinary_solution");
-  const Albany::LayeredMeshNumbering<LO>& layeredMeshNumbering = *workset.disc->getLayeredMeshNumbering();
-  int                                     numLayers            = layeredMeshNumbering.numLayers;
-  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID   = workset.disc->getWsElNodeID()[workset.wsIndex];
+  int const                                       neq                  = workset.wsElNodeEqID.extent(2);
+  const Albany::NodalDOFManager&                  solDOFManager        = workset.disc->getOverlapDOFManager("ordinary_solution");
+  const Albany::LayeredMeshNumbering<LO>&         layeredMeshNumbering = *workset.disc->getLayeredMeshNumbering();
+  int                                             numLayers            = layeredMeshNumbering.numLayers;
+  const Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>& wsElNodeID           = workset.disc->getWsElNodeID()[workset.wsIndex];
 
   if (workset.sideSets == Teuchos::null) ALBANY_ABORT("Side sets not properly specified on the mesh" << std::endl);
 
@@ -201,15 +195,13 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::evaluate2D
 
 template <typename Traits>
 void
-SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::postEvaluate(
-    typename Traits::PostEvalData workset)
+SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::postEvaluate(typename Traits::PostEvalData workset)
 {
   // Here we scatter the *global* response
   Teuchos::RCP<Thyra_Vector> g = workset.g;
   if (g != Teuchos::null) {
     Teuchos::ArrayRCP<ST> g_nonconstView = Albany::getNonconstLocalData(g);
-    for (PHAL::MDFieldIterator<ScalarT const> gr(this->global_response); !gr.done(); ++gr)
-      g_nonconstView[gr.idx()] = gr.ref().val();
+    for (PHAL::MDFieldIterator<ScalarT const> gr(this->global_response); !gr.done(); ++gr) g_nonconstView[gr.idx()] = gr.ref().val();
   }
 
   // Here we scatter the *global* response derivatives

@@ -167,10 +167,7 @@ struct NeumannTraits
   typedef PHAL::NeumannFactoryTraits<PHAL::AlbanyTraits> factory_type;
 
   static Teuchos::RCP<Teuchos::ParameterList const>
-  getValidBCParameters(
-      std::vector<std::string> const& sideSetIDs,
-      std::vector<std::string> const& bcNames,
-      std::vector<std::string> const& conditions);
+  getValidBCParameters(std::vector<std::string> const& sideSetIDs, std::vector<std::string> const& bcNames, std::vector<std::string> const& conditions);
 
   static std::string
   constructBCName(std::string const& ns, std::string const& dof, std::string const& condition);
@@ -221,7 +218,7 @@ class BCUtils
   {
     return use_sdbcs_;
   }
-  
+
   ///
   /// Get boolean telling code if Adaptation is utilized
   ///
@@ -230,7 +227,6 @@ class BCUtils
   {
     return false;
   }
-
 
   //! Specific implementation for Dirichlet BC Evaluator below
 

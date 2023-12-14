@@ -12,15 +12,8 @@
  |  ctor (public)                                            mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(
-    NodeT)::NodeT(int Id, const double* x, int ndof, const int* dof, bool isonboundary, int out)
-    : Id_(Id),
-      outputlevel_(out),
-      iscorner_(false),
-      isonboundary_(isonboundary),
-      Drow_(Teuchos::null),
-      Mrow_(Teuchos::null),
-      Mmodrow_(Teuchos::null)
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(int Id, const double* x, int ndof, const int* dof, bool isonboundary, int out)
+    : Id_(Id), outputlevel_(out), iscorner_(false), isonboundary_(isonboundary), Drow_(Teuchos::null), Mrow_(Teuchos::null), Mmodrow_(Teuchos::null)
 {
   seg_.resize(0);
   segptr_.resize(0);
@@ -46,13 +39,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
 MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(int out)
-    : Id_(-1),
-      outputlevel_(out),
-      iscorner_(false),
-      isonboundary_(false),
-      Drow_(Teuchos::null),
-      Mrow_(Teuchos::null),
-      Mmodrow_(Teuchos::null)
+    : Id_(-1), outputlevel_(out), iscorner_(false), isonboundary_(false), Drow_(Teuchos::null), Mrow_(Teuchos::null), Mmodrow_(Teuchos::null)
 {
   seg_.resize(0);
   segptr_.resize(0);
@@ -73,8 +60,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(int out)
  |  copy-ctor (public)                                       mwgee 06/05|
  *----------------------------------------------------------------------*/
 MOERTEL_TEMPLATE_STATEMENT
-MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & old)
-    : supportedby_(old.supportedby_)
+MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT)::NodeT(const MoertelT::MOERTEL_TEMPLATE_CLASS(NodeT) & old) : supportedby_(old.supportedby_)
 {
   Id_           = old.Id();
   outputlevel_  = old.outputlevel_;

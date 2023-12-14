@@ -13,8 +13,7 @@ static constexpr minitensor::Index MAX_DIM = 3;
 
 //! Nonlinear Solver (NLS) class for the ElastoViscoplastic model
 template <typename EvalT, minitensor::Index M = MAX_DIM>
-class ElastoViscoplasticNLS
-    : public minitensor::Function_Base<ElastoViscoplasticNLS<EvalT, M>, typename EvalT::ScalarT, M>
+class ElastoViscoplasticNLS : public minitensor::Function_Base<ElastoViscoplasticNLS<EvalT, M>, typename EvalT::ScalarT, M>
 {
   using S = typename EvalT::ScalarT;
 

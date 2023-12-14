@@ -12,15 +12,9 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 CahnHillRhoResid<EvalT, Traits>::CahnHillRhoResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      rhoGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      chemTerm(
-          p.get<std::string>("Chemical Energy Term"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      rhoGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      chemTerm(p.get<std::string>("Chemical Energy Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       rhoResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout"))
 {
   haveNoise = p.get<bool>("Have Noise");
@@ -32,14 +26,13 @@ CahnHillRhoResid<EvalT, Traits>::CahnHillRhoResid(Teuchos::ParameterList const& 
   this->addEvaluatedField(rhoResidual);
 
   if (haveNoise) {
-    noiseTerm = decltype(noiseTerm)(
-        p.get<std::string>("Langevin Noise Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+    noiseTerm = decltype(noiseTerm)(p.get<std::string>("Langevin Noise Term"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
     this->addDependentField(noiseTerm.fieldTag());
   }
 
   gamma = p.get<double>("gamma Value");
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   worksetSize = dims[0];
@@ -85,10 +78,8 @@ CahnHillRhoResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData workse
   FST::integrate(rhoResidual.get_view(), chemTerm.get_view(), wBF.get_view(),
                  true);  // "true" sums into
 
-  if (haveNoise)
-
-    FST::integrate(rhoResidual.get_view(), noiseTerm.get_view(), wBF.get_view(),
-                   true);  // "true" sums into
+  if (haveNoise) FST::integrate(rhoResidual.get_view(), noiseTerm.get_view(), wBF.get_view(),
+                                true);  // "true" sums into
 }
 
 template <typename EvalT, typename Traits>
@@ -100,9 +91,7 @@ CahnHillRhoResid<EvalT, Traits>::getValue(std::string const& n)
     return gamma;
 
   else {
-    ALBANY_ABORT(
-        std::endl
-        << "Error! Logic error in getting parameter " << n << " in CahnHillRhoResid::getValue()" << std::endl);
+    ALBANY_ABORT(std::endl << "Error! Logic error in getting parameter " << n << " in CahnHillRhoResid::getValue()" << std::endl);
     return gamma;
   }
 }

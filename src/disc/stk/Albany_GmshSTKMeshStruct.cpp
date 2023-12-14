@@ -20,9 +20,7 @@
 #include "Teuchos_CommHelpers.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
-Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
-    const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<Teuchos_Comm const>&     commT)
+Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<Teuchos_Comm const>& commT)
     : GenericSTKMeshStruct(params, Teuchos::null)
 {
   fname = params->get("Gmsh Input Mesh File Name", "mesh.msh");
@@ -124,8 +122,8 @@ Albany::GmshSTKMeshStruct::GmshSTKMeshStruct(
   shards::CellTopology    shards_ctd     = stk::mesh::get_cell_topology(stk_topo_data);
   const CellTopologyData& ctd            = *shards_ctd.getCellTopologyData();
   cullSubsetParts(ssNames, ssPartVec);
-  this->meshSpecs[0] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-      ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
+  this->meshSpecs[0] =
+      Teuchos::rcp(new Albany::MeshSpecsStruct(ctd, numDim, cub, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
 
   this->initializeSideSetMeshStructs(commT);
 }
@@ -543,8 +541,8 @@ Albany::GmshSTKMeshStruct::loadLegacyMesh()
         ++itria;
         break;
       case 5:  // 8-pt Hexa
-        ss >> hexas[0][ihexa] >> hexas[1][ihexa] >> hexas[2][ihexa] >> hexas[3][ihexa] >> hexas[4][ihexa] >>
-            hexas[5][ihexa] >> hexas[6][ihexa] >> hexas[7][ihexa];
+        ss >> hexas[0][ihexa] >> hexas[1][ihexa] >> hexas[2][ihexa] >> hexas[3][ihexa] >> hexas[4][ihexa] >> hexas[5][ihexa] >> hexas[6][ihexa] >>
+            hexas[7][ihexa];
         hexas[8][ihexa] = reg_phys;
         ++ihexa;
         break;
@@ -902,8 +900,8 @@ Albany::GmshSTKMeshStruct::store_element_info(
       ++itetra;
       break;
     case 5:  // 8-pt Hexa
-      ss >> hexas[0][ihexa] >> hexas[1][ihexa] >> hexas[2][ihexa] >> hexas[3][ihexa] >> hexas[4][ihexa] >>
-          hexas[5][ihexa] >> hexas[6][ihexa] >> hexas[7][ihexa];
+      ss >> hexas[0][ihexa] >> hexas[1][ihexa] >> hexas[2][ihexa] >> hexas[3][ihexa] >> hexas[4][ihexa] >> hexas[5][ihexa] >> hexas[6][ihexa] >>
+          hexas[7][ihexa];
       hexas[8][ihexa] = tags[0];
       ++ihexa;
       break;
@@ -921,8 +919,8 @@ Albany::GmshSTKMeshStruct::store_element_info(
       // NOTE!
       // The node ordering between gmsh and STK for tet10 is the same
       // EXCEPT for the last two. I.e., nodes 8 and 9 are switched!
-      ss >> tet10[0][itet10] >> tet10[1][itet10] >> tet10[2][itet10] >> tet10[3][itet10] >> tet10[4][itet10] >>
-          tet10[5][itet10] >> tet10[6][itet10] >> tet10[7][itet10] >> tet10[9][itet10] >> tet10[8][itet10];
+      ss >> tet10[0][itet10] >> tet10[1][itet10] >> tet10[2][itet10] >> tet10[3][itet10] >> tet10[4][itet10] >> tet10[5][itet10] >> tet10[6][itet10] >>
+          tet10[7][itet10] >> tet10[9][itet10] >> tet10[8][itet10];
       tet10[10][itet10] = tags[0];
       itet10++;
       break;
@@ -1319,10 +1317,7 @@ Albany::GmshSTKMeshStruct::set_all_sides_boundary(std::vector<std::string>& ssNa
 }
 
 void
-Albany::GmshSTKMeshStruct::set_boundaries(
-    const Teuchos::RCP<Teuchos_Comm const>& commT,
-    std::vector<std::string>&               ssNames,
-    std::vector<std::string>&               nsNames)
+Albany::GmshSTKMeshStruct::set_boundaries(const Teuchos::RCP<Teuchos_Comm const>& commT, std::vector<std::string>& ssNames, std::vector<std::string>& nsNames)
 {
   set_all_nodes_boundary(nsNames);
   set_all_sides_boundary(ssNames);
@@ -1491,10 +1486,7 @@ Albany::GmshSTKMeshStruct::get_name_for_physical_names(std::string& name, std::i
 }
 
 void
-Albany::GmshSTKMeshStruct::get_physical_tag_to_surface_tag_map(
-    std::ifstream&      ifile,
-    std::map<int, int>& physical_surface_tags,
-    int                 num_surfaces)
+Albany::GmshSTKMeshStruct::get_physical_tag_to_surface_tag_map(std::ifstream& ifile, std::map<int, int>& physical_surface_tags, int num_surfaces)
 {
   int    surface_tag         = 0;
   double min_x               = 0.0;
@@ -1512,8 +1504,7 @@ Albany::GmshSTKMeshStruct::get_physical_tag_to_surface_tag_map(
   for (int i = 0; i < num_surfaces; i++) {
     std::getline(ifile, line);
     std::stringstream ss(line);
-    ss >> surface_tag >> min_x >> min_y >> min_z >> max_x >> max_y >> max_z >> num_physical_tags >> physical_tag >>
-        num_bounding_curves >> curve_tag;
+    ss >> surface_tag >> min_x >> min_y >> min_z >> max_x >> max_y >> max_z >> num_physical_tags >> physical_tag >> num_bounding_curves >> curve_tag;
 
     ALBANY_PANIC(num_physical_tags > 1, "Cannot support more than one physical tag per surface.\n");
 
@@ -1626,9 +1617,7 @@ Albany::GmshSTKMeshStruct::broadcast_name_tag_pair(
 }
 
 void
-Albany::GmshSTKMeshStruct::broadcast_physical_names(
-    std::map<std::string, int>&             physical_names,
-    const Teuchos::RCP<Teuchos_Comm const>& commT)
+Albany::GmshSTKMeshStruct::broadcast_physical_names(std::map<std::string, int>& physical_names, const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   // Broadcast the number of name-tag pairs
   int num_pairs = physical_names.size();
@@ -1662,9 +1651,7 @@ Albany::GmshSTKMeshStruct::broadcast_physical_names(
 }
 
 void
-Albany::GmshSTKMeshStruct::get_physical_names(
-    std::map<std::string, int>&             physical_names,
-    const Teuchos::RCP<Teuchos_Comm const>& commT)
+Albany::GmshSTKMeshStruct::get_physical_names(std::map<std::string, int>& physical_names, const Teuchos::RCP<Teuchos_Comm const>& commT)
 {
   if (commT->getRank() == 0) {
     read_physical_names_from_file(physical_names);

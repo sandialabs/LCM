@@ -13,21 +13,11 @@ namespace PHAL {
 template <typename EvalT, typename Traits>
 HeatEqResid<EvalT, Traits>::HeatEqResid(Teuchos::ParameterList const& p)
     : wBF(p.get<std::string>("Weighted BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout")),
-      Temperature(
-          p.get<std::string>("QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      Tdot(
-          p.get<std::string>("QP Time Derivative Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      ThermalCond(
-          p.get<std::string>("ThermalConductivity Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
-      TGrad(
-          p.get<std::string>("Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      Temperature(p.get<std::string>("QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      Tdot(p.get<std::string>("QP Time Derivative Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      ThermalCond(p.get<std::string>("ThermalConductivity Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      TGrad(p.get<std::string>("Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       Source(p.get<std::string>("Source Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       TResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Scalar Data Layout")),
       haveSource(p.get<bool>("Have Source")),
@@ -48,13 +38,12 @@ HeatEqResid<EvalT, Traits>::HeatEqResid(Teuchos::ParameterList const& p)
   this->addDependentField(wGradBF);
   if (haveSource) this->addDependentField(Source);
   if (haveAbsorption) {
-    Absorption = decltype(Absorption)(
-        p.get<std::string>("Absorption Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+    Absorption = decltype(Absorption)(p.get<std::string>("Absorption Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
     this->addDependentField(Absorption);
   }
   this->addEvaluatedField(TResidual);
 
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   worksetSize = dims[0];
@@ -70,8 +59,7 @@ HeatEqResid<EvalT, Traits>::HeatEqResid(Teuchos::ParameterList const& p)
     haveConvection = true;
     if (p.isType<bool>("Have Rho Cp")) haverhoCp = p.get<bool>("Have Rho Cp");
     if (haverhoCp) {
-      rhoCp = decltype(rhoCp)(
-          p.get<std::string>("Rho Cp Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
+      rhoCp = decltype(rhoCp)(p.get<std::string>("Rho Cp Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"));
       this->addDependentField(rhoCp);
     }
   }

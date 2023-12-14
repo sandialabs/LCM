@@ -12,12 +12,9 @@
 namespace PHAL {
 
 template <typename EvalT, typename Traits>
-SaveNodalFieldBase<EvalT, Traits>::SaveNodalFieldBase(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SaveNodalFieldBase<EvalT, Traits>::SaveNodalFieldBase(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
-  Teuchos::RCP<Teuchos::ParameterList> paramsFromProblem =
-      p.get<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem");
+  Teuchos::RCP<Teuchos::ParameterList> paramsFromProblem = p.get<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem");
 
   //! Register with state manager
   this->pStateMgr = p.get<Albany::StateManager*>("State Manager Ptr");
@@ -34,16 +31,14 @@ SaveNodalFieldBase<EvalT, Traits>::SaveNodalFieldBase(
     //    dl->dummy)); savexdot_operation = Teuchos::rcp(new
     //    PHX::Tag<ScalarT>(xdotName, dl->node_node_vector));
     //    this->addEvaluatedField(*savexdot_operation);
-    this->pStateMgr->registerStateVariable(
-        this->xName, dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, true);
+    this->pStateMgr->registerStateVariable(this->xName, dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, true);
   }
   if (this->xdotName.length() > 0) {
     //    savexdot_operation = Teuchos::rcp(new PHX::Tag<ScalarT>(xdotName,
     //    dl->dummy)); savexdot_operation = Teuchos::rcp(new
     //    PHX::Tag<ScalarT>(xdotName, dl->node_node_vector));
     //    this->addEvaluatedField(*savexdot_operation);
-    this->pStateMgr->registerStateVariable(
-        this->xdotName, dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, true);
+    this->pStateMgr->registerStateVariable(this->xdotName, dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, true);
   }
   if (this->xdotdotName.length() > 0) {
     //    savexdotdot_operation = Teuchos::rcp(new
@@ -51,8 +46,7 @@ SaveNodalFieldBase<EvalT, Traits>::SaveNodalFieldBase(
     //    Teuchos::rcp(new PHX::Tag<ScalarT>(xdotdotName,
     //    dl->node_node_vector));
     //    this->addEvaluatedField(*savexdotdot_operation);
-    this->pStateMgr->registerStateVariable(
-        this->xdotdotName, dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, true);
+    this->pStateMgr->registerStateVariable(this->xdotdotName, dl->node_node_vector, dl->dummy, "all", "scalar", 0.0, false, true);
   }
 
   // Create field tag
@@ -64,9 +58,7 @@ SaveNodalFieldBase<EvalT, Traits>::SaveNodalFieldBase(
 // **********************************************************************
 template <typename EvalT, typename Traits>
 void
-SaveNodalFieldBase<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& /* fm */)
+SaveNodalFieldBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& /* fm */)
 {
   // do nawthing ...
 }
@@ -77,9 +69,7 @@ SaveNodalFieldBase<EvalT, Traits>::postRegistrationSetup(
 // **********************************************************************
 template <typename Traits>
 
-SaveNodalField<AlbanyTraits::Residual, Traits>::SaveNodalField(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+SaveNodalField<AlbanyTraits::Residual, Traits>::SaveNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : SaveNodalFieldBase<AlbanyTraits::Residual, Traits>(p, dl)
 {
   // Nothing to be done here
@@ -109,8 +99,7 @@ SaveNodalField<AlbanyTraits::Residual, Traits>::postEvaluate(typename Traits::Po
   // Note: we are in postEvaluate so all PEs call this
 
   // Get the node data block container
-  Teuchos::RCP<Adapt::NodalDataVector> node_data =
-      this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
+  Teuchos::RCP<Adapt::NodalDataVector> node_data = this->pStateMgr->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector();
 
   if (this->xName.length() > 0) {
     node_data->saveNodalDataVector(this->xName, x, 0);

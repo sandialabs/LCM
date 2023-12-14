@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-StabilizedPressureResidual<EvalT, Traits>::StabilizedPressureResidual(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+StabilizedPressureResidual<EvalT, Traits>::StabilizedPressureResidual(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : shear_modulus_(p.get<std::string>("Shear Modulus Name"), dl->qp_scalar),
       bulk_modulus_(p.get<std::string>("Bulk Modulus Name"), dl->qp_scalar),
       def_grad_(p.get<std::string>("Deformation Gradient Name"), dl->qp_tensor),
@@ -49,9 +47,7 @@ StabilizedPressureResidual<EvalT, Traits>::StabilizedPressureResidual(
 
 template <typename EvalT, typename Traits>
 void
-StabilizedPressureResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+StabilizedPressureResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(shear_modulus_, fm);
   this->utils.setFieldData(bulk_modulus_, fm);
@@ -122,8 +118,7 @@ StabilizedPressureResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalD
         for (int node = 0; node < num_nodes_; ++node) {
           for (int i = 0; i < num_dims_; ++i) {
             for (int j = 0; j < num_dims_; ++j) {
-              residual_(cell, node) -=
-                  stab_param * J * Cinv(i, j) * pressure_grad_(cell, pt, i) * w_grad_bf_(cell, node, pt, j);
+              residual_(cell, node) -= stab_param * J * Cinv(i, j) * pressure_grad_(cell, pt, i) * w_grad_bf_(cell, node, pt, j);
             }
           }
         }

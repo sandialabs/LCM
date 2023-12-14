@@ -15,10 +15,7 @@ struct ACEiceMiniKernel : public ParallelKernel<EvalT, Traits>
   ///
   /// Constructor
   ///
-  ACEiceMiniKernel(
-      ConstitutiveModel<EvalT, Traits>&    model,
-      Teuchos::ParameterList*              p,
-      Teuchos::RCP<Albany::Layouts> const& dl);
+  ACEiceMiniKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// No copy constructor

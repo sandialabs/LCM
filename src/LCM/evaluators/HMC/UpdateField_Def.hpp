@@ -41,10 +41,7 @@ UpdateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   Albany::StateArray::const_iterator it;
   it = workset.stateArrayPtr->find(name_N);
 
-  ALBANY_PANIC(
-      (it == workset.stateArrayPtr->end()),
-      std::endl
-          << "Error: cannot locate " << name_N << " in UpdateField_Def" << std::endl);
+  ALBANY_PANIC((it == workset.stateArrayPtr->end()), std::endl << "Error: cannot locate " << name_N << " in UpdateField_Def" << std::endl);
 
   Albany::MDArray                         state_N = it->second;
   std::vector<PHX::DataLayout::size_type> dims;
@@ -75,8 +72,7 @@ UpdateField<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
         for (int j = 0; j < dims[1]; ++j)
           for (int k = 0; k < dims[2]; ++k)
             for (int l = 0; l < dims[3]; ++l)
-              for (int m = 0; m < dims[4]; ++m)
-                field_Nplus1(i, j, k, l, m) = state_N(i, j, k, l, m) + field_Inc(i, j, k, l, m);
+              for (int m = 0; m < dims[4]; ++m) field_Nplus1(i, j, k, l, m) = state_N(i, j, k, l, m) + field_Inc(i, j, k, l, m);
       break;
     default: ALBANY_PANIC(size < 1 || size > 5, "Unexpected Array dimensions in UpdateField: " << size);
   }

@@ -13,9 +13,7 @@ namespace LCM {
 // NOTE: beta_0, beta_1 and beta_2 are parameters that enable one to favor
 // tension or shear. The default tensor should be identity.
 template <typename EvalT, typename Traits>
-TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       delta_1(p->get<RealType>("delta_1", 0.5)),
       delta_2(p->get<RealType>("delta_2", 0.5)),
@@ -80,10 +78,7 @@ TvergaardHutchinsonModel<EvalT, Traits>::TvergaardHutchinsonModel(
 }
 template <typename EvalT, typename Traits>
 void
-TvergaardHutchinsonModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+TvergaardHutchinsonModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto jump  = *dep_fields["Vector Jump"];

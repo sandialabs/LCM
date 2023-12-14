@@ -12,22 +12,12 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 MixtureSpecificHeat<EvalT, Traits>::MixtureSpecificHeat(Teuchos::ParameterList const& p)
     : porosity(p.get<std::string>("Porosity Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      gammaSkeleton(
-          p.get<std::string>("Skeleton Specific Heat Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      gammaPoreFluid(
-          p.get<std::string>("Pore-Fluid Specific Heat Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      densitySkeleton(
-          p.get<std::string>("Skeleton Density Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      densityPoreFluid(
-          p.get<std::string>("Pore-Fluid Density Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      gammaSkeleton(p.get<std::string>("Skeleton Specific Heat Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      gammaPoreFluid(p.get<std::string>("Pore-Fluid Specific Heat Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      densitySkeleton(p.get<std::string>("Skeleton Density Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      densityPoreFluid(p.get<std::string>("Pore-Fluid Density Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      mixtureSpecificHeat(
-          p.get<std::string>("Mixture Specific Heat Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+      mixtureSpecificHeat(p.get<std::string>("Mixture Specific Heat Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   this->addDependentField(porosity);
   this->addDependentField(J);
@@ -68,9 +58,8 @@ MixtureSpecificHeat<EvalT, Traits>::evaluateFields(typename Traits::EvalData wor
   // Compute Strain tensor from displacement gradient
   for (int cell = 0; cell < workset.numCells; ++cell) {
     for (int qp = 0; qp < numQPs; ++qp) {
-      mixtureSpecificHeat(cell, qp) =
-          (J(cell, qp) - porosity(cell, qp)) * gammaSkeleton(cell, qp) * densitySkeleton(cell, qp) +
-          porosity(cell, qp) * gammaPoreFluid(cell, qp) * densityPoreFluid(cell, qp);
+      mixtureSpecificHeat(cell, qp) = (J(cell, qp) - porosity(cell, qp)) * gammaSkeleton(cell, qp) * densitySkeleton(cell, qp) +
+                                      porosity(cell, qp) * gammaPoreFluid(cell, qp) * densityPoreFluid(cell, qp);
     }
   }
 }

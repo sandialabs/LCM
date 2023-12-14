@@ -101,10 +101,7 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
   }
 
   void
-  scatterX(
-      Thyra_Vector const&                    x,
-      const Teuchos::Ptr<Thyra_Vector const> x_dot,
-      const Teuchos::Ptr<Thyra_Vector const> x_dotdot);
+  scatterX(Thyra_Vector const& x, const Teuchos::Ptr<Thyra_Vector const> x_dot, const Teuchos::Ptr<Thyra_Vector const> x_dotdot);
 
   void
   scatterX(const Thyra_MultiVector& soln);

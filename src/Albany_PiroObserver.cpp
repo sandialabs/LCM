@@ -51,11 +51,7 @@ PiroObserver::observeSolution(Thyra_Vector const& solution, Thyra_Vector const& 
 }
 
 void
-PiroObserver::observeSolution(
-    Thyra_Vector const& solution,
-    Thyra_Vector const& solution_dot,
-    Thyra_Vector const& solution_dotdot,
-    const ST            stamp)
+PiroObserver::observeSolution(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, Thyra_Vector const& solution_dotdot, const ST stamp)
 {
   this->observeSolutionImpl(solution, solution_dot, solution_dotdot, stamp);
   stepper_counter_++;
@@ -83,8 +79,7 @@ PiroObserver::observeSolutionImpl(Thyra_Vector const& solution, const ST default
 
   // observe responses
   if (observe_responses_ == true) {
-    if (stepper_counter_ % observe_responses_every_n_steps_ == 0)
-      this->observeResponse(defaultStamp, Teuchos::rcpFromRef(solution));
+    if (stepper_counter_ % observe_responses_every_n_steps_ == 0) this->observeResponse(defaultStamp, Teuchos::rcpFromRef(solution));
   }
 }
 
@@ -103,11 +98,7 @@ PiroObserver::observeSolutionImpl(Thyra_Vector const& solution, Thyra_Vector con
 }
 
 void
-PiroObserver::observeSolutionImpl(
-    Thyra_Vector const& solution,
-    Thyra_Vector const& solution_dot,
-    Thyra_Vector const& solution_dotdot,
-    const ST            defaultStamp)
+PiroObserver::observeSolutionImpl(Thyra_Vector const& solution, Thyra_Vector const& solution_dot, Thyra_Vector const& solution_dotdot, const ST defaultStamp)
 {
   // Determine the stamp associated with the snapshot
   const ST stamp = impl_.getTimeParamValueOrDefault(defaultStamp);
@@ -116,11 +107,7 @@ PiroObserver::observeSolutionImpl(
   // observe responses
   if (observe_responses_ == true) {
     if (stepper_counter_ % observe_responses_every_n_steps_ == 0)
-      this->observeResponse(
-          defaultStamp,
-          Teuchos::rcpFromRef(solution),
-          Teuchos::rcpFromRef(solution_dot),
-          Teuchos::rcpFromRef(solution_dotdot));
+      this->observeResponse(defaultStamp, Teuchos::rcpFromRef(solution), Teuchos::rcpFromRef(solution_dot), Teuchos::rcpFromRef(solution_dotdot));
   }
 }
 
@@ -198,8 +185,7 @@ PiroObserver::observeResponse(
 
       Teuchos::RCP<Thyra::VectorBase<double>> g = outArgs.get_g(i);
       *out << ss.str();  // "   Response[" << i << "] = ";
-      for (Thyra::Ordinal k = 0; k < g->space()->dim(); k++)
-        *out << std::setw(value_width) << Thyra::get_ele(*g, k) << " ";
+      for (Thyra::Ordinal k = 0; k < g->space()->dim(); k++) *out << std::setw(value_width) << Thyra::get_ele(*g, k) << " ";
       *out << std::endl;
 
       if (firstResponseObtained && calculateRelativeResponses)

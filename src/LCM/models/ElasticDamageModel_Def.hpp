@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ElasticDamageModel<EvalT, Traits>::ElasticDamageModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ElasticDamageModel<EvalT, Traits>::ElasticDamageModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       max_damage_(p->get<RealType>("Maximum damage", 1.0)),
       saturation_(p->get<RealType>("Damage saturation", 0.0))
@@ -65,10 +63,7 @@ ElasticDamageModel<EvalT, Traits>::ElasticDamageModel(
 }
 template <typename EvalT, typename Traits>
 void
-ElasticDamageModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+ElasticDamageModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // bool print = false;
   // if (typeid(ScalarT) == typeid(RealType)) print = true;
@@ -115,8 +110,7 @@ ElasticDamageModel<EvalT, Traits>::computeState(
     for (int pt = 0; pt < num_pts_; ++pt) {
       // local parameters
       mu   = elastic_modulus(cell, pt) / (2.0 * (1.0 + poissons_ratio(cell, pt)));
-      lame = elastic_modulus(cell, pt) * poissons_ratio(cell, pt) / (1.0 + poissons_ratio(cell, pt)) /
-             (1.0 - 2.0 * poissons_ratio(cell, pt));
+      lame = elastic_modulus(cell, pt) * poissons_ratio(cell, pt) / (1.0 + poissons_ratio(cell, pt)) / (1.0 - 2.0 * poissons_ratio(cell, pt));
 
       // small strain tensor
       epsilon.fill(strain, cell, pt, 0, 0);

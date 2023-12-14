@@ -17,16 +17,12 @@ LocalNonlinearSolver_Base<EvalT, Traits>::LocalNonlinearSolver_Base() : lapack()
 // Residual
 // -----------------------------------------------------------------------------
 template <typename Traits>
-LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>::LocalNonlinearSolver()
-    : LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Residual, Traits>()
+LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>::LocalNonlinearSolver() : LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Residual, Traits>()
 {
 }
 
 template <typename Traits>
-void inline LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>::solve(
-    std::vector<ScalarT>& A,
-    std::vector<ScalarT>& X,
-    std::vector<ScalarT>& B)
+void inline LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>::solve(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B)
 {
   // system size
   int numLocalVars = B.size();
@@ -44,10 +40,7 @@ void inline LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>::solve(
 
 template <typename Traits>
 void
-LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>::computeFadInfo(
-    std::vector<ScalarT>& A,
-    std::vector<ScalarT>& X,
-    std::vector<ScalarT>& B)
+LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>::computeFadInfo(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B)
 {
   // no-op
 }
@@ -56,17 +49,13 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>::computeFadInfo(
 // Jacobian
 // -----------------------------------------------------------------------------
 template <typename Traits>
-LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::LocalNonlinearSolver()
-    : LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Jacobian, Traits>()
+LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::LocalNonlinearSolver() : LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Jacobian, Traits>()
 {
 }
 
 template <typename Traits>
 void
-LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::solve(
-    std::vector<ScalarT>& A,
-    std::vector<ScalarT>& X,
-    std::vector<ScalarT>& B)
+LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::solve(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B)
 {
   // system size
   int numLocalVars = B.size();
@@ -94,10 +83,7 @@ LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::solve(
 
 template <typename Traits>
 void
-LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::computeFadInfo(
-    std::vector<ScalarT>& A,
-    std::vector<ScalarT>& X,
-    std::vector<ScalarT>& B)
+LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>::computeFadInfo(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B)
 {
   // local system size
   int numLocalVars  = B.size();

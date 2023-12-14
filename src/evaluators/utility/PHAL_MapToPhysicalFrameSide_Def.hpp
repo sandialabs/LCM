@@ -13,9 +13,7 @@ namespace PHAL {
 
 //**********************************************************************
 template <typename EvalT, typename Traits>
-MapToPhysicalFrameSide<EvalT, Traits>::MapToPhysicalFrameSide(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl_side)
+MapToPhysicalFrameSide<EvalT, Traits>::MapToPhysicalFrameSide(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl_side)
 {
   sideSetName = p.get<std::string>("Side Set Name");
 
@@ -24,9 +22,8 @@ MapToPhysicalFrameSide<EvalT, Traits>::MapToPhysicalFrameSide(
       "Error! The layouts structure does not appear to be that of a side "
       "set.\n");
 
-  coords_side_vertices =
-      decltype(coords_side_vertices)(p.get<std::string>("Coordinate Vector Vertex Name"), dl_side->vertices_vector);
-  coords_side_qp = decltype(coords_side_qp)(p.get<std::string>("Coordinate Vector QP Name"), dl_side->qp_coords);
+  coords_side_vertices = decltype(coords_side_vertices)(p.get<std::string>("Coordinate Vector Vertex Name"), dl_side->vertices_vector);
+  coords_side_qp       = decltype(coords_side_qp)(p.get<std::string>("Coordinate Vector QP Name"), dl_side->qp_coords);
 
   this->addDependentField(coords_side_vertices.fieldTag());
   this->addEvaluatedField(coords_side_qp);
@@ -38,11 +35,11 @@ MapToPhysicalFrameSide<EvalT, Traits>::MapToPhysicalFrameSide(
   int sideDim  = numDim - 1;
 
   // Compute cubature points in reference elements
-  auto cubature = p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature");
+  auto                                       cubature = p.get<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature");
   Kokkos::DynRankView<RealType, PHX::Device> ref_cub_points, ref_weights;
   ref_cub_points = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numSideQPs, sideDim);
   ref_weights    = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numSideQPs);  // Not needed per se, but need to be
-                                                                                // passed to the following function call
+                                                                                   // passed to the following function call
   cubature->getCubature(ref_cub_points, ref_weights);
 
   // Index of the vertices on the sides in the numeration of the cell
@@ -64,9 +61,7 @@ MapToPhysicalFrameSide<EvalT, Traits>::MapToPhysicalFrameSide(
 //**********************************************************************
 template <typename EvalT, typename Traits>
 void
-MapToPhysicalFrameSide<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+MapToPhysicalFrameSide<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(coords_side_vertices, fm);
   this->utils.setFieldData(coords_side_qp, fm);
@@ -92,8 +87,7 @@ MapToPhysicalFrameSide<EvalT, Traits>::evaluateFields(typename Traits::EvalData 
       for (int dim = 0; dim < numDim; ++dim) {
         coords_side_qp(cell, side, qp, dim) = 0;
         for (int v = 0; v < numSideVertices[side]; ++v)
-          coords_side_qp(cell, side, qp, dim) +=
-              coords_side_vertices(cell, side, v, dim) * phi_at_cub_points[side](v, qp);
+          coords_side_qp(cell, side, qp, dim) += coords_side_vertices(cell, side, v, dim) * phi_at_cub_points[side](v, qp);
       }
     }
   }

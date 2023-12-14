@@ -13,9 +13,7 @@ namespace LCM {
 
 template <typename EvalT, typename Traits>
 BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
-    : biotModulus(
-          p.get<std::string>("Biot Modulus Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
+    : biotModulus(p.get<std::string>("Biot Modulus Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   Teuchos::ParameterList* elmd_list = p.get<Teuchos::ParameterList*>("Parameter List");
 
@@ -55,7 +53,7 @@ BiotModulus<EvalT, Traits>::BiotModulus(Teuchos::ParameterList& p)
 
   if (p.isType<std::string>("Biot Coefficient Name")) {
     Teuchos::RCP<PHX::DataLayout> scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout");
-    biotCoefficient = decltype(biotCoefficient)(p.get<std::string>("Biot Coefficient Name"), scalar_dl);
+    biotCoefficient                         = decltype(biotCoefficient)(p.get<std::string>("Biot Coefficient Name"), scalar_dl);
     this->addDependentField(biotCoefficient);
   }
 
@@ -93,8 +91,7 @@ BiotModulus<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     for (int cell = 0; cell < numCells; ++cell) {
       for (int qp = 0; qp < numQPs; ++qp) {
         // 1/M = (B-phi)/Ks + phi/Kf
-        biotModulus(cell, qp) = 1 / ((biotCoefficient(cell, qp) - porosity(cell, qp)) / GrainBulkModulus +
-                                     porosity(cell, qp) / FluidBulkModulus);
+        biotModulus(cell, qp) = 1 / ((biotCoefficient(cell, qp) - porosity(cell, qp)) / GrainBulkModulus + porosity(cell, qp) / FluidBulkModulus);
       }
     }
   }
@@ -111,9 +108,7 @@ BiotModulus<EvalT, Traits>::getValue(std::string const& n)
     return FluidBulkModulus;
   else if (n == "Grain Bulk Modulus Value")
     return GrainBulkModulus;
-  ALBANY_ABORT(
-      std::endl
-      << "Error! Logic error in getting paramter " << n << " in BiotModulus::getValue()" << std::endl);
+  ALBANY_ABORT(std::endl << "Error! Logic error in getting paramter " << n << " in BiotModulus::getValue()" << std::endl);
   return constant_value;
 }
 

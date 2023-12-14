@@ -64,10 +64,7 @@ template <typename EvalT, typename Traits>
 class ProjectIPtoNodalField : public ProjectIPtoNodalFieldBase<EvalT, Traits>
 {
  public:
-  ProjectIPtoNodalField(
-      Teuchos::ParameterList& /* p */,
-      const Teuchos::RCP<Albany::Layouts>& dl,
-      Albany::MeshSpecsStruct const* /* mesh_specs */)
+  ProjectIPtoNodalField(Teuchos::ParameterList& /* p */, const Teuchos::RCP<Albany::Layouts>& dl, Albany::MeshSpecsStruct const* /* mesh_specs */)
       : ProjectIPtoNodalFieldBase<EvalT, Traits>(dl)
   {
   }
@@ -84,14 +81,10 @@ class ProjectIPtoNodalFieldManager;
 class ProjectIPtoNodalFieldQuadrature;
 
 template <typename Traits>
-class ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>
-    : public ProjectIPtoNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>
+class ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits> : public ProjectIPtoNodalFieldBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  ProjectIPtoNodalField(
-      Teuchos::ParameterList&              p,
-      const Teuchos::RCP<Albany::Layouts>& dl,
-      Albany::MeshSpecsStruct const*       mesh_specs);
+  ProjectIPtoNodalField(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl, Albany::MeshSpecsStruct const* mesh_specs);
   void
   postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);
   void

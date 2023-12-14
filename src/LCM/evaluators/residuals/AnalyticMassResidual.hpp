@@ -148,8 +148,7 @@ class AnalyticMassResidual;
 // Residual
 // **************************************************************
 template <typename Traits>
-class AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>
-    : public AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>
+class AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits> : public AnalyticMassResidualBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   AnalyticMassResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -165,8 +164,7 @@ class AnalyticMassResidual<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // **************************************************************
 template <typename Traits>
-class AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>
+class AnalyticMassResidual<PHAL::AlbanyTraits::Jacobian, Traits> : public AnalyticMassResidualBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   AnalyticMassResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);

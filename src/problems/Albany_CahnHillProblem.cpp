@@ -15,20 +15,14 @@ Albany::CahnHillProblem::CahnHillProblem(
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_,
     Teuchos::RCP<Teuchos::Comm<int> const>&     commT_)
-    : Albany::AbstractProblem(params_, paramLib_, 2),
-      numDim(numDim_),
-      haveNoise(false),
-      commT(commT_),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_, 2), numDim(numDim_), haveNoise(false), commT(commT_), use_sdbcs_(false)
 {
 }
 
 Albany::CahnHillProblem::~CahnHillProblem() {}
 
 void
-Albany::CahnHillProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::CahnHillProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   ALBANY_PANIC(meshSpecs.size() != 1, "Problem supports one Material Block");

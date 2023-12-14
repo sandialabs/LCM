@@ -40,10 +40,7 @@ NeohookeanModel<EvalT, Traits>::NeohookeanModel(Teuchos::ParameterList* p, const
 
 template <typename EvalT, typename Traits>
 void
-NeohookeanModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+NeohookeanModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   std::string F_string = (*field_name_map_)["F"];
   std::string J_string = (*field_name_map_)["J"];
@@ -111,8 +108,7 @@ NeohookeanModel<EvalT, Traits>::computeState(
       }
 
       if (compute_energy_ == true) {
-        energy(cell, pt) =
-            0.5 * kappa * (0.5 * (J * J - 1.0) - std::log(J)) + 0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
+        energy(cell, pt) = 0.5 * kappa * (0.5 * (J * J - 1.0) - std::log(J)) + 0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
       }
 
       if (compute_tangent_ == true) {

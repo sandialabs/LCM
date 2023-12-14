@@ -21,8 +21,7 @@ namespace LCM {
 */
 
 template <typename EvalT, typename Traits>
-class ThermoPoroPlasticityResidEnergy : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                        public PHX::EvaluatorDerived<EvalT, Traits>
+class ThermoPoroPlasticityResidEnergy : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ThermoPoroPlasticityResidEnergy(Teuchos::ParameterList const& p);

@@ -40,8 +40,7 @@ class LocalNonlinearSolver;
 // Residual
 // -----------------------------------------------------------------------------
 template <typename Traits>
-class LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>
-    : public LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Residual, Traits>
+class LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits> : public LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
   typedef typename PHAL::AlbanyTraits::Residual::ScalarT ScalarT;
@@ -56,8 +55,7 @@ class LocalNonlinearSolver<PHAL::AlbanyTraits::Residual, Traits>
 // Jacobian
 // -----------------------------------------------------------------------------
 template <typename Traits>
-class LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits>
-    : public LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Jacobian, Traits>
+class LocalNonlinearSolver<PHAL::AlbanyTraits::Jacobian, Traits> : public LocalNonlinearSolver_Base<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
   typedef typename PHAL::AlbanyTraits::Jacobian::ScalarT ScalarT;

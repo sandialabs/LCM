@@ -13,12 +13,8 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 JouleHeating<EvalT, Traits>::JouleHeating(Teuchos::ParameterList& p)
-    : potentialGrad(
-          p.get<std::string>("Gradient Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      potentialFlux(
-          p.get<std::string>("Flux Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+    : potentialGrad(p.get<std::string>("Gradient Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      potentialFlux(p.get<std::string>("Flux Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
       jouleHeating(p.get<std::string>("Source Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout"))
 {
   Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
@@ -48,8 +44,7 @@ template <typename EvalT, typename Traits>
 void
 JouleHeating<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  Intrepid2::FunctionSpaceTools<PHX::Device>::dotMultiplyDataData(
-      jouleHeating.get_view(), potentialFlux.get_view(), potentialGrad.get_view());
+  Intrepid2::FunctionSpaceTools<PHX::Device>::dotMultiplyDataData(jouleHeating.get_view(), potentialFlux.get_view(), potentialGrad.get_view());
 }
 // **********************************************************************
 // **********************************************************************

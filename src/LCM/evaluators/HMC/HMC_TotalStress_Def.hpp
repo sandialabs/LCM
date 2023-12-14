@@ -22,8 +22,7 @@ TotalStress<EvalT, Traits>::TotalStress(Teuchos::ParameterList const& p, const T
     std::string ms = Albany::strint("Micro Stress", i);
     std::string msname(ms);
     msname += " Name";
-    microStress[i] = Teuchos::rcp(
-        new cHMC2Tensor(p.get<std::string>(msname), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
+    microStress[i] = Teuchos::rcp(new cHMC2Tensor(p.get<std::string>(msname), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
     this->addDependentField(*(microStress[i]));
   }
 
@@ -57,8 +56,7 @@ TotalStress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       for (std::size_t i = 0; i < numDims; ++i) {
         for (std::size_t j = 0; j < numDims; ++j) {
           totalStress(cell, qp, i, j) = macroStress(cell, qp, i, j);
-          for (std::size_t k = 0; k < numMicroScales; ++k)
-            totalStress(cell, qp, i, j) += (*microStress[k])(cell, qp, i, j);
+          for (std::size_t k = 0; k < numMicroScales; ++k) totalStress(cell, qp, i, j) += (*microStress[k])(cell, qp, i, j);
         }
       }
     }

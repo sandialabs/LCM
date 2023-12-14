@@ -8,8 +8,7 @@
 
 namespace Adapt {
 
-NodalDataBase::NodalDataBase()
-    : nodeContainer(Teuchos::rcp(new Albany::NodeFieldContainer)), vectorsize(0), initialized(false)
+NodalDataBase::NodalDataBase() : nodeContainer(Teuchos::rcp(new Albany::NodeFieldContainer)), vectorsize(0), initialized(false)
 {
   // Nothing to be done here
 }
@@ -27,10 +26,7 @@ NodalDataBase::registerVectorState(std::string const& stateName, int ndofs)
   // implies access order.
   auto it = nodeVectorMap.find(stateName);
 
-  ALBANY_PANIC(
-      (it != nodeVectorMap.end()),
-      std::endl
-          << "Error: found duplicate entry " << stateName << " in NodalDataVector");
+  ALBANY_PANIC((it != nodeVectorMap.end()), std::endl << "Error: found duplicate entry " << stateName << " in NodalDataVector");
 
   NodeFieldSize size;
   size.name   = stateName;
@@ -76,9 +72,7 @@ NodalDataBase::replaceOwnedVectorSpace(Teuchos::RCP<Thyra_VectorSpace const> con
 }
 
 void
-NodalDataBase::replaceOverlapVectorSpace(
-    const Teuchos::Array<GO>&               overlap_nodeGIDs,
-    const Teuchos::RCP<Teuchos_Comm const>& comm_)
+NodalDataBase::replaceOverlapVectorSpace(const Teuchos::Array<GO>& overlap_nodeGIDs, const Teuchos::RCP<Teuchos_Comm const>& comm_)
 {
   initialize();
 
@@ -88,9 +82,7 @@ NodalDataBase::replaceOverlapVectorSpace(
 }
 
 void
-NodalDataBase::replaceOwnedVectorSpace(
-    const Teuchos::Array<GO>&               local_nodeGIDs,
-    const Teuchos::RCP<Teuchos_Comm const>& comm_)
+NodalDataBase::replaceOwnedVectorSpace(const Teuchos::Array<GO>& local_nodeGIDs, const Teuchos::RCP<Teuchos_Comm const>& comm_)
 {
   initialize();
 

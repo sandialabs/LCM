@@ -16,11 +16,7 @@ Albany::ThermalProblem::ThermalProblem(
     // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib_,
     int const                               numDim_,
     Teuchos::RCP<Teuchos::Comm<int> const>& commT_)
-    : Albany::AbstractProblem(params_, paramLib_ /*, distParamLib_*/),
-      params(params_),
-      numDim(numDim_),
-      commT(commT_),
-      use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_ /*, distParamLib_*/), params(params_), numDim(numDim_), commT(commT_), use_sdbcs_(false)
 {
   this->setNumEquations(1);
   // We just have 1 PDE/node
@@ -39,9 +35,7 @@ Albany::ThermalProblem::ThermalProblem(
 Albany::ThermalProblem::~ThermalProblem() {}
 
 void
-Albany::ThermalProblem::buildProblem(
-    Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs,
-    Albany::StateManager&                                    stateMgr)
+Albany::ThermalProblem::buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, Albany::StateManager& stateMgr)
 {
   /* Construct All Phalanx Evaluators */
   int physSets = meshSpecs.size();
@@ -145,8 +139,7 @@ Albany::ThermalProblem::constructNeumannEvaluators(const Teuchos::RCP<Albany::Me
   condNames[4] = "radiate";
 
   nfm.resize(1);  // Heat problem only has one physics set
-  nfm[0] = bcUtils.constructBCEvaluators(
-      meshSpecs, bcNames, dof_names, false, 0, condNames, offsets, dl, this->params, this->paramLib);
+  nfm[0] = bcUtils.constructBCEvaluators(meshSpecs, bcNames, dof_names, false, 0, condNames, offsets, dl, this->params, this->paramLib);
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>
@@ -156,8 +149,7 @@ Albany::ThermalProblem::getValidProblemParameters() const
 
   Teuchos::Array<double> defaultData;
   defaultData.resize(numDim, 1.0);
-  validPL->set<Teuchos::Array<double>>(
-      "Thermal Conductivity", defaultData, "Arrays of values of thermal conductivities in x, y, z [required]");
+  validPL->set<Teuchos::Array<double>>("Thermal Conductivity", defaultData, "Arrays of values of thermal conductivities in x, y, z [required]");
   validPL->set<double>("Heat Capacity", 1.0, "Value of heat capacity [required]");
   validPL->set<double>("Density", 1.0, "Value of density [required]");
 

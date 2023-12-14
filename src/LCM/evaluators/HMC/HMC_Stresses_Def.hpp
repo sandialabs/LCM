@@ -33,20 +33,17 @@ Stresses<EvalT, Traits>::Stresses(Teuchos::ParameterList const& p)
   for (int i = 0; i < numMicroScales; i++) {
     std::stringstream sdname;
     sdname << "Strain Difference " << i << " Name";
-    strainDifference[i] = Teuchos::rcp(new cHMC2Tensor(
-        p.get<std::string>(sdname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
+    strainDifference[i] = Teuchos::rcp(new cHMC2Tensor(p.get<std::string>(sdname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
     std::stringstream sdgradname;
     sdgradname << "Micro Strain Gradient " << i << " Name";
-    microStrainGradient[i] = Teuchos::rcp(new cHMC3Tensor(
-        p.get<std::string>(sdgradname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")));
+    microStrainGradient[i] =
+        Teuchos::rcp(new cHMC3Tensor(p.get<std::string>(sdgradname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")));
     std::stringstream msname;
     msname << "Micro Stress " << i << " Name";
-    microStress[i] = Teuchos::rcp(new HMC2Tensor(
-        p.get<std::string>(msname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
+    microStress[i] = Teuchos::rcp(new HMC2Tensor(p.get<std::string>(msname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 2Tensor Data Layout")));
     std::stringstream dsname;
     dsname << "Double Stress " << i << " Name";
-    doubleStress[i] = Teuchos::rcp(new HMC3Tensor(
-        p.get<std::string>(dsname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")));
+    doubleStress[i] = Teuchos::rcp(new HMC3Tensor(p.get<std::string>(dsname.str()), p.get<Teuchos::RCP<PHX::DataLayout>>("QP 3Tensor Data Layout")));
   }
 
   lengthScale.resize(numMicroScales);

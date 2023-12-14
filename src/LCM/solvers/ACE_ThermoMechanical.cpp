@@ -65,19 +65,14 @@ deleteParallel(std::string const& filename, Teuchos::RCP<Teuchos::Comm<int> cons
 }
 
 void
-renameParallel(
-    std::string const&                     old_filename,
-    std::string const&                     new_filename,
-    Teuchos::RCP<Teuchos::Comm<int> const> comm)
+renameParallel(std::string const& old_filename, std::string const& new_filename, Teuchos::RCP<Teuchos::Comm<int> const> comm)
 {
   int const num_ranks = comm->getSize();
   int const this_rank = comm->getRank();
   if (num_ranks > 1) {
-    std::string const full_old_filename =
-        old_filename + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
-    std::string const full_new_filename =
-        new_filename + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
-    auto const file_renamed = rename(full_old_filename.c_str(), full_new_filename.c_str());
+    std::string const full_old_filename = old_filename + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
+    std::string const full_new_filename = new_filename + "." + std::to_string(num_ranks) + "." + std::to_string(this_rank);
+    auto const        file_renamed      = rename(full_old_filename.c_str(), full_new_filename.c_str());
     ALBANY_ASSERT(file_renamed == 0, "Could not rename file : " << full_old_filename << " to " << full_new_filename);
   } else {
     auto const file_renamed = rename(old_filename.c_str(), new_filename.c_str());
@@ -88,9 +83,7 @@ renameParallel(
 
 namespace LCM {
 
-ACEThermoMechanical::ACEThermoMechanical(
-    Teuchos::RCP<Teuchos::ParameterList> const&   app_params,
-    Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
+ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> const& app_params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
     : fos_(Teuchos::VerboseObjectBase::getDefaultOStream()), comm_(comm)
 {
   alt_system_params_ = Teuchos::sublist(app_params, "Alternating System");
@@ -176,8 +169,7 @@ ACEThermoMechanical::ACEThermoMechanical(
     } else if (problem_name == "ACE Thermal") {
       prob_types_[subdomain] = THERMAL;
     } else {
-      ALBANY_ABORT(
-          "ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
+      ALBANY_ABORT("ACE Sequential thermo-mechanical solver only supports coupling of 'Mechanics' and 'ACE Thermal' problems!");
     }
 
     auto const problem_type = prob_types_[subdomain];
@@ -198,10 +190,8 @@ ACEThermoMechanical::ACEThermoMechanical(
 
       tempus_params.set("Abort on Failure", false);
 
-      Teuchos::ParameterList& time_step_control_params = piro_params.sublist("Tempus")
-                                                             .sublist("Tempus Integrator")
-                                                             .sublist("Time Step Control")
-                                                             .sublist("Time Step Control Strategy");
+      Teuchos::ParameterList& time_step_control_params =
+          piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control").sublist("Time Step Control Strategy");
 
       std::string const integrator_step_type = time_step_control_params.get("Strategy Type", "Constant");
 
@@ -221,10 +211,8 @@ ACEThermoMechanical::ACEThermoMechanical(
         Teuchos::ParameterList& tempus_params = piro_params.sublist("Tempus");
         tempus_params.set("Abort on Failure", false);
 
-        Teuchos::ParameterList& time_step_control_params = piro_params.sublist("Tempus")
-                                                               .sublist("Tempus Integrator")
-                                                               .sublist("Time Step Control")
-                                                               .sublist("Time Step Control Strategy");
+        Teuchos::ParameterList& time_step_control_params =
+            piro_params.sublist("Tempus").sublist("Tempus Integrator").sublist("Time Step Control").sublist("Time Step Control Strategy");
 
         std::string const integrator_step_type = time_step_control_params.get("Strategy Type", "Constant");
 
@@ -238,9 +226,7 @@ ACEThermoMechanical::ACEThermoMechanical(
         ALBANY_ASSERT(integrator_step_type == "Constant", msg);
       } else {
         mechanical_solver_ = MechanicalSolver::TrapezoidRule;
-        ALBANY_ASSERT(
-            is_trapezoid_rule == true,
-            "ACE Thermomechanical Coupling requires Tempus or Trapezoid Rule for mechanical solve.");
+        ALBANY_ASSERT(is_trapezoid_rule == true, "ACE Thermomechanical Coupling requires Tempus or Trapezoid Rule for mechanical solve.");
       }
     } else {
       ALBANY_ABORT("ACE Thermomechanical Coupling only supports coupling of ACE Thermal and Mechanical problems.");
@@ -421,16 +407,14 @@ ACEThermoMechanical::createOutArgsImpl() const
   oas.setSupports(Thyra_ModelEvaluator::OUT_ARG_W_op, true);
   oas.setSupports(Thyra_ModelEvaluator::OUT_ARG_W_prec, false);
 
-  oas.set_W_properties(Thyra_ModelEvaluator::DerivativeProperties(
-      Thyra_ModelEvaluator::DERIV_LINEARITY_UNKNOWN, Thyra_ModelEvaluator::DERIV_RANK_FULL, true));
+  oas.set_W_properties(Thyra_ModelEvaluator::DerivativeProperties(Thyra_ModelEvaluator::DERIV_LINEARITY_UNKNOWN, Thyra_ModelEvaluator::DERIV_RANK_FULL, true));
 
   return static_cast<Thyra_OutArgs>(oas);
 }
 
 // Evaluate model on InArgs
 void
-ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&)
-    const
+ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&) const
 {
   ThermoMechanicalLoopDynamics();
 }
@@ -502,8 +486,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
   problem_params.set<double>("ACE Thermomechanical Problem Current Time", current_time);
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
-  Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
-      solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
+  Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
 
   solvers_[subdomain] = solver;
   apps_[subdomain]    = app;
@@ -542,11 +525,7 @@ ACEThermoMechanical::createThermalSolverAppDiscME(int const file_index, double c
 }
 
 void
-ACEThermoMechanical::createMechanicalSolverAppDiscME(
-    int const    file_index,
-    double const current_time,
-    double const next_time,
-    double const time_step) const
+ACEThermoMechanical::createMechanicalSolverAppDiscME(int const file_index, double const current_time, double const next_time, double const time_step) const
 {
   auto const              subdomain      = 1;
   Teuchos::ParameterList& params         = solver_factories_[subdomain]->getParameters();
@@ -619,15 +598,13 @@ ACEThermoMechanical::createMechanicalSolverAppDiscME(
   }
 
   Teuchos::RCP<Albany::Application>                       app{Teuchos::null};
-  Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver =
-      solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
+  Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>> solver = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
 
   solvers_[subdomain] = solver;
   apps_[subdomain]    = app;
   auto num_dims       = app->getSpatialDimension();
   if (num_dims != 3) {
-    ALBANY_ABORT(
-        "ACE Thermo-Mechanical solver only works in 3D!  Mechanics problem has " << num_dims << " dimensions.");
+    ALBANY_ABORT("ACE Thermo-Mechanical solver only works in 3D!  Mechanics problem has " << num_dims << " dimensions.");
   }
 
   // Get STK mesh structs to control Exodus output interval

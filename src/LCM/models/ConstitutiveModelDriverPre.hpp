@@ -17,8 +17,7 @@ namespace LCM {
 
 /// \brief Constitutive Model Driver
 template <typename EvalT, typename Traits>
-class ConstitutiveModelDriverPre : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                   public PHX::EvaluatorDerived<EvalT, Traits>
+class ConstitutiveModelDriverPre : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   ///

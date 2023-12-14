@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-HyperelasticDamageModel<EvalT, Traits>::HyperelasticDamageModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+HyperelasticDamageModel<EvalT, Traits>::HyperelasticDamageModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       max_damage_(p->get<RealType>("Maximum Damage", 1.0)),
       damage_saturation_(p->get<RealType>("Damage Saturation", 1.0))
@@ -55,10 +53,7 @@ HyperelasticDamageModel<EvalT, Traits>::HyperelasticDamageModel(
 }
 template <typename EvalT, typename Traits>
 void
-HyperelasticDamageModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+HyperelasticDamageModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto def_grad        = *dep_fields["F"];
@@ -116,20 +111,17 @@ HyperelasticDamageModel<EvalT, Traits>::computeState(
       mubar = (1.0 / 3.0) * mu * Jm23 * minitensor::trace(b);
       sigma = 0.5 * kappa * (J(cell, pt) - 1. / J(cell, pt)) * I + mu * Jm53 * minitensor::dev(b);
 
-      energy = 0.5 * kappa * (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) +
-               0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
+      energy = 0.5 * kappa * (0.5 * (J(cell, pt) * J(cell, pt) - 1.0) - std::log(J(cell, pt))) + 0.5 * mu * (Jm23 * minitensor::trace(b) - 3.0);
 
       if (have_temperature_) {
         ScalarT delta_temp = temperature_(cell, pt) - ref_temperature_;
-        energy += heat_capacity_ *
-                      ((delta_temp)-temperature_(cell, pt) * std::log(temperature_(cell, pt) / ref_temperature_)) -
+        energy += heat_capacity_ * ((delta_temp)-temperature_(cell, pt) * std::log(temperature_(cell, pt) / ref_temperature_)) -
                   3.0 * kappa * expansion_coeff_ * (J(cell, pt) - 1.0 / J(cell, pt)) * delta_temp;
       }
 
       alpha(cell, pt) = std::max((ScalarT)alpha_old(cell, pt), energy);
 
-      source(cell, pt) = (max_damage_ / damage_saturation_) * std::exp(-alpha(cell, pt) / damage_saturation_) *
-                         (alpha(cell, pt) - alpha_old(cell, pt)) / dt;
+      source(cell, pt) = (max_damage_ / damage_saturation_) * std::exp(-alpha(cell, pt) / damage_saturation_) * (alpha(cell, pt) - alpha_old(cell, pt)) / dt;
 
       if (!have_damage_) {
         damage(cell, pt) = max_damage_ * (1.0 - std::exp(-alpha(cell, pt) / damage_saturation_));

@@ -73,10 +73,7 @@ LinearHMCModel<EvalT, Traits>::LinearHMCModel(Teuchos::ParameterList* p, const T
 }
 template <typename EvalT, typename Traits>
 void
-LinearHMCModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+LinearHMCModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract independent MDFields
   auto                                     macroStrain = *dep_fields[macroStrainName];
@@ -122,8 +119,7 @@ LinearHMCModel<EvalT, Traits>::computeState(
         ScalarT beta = betaParameter[i];
         for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
           for (std::size_t qp = 0; qp < num_pts_; ++qp) {
-            ScalarT const e1 = sd(cell, qp, 0, 0), e2 = sd(cell, qp, 1, 1), e3 = sd(cell, qp, 0, 1),
-                          e4   = sd(cell, qp, 1, 0);
+            ScalarT const e1 = sd(cell, qp, 0, 0), e2 = sd(cell, qp, 1, 1), e3 = sd(cell, qp, 0, 1), e4 = sd(cell, qp, 1, 0);
             ms(cell, qp, 0, 0) = beta * (C11 * e1 + C12 * e2);
             ms(cell, qp, 1, 1) = beta * (C12 * e1 + C11 * e2);
             ms(cell, qp, 0, 1) = beta * (C44 * e3);

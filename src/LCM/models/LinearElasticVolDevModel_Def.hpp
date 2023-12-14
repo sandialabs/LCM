@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-LinearElasticVolDevModel<EvalT, Traits>::LinearElasticVolDevModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+LinearElasticVolDevModel<EvalT, Traits>::LinearElasticVolDevModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   // Baseline constants
@@ -39,10 +37,7 @@ LinearElasticVolDevModel<EvalT, Traits>::LinearElasticVolDevModel(
 
 template <typename EvalT, typename Traits>
 void
-LinearElasticVolDevModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+LinearElasticVolDevModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // constants
   auto const kappa = bulk_modulus_;

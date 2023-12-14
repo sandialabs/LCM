@@ -155,8 +155,7 @@ RIHMRModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
       for (int i = 0; i < num_dims_; ++i)
         for (int j = 0; j < num_dims_; ++j)
           for (int p = 0; p < num_dims_; ++p)
-            for (int q = 0; q < num_dims_; ++q)
-              be(i, j) += Jm23 * def_grad(cell, pt, i, p) * Cpinv(p, q) * def_grad(cell, pt, j, q);
+            for (int q = 0; q < num_dims_; ++q) be(i, j) += Jm23 * def_grad(cell, pt, i, p) * Cpinv(p, q) * def_grad(cell, pt, j, q);
 
       trd3  = minitensor::trace(be) / 3.;
       mubar = trd3 * mu;

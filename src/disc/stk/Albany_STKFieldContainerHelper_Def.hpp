@@ -31,10 +31,7 @@ access<const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
 
 template <>
 double&
-access<BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
-    BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array,
-    int const                                                j,
-    int const                                                i)
+access<BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array, int const j, int const i)
 {
   ALBANY_EXPECT(j == 0, "Error! Attempting to access 1d array with two indices.\n");
   (void)j;
@@ -53,10 +50,7 @@ access<const BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(
 
 template <>
 double&
-access<BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(
-    BucketArray<AbstractSTKFieldContainer::VectorFieldType>& array,
-    int const                                                j,
-    int const                                                i)
+access<BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(BucketArray<AbstractSTKFieldContainer::VectorFieldType>& array, int const j, int const i)
 {
   return array(j, i);
 }

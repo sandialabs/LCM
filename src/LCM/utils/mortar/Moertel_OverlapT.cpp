@@ -14,22 +14,10 @@
 namespace MoertelT {
 
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_INT)
-MOERTEL_INSTANTIATE_NESTED_TEMPLATE_CLASS_ST_LO_GO_N(
-    MoertelT::OverlapT,
-    MoertelT::InterfaceT,
-    double,
-    int,
-    int,
-    KokkosNode)
+MOERTEL_INSTANTIATE_NESTED_TEMPLATE_CLASS_ST_LO_GO_N(MoertelT::OverlapT, MoertelT::InterfaceT, double, int, int, KokkosNode)
 #endif
 #if defined(HAVE_MOERTEL_INST_DOUBLE_INT_LONGLONGINT)
-MOERTEL_INSTANTIATE_NESTED_TEMPLATE_CLASS_ST_LO_GO_N(
-    MoertelT::OverlapT,
-    MoertelT::InterfaceT,
-    double,
-    int,
-    long long,
-    KokkosNode)
+MOERTEL_INSTANTIATE_NESTED_TEMPLATE_CLASS_ST_LO_GO_N(MoertelT::OverlapT, MoertelT::InterfaceT, double, int, long long, KokkosNode)
 #endif
 
 MOERTEL_INSTANTIATE_TEMPLATE_CLASS_ON_NAME_ORD(Overlap, Interface)

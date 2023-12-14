@@ -88,8 +88,7 @@ AAdapt::createAnalyticFunction(std::string name, int neq, int numDim, Teuchos::A
   return F;
 }
 
-AAdapt::ConstantFunction::ConstantFunction(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::ConstantFunction::ConstantFunction(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
       (data.size() != neq),
@@ -139,8 +138,7 @@ AAdapt::StepX::compute(double* x, double const* X)
   }
 }
 
-AAdapt::TemperatureStep::TemperatureStep(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::TemperatureStep::TemperatureStep(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
       (data.size() != 6),
@@ -185,8 +183,7 @@ AAdapt::TemperatureStep::compute(double* x, double const* X)
   }
 }
 
-AAdapt::DispConstTemperatureStep::DispConstTemperatureStep(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::DispConstTemperatureStep::DispConstTemperatureStep(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
       (data.size() != 9),
@@ -233,8 +230,7 @@ AAdapt::DispConstTemperatureStep::compute(double* x, double const* X)
   }
 }
 
-AAdapt::DispConstTemperatureLinear::DispConstTemperatureLinear(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::DispConstTemperatureLinear::DispConstTemperatureLinear(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
       (data.size() != 8),
@@ -287,8 +283,7 @@ AAdapt::DispConstTemperatureLinear::compute(double* x, double const* X)
   x[3] = b + m * X[coord];
 }
 
-AAdapt::TemperatureLinear::TemperatureLinear(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::TemperatureLinear::TemperatureLinear(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
       (data.size() != 5),
@@ -365,8 +360,8 @@ AAdapt::ConstantFunctionPerturbed::ConstantFunctionPerturbed(
   ALBANY_PANIC(
       (data.size() != neq || pert_mag.size() != neq),
       "Error! Invalid specification of initial condition: incorrect length of "
-          << "Function Data for Constant Function Perturbed; neq = " << neq << ", data.size() = " << data.size()
-          << ", pert_mag.size() = " << pert_mag.size() << std::endl);
+          << "Function Data for Constant Function Perturbed; neq = " << neq << ", data.size() = " << data.size() << ", pert_mag.size() = " << pert_mag.size()
+          << std::endl);
 
   //  srand( time(NULL) ); // seed the random number gen
   srand(seedgen(worksetID));  // seed the random number gen
@@ -405,15 +400,14 @@ AAdapt::ConstantFunctionGaussianPerturbed::ConstantFunctionGaussianPerturbed(
   ALBANY_PANIC(
       (data.size() != neq || pert_mag.size() != neq),
       "Error! Invalid specification of initial condition: incorrect length of "
-          << "Function Data for Constant Function Gaussian Perturbed; neq = " << neq
-          << ", data.size() = " << data.size() << ", pert_mag.size() = " << pert_mag.size() << std::endl);
+          << "Function Data for Constant Function Gaussian Perturbed; neq = " << neq << ", data.size() = " << data.size()
+          << ", pert_mag.size() = " << pert_mag.size() << std::endl);
 
   if (data.size() > 0 && pert_mag.size() > 0)
     for (int i = 0; i < neq; i++)
       if (pert_mag[i] > std::numeric_limits<double>::epsilon()) {
         nd[i]      = Teuchos::rcp(new boost::normal_distribution<double>(data[i], pert_mag[i]));
-        var_nor[i] = Teuchos::rcp(
-            new boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>(rng, *nd[i]));
+        var_nor[i] = Teuchos::rcp(new boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>(rng, *nd[i]));
       }
 }
 
@@ -428,12 +422,10 @@ AAdapt::ConstantFunctionGaussianPerturbed::compute(double* x, double const* X)
       x[i] = data[i];
 }
 
-AAdapt::GaussSin::GaussSin(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::GaussSin::GaussSin(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      (neq != 1) || (numDim != 1) || (data.size() != 1),
-      "Error! Invalid call of GaussSin with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      (neq != 1) || (numDim != 1) || (data.size() != 1), "Error! Invalid call of GaussSin with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::GaussSin::compute(double* x, double const* X)
@@ -441,12 +433,10 @@ AAdapt::GaussSin::compute(double* x, double const* X)
   x[0] = sin(pi * X[0]) + 0.5 * data[0] * X[0] * (1.0 - X[0]);
 }
 
-AAdapt::GaussCos::GaussCos(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::GaussCos::GaussCos(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      (neq != 1) || (numDim != 1) || (data.size() != 1),
-      "Error! Invalid call of GaussCos with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      (neq != 1) || (numDim != 1) || (data.size() != 1), "Error! Invalid call of GaussCos with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::GaussCos::compute(double* x, double const* X)
@@ -457,8 +447,7 @@ AAdapt::GaussCos::compute(double* x, double const* X)
 AAdapt::LinearY::LinearY(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      (neq < 2) || (numDim < 2) || (data.size() != 1),
-      "Error! Invalid call of LinearY with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      (neq < 2) || (numDim < 2) || (data.size() != 1), "Error! Invalid call of LinearY with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::LinearY::compute(double* x, double const* X)
@@ -471,9 +460,7 @@ AAdapt::LinearY::compute(double* x, double const* X)
 
 AAdapt::Linear::Linear(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
-  ALBANY_PANIC(
-      (data.size() != neq * numDim),
-      "Error! Invalid call of Linear with " << neq << " " << numDim << "  " << data.size() << std::endl);
+  ALBANY_PANIC((data.size() != neq * numDim), "Error! Invalid call of Linear with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::Linear::compute(double* x, double const* X)
@@ -487,12 +474,9 @@ AAdapt::Linear::compute(double* x, double const* X)
   }
 }
 
-AAdapt::ConstantBox::ConstantBox(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::ConstantBox::ConstantBox(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
-  ALBANY_PANIC(
-      (data.size() != 2 * numDim + neq),
-      "Error! Invalid call of Linear with " << neq << " " << numDim << "  " << data.size() << std::endl);
+  ALBANY_PANIC((data.size() != 2 * numDim + neq), "Error! Invalid call of Linear with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::ConstantBox::compute(double* x, double const* X)
@@ -514,8 +498,7 @@ AAdapt::ConstantBox::compute(double* x, double const* X)
 AAdapt::AboutZ::AboutZ(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      (neq < 2) || (numDim < 2) || (data.size() != 1),
-      "Error! Invalid call of AboutZ with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      (neq < 2) || (numDim < 2) || (data.size() != 1), "Error! Invalid call of AboutZ with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::AboutZ::compute(double* x, double const* X)
@@ -529,8 +512,7 @@ AAdapt::AboutZ::compute(double* x, double const* X)
 AAdapt::RadialZ::RadialZ(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      (neq < 2) || (numDim < 2) || (data.size() != 1),
-      "Error! Invalid call of RadialZ with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      (neq < 2) || (numDim < 2) || (data.size() != 1), "Error! Invalid call of RadialZ with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::RadialZ::compute(double* x, double const* X)
@@ -541,12 +523,10 @@ AAdapt::RadialZ::compute(double* x, double const* X)
   if (neq > 2) x[2] = 0.0;
 }
 
-AAdapt::AboutLinearZ::AboutLinearZ(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::AboutLinearZ::AboutLinearZ(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      (neq < 3) || (numDim < 3) || (data.size() != 1),
-      "Error! Invalid call of AboutLinearZ with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      (neq < 3) || (numDim < 3) || (data.size() != 1), "Error! Invalid call of AboutLinearZ with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::AboutLinearZ::compute(double* x, double const* X)
@@ -556,12 +536,10 @@ AAdapt::AboutLinearZ::compute(double* x, double const* X)
   x[2] = 0.0;
 }
 
-AAdapt::GaussianZ::GaussianZ(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::GaussianZ::GaussianZ(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      (neq < 2) || (numDim < 2) || (data.size() != 3),
-      "Error! Invalid call of GaussianZ with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      (neq < 2) || (numDim < 2) || (data.size() != 3), "Error! Invalid call of GaussianZ with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::GaussianZ::compute(double* x, double const* X)
@@ -580,9 +558,7 @@ AAdapt::Circle::Circle(int neq_, int numDim_, Teuchos::Array<double> data_) : nu
 {
   bool error = true;
   if (neq == 1 || neq == 3) error = false;
-  ALBANY_PANIC(
-      error || (numDim != 2),
-      "Error! Invalid call of Circle with " << neq << " " << numDim << "  " << data.size() << std::endl);
+  ALBANY_PANIC(error || (numDim != 2), "Error! Invalid call of Circle with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::Circle::compute(double* x, double const* X)
@@ -600,8 +576,7 @@ AAdapt::Circle::compute(double* x, double const* X)
   }*/
 }
 
-AAdapt::GaussianPress::GaussianPress(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::GaussianPress::GaussianPress(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
       (neq < 3) || (numDim < 2) || (data.size() != 4),
@@ -619,9 +594,7 @@ AAdapt::GaussianPress::compute(double* x, double const* X)
 
 AAdapt::SinCos::SinCos(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
-  ALBANY_PANIC(
-      (neq < 3) || (numDim < 2),
-      "Error! Invalid call of SinCos with " << neq << " " << numDim << "  " << data.size() << std::endl);
+  ALBANY_PANIC((neq < 3) || (numDim < 2), "Error! Invalid call of SinCos with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::SinCos::compute(double* x, double const* X)
@@ -631,12 +604,10 @@ AAdapt::SinCos::compute(double* x, double const* X)
   x[2] = sin(2.0 * pi * X[0]) * sin(2.0 * pi * X[1]);
 }
 
-AAdapt::SinScalar::SinScalar(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::SinScalar::SinScalar(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      neq != 1 || numDim < 2 || data.size() != numDim,
-      "Error! Invalid call of SinScalar with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      neq != 1 || numDim < 2 || data.size() != numDim, "Error! Invalid call of SinScalar with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::SinScalar::compute(double* x, double const* X)
@@ -647,12 +618,9 @@ AAdapt::SinScalar::compute(double* x, double const* X)
   }
 }
 
-AAdapt::TaylorGreenVortex::TaylorGreenVortex(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::TaylorGreenVortex::TaylorGreenVortex(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
-  ALBANY_PANIC(
-      (neq < 3) || (numDim != 2),
-      "Error! Invalid call of TaylorGreenVortex with " << neq << " " << numDim << "  " << data.size() << std::endl);
+  ALBANY_PANIC((neq < 3) || (numDim != 2), "Error! Invalid call of TaylorGreenVortex with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::TaylorGreenVortex::compute(double* x, double const* X)
@@ -663,12 +631,10 @@ AAdapt::TaylorGreenVortex::compute(double* x, double const* X)
   x[3] = cos(2.0 * pi * X[0]) + cos(2.0 * pi * X[1]);   // initial temperature
 }
 
-AAdapt::AcousticWave::AcousticWave(int neq_, int numDim_, Teuchos::Array<double> data_)
-    : numDim(numDim_), neq(neq_), data(data_)
+AAdapt::AcousticWave::AcousticWave(int neq_, int numDim_, Teuchos::Array<double> data_) : numDim(numDim_), neq(neq_), data(data_)
 {
   ALBANY_PANIC(
-      (neq > 3) || (numDim > 2) || (data.size() != 3),
-      "Error! Invalid call of AcousticWave with " << neq << " " << numDim << "  " << data.size() << std::endl);
+      (neq > 3) || (numDim > 2) || (data.size() != 3), "Error! Invalid call of AcousticWave with " << neq << " " << numDim << "  " << data.size() << std::endl);
 }
 void
 AAdapt::AcousticWave::compute(double* x, double const* X)
@@ -681,12 +647,9 @@ AAdapt::AcousticWave::compute(double* x, double const* X)
   for (int i = 1; i < numDim; i++) x[i] = 0.0;
 }
 
-AAdapt::ExpressionParser::ExpressionParser(int neq_, int dim_, Teuchos::Array<std::string>& expr_)
-    : dim(dim_), neq(neq_), expr(expr_)
+AAdapt::ExpressionParser::ExpressionParser(int neq_, int dim_, Teuchos::Array<std::string>& expr_) : dim(dim_), neq(neq_), expr(expr_)
 {
-  ALBANY_ASSERT(
-      expr.size() == neq,
-      "Must have the same number of equations (" << neq << ") and expressions (" << expr.size() << ").");
+  ALBANY_ASSERT(expr.size() == neq, "Must have the same number of equations (" << neq << ") and expressions (" << expr.size() << ").");
 }
 
 void

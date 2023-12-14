@@ -18,11 +18,9 @@ RigidContactBC_Base<EvalT, Traits>::RigidContactBC_Base(Teuchos::ParameterList& 
 
   if (this->bc_type == PHAL::NeumannBase<EvalT, Traits>::COORD)
 
-    ALBANY_PANIC(
-        !(this->cellDims == BCValues.getNumCols()), "Dimension of the current problem and \"BC Values\" do not match");
+    ALBANY_PANIC(!(this->cellDims == BCValues.getNumCols()), "Dimension of the current problem and \"BC Values\" do not match");
 
-  ALBANY_PANIC(
-      !(timeValues.size() == BCValues.getNumRows()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
+  ALBANY_PANIC(!(timeValues.size() == BCValues.getNumRows()), "Dimension of \"Time Values\" and \"BC Values\" do not match");
 }
 
 //*****
@@ -96,10 +94,7 @@ RigidContactBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       this->computeCoordVal(time);
       break;
 
-    default:
-
-      ALBANY_ABORT("Time dependent Neumann boundary condition of type - " << this->bc_type << " is not supported");
-      break;
+    default: ALBANY_ABORT("Time dependent Neumann boundary condition of type - " << this->bc_type << " is not supported"); break;
   }
 
   PHAL::Neumann<EvalT, Traits>::evaluateFields(workset);

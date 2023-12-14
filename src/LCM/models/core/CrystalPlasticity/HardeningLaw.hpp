@@ -48,9 +48,7 @@ struct HardeningParameterBase
   using ParamIndex = int;
 
   virtual void
-  createLatentMatrix(
-      SlipFamily<NumDimT, NumSlipT>&          slip_family,
-      std::vector<SlipSystem<NumDimT>> const& slip_systems) = 0;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems) = 0;
 
   void
   setParameter(ParamIndex const index_param, RealType const value_param)
@@ -118,8 +116,7 @@ struct LinearMinusRecoveryHardeningParameters final : public HardeningParameterB
   }
 
   virtual void
-  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems)
-      override;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems) override;
 
   virtual void
   setValueAsymptotic() override
@@ -184,8 +181,7 @@ struct SaturationHardeningParameters final : public HardeningParameterBase<NumDi
   }
 
   virtual void
-  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems)
-      override;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems) override;
 
   virtual void
   setValueAsymptotic() override
@@ -240,8 +236,7 @@ struct DislocationDensityHardeningParameters final : public HardeningParameterBa
   }
 
   virtual void
-  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems)
-      override;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems) override;
 
   virtual void
   setValueAsymptotic() override
@@ -274,8 +269,7 @@ struct NoHardeningParameters final : public HardeningParameterBase<NumDimT, NumS
   }
 
   virtual void
-  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems)
-      override;
+  createLatentMatrix(SlipFamily<NumDimT, NumSlipT>& slip_family, std::vector<SlipSystem<NumDimT>> const& slip_systems) override;
 
   virtual void
   setValueAsymptotic() override

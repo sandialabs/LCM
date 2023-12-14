@@ -18,10 +18,7 @@ namespace Albany {
 // across ranks. If Teuchos end up implementing it, you can remove
 // this routine (or turn it into a wrapper of Teuchos routines).
 void
-gatherAllV(
-    const Teuchos::RCP<Teuchos_Comm const>& comm,
-    const Teuchos::ArrayView<const GO>&     myVals,
-    Teuchos::Array<GO>&                     allVals);
+gatherAllV(const Teuchos::RCP<Teuchos_Comm const>& comm, const Teuchos::ArrayView<const GO>& myVals, Teuchos::Array<GO>& allVals);
 
 // This free function gathers all values on the root rank.
 // The reason for the existence of this routine rather than
@@ -31,11 +28,7 @@ gatherAllV(
 // case for Albany (the global count is GO, and the comm
 // ordinal is LO).
 void
-gatherV(
-    const Teuchos::RCP<Teuchos_Comm const>& comm,
-    const Teuchos::ArrayView<const GO>&     myVals,
-    Teuchos::Array<GO>&                     allVals,
-    const LO                                root_rank);
+gatherV(const Teuchos::RCP<Teuchos_Comm const>& comm, const Teuchos::ArrayView<const GO>& myVals, Teuchos::Array<GO>& allVals, const LO root_rank);
 
 }  // namespace Albany
 

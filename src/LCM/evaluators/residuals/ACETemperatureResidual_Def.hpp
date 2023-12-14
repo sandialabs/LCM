@@ -62,9 +62,7 @@ ACETemperatureResidual<EvalT, Traits>::ACETemperatureResidual(
 
 template <typename EvalT, typename Traits>
 void
-ACETemperatureResidual<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ACETemperatureResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   // List all fields
   this->utils.setFieldData(wbf_, fm);

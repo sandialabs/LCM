@@ -45,9 +45,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
-    Teuchos::ParameterList&              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : have_temperature_(false),
       have_damage_(false),
       have_total_concentration_(false),
@@ -95,24 +93,21 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
   // optionally deal with total concentration
   if (p.isType<std::string>("Total Concentration Name")) {
     have_total_concentration_ = true;
-    total_concentration_ =
-        decltype(total_concentration_)(p.get<std::string>("Total Concentration Name"), dl->qp_scalar);
+    total_concentration_      = decltype(total_concentration_)(p.get<std::string>("Total Concentration Name"), dl->qp_scalar);
     this->addDependentField(total_concentration_);
   }
 
   // optionally deal with total bubble density
   if (p.isType<std::string>("Total Bubble Density Name")) {
     have_total_bubble_density_ = true;
-    total_bubble_density_ =
-        decltype(total_bubble_density_)(p.get<std::string>("Total Bubble Density Name"), dl->qp_scalar);
+    total_bubble_density_      = decltype(total_bubble_density_)(p.get<std::string>("Total Bubble Density Name"), dl->qp_scalar);
     this->addDependentField(total_bubble_density_);
   }
 
   // optionally deal with bubble volume fraction
   if (p.isType<std::string>("Bubble Volume Fraction Name")) {
     have_bubble_volume_fraction_ = true;
-    bubble_volume_fraction_ =
-        decltype(bubble_volume_fraction_)(p.get<std::string>("Bubble Volume Fraction Name"), dl->qp_scalar);
+    bubble_volume_fraction_      = decltype(bubble_volume_fraction_)(p.get<std::string>("Bubble Volume Fraction Name"), dl->qp_scalar);
     this->addDependentField(bubble_volume_fraction_);
   }
 
@@ -142,9 +137,7 @@ ConstitutiveModelInterface<EvalT, Traits>::ConstitutiveModelInterface(
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+ConstitutiveModelInterface<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   ALBANY_PANIC(dep_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
   ALBANY_PANIC(eval_fields_map_.size() == 0, "something is wrong in the LCM::CMI");
@@ -240,9 +233,7 @@ ConstitutiveModelInterface<EvalT, Traits>::fillStateVariableStruct(int state_var
 
 template <typename EvalT, typename Traits>
 void
-ConstitutiveModelInterface<EvalT, Traits>::initializeModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
 {
   std::string model_name = p->sublist("Material Model").get<std::string>("Model Name");
 

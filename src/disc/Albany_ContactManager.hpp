@@ -86,13 +86,7 @@ class ContactManager
   WorksetContactNodes slaveNodeGIDs;
 
   void
-  processSS(
-      int const          ctr,
-      std::string const& sideSetName,
-      int                s_or_mortar,
-      int                mortarside,
-      WorksetContactNodes&,
-      std::ofstream& stream);
+  processSS(int const ctr, std::string const& sideSetName, int s_or_mortar, int mortarside, WorksetContactNodes&, std::ofstream& stream);
 
   Teuchos::RCP<Teuchos::ParameterList> params;
 

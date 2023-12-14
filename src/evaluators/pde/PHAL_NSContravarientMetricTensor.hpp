@@ -22,8 +22,7 @@ namespace PHAL {
 */
 
 template <typename EvalT, typename Traits>
-class NSContravarientMetricTensor : public PHX::EvaluatorWithBaseImpl<Traits>,
-                                    public PHX::EvaluatorDerived<EvalT, Traits>
+class NSContravarientMetricTensor : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::EvaluatorDerived<EvalT, Traits>
 {
  public:
   NSContravarientMetricTensor(Teuchos::ParameterList const& p);

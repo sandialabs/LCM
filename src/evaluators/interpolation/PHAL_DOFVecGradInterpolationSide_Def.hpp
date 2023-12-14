@@ -37,9 +37,7 @@ DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::DOFVecGradInterpolation
 //**********************************************************************
 template <typename EvalT, typename Traits, typename ScalarT>
 void
-DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+DOFVecGradInterpolationSideBase<EvalT, Traits, ScalarT>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(val_node, fm);
   this->utils.setFieldData(gradBF, fm);

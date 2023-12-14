@@ -176,8 +176,7 @@ AggregateScalarResponseFunction::evaluateGradient(
     }
 
     // Evaluate response function
-    responses[i]->evaluateGradient(
-        current_time, x, xdot, xdotdot, p, deriv_p, g_i, dgdx_i, dgdxdot_i, dgdxdotdot_i, dgdp_i);
+    responses[i]->evaluateGradient(current_time, x, xdot, xdotdot, p, deriv_p, g_i, dgdx_i, dgdxdot_i, dgdxdotdot_i, dgdp_i);
 
     // Copy into the monolithic (multi)vectors
     for (unsigned int j = 0; j < responses[i]->numResponses(); ++j) {

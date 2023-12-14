@@ -108,8 +108,7 @@ class TmplSTKMeshStruct : public GenericSTKMeshStruct
       const Teuchos::RCP<Albany::StateInfoStruct>&                                     sis,
       const unsigned int                                                               worksetSize,
       std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis = {},
-      std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req =
-          {});  // empty map as default
+      std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req = {});  // empty map as default
 
   //! Flag if solution has a restart values -- used in Init Cond
   bool
@@ -137,10 +136,7 @@ class TmplSTKMeshStruct : public GenericSTKMeshStruct
   //! Build STK parts and nodesets that correspond to the dimension of the
   //! problem and input values
   void
-  DeclareParts(
-      std::vector<EBSpecsStruct<Dim, traits>> ebStructArray,
-      std::vector<std::string>                ssNames,
-      std::vector<std::string>                nsNames);
+  DeclareParts(std::vector<EBSpecsStruct<Dim, traits>> ebStructArray, std::vector<std::string> ssNames, std::vector<std::string> nsNames);
 
   GO                  nelem[traits_type::size];
   double              scale[traits_type::size];

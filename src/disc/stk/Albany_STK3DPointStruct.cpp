@@ -6,9 +6,7 @@
 #include <stk_io/IossBridge.hpp>
 
 // Constructor for meshes read from ASCII file
-Albany::STK3DPointStruct::STK3DPointStruct(
-    const Teuchos::RCP<Teuchos::ParameterList>& params,
-    const Teuchos::RCP<Teuchos_Comm const>&     commT)
+Albany::STK3DPointStruct::STK3DPointStruct(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<Teuchos_Comm const>& commT)
     : GenericSTKMeshStruct(params, Teuchos::null, 3)
 {
   partVec[0] = &metaData->declare_part("Block0", stk::topology::ELEMENT_RANK);
@@ -28,16 +26,8 @@ Albany::STK3DPointStruct::STK3DPointStruct(
   std::cout << "--- creating a new MeshSpecsStruct ---" << std::endl;
   std::map<std::string, int> ebNameToIndex;
   ebNameToIndex[partVec[0]->name()] = 0;
-  this->meshSpecs[0]                = Teuchos::rcp(new Albany::MeshSpecsStruct(
-      ctd,
-      numDim,
-      cubDegree,
-      nsNames,
-      ssNames,
-      worksetSize,
-      partVec[0]->name(),
-      ebNameToIndex,
-      this->interleavedOrdering));
+  this->meshSpecs[0]                = Teuchos::rcp(
+      new Albany::MeshSpecsStruct(ctd, numDim, cubDegree, nsNames, ssNames, worksetSize, partVec[0]->name(), ebNameToIndex, this->interleavedOrdering));
   std::cout << "---3DPoint constructor done---" << std::endl;
 
   // Create a mesh specs object for EACH side set

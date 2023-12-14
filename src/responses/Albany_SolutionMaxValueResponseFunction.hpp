@@ -16,11 +16,7 @@ class SolutionMaxValueResponseFunction : public SamplingBasedScalarResponseFunct
 {
  public:
   //! Default constructor
-  SolutionMaxValueResponseFunction(
-      const Teuchos::RCP<Teuchos_Comm const>& comm,
-      int                                     neq                 = 1,
-      int                                     eq                  = 0,
-      bool                                    interleavedOrdering = true);
+  SolutionMaxValueResponseFunction(const Teuchos::RCP<Teuchos_Comm const>& comm, int neq = 1, int eq = 0, bool interleavedOrdering = true);
 
   //! Destructor
   ~SolutionMaxValueResponseFunction() = default;

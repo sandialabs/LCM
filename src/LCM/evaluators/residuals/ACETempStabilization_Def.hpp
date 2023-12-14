@@ -12,12 +12,8 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList const& p)
-    : thermal_cond_grad_at_qps_(
-          p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
-      jacobian_det_(
-          p.get<std::string>("Jacobian Det Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+    : thermal_cond_grad_at_qps_(p.get<std::string>("ACE_Therm_Cond Gradient QP Variable Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout")),
+      jacobian_det_(p.get<std::string>("Jacobian Det Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       tau_(p.get<std::string>("Tau Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       fos_(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
@@ -34,10 +30,9 @@ ACETempStabilization<EvalT, Traits>::ACETempStabilization(Teuchos::ParameterList
   } else if (tau_type_string == "Proportional to Mesh Size") {
     tau_type_ = PROP_TO_H;
   } else {
-    ALBANY_ABORT(
-        "Invalid stabilization parameter value!  Valid values are 'None', 'SUPG' and 'Proportional to Mesh Size'.");
+    ALBANY_ABORT("Invalid stabilization parameter value!  Valid values are 'None', 'SUPG' and 'Proportional to Mesh Size'.");
   }
-  Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
+  Teuchos::RCP<PHX::DataLayout>           vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout");
   std::vector<PHX::DataLayout::size_type> dims;
   vector_dl->dimensions(dims);
   workset_size_ = dims[0];

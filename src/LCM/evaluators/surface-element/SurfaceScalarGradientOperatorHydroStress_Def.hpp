@@ -56,9 +56,7 @@ SurfaceScalarGradientOperatorHydroStress<EvalT, Traits>::SurfaceScalarGradientOp
 //*****
 template <typename EvalT, typename Traits>
 void
-SurfaceScalarGradientOperatorHydroStress<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+SurfaceScalarGradientOperatorHydroStress<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(refDualBasis, fm);
   this->utils.setFieldData(refNormal, fm);

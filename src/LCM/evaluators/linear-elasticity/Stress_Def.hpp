@@ -12,12 +12,8 @@ namespace LCM {
 template <typename EvalT, typename Traits>
 Stress<EvalT, Traits>::Stress(Teuchos::ParameterList const& p)
     : strain(p.get<std::string>("Strain Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      elasticModulus(
-          p.get<std::string>("Elastic Modulus Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
-      poissonsRatio(
-          p.get<std::string>("Poissons Ratio Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      elasticModulus(p.get<std::string>("Elastic Modulus Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
+      poissonsRatio(p.get<std::string>("Poissons Ratio Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       stress(p.get<std::string>("Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout"))
 {
   // Pull out numQPs and numDims from a Layout
@@ -56,21 +52,15 @@ Stress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
   ScalarT lambda, mu;
 
   switch (numDims) {
-    case 1:
-      Intrepid2::FunctionSpaceTools<PHX::Device>::tensorMultiplyDataData(
-          stress.get_view(), elasticModulus.get_view(), strain.get_view());
-      break;
+    case 1: Intrepid2::FunctionSpaceTools<PHX::Device>::tensorMultiplyDataData(stress.get_view(), elasticModulus.get_view(), strain.get_view()); break;
     case 2:
       // Compute Stress (with the plane strain assumption for now)
       for (int cell = 0; cell < workset.numCells; ++cell) {
         for (int qp = 0; qp < numQPs; ++qp) {
-          lambda = (elasticModulus(cell, qp) * poissonsRatio(cell, qp)) /
-                   ((1 + poissonsRatio(cell, qp)) * (1 - 2 * poissonsRatio(cell, qp)));
-          mu = elasticModulus(cell, qp) / (2 * (1 + poissonsRatio(cell, qp)));
-          stress(cell, qp, 0, 0) =
-              2.0 * mu * (strain(cell, qp, 0, 0)) + lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1));
-          stress(cell, qp, 1, 1) =
-              2.0 * mu * (strain(cell, qp, 1, 1)) + lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1));
+          lambda                 = (elasticModulus(cell, qp) * poissonsRatio(cell, qp)) / ((1 + poissonsRatio(cell, qp)) * (1 - 2 * poissonsRatio(cell, qp)));
+          mu                     = elasticModulus(cell, qp) / (2 * (1 + poissonsRatio(cell, qp)));
+          stress(cell, qp, 0, 0) = 2.0 * mu * (strain(cell, qp, 0, 0)) + lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1));
+          stress(cell, qp, 1, 1) = 2.0 * mu * (strain(cell, qp, 1, 1)) + lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1));
           stress(cell, qp, 0, 1) = 2.0 * mu * (strain(cell, qp, 0, 1));
           stress(cell, qp, 1, 0) = stress(cell, qp, 0, 1);
         }
@@ -80,15 +70,11 @@ Stress<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       // Compute Stress
       for (int cell = 0; cell < workset.numCells; ++cell) {
         for (int qp = 0; qp < numQPs; ++qp) {
-          lambda = (elasticModulus(cell, qp) * poissonsRatio(cell, qp)) /
-                   ((1 + poissonsRatio(cell, qp)) * (1 - 2 * poissonsRatio(cell, qp)));
+          lambda                 = (elasticModulus(cell, qp) * poissonsRatio(cell, qp)) / ((1 + poissonsRatio(cell, qp)) * (1 - 2 * poissonsRatio(cell, qp)));
           mu                     = elasticModulus(cell, qp) / (2 * (1 + poissonsRatio(cell, qp)));
-          stress(cell, qp, 0, 0) = 2.0 * mu * (strain(cell, qp, 0, 0)) +
-                                   lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1) + strain(cell, qp, 2, 2));
-          stress(cell, qp, 1, 1) = 2.0 * mu * (strain(cell, qp, 1, 1)) +
-                                   lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1) + strain(cell, qp, 2, 2));
-          stress(cell, qp, 2, 2) = 2.0 * mu * (strain(cell, qp, 2, 2)) +
-                                   lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1) + strain(cell, qp, 2, 2));
+          stress(cell, qp, 0, 0) = 2.0 * mu * (strain(cell, qp, 0, 0)) + lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1) + strain(cell, qp, 2, 2));
+          stress(cell, qp, 1, 1) = 2.0 * mu * (strain(cell, qp, 1, 1)) + lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1) + strain(cell, qp, 2, 2));
+          stress(cell, qp, 2, 2) = 2.0 * mu * (strain(cell, qp, 2, 2)) + lambda * (strain(cell, qp, 0, 0) + strain(cell, qp, 1, 1) + strain(cell, qp, 2, 2));
           stress(cell, qp, 0, 1) = 2.0 * mu * (strain(cell, qp, 0, 1));
           stress(cell, qp, 1, 2) = 2.0 * mu * (strain(cell, qp, 1, 2));
           stress(cell, qp, 2, 0) = 2.0 * mu * (strain(cell, qp, 2, 0));

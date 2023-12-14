@@ -93,8 +93,7 @@ CP::ResidualSlipNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vector<T, N>
   minitensor::Vector<T, NumSlipT> shear_np1(num_slip_, minitensor::Filler::ZEROS);
 
   // Compute sigma_np1, S_np1, and shear_np1
-  CP::computeStress<NumDimT, NumSlipT, T>(
-      slip_systems_, C_peeled, F_np1_peeled, Fp_np1, sigma_np1, S_np1, shear_np1, failed);
+  CP::computeStress<NumDimT, NumSlipT, T>(slip_systems_, C_peeled, F_np1_peeled, Fp_np1, sigma_np1, S_np1, shear_np1, failed);
 
   // Ensure that the stress was calculated properly
   if (failed == true) {
@@ -105,8 +104,7 @@ CP::ResidualSlipNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vector<T, N>
   minitensor::Vector<T, NumSlipT> slip_resistance(num_slip_, minitensor::Filler::ZEROS);
 
   // Compute state_hardening_np1
-  CP::updateHardness<NumDimT, NumSlipT, T>(
-      slip_systems_, slip_families_, dt_, rate_slip, state_hardening_n_, state_hardening_np1, slip_resistance, failed);
+  CP::updateHardness<NumDimT, NumSlipT, T>(slip_systems_, slip_families_, dt_, rate_slip, state_hardening_n_, state_hardening_np1, slip_resistance, failed);
 
   // Ensure that the hardening law was calculated properly
   if (failed == true) {
@@ -117,8 +115,7 @@ CP::ResidualSlipNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vector<T, N>
   minitensor::Vector<T, NumSlipT> slip_computed(num_slip_, minitensor::Filler::ZEROS);
 
   // Compute slips
-  CP::updateSlip<NumDimT, NumSlipT, T>(
-      slip_systems_, slip_families_, dt_, slip_resistance, shear_np1, slip_n_, slip_computed, failed);
+  CP::updateSlip<NumDimT, NumSlipT, T>(slip_systems_, slip_families_, dt_, slip_resistance, shear_np1, slip_n_, slip_computed, failed);
 
   // Ensure that the flow rule was calculated properly
   if (failed == true) {
@@ -186,8 +183,7 @@ CP::Dissipation<NumDimT, NumSlipT, EvalT>::value(minitensor::Vector<T, N> const&
 
     auto phardening = hardening_law_factory.template createHardeningLaw<T>(type_hardening_law);
 
-    phardening->harden(
-        slip_family, slip_systems_, dt_, rate_slip_in, state_hardening_n_, state_hardening_np1, slip_resistance);
+    phardening->harden(slip_family, slip_systems_, dt_, rate_slip_in, state_hardening_n_, state_hardening_np1, slip_resistance);
   }
 
   RealType dissipation{0.0};
@@ -316,8 +312,7 @@ CP::ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vect
   minitensor::Vector<T, NumSlipT> shear_np1(num_slip_, minitensor::Filler::ZEROS);
 
   // Compute sigma_np1, S_np1, and shear_np1
-  CP::computeStress<NumDimT, NumSlipT, T>(
-      slip_systems_, C_peeled, F_np1_peeled, Fp_np1, sigma_np1, S_np1, shear_np1, failed);
+  CP::computeStress<NumDimT, NumSlipT, T>(slip_systems_, C_peeled, F_np1_peeled, Fp_np1, sigma_np1, S_np1, shear_np1, failed);
 
   // Ensure that the stress was calculated properly
   if (failed == true) {
@@ -332,14 +327,7 @@ CP::ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vect
   // Compute state_hardening_np1
   state_hardening_computed = state_hardening_np1;
   CP::updateHardness<NumDimT, NumSlipT, T>(
-      slip_systems_,
-      slip_families_,
-      dt_,
-      rate_slip,
-      state_hardening_n_,
-      state_hardening_computed,
-      slip_resistance,
-      failed);
+      slip_systems_, slip_families_, dt_, rate_slip, state_hardening_n_, state_hardening_computed, slip_resistance, failed);
 
   // Ensure that the hardening law was calculated properly
   if (failed == true) {
@@ -350,8 +338,7 @@ CP::ResidualSlipHardnessNLS<NumDimT, NumSlipT, EvalT>::gradient(minitensor::Vect
   minitensor::Vector<T, NumSlipT> slip_computed(num_slip_, minitensor::Filler::ZEROS);
 
   // Compute slips
-  CP::updateSlip<NumDimT, NumSlipT, T>(
-      slip_systems_, slip_families_, dt_, slip_resistance, shear_np1, slip_n_, slip_computed, failed);
+  CP::updateSlip<NumDimT, NumSlipT, T>(slip_systems_, slip_families_, dt_, slip_resistance, shear_np1, slip_n_, slip_computed, failed);
 
   // Ensure that the flow rule was calculated properly
   if (failed == true) {
@@ -473,8 +460,7 @@ CP::ResidualSlipHardnessFN<NumDimT, NumSlipT, EvalT>::value(minitensor::Vector<T
   bool failed{false};
 
   // Compute sigma_np1, S_np1, and shear_np1
-  CP::computeStress<NumDimT, NumSlipT, T>(
-      slip_systems_, C_peeled, F_np1_peeled, Fp_np1, sigma_np1, S_np1, shear_np1, failed);
+  CP::computeStress<NumDimT, NumSlipT, T>(slip_systems_, C_peeled, F_np1_peeled, Fp_np1, sigma_np1, S_np1, shear_np1, failed);
 
   // Ensure that the stress was calculated properly
   if (failed == true) {
@@ -487,14 +473,7 @@ CP::ResidualSlipHardnessFN<NumDimT, NumSlipT, EvalT>::value(minitensor::Vector<T
   // Compute state_hardening_np1
   state_hardening_computed = state_hardening_np1;
   CP::updateHardness<NumDimT, NumSlipT, T>(
-      slip_systems_,
-      slip_families_,
-      dt_,
-      rate_slip,
-      state_hardening_n_,
-      state_hardening_computed,
-      slip_resistance,
-      failed);
+      slip_systems_, slip_families_, dt_, rate_slip, state_hardening_n_, state_hardening_computed, slip_resistance, failed);
 
   // Ensure that the hardening law was calculated properly
   if (failed == true) {
@@ -505,8 +484,7 @@ CP::ResidualSlipHardnessFN<NumDimT, NumSlipT, EvalT>::value(minitensor::Vector<T
   }
 
   // Compute slips
-  CP::updateSlip<NumDimT, NumSlipT, T>(
-      slip_systems_, slip_families_, dt_, slip_resistance, shear_np1, slip_n_, slip_computed, failed);
+  CP::updateSlip<NumDimT, NumSlipT, T>(slip_systems_, slip_families_, dt_, slip_resistance, shear_np1, slip_n_, slip_computed, failed);
 
   // Ensure that the flow rule was calculated properly
   if (failed == true) {

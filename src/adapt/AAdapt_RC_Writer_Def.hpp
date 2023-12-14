@@ -15,8 +15,7 @@ WriterBase<EvalT, Traits>::WriterBase()
   this->setName("AAdapt::rc::Writer" + PHX::print<EvalT>());
   // Writer doesn't output anything, so make a no-output tag to give to the
   // field manager via getNoOutputTag().
-  nooutput_tag_ = Teuchos::rcp(new PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT>(
-      "AAdapt::rc::Writer", Teuchos::rcp(new PHX::MDALayout<Dummy>(0))));
+  nooutput_tag_ = Teuchos::rcp(new PHX::Tag<PHAL::AlbanyTraits::Residual::ScalarT>("AAdapt::rc::Writer", Teuchos::rcp(new PHX::MDALayout<Dummy>(0))));
   this->addEvaluatedField(*nooutput_tag_);
 }
 
@@ -28,10 +27,7 @@ WriterBase<EvalT, Traits>::getNoOutputTag()
 }
 
 template <typename Traits>
-Writer<PHAL::AlbanyTraits::Residual, Traits>::Writer(
-    const Teuchos::RCP<Manager>&         rc_mgr,
-    const Teuchos::RCP<Albany::Layouts>& dl)
-    : rc_mgr_(rc_mgr)
+Writer<PHAL::AlbanyTraits::Residual, Traits>::Writer(const Teuchos::RCP<Manager>& rc_mgr, const Teuchos::RCP<Albany::Layouts>& dl) : rc_mgr_(rc_mgr)
 {
   if (this->rc_mgr_->usingProjection()) {
     bf_  = decltype(bf_)("BF", dl->node_qp_scalar);
@@ -47,9 +43,7 @@ Writer<PHAL::AlbanyTraits::Residual, Traits>::Writer(
 
 template <typename Traits>
 void
-Writer<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
-    typename Traits::SetupData /* d */,
-    PHX::FieldManager<Traits>& fm)
+Writer<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(typename Traits::SetupData /* d */, PHX::FieldManager<Traits>& fm)
 {
   if (this->rc_mgr_->usingProjection()) {
     this->utils.setFieldData(bf_, fm);

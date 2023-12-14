@@ -41,9 +41,7 @@ removeComponents(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos:
 
 // The complement of the above: the specified components are the ones to keep
 Teuchos::RCP<Thyra_VectorSpace const>
-createSubspace(
-    Teuchos::RCP<Thyra_VectorSpace const> const& vs,
-    const Teuchos::ArrayView<const LO>&          subspace_components);
+createSubspace(Teuchos::RCP<Thyra_VectorSpace const> const& vs, const Teuchos::ArrayView<const LO>& subspace_components);
 
 // Create a vector space, given the ids of the space components
 Teuchos::RCP<const Thyra_SpmdVectorSpace>
@@ -98,11 +96,7 @@ assign(const Teuchos::RCP<Thyra_LinearOp>& lop, const ST value);
 void
 getDiagonalCopy(const Teuchos::RCP<const Thyra_LinearOp>& lop, Teuchos::RCP<Thyra_Vector>& diag);
 void
-getLocalRowValues(
-    const Teuchos::RCP<Thyra_LinearOp>& lop,
-    const LO                            lrow,
-    Teuchos::Array<LO>&                 indices,
-    Teuchos::Array<ST>&                 values);
+getLocalRowValues(const Teuchos::RCP<Thyra_LinearOp>& lop, const LO lrow, Teuchos::Array<LO>& indices, Teuchos::Array<ST>& values);
 
 void
 setLocalRowValues(
@@ -135,11 +129,7 @@ replaceGlobalValues(
     const Teuchos::ArrayView<const ST>  values);
 
 void
-insertGlobalValues(
-    const Teuchos::RCP<Thyra_LinearOp>& lop,
-    const GO                            grow,
-    const Teuchos::ArrayView<const GO>  cols,
-    const Teuchos::ArrayView<const ST>  values);
+insertGlobalValues(const Teuchos::RCP<Thyra_LinearOp>& lop, const GO grow, const Teuchos::ArrayView<const GO> cols, const Teuchos::ArrayView<const ST> values);
 
 int
 getGlobalMaxNumRowEntries(const Teuchos::RCP<const Thyra_LinearOp>& lop);
@@ -156,14 +146,10 @@ bool
 isStaticGraph(const Teuchos::RCP<const Thyra_LinearOp>& lop);
 
 Teuchos::RCP<const Thyra_LinearOp>
-buildRestrictionOperator(
-    Teuchos::RCP<Thyra_VectorSpace const> const& space,
-    Teuchos::RCP<Thyra_VectorSpace const> const& subspace);
+buildRestrictionOperator(Teuchos::RCP<Thyra_VectorSpace const> const& space, Teuchos::RCP<Thyra_VectorSpace const> const& subspace);
 
 Teuchos::RCP<const Thyra_LinearOp>
-buildProlongationOperator(
-    Teuchos::RCP<Thyra_VectorSpace const> const& space,
-    Teuchos::RCP<Thyra_VectorSpace const> const& subspace);
+buildProlongationOperator(Teuchos::RCP<Thyra_VectorSpace const> const& space, Teuchos::RCP<Thyra_VectorSpace const> const& subspace);
 
 // Math properties helpers
 double
@@ -215,11 +201,7 @@ getNumVectors(const Teuchos::RCP<const Thyra_MultiVector>& mv);
 // V_StVpStV, which can be a bit arcane. Here we simply wrap that function in
 // one with a nicer name. Performs y = y_coeff*y + x_coeff*x;
 void
-scale_and_update(
-    Teuchos::RCP<Thyra_Vector> const       y,
-    const ST                               y_coeff,
-    Teuchos::RCP<Thyra_Vector const> const x,
-    const ST                               x_coeff);
+scale_and_update(Teuchos::RCP<Thyra_Vector> const y, const ST y_coeff, Teuchos::RCP<Thyra_Vector const> const x, const ST x_coeff);
 
 // Thyra does not offer a 'mean' method in its (multi)vector interface.
 // The method 'sum' in Thyra_VectorStdOps already does the sum,
@@ -233,10 +215,7 @@ means(const Teuchos::RCP<const Thyra_MultiVector>& mv);
 
 template <typename ThyraObjectType>
 void
-describe(
-    const Teuchos::RCP<const ThyraObjectType>& obj,
-    Teuchos::FancyOStream&                     out,
-    const Teuchos::EVerbosityLevel             verbLevel);
+describe(const Teuchos::RCP<const ThyraObjectType>& obj, Teuchos::FancyOStream& out, const Teuchos::EVerbosityLevel verbLevel);
 
 // ========= Thyra_SpmdXYZ utilities ========== //
 

@@ -10,9 +10,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-StVenantKirchhoffModel<EvalT, Traits>::StVenantKirchhoffModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+StVenantKirchhoffModel<EvalT, Traits>::StVenantKirchhoffModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   // define the dependent fields
@@ -36,10 +34,7 @@ StVenantKirchhoffModel<EvalT, Traits>::StVenantKirchhoffModel(
 }
 template <typename EvalT, typename Traits>
 void
-StVenantKirchhoffModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+StVenantKirchhoffModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // extract dependent MDFields
   auto def_grad        = *dep_fields["F"];
@@ -58,9 +53,8 @@ StVenantKirchhoffModel<EvalT, Traits>::computeState(
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int pt(0); pt < num_pts_; ++pt) {
-      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) / (1. + poissons_ratio(cell, pt)) /
-               (1 - 2 * poissons_ratio(cell, pt));
-      mu = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
+      lambda = (elastic_modulus(cell, pt) * poissons_ratio(cell, pt)) / (1. + poissons_ratio(cell, pt)) / (1 - 2 * poissons_ratio(cell, pt));
+      mu     = elastic_modulus(cell, pt) / (2. * (1. + poissons_ratio(cell, pt)));
       F.fill(def_grad, cell, pt, 0, 0);
       C     = F * transpose(F);
       E     = 0.5 * (C - I);

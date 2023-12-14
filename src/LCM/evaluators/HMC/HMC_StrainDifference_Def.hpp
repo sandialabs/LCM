@@ -9,9 +9,7 @@
 namespace HMC {
 
 template <typename EvalT, typename Traits>
-StrainDifference<EvalT, Traits>::StrainDifference(
-    Teuchos::ParameterList const&        p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+StrainDifference<EvalT, Traits>::StrainDifference(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
     : macroStrain(p.get<std::string>("Macro Strain Name"), dl->qp_tensor),
       microStrain(p.get<std::string>("Micro Strain Name"), dl->qp_tensor),
       strainDifference(p.get<std::string>("Strain Difference Name"), dl->qp_tensor)

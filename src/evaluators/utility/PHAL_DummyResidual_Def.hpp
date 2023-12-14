@@ -9,8 +9,7 @@ namespace PHAL {
 
 template <typename EvalT, typename Traits>
 DummyResidual<EvalT, Traits>::DummyResidual(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-    : solution(p.get<std::string>("Solution Variable Name"), dl->node_scalar),
-      residual(p.get<std::string>("Residual Variable Name"), dl->node_scalar)
+    : solution(p.get<std::string>("Solution Variable Name"), dl->node_scalar), residual(p.get<std::string>("Residual Variable Name"), dl->node_scalar)
 {
   this->addDependentField(solution);
   this->addEvaluatedField(residual);

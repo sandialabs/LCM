@@ -11,9 +11,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
-    Teuchos::ParameterList*              p,
-    const Teuchos::RCP<Albany::Layouts>& dl)
+ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       f0_(p->get<RealType>("Initial Void Volume", 0.0)),
       kw_(p->get<RealType>("Shear Damage Parameter", 0.0)),
@@ -266,10 +264,7 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(
 
 template <typename EvalT, typename Traits>
 void
-ElastoViscoplasticModel<EvalT, Traits>::computeState(
-    typename Traits::EvalData workset,
-    DepFieldMap               dep_fields,
-    FieldMap                  eval_fields)
+ElastoViscoplasticModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // get strings from field_name_map in order to extract MDFields
   std::string cauchy_string               = (*field_name_map_)["Cauchy_Stress"];

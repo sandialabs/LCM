@@ -12,14 +12,10 @@ namespace LCM {
 //*****
 template <typename EvalT, typename Traits>
 TLPoroPlasticityResidMomentum<EvalT, Traits>::TLPoroPlasticityResidMomentum(Teuchos::ParameterList const& p)
-    : TotalStress(
-          p.get<std::string>("Total Stress Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
+    : TotalStress(p.get<std::string>("Total Stress Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
       J(p.get<std::string>("DetDefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Scalar Data Layout")),
       defgrad(p.get<std::string>("DefGrad Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("QP Tensor Data Layout")),
-      wGradBF(
-          p.get<std::string>("Weighted Gradient BF Name"),
-          p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
+      wGradBF(p.get<std::string>("Weighted Gradient BF Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Vector Data Layout")),
       ExResidual(p.get<std::string>("Residual Name"), p.get<Teuchos::RCP<PHX::DataLayout>>("Node Vector Data Layout"))
 {
   this->addDependentField(TotalStress);
@@ -35,9 +31,8 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::TLPoroPlasticityResidMomentum(Teuc
 
   if (enableTransient) {
     // Two more fields are required for transient capability
-    Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl =
-        p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
-    Teuchos::RCP<PHX::DataLayout> vector_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
+    Teuchos::RCP<PHX::DataLayout> node_qp_scalar_dl = p.get<Teuchos::RCP<PHX::DataLayout>>("Node QP Scalar Data Layout");
+    Teuchos::RCP<PHX::DataLayout> vector_dl         = p.get<Teuchos::RCP<PHX::DataLayout>>("QP Vector Data Layout");
 
     wBF     = decltype(wBF)(p.get<std::string>("Weighted BF Name"), node_qp_scalar_dl);
     uDotDot = decltype(uDotDot)(p.get<std::string>("Time Dependent Variable Name"), vector_dl);
@@ -59,9 +54,7 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::TLPoroPlasticityResidMomentum(Teuc
 //*****
 template <typename EvalT, typename Traits>
 void
-TLPoroPlasticityResidMomentum<EvalT, Traits>::postRegistrationSetup(
-    typename Traits::SetupData d,
-    PHX::FieldManager<Traits>& fm)
+TLPoroPlasticityResidMomentum<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& fm)
 {
   this->utils.setFieldData(TotalStress, fm);
   this->utils.setFieldData(wGradBF, fm);

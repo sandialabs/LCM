@@ -573,7 +573,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
       failed += 1000.0;
     }
     angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
-
   }
   auto const maximum_displacement   = 0.35;  // [m]
   auto const disp_val               = Sacado::Value<decltype(displacement)>::eval(displacement);

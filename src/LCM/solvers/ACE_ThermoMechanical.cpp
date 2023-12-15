@@ -686,7 +686,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         if (num_iter_ == 0) {
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
-          fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+          //fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
           do_outputs_[subdomain] = true;  // We always want output in the initial step
         } else {
           if (do_outputs_init_[subdomain] == true) {
@@ -808,9 +808,9 @@ ACEThermoMechanical::AdvanceThermalDynamics(
   // IKT FIXME 6/5/2020: need to check if this does the right thing for thermal problem
   // The only relevant internal state here would be the ice saturation
   // Restore internal states
-  auto& app       = *apps_[subdomain];
-  auto& state_mgr = app.getStateMgr();
-  fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+  //auto& app       = *apps_[subdomain];
+  //auto& state_mgr = app.getStateMgr();
+  //fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
@@ -870,10 +870,9 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
     // Restore internal states
-    auto& app       = *apps_[subdomain];
-    auto& state_mgr = app.getStateMgr();
-
-    fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+    //auto& app       = *apps_[subdomain];
+    //auto& state_mgr = app.getStateMgr();
+    //fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
     Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
     Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
@@ -920,16 +919,15 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
 
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
-    auto x_init = me.getNominalValues().get_x();
-    auto v_init = me.getNominalValues().get_x_dot();
-    auto a_init = me.get_x_dotdot();
-    auto nrm    = norm_2(*a_init);
+    auto const& nv     = me.getNominalValues();
+    auto        x_init = nv.get_x();
+    auto        v_init = nv.get_x_dot();
+    auto        a_init = me.get_x_dotdot();
 
     // Restore internal states
     auto& app       = *apps_[subdomain];
-    auto& state_mgr = app.getStateMgr();
-
-    fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+    //auto& state_mgr = app.getStateMgr();
+    //fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
     // Make sure there is no leftover adapted mesh from before.
     std::string const tmp_adapt_filename{"ace_adapt_temporary.e"};

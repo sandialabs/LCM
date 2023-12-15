@@ -162,7 +162,6 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   stress_                 = *eval_fields[cauchy_str];
   Fp_                     = *eval_fields[Fp_str];
   eqps_                   = *eval_fields[eqps_str];
-  cumulative_time_        = *eval_fields[ct_str];
   yield_surf_             = *eval_fields[yield_surf_str];
   j2_stress_              = *eval_fields[j2_stress_str];
   tilt_angle_             = *eval_fields[tilt_angle_str];

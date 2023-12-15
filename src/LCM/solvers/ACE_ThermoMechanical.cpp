@@ -17,6 +17,8 @@
 #include "Piro_ObserverToLOCASaveDataStrategyAdapter.hpp"
 #include "Piro_TempusSolver.hpp"
 #include "Piro_TrapezoidRuleSolver.hpp"
+#include "Topology.hpp"
+#include "Topology_FailureCriterion.hpp"
 
 namespace {
 
@@ -983,6 +985,34 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     this_xdot_[subdomain]    = xdot_rcp;
     this_xdotdot_[subdomain] = xdotdot_rcp;
 
+    // Acummulate values of failed cells and report.
+    auto& thyra_solution_manager    = *(piro_tr_solver.getSolutionManager());
+    auto& adaptive_solution_manager = static_cast<AAdapt::AdaptiveSolutionManager&>(thyra_solution_manager);
+    auto& adapter                   = *(adaptive_solution_manager.getAdapter());
+    auto& erosion_adapter           = static_cast<AAdapt::Erosion&>(adapter);
+    auto& topology                  = *(erosion_adapter.getTopology());
+    auto& failure_criterion         = *(topology.get_failure_criterion());
+    auto& bulk_failure_criterion    = static_cast<BulkFailureCriterion&>(failure_criterion);
+
+    count_displacement += bulk_failure_criterion.count_displacement;
+    count_angle += bulk_failure_criterion.count_angle;
+    count_yield += bulk_failure_criterion.count_yield;
+    count_strain += bulk_failure_criterion.count_strain;
+    count_tension += bulk_failure_criterion.count_tension;
+
+    auto&      fos                 = *Teuchos::VerboseObjectBase::getDefaultOStream();
+    auto const failed_displacement = count_displacement / bulk_failure_criterion.failed_threshold;
+    auto const failed_angle        = count_angle / bulk_failure_criterion.failed_threshold;
+    auto const failed_yield        = count_yield / bulk_failure_criterion.failed_threshold;
+    auto const failed_strain       = count_strain / bulk_failure_criterion.failed_threshold;
+    auto const failed_tension      = count_tension / bulk_failure_criterion.failed_threshold;
+    fos << "INFO: Failed element count";
+    fos << ": displacement:" << failed_displacement;
+    fos << ", angle:" << failed_angle;
+    fos << ", yield:" << failed_yield;
+    fos << ", strain:" << failed_strain;
+    fos << ", tension:" << failed_tension;
+    fos << '\n';
   } else {
     ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");
   }

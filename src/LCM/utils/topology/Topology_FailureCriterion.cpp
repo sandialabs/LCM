@@ -228,8 +228,27 @@ BulkFailureCriterion::check(stk::mesh::BulkData& /* bulk_data */, stk::mesh::Ent
 {
   failure_state_ = get_meta_data().get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, failure_state_name_);
   ALBANY_ASSERT(failure_state_ != nullptr);
-  auto const* const pfs = reinterpret_cast<double const* const>(stk::mesh::field_data(*failure_state_, element));
-  return pfs[0] >= 8.0;  // # of integration points that must fail (max is 8 per element)
+  auto const* const pfs              = reinterpret_cast<double const* const>(stk::mesh::field_data(*failure_state_, element));
+  auto const        failure_modes    = static_cast<int>(pfs[0]);
+  auto              failure_state    = failure_modes;
+  auto const        num_displacement = failure_state / 10000;
+  failure_state -= 10000 * num_displacement;
+  auto const num_angle = failure_state / 1000;
+  failure_state -= 1000 * num_angle;
+  auto const num_yield = failure_state / 100;
+  failure_state -= 100 * num_yield;
+  auto const num_strain = failure_state / 10;
+  failure_state -= 10 * num_strain;
+  auto const num_tension = failure_state;
+  auto const num_failed  = num_displacement + num_angle + num_yield + num_strain + num_tension;
+  if (accumulate == true) {
+    count_displacement += num_displacement;
+    count_angle += num_angle;
+    count_yield += num_yield;
+    count_strain += num_strain;
+    count_tension += num_tension;
+  }
+  return num_failed >= failed_threshold;  // # of integration points that must fail (max is 8 per element)
 }
 
 }  // namespace LCM

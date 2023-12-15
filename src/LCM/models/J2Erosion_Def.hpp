@@ -553,14 +553,13 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const     strain_failure = distortion >= strain_limit;
     strain_indicator_(cell, pt)   = safe_quotient(distortion, strain_limit);
     if (strain_failure == true) {
-      failed += 1.0;
+      failed += 10.0;
     }
   }
 
   // Determine if critical stress is exceeded
   if (yielded == true) {
-    failed += 1.0;
-    // std::cout << "Cell " << cell << " pt " << pt << " :: yielded \n";
+    failed += 100.0;
   }
 
   // Determine if kinematic failure occurred
@@ -571,8 +570,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (critical_angle > 0.0) {
     auto const theta_abs = std::abs(theta);
     if (theta_abs >= critical_angle) {
-      failed += 1.0;
-      // std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
+      failed += 1000.0;
     }
     angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
 
@@ -582,7 +580,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const displacement_norm      = minitensor::norm(disp_val);
   displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement);
   if (displacement_norm > maximum_displacement) {
-    failed += 1.0;
+    failed += 10000.0;
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
 }

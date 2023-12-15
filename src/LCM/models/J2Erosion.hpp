@@ -75,6 +75,13 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField tilt_angle_;
   ScalarField failed_;
 
+  // Failure indicators
+  ScalarField yield_indicator_;
+  ScalarField tensile_indicator_;
+  ScalarField strain_indicator_;
+  ScalarField angle_indicator_;
+  ScalarField displacement_indicator_;
+
   // Workspace arrays
   Albany::MDArray Fp_old_;
   Albany::MDArray eqps_old_;

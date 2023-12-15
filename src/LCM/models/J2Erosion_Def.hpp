@@ -70,6 +70,13 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   std::string const F_str          = field_name_map_["F"];
   std::string const J_str          = field_name_map_["J"];
 
+  // failure indicators just for output
+  std::string const yield_indicator_str        = field_name_map_["Yield_Indicator"];
+  std::string const tensile_indicator_str      = field_name_map_["Tensile_Indicator"];
+  std::string const strain_indicator_str       = field_name_map_["Strain_Indicator"];
+  std::string const angle_indicator_str        = field_name_map_["Angle_Indicator"];
+  std::string const displacement_indicator_str = field_name_map_["Displacement_Indicator"];
+
   // define the dependent fields
   setDependentField(F_str, dl->qp_tensor);
   setDependentField(J_str, dl->qp_scalar);
@@ -89,6 +96,11 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   setEvaluatedField(yield_surf_str, dl->qp_scalar);
   setEvaluatedField(j2_stress_str, dl->qp_scalar);
   setEvaluatedField(tilt_angle_str, dl->qp_scalar);
+  setEvaluatedField(yield_indicator_str, dl->qp_scalar);
+  setEvaluatedField(tensile_indicator_str, dl->qp_scalar);
+  setEvaluatedField(strain_indicator_str, dl->qp_scalar);
+  setEvaluatedField(angle_indicator_str, dl->qp_scalar);
+  setEvaluatedField(displacement_indicator_str, dl->qp_scalar);
   if (have_temperature_ == true) {
     setDependentField("Temperature", dl->qp_scalar);
     setEvaluatedField(source_str, dl->qp_scalar);
@@ -102,28 +114,38 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(yield_surf_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Surface", false));
   addStateVariable(j2_stress_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output J2 Stress", false));
   addStateVariable(tilt_angle_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
+  addStateVariable(yield_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Yield Indicator", false));
+  addStateVariable(tensile_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tensile Indicator", false));
+  addStateVariable(strain_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
+  addStateVariable(angle_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
+  addStateVariable(displacement_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
+  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
     addStateVariable(source_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Mechanical Source", false));
   }
-
-  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
 }
 
 template <typename EvalT, typename Traits>
 void
 J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields)
 {
-  std::string cauchy_str     = field_name_map_["Cauchy_Stress"];
-  std::string Fp_str         = field_name_map_["Fp"];
-  std::string eqps_str       = field_name_map_["eqps"];
-  std::string yield_surf_str = field_name_map_["Yield_Surface"];
-  std::string j2_stress_str  = field_name_map_["J2_Stress"];
-  std::string tilt_angle_str = field_name_map_["Tilt_Angle"];
-  std::string source_str     = field_name_map_["Mechanical_Source"];
-  std::string F_str          = field_name_map_["F"];
-  std::string J_str          = field_name_map_["J"];
+  std::string const cauchy_str                 = field_name_map_["Cauchy_Stress"];
+  std::string const Fp_str                     = field_name_map_["Fp"];
+  std::string const eqps_str                   = field_name_map_["eqps"];
+  std::string const ct_str                     = field_name_map_["Cumulative_Time"];
+  std::string const yield_surf_str             = field_name_map_["Yield_Surface"];
+  std::string const j2_stress_str              = field_name_map_["J2_Stress"];
+  std::string const tilt_angle_str             = field_name_map_["Tilt_Angle"];
+  std::string const source_str                 = field_name_map_["Mechanical_Source"];
+  std::string const F_str                      = field_name_map_["F"];
+  std::string const J_str                      = field_name_map_["J"];
+  std::string const yield_indicator_str        = field_name_map_["Yield_Indicator"];
+  std::string const tensile_indicator_str      = field_name_map_["Tensile_Indicator"];
+  std::string const strain_indicator_str       = field_name_map_["Strain_Indicator"];
+  std::string const angle_indicator_str        = field_name_map_["Angle_Indicator"];
+  std::string const displacement_indicator_str = field_name_map_["Displacement_Indicator"];
 
   // extract dependent MDFields
   def_grad_          = *dep_fields[F_str];
@@ -137,13 +159,19 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   displacement_      = *dep_fields["Displacement"];
 
   // extract evaluated MDFields
-  stress_     = *eval_fields[cauchy_str];
-  Fp_         = *eval_fields[Fp_str];
-  eqps_       = *eval_fields[eqps_str];
-  yield_surf_ = *eval_fields[yield_surf_str];
-  j2_stress_  = *eval_fields[j2_stress_str];
-  tilt_angle_ = *eval_fields[tilt_angle_str];
-  failed_     = *eval_fields["failure_state"];
+  stress_                 = *eval_fields[cauchy_str];
+  Fp_                     = *eval_fields[Fp_str];
+  eqps_                   = *eval_fields[eqps_str];
+  cumulative_time_        = *eval_fields[ct_str];
+  yield_surf_             = *eval_fields[yield_surf_str];
+  j2_stress_              = *eval_fields[j2_stress_str];
+  tilt_angle_             = *eval_fields[tilt_angle_str];
+  yield_indicator_        = *eval_fields[yield_indicator_str];
+  tensile_indicator_      = *eval_fields[tensile_indicator_str];
+  strain_indicator_       = *eval_fields[strain_indicator_str];
+  angle_indicator_        = *eval_fields[angle_indicator_str];
+  displacement_indicator_ = *eval_fields[displacement_indicator_str];
+  failed_                 = *eval_fields["failure_state"];
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_str];
@@ -309,6 +337,14 @@ unit_fit(T ice_saturation, RealType porosity)
   return std::make_tuple(E, Y, K);
 }
 
+template <typename T>
+T
+safe_quotient(T num, T den)
+{
+  if (den == 0.0) return den;
+  return num / den;
+}
+
 }  // anonymous namespace
 
 template <typename EvalT, typename Traits>
@@ -408,15 +444,16 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT const f    = smag - ys;
 
   // update for output
-  yield_surf_(cell, pt) = ys;
-  j2_stress_(cell, pt)  = smag;
-  auto const Fval       = Sacado::Value<decltype(F)>::eval(F);
-  auto const Q          = minitensor::polar_rotation(Fval);
-  auto       cosine     = 0.5 * (minitensor::trace(Q) - 1.0);
-  cosine                = cosine > 1.0 ? 1.0 : cosine;
-  cosine                = cosine < -1.0 ? -1.0 : cosine;
-  auto const theta      = std::acos(cosine);
-  tilt_angle_(cell, pt) = theta;
+  yield_surf_(cell, pt)      = ys;
+  j2_stress_(cell, pt)       = smag;
+  auto const Fval            = Sacado::Value<decltype(F)>::eval(F);
+  auto const Q               = minitensor::polar_rotation(Fval);
+  auto       cosine          = 0.5 * (minitensor::trace(Q) - 1.0);
+  cosine                     = cosine > 1.0 ? 1.0 : cosine;
+  cosine                     = cosine < -1.0 ? -1.0 : cosine;
+  auto const theta           = std::acos(cosine);
+  tilt_angle_(cell, pt)      = theta;
+  yield_indicator_(cell, pt) = safe_quotient(smag, ys);
 
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;
@@ -498,8 +535,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     auto          sig = Sacado::Value<decltype(sigma)>::eval(sigma);
     decltype(sig) V(num_dims_);
     decltype(sig) S(num_dims_);
-    std::tie(V, S)             = minitensor::eig_sym(sig);
-    bool const tension_failure = S(0, 0) >= tensile_strength || S(1, 1) >= tensile_strength || S(2, 2) >= tensile_strength;
+    std::tie(V, S)               = minitensor::eig_sym(sig);
+    auto const Smax              = std::max(S(0, 0), std::max(S(1, 1), S(2, 2)));
+    bool const tension_failure   = Smax >= tensile_strength;
+    tensile_indicator_(cell, pt) = safe_quotient(Smax, tensile_strength);
     if (tension_failure == true) {
       failed += 1.0;
     }
@@ -513,6 +552,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     decltype(Fval) Cdevval        = Jm23val * Cval;
     auto const     distortion     = minitensor::norm(Cdevval) / std::sqrt(3.0);
     bool const     strain_failure = distortion >= strain_limit;
+    strain_indicator_(cell, pt)   = safe_quotient(distortion, strain_limit);
     if (strain_failure == true) {
       failed += 1.0;
     }
@@ -530,15 +570,20 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     critical_angle = 1.0 * critical_angle_;
   }
   if (critical_angle > 0.0) {
-    if (std::abs(theta) >= critical_angle) {
+    auto const theta_abs = std::abs(theta);
+    if (theta_abs >= critical_angle) {
       failed += 1.0;
       // std::cout << "Cell " << cell << " pt " << pt << " :: critical angle \n";
     }
+    angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
+
   }
-  auto const maximum_displacement = 0.35;  // [m]
-  auto const displacement_norm    = minitensor::norm(displacement);
+  auto const maximum_displacement   = 0.35;  // [m]
+  auto const disp_val               = Sacado::Value<decltype(displacement)>::eval(displacement);
+  auto const displacement_norm      = minitensor::norm(disp_val);
+  displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement);
   if (displacement_norm > maximum_displacement) {
-    failed += 8.0;
+    failed += 1.0;
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
 }

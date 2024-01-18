@@ -35,7 +35,6 @@ ALBANY:
       ACE Sea Level File: './waterH_ExSec3600_Grid0.02_2011.txt'
       ACE Ocean Salinity File: './ocean_salinity_ExSec3600_Grid0.02_2011.txt'
       ACE Element Size: 0.10  # [m]
-      ACE Thermal Erosion Factor: 1.0
     Ice:
       #=======================================#
       # This material describes an ice wedge  #
@@ -59,6 +58,5 @@ ALBANY:
       ACE Sea Level File: './waterH_ExSec3600_Grid0.02_2011.txt'
       ACE Ocean Salinity File: './ocean_salinity_ExSec3600_Grid0.02_2011.txt'
       ACE Element Size: 0.10  # [m]
-      ACE Thermal Erosion Factor: 1.0
 
 

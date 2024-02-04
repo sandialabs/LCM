@@ -291,8 +291,16 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       Tdiff = Tcurr - (Tmelt + Tshift);
 
+      ScalarT const r_max    = 1.7e308; //This is the max double that can be represented in C++ w/o overflow
       ScalarT const tol_bt   = 709.0;
-      ScalarT const tol_qebt = 6.6e+30;
+      //IKT 2/4/2025: Please see ace_thermal_param_upper_bound_to_prevent_nans.pdf in 
+      //the arctic_coastal_erosion repo for a derivation of the following tolerance.
+      //It is calcutated such that d^2f/dT^2 does not overflow.  This value comes up in the derivatives 
+      //of qebt, which are used to calculate the stiffness matrix for the problem.
+      ScalarT const d        = 1.0/0.1 + 2.0; 
+      ScalarT const tol_qebt = pow(r_max, 1.0/d) - C;
+      //std::cout << "IKT r_max, v, d, 1/d, tol_qebt = " << r_max << ", " << v << ", " << d << ", "
+      //          << 1.0/d << ", " << tol_qebt << "\n"; 
       ScalarT const bt       = -B * Tdiff;
 
       if (bt < -tol_bt) {

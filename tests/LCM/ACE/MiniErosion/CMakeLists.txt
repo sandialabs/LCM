@@ -10,6 +10,8 @@ add_subdirectory(grid)
 add_subdirectory(external_files)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_new_wave_press_nbc.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/coupled_new_wave_press_nbc.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_new_wave_press_nbc_implicit.yaml
+        	${CMAKE_CURRENT_BINARY_DIR}/coupled_new_wave_press_nbc_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation_tempus_noerosion.yaml
@@ -18,6 +20,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation_tempus_noerosion_a
         	${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation_tempus_noerosion_all_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_new_wave_press_nbc.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/thermal_new_wave_press_nbc.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_new_wave_press_nbc_implicit.yaml
+        	${CMAKE_CURRENT_BINARY_DIR}/thermal_new_wave_press_nbc_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion.yaml
@@ -26,6 +30,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_i
         	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_new_wave_press_nbc.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/mechanical_new_wave_press_nbc.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_new_wave_press_nbc_implicit.yaml
+        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_new_wave_press_nbc_implicit.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation.yaml
         	${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion.yaml

@@ -108,6 +108,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   std::vector<RealType> z_above_mean_sea_level_;
   std::vector<RealType> peat_from_file_;
   std::vector<RealType> porosity_from_file_;
+  std::vector<RealType> air_from_file_;
   std::vector<RealType> sea_level_;
   std::vector<RealType> time_;
 

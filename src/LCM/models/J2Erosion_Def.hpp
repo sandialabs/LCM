@@ -58,6 +58,16 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
         "*** ERROR: Number of z values and number of peat values in "
         "ACE Peat File must match.");
   }
+  if (p->isParameter("ACE Air File") == true) {
+    auto const filename = p->get<std::string>("ACE Air File");
+    air_from_file_     = vectorFromFile(filename);
+    ALBANY_ASSERT(
+        z_above_mean_sea_level_.size() == air_from_file_.size(),
+        "*** ERROR: Number of z values and number of air values in "
+        "ACE Air File must match.");
+  }
+
+  // retrieve appropriate field name strings
 
   // retrieve appropriate field name strings
   std::string const cauchy_str     = field_name_map_["Cauchy_Stress"];
@@ -367,6 +377,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   auto const peat     = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) : 0.0;
   auto const porosity = porosity_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) : bulk_porosity_;
+  //IKT, 2/17/2024: added air for specification of snow
+  //TODO: work this variable into implementation
+  auto const air     = air_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, air_from_file_, height) : 0.0;
+  //std::cout << "IKT J2Erosion air = " << air << "\n"; 
   ScalarT    ne{1.0};
   ScalarT    ny{1.0};
   ScalarT    nk{1.0};

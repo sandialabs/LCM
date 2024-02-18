@@ -169,6 +169,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
   std::vector<RealType> clay_from_file_eb     = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_);
   std::vector<RealType> silt_from_file_eb     = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_);
   std::vector<RealType> peat_from_file_eb     = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_);
+  //The following is for specifying snow for ACI/NH
+  std::vector<RealType> air_from_file_eb      = this->queryElementBlockParameterMap(eb_name, air_from_file_map_);
 
   ScalarT ice_density_eb         = this->queryElementBlockParameterMap(eb_name, ice_density_map_);
   ScalarT water_density_eb       = this->queryElementBlockParameterMap(eb_name, water_density_map_);
@@ -265,6 +267,11 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         sediment_given = true;
       }
 
+      // Check if air fraction was provided
+      bool air_given{false};
+      if (air_from_file_eb.size() > 0) {
+        air_given = true;
+      }
       ScalarT  Tshift;
       ScalarT  Tdiff;
       RealType v = 0.1;
@@ -279,6 +286,14 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       } else {
         Tshift = 0.1;
       }
+
+      //IKT 2/17/2024: code to use air frac goes here for Jenn to fill in.
+      //Might want to move elsewhere in this function...
+      if (air_given == true) {
+        auto air_frac = interpolateVectors(z_above_mean_sea_level_eb, air_from_file_eb, height);
+	//std::cout << "IKT air_frac = " << air_frac << "\n"; 
+      }
+
       // Use freezing curve to get icurr and dfdT
       ScalarT icurr{1.0};
       ScalarT dfdT{0.0};
@@ -569,6 +584,18 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "ACE Peat File must match. \n"
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
+    if (material_db_->isElementBlockParam(eb_name, "ACE Air File") == true) {
+      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Air File");
+      air_from_file_map_[eb_name] = vectorFromFile(filename);
+      //IKT 2/17/2024: I am not sure if the following assert makes sense for the air.
+      //TODO: check with Jenn.
+      ALBANY_ASSERT(
+          z_above_mean_sea_level_map_[eb_name].size() == air_from_file_map_[eb_name].size(),
+          "*** ERROR: Number of z values and number of air values in "
+          "ACE Air File must match. \n"
+          "Hint: Did you provide the 'ACE Z Depth File'?");
+    }
+
 
     ALBANY_ASSERT(
         time_map_[eb_name].size() == sea_level_map_[eb_name].size(),

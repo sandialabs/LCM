@@ -116,6 +116,8 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   std::map<std::string, std::vector<RealType>> clay_from_file_map_;
   std::map<std::string, std::vector<RealType>> silt_from_file_map_;
   std::map<std::string, std::vector<RealType>> peat_from_file_map_;
+  //The following is used to specify snow for ACI/NH
+  std::map<std::string, std::vector<RealType>> air_from_file_map_;
 
   //! Variables keeping track of whether cells are on erodible boundary
   bool                       have_cell_boundary_indicator_{false};

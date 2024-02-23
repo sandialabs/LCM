@@ -109,8 +109,9 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   std::map<std::string, std::vector<RealType>> z_above_mean_sea_level_map_;
   std::map<std::string, std::vector<RealType>> sea_level_map_;
   std::map<std::string, std::vector<RealType>> salinity_map_;
-  std::map<std::string, std::vector<RealType>> ocean_salinity_map_;  // IKT FIXME?: this is not block dept so can be a
-                                                                     // std::vector
+  std::map<std::string, std::vector<RealType>> ocean_salinity_map_;  // IKT FIXME?: this is not block dept so can be a std::vector
+
+  std::map<std::string, std::vector<RealType>> snow_depth_map_;  
   std::map<std::string, std::vector<RealType>> porosity_from_file_map_;
   std::map<std::string, std::vector<RealType>> sand_from_file_map_;
   std::map<std::string, std::vector<RealType>> clay_from_file_map_;

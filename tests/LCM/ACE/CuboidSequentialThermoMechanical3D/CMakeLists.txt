@@ -65,6 +65,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/silt_frac.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/air_frac.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/air_frac.txt COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/snow_depth.txt
+                 ${CMAKE_CURRENT_BINARY_DIR}/snow_depth.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/time_fake.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/time_fake.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/waterH_fake.txt

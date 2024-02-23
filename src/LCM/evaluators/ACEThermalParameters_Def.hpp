@@ -165,6 +165,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
   std::vector<RealType> porosity_from_file_eb = this->queryElementBlockParameterMap(eb_name, porosity_from_file_map_);
   std::vector<RealType> ocean_salinity_eb     = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
+  std::vector<RealType> snow_depth_eb     = this->queryElementBlockParameterMap(eb_name, snow_depth_map_);
   std::vector<RealType> sand_from_file_eb     = this->queryElementBlockParameterMap(eb_name, sand_from_file_map_);
   std::vector<RealType> clay_from_file_eb     = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_);
   std::vector<RealType> silt_from_file_eb     = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_);
@@ -225,6 +226,14 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         porosity_eb = interpolateVectors(z_above_mean_sea_level_eb, porosity_from_file_eb, height);
       }
       porosity_(cell, qp) = porosity_eb;
+      
+      //IKT 2/23/2024: the following was added for the snow_depth field.
+      //TODO Jenn: use this field to incorporate snow into mixture model
+      ScalarT       snow_depth(0.0);
+      if (snow_depth_eb.size() > 0) {
+        snow_depth = interpolateVectors(time_eb, snow_depth_eb, current_time);
+      }
+      //std::cout << "IKT snow_depth = " << snow_depth << "\n"; 
 
       // Calculate the salinity of the grid cell
       if ((is_erodible == true) && (height <= sea_level)) {
@@ -538,6 +547,15 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "*** ERROR: Number of time values and number of ocean salinity "
           "values in "
           "ACE Ocean Salinity File must match.");
+    }
+    if (material_db_->isElementBlockParam(eb_name, "ACE Snow Depth File") == true) {
+      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Snow Depth File");
+      snow_depth_map_[eb_name] = vectorFromFile(filename);
+      ALBANY_ASSERT(
+          time_map_[eb_name].size() == snow_depth_map_[eb_name].size(),
+          "*** ERROR: Number of time values and number of snow depth "
+          "values in "
+          "ACE Snow Depth File must match.");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE_Porosity File") == true) {
       std::string const filename       = material_db_->getElementBlockParam<std::string>(eb_name, "ACE_Porosity File");

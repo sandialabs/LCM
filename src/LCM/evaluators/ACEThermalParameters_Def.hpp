@@ -229,7 +229,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       
       //IKT 2/23/2024: the following was added for the snow_depth field.
       //TODO Jenn: use this field to incorporate snow into mixture model
-      ScalarT       snow_depth(0.0);
+      ScalarT snow_depth(0.0);
+      bool    snow_given{false};               
       if (snow_depth_eb.size() > 0) {
         snow_depth = interpolateVectors(time_eb, snow_depth_eb, current_time);
       }
@@ -348,6 +349,11 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         }
       }
 
+      if (snow_given == true) {
+        dfdT  = 0.0;
+        icurr = 1.0;
+      }
+
       std::min(icurr, 1.0);
       std::max(icurr, 0.0);
 
@@ -384,6 +390,11 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         density_(cell, qp) = (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) + ((1.0 - porosity_eb) * soil_density_eb);
       }
 
+      if (snow_given == true) {
+        auto const SWE = 0.10;
+        density_(cell, qp) = SWE * water_density_eb;
+      }
+
       // Update the effective material heat capacity
       if (sediment_given == true) {
         heat_capacity_(cell, qp) =
@@ -395,6 +406,10 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       // HACK!! HACK!! HACK!!
       // HACK!! HACK!! HACK!!
       heat_capacity_(cell, qp) = (1.0) * heat_capacity_(cell, qp);
+
+      if (snow_given == true) {
+        heat_capacity_(cell, qp) = 2090.0;  // [J/kg/K]      
+      }
 
       // Update the effective material thermal conductivity
       if (sediment_given == true) {
@@ -409,6 +424,13 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       // HACK!! HACK!! HACK!!
       // HACK!! HACK!! HACK!!
       thermal_conductivity_(cell, qp) = (1.0) * thermal_conductivity_(cell, qp);
+
+      if (snow_given == true) {
+        ScalarT       snow_K = 0.1;  // [W/K/m]
+        ScalarT const dZ = element_size_eb; // [m]
+        snow_K = snow_K * (dZ / snow_depth);
+        thermal_conductivity_(cell, qp) = std::min(snow_K, 1000.0);  // [W/K/m]      
+      }
 
       // Jenn's sub-grid scale model to calibrate niche formation follows.
       // By default, thermal_factor = 1.0, so that no scaling occurs.

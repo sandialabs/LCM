@@ -233,6 +233,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       bool    snow_given{false};               
       if (snow_depth_eb.size() > 0) {
         snow_depth = interpolateVectors(time_eb, snow_depth_eb, current_time);
+	snow_given = true;
       }
       //std::cout << "IKT snow_depth = " << snow_depth << "\n"; 
 
@@ -424,12 +425,14 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       // HACK!! HACK!! HACK!!
       // HACK!! HACK!! HACK!!
       thermal_conductivity_(cell, qp) = (1.0) * thermal_conductivity_(cell, qp);
-
+      
       if (snow_given == true) {
         ScalarT       snow_K = 0.1;  // [W/K/m]
         ScalarT const dZ = element_size_eb; // [m]
         snow_K = snow_K * (dZ / snow_depth);
-        thermal_conductivity_(cell, qp) = std::min(snow_K, 1000.0);  // [W/K/m]      
+	//std::cout << "snow_depth = " << snow_depth << " ";
+	//std::cout << "snow_K = " << snow_K << " ";
+        thermal_conductivity_(cell, qp) = std::min(snow_K, 15.0);  // [W/K/m]      
       }
 
       // Jenn's sub-grid scale model to calibrate niche formation follows.

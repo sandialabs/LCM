@@ -132,6 +132,8 @@ MechanicsProblem::constructEvaluators(
   // IKT: uncomment the following if wish to run stand-alone mechanics problem
   // with ACE_Ice_Saturation field.
   // is_ace_sequential_thermomechanical_ = true;
+  // A better way to do this at runtime is to add the ACE Sequential Thermomechanical: true option 
+  // to the "Problem" PL in your input file.
 
   using Intrepid2Basis = typename Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>;
 

@@ -28,6 +28,7 @@ LCM:
       Hardening Modulus:
         Hardening Modulus Type: Constant
         Value: 0.0
+      ACE Maximum Displacement: 0.35
       Saturation Modulus: 0.0
       Saturation Exponent: 0.0
       Output Cauchy Stress: true
@@ -77,6 +78,7 @@ LCM:
       Hardening Modulus:
         Hardening Modulus Type: Constant
         Value: 0.0
+      ACE Maximum Displacement: 0.35
       Saturation Modulus: 0.0
       Saturation Exponent: 0.0
       Output Cauchy Stress: true

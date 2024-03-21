@@ -25,6 +25,12 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   strain_limit_             = p->get<RealType>("ACE Strain Limit", 0.0);
+  if (p->isParameter("ACE Maximum Displacement")) { 
+    maximum_displacement_     = p->get<RealType>("ACE Maximum Displacement", 0.0);
+  }
+  else {
+    ALBANY_ABORT("ACE Maximum Displacement not specified in mechanics material file!  To get the old default behavior, set this parameter to 0.35."); 
+  }
 
   if (p->isParameter("ACE Sea Level File") == true) {
     auto const filename = p->get<std::string>("ACE Sea Level File");
@@ -391,7 +397,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const is_erodible    = cell_bi == 2.0;
 
   auto strain_limit = strain_limit_;
-  if (porosity < 0.99) {
+  if ((porosity < 0.99) && (strain_limit > 0.0)) {
     strain_limit = 1.0 + peat;
     strain_limit = std::max(strain_limit, 1.04);
   }
@@ -401,7 +407,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if ((is_erodible == true) && (height <= sea_level)) {
     Y            = Y / (Y_weakening_factor_);
     E            = E / (E_weakening_factor_);
-    strain_limit = 1.0 + ((strain_limit - 1.0) / SL_weakening_factor_);
+    if (strain_limit > 0.0) {
+      strain_limit = 1.0 + ((strain_limit - 1.0) / SL_weakening_factor_);
+    }
   }
 
   ScalarT const nu    = poissons_ratio_(cell, pt);
@@ -539,6 +547,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const tension_failure   = Smax >= tensile_strength;
     tensile_indicator_(cell, pt) = safe_quotient(Smax, tensile_strength);
     if (tension_failure == true) {
+       ALBANY_ABORT("Tensile failure!\n"); 
       failed += 1.0;
     }
   }
@@ -553,12 +562,14 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const     strain_failure = distortion >= strain_limit;
     strain_indicator_(cell, pt)   = safe_quotient(distortion, strain_limit);
     if (strain_failure == true) {
+      //ALBANY_ABORT("Strain failure!\n"); 
       failed += 10.0;
     }
   }
 
   // Determine if critical stress is exceeded
   if (yielded == true) {
+    //ALBANY_ABORT("Yield failure!\n"); 
     failed += 100.0;
   }
 
@@ -570,15 +581,17 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (critical_angle > 0.0) {
     auto const theta_abs = std::abs(theta);
     if (theta_abs >= critical_angle) {
+      //ALBANY_ABORT("Critical angle failure!\n"); 
       failed += 1000.0;
     }
     angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
   }
-  auto const maximum_displacement   = 0.35;  // [m]
   auto const disp_val               = Sacado::Value<decltype(displacement)>::eval(displacement);
   auto const displacement_norm      = minitensor::norm(disp_val);
-  displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement);
-  if (displacement_norm > maximum_displacement) {
+  displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement_);
+  if ((maximum_displacement_ > 0.0) && (displacement_norm > maximum_displacement_)) {
+    //std::cout << "displacement_norm, maximum_displacement = " << displacement_norm << ", " << maximum_displacement_ << "\n"; 
+    //ALBANY_ABORT("Kinematic failure!\n"); 
     failed += 10000.0;
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }

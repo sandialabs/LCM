@@ -22,6 +22,7 @@ LCM:
       Hardening Modulus:
         Hardening Modulus Type: Constant
         Value: 0.0
+      ACE Maximum Displacement: 0.35
       Saturation Modulus: 0.0
       Saturation Exponent: 0.0
       ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
@@ -49,6 +50,7 @@ LCM:
       Hardening Modulus:
         Hardening Modulus Type: Constant
         Value: 0.0
+      ACE Maximum Displacement: 0.35
       Saturation Modulus: 0.0
       Saturation Exponent: 0.0
       ACE Bulk Porosity: 1.00  # Used if porosity.txt not given.
@@ -80,6 +82,7 @@ LCM:
   #    Hardening Modulus:
   #      Hardening Modulus Type: Constant
   #      Value: 0.0
+  #    ACE Maximum Displacement: 0.35
   #    Saturation Modulus: 0.0
   #    Saturation Exponent: 0.0
   #    Output Cauchy Stress: true
@@ -129,7 +132,8 @@ LCM:
   #    Hardening Modulus:
   #      Hardening Modulus Type: Constant
   #      Value: 0.0
-  #     Saturation Modulus: 0.0
+  #    ACE Maximum Displacement: 0.35
+  #    Saturation Modulus: 0.0
   #    Saturation Exponent: 0.0
   #    Output Cauchy Stress: true
   #    Output eqps: true

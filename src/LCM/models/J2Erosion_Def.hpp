@@ -24,7 +24,12 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
-  strain_limit_             = p->get<RealType>("ACE Strain Limit", 0.0);
+  if (p->isParameter("ACE Strain Limit")) { 
+    strain_limit_             = p->get<RealType>("ACE Strain Limit");
+  }
+  else {
+    ALBANY_ABORT("ACE Strain Limit not specified in mechanics material file!  To avoid strain failure criterion, set this value to 0.0."); 
+  }
   if (p->isParameter("ACE Maximum Displacement")) { 
     maximum_displacement_     = p->get<RealType>("ACE Maximum Displacement", 0.0);
   }

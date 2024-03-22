@@ -31,8 +31,13 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   tensile_strength_ = 0.0; */
   //std::cout << "IKT erosion enabled!\n"; 
   critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
-  strain_limit_             = p->get<RealType>("ACE Strain Limit", 0.0);
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
+  if (p->isParameter("ACE Strain Limit")) { 
+    strain_limit_             = p->get<RealType>("ACE Strain Limit");
+  }
+  else {
+    ALBANY_ABORT("ACE Strain Limit not specified in mechanics material file!  To avoid strain failure criterion, set this value to 0.0."); 
+  }
   if (p->isParameter("ACE Maximum Displacement")) { 
     maximum_displacement_     = p->get<RealType>("ACE Maximum Displacement");
   }

@@ -16,4 +16,4 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 add_test(ACE_${testName} ${SerialAlbany.exe} cube.yaml)
 set_tests_properties(ACE_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-add_subdirectory(TempNBC)
+#add_subdirectory(TempNBC)

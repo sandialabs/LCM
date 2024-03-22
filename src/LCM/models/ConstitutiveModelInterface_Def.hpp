@@ -3,8 +3,6 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include "AAAModel.hpp"
-#include "ACEice.hpp"
-#include "ACEpermafrost.hpp"
 #include "Albany_Macros.hpp"
 #include "AnisotropicDamageModel.hpp"
 #include "AnisotropicHyperelasticDamageModel.hpp"
@@ -313,10 +311,6 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
     model = rcp(new J2Erosion<EvalT, Traits>(p, dl));
   } else if (model_name == "J2 MiniSolver") {
     model = rcp(new J2MiniSolver<EvalT, Traits>(p, dl));
-  } else if (model_name == "ACE ice") {
-    model = rcp(new ACEice<EvalT, Traits>(p, dl));
-  } else if (model_name == "ACE permafrost") {
-    model = rcp(new ACEpermafrost<EvalT, Traits>(p, dl));
   } else {
     ALBANY_ABORT(error_msg);
   }

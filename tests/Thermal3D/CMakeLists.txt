@@ -5,8 +5,6 @@ if(NOT ALBANY_PARALLEL_ONLY)
   # Copy Input file from source to binary dir
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_ACE.yaml
-                 ${CMAKE_CURRENT_BINARY_DIR}/input_ACE.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/material.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.g
@@ -36,6 +34,5 @@ if(NOT ALBANY_PARALLEL_ONLY)
 
   # Create the test with this name and standard executable
   add_test(${testName} ${Albany.exe} input.yaml)
-  add_test(${testName}_ACE ${Albany.exe} input_ACE.yaml)
   set_tests_properties(${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
 endif()

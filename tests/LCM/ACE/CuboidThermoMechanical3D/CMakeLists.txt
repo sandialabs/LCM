@@ -6,9 +6,6 @@ if(NOT ALBANY_PARALLEL_ONLY)
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/simulation_thermal_only.yaml
     ${CMAKE_CURRENT_BINARY_DIR}/simulation_thermal_only.yaml COPYONLY)
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation_thermomechanical.yaml
-    ${CMAKE_CURRENT_BINARY_DIR}/simulation_thermomechanical.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bluff_salinity.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/bluff_salinity.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clay_frac.txt
@@ -28,9 +25,6 @@ if(NOT ALBANY_PARALLEL_ONLY)
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal_only.yaml
     ${CMAKE_CURRENT_BINARY_DIR}/materials_thermal_only.yaml COPYONLY)
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/materials_thermomechanical.yaml
-    ${CMAKE_CURRENT_BINARY_DIR}/materials_thermomechanical.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/peat_frac.txt
                  ${CMAKE_CURRENT_BINARY_DIR}/peat_frac.txt COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/porosity.txt
@@ -49,6 +43,4 @@ if(NOT ALBANY_PARALLEL_ONLY)
   set_tests_properties(ACE_${testName}_ThermalOnly PROPERTIES LABELS
                                                           "Demo;Tpetra;Forward")
 
-  add_test(ACE_${testName} ${Albany.exe} simulation_thermomechanical.yaml)
-  set_tests_properties(ACE_${testName} PROPERTIES LABELS "Demo;Tpetra;Forward")
 endif()

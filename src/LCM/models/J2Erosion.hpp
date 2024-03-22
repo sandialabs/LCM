@@ -104,6 +104,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType tensile_strength_{0.0};
   RealType strain_limit_{0.0};
   RealType maximum_displacement_{0.0}; 
+  bool disable_erosion_{false}; //By default erosion is ON so not disabled  
 
   // Params with depth or time:
   std::vector<RealType> z_above_mean_sea_level_;

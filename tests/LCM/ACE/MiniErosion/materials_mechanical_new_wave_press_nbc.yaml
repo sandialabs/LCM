@@ -8,6 +8,7 @@ LCM:
       
   Materials:
     Permafrost:
+      Disable Erosion: false
       Material Model:
         Model Name: J2 Erosion
       Elastic Modulus:
@@ -26,6 +27,7 @@ LCM:
         Hardening Modulus Type: Constant
         Value: 0.0
       ACE Maximum Displacement: 0.35
+      ACE Strain Limit: 1.05
       Saturation Modulus: 0.0
       Saturation Exponent: 0.0
       ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.

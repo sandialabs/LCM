@@ -17,16 +17,24 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   sat_mod_                  = p->get<RealType>("Saturation Modulus", 0.0);
   sat_exp_                  = p->get<RealType>("Saturation Exponent", 0.0);
   bulk_porosity_            = p->get<RealType>("ACE Bulk Porosity", 0.0);
-  critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
   Y_weakening_factor_       = p->get<RealType>("ACE Y Weakening Factor", 1.0);
   E_weakening_factor_       = p->get<RealType>("ACE E Weakening Factor", 1.0);
   SL_weakening_factor_      = p->get<RealType>("ACE SL Weakening Factor", 1.0);
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
-  tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
+  disable_erosion_          = p->get<bool>("Disable Erosion", false);  
+  //IKT 3/21/2024 NOTE: another way to disable erosion from all but the yield criterion  without using the disable_erosion_
+  //flag is to specify:
+  /*critical_angle_ = 0.0; 
+  strain_limit_ = 0.0; 
+  maximum_displacement_ = 0.0; 
+  tensile_strength_ = 0.0; */
+  //std::cout << "IKT erosion enabled!\n"; 
+  critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
   strain_limit_             = p->get<RealType>("ACE Strain Limit", 0.0);
+  tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   if (p->isParameter("ACE Maximum Displacement")) { 
-    maximum_displacement_     = p->get<RealType>("ACE Maximum Displacement", 0.0);
+    maximum_displacement_     = p->get<RealType>("ACE Maximum Displacement");
   }
   else {
     ALBANY_ABORT("ACE Maximum Displacement not specified in mechanics material file!  To get the old default behavior, set this parameter to 0.35."); 
@@ -561,7 +569,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const tension_failure   = Smax >= tensile_strength;
     tensile_indicator_(cell, pt) = safe_quotient(Smax, tensile_strength);
     if (tension_failure == true) {
-       ALBANY_ABORT("Tensile failure!\n"); 
+      //ALBANY_ABORT("Tensile failure!\n"); 
       failed += 1.0;
     }
   }
@@ -608,6 +616,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     //ALBANY_ABORT("Kinematic failure!\n"); 
     failed += 10000.0;
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
+  }
+  if (disable_erosion_ == true) { //Set failed to 0 if erosion is disabled
+    failed = 0.0; 
   }
 }
 }  // namespace LCM

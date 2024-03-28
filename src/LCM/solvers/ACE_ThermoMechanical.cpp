@@ -925,11 +925,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto        x_init = nv.get_x();
     auto        v_init = nv.get_x_dot();
     auto        a_init = me.get_x_dotdot();
-
-    // Restore internal states
     auto& app = *apps_[subdomain];
-    // auto& state_mgr = app.getStateMgr();
-    // fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
     // Make sure there is no leftover adapted mesh from before.
     std::string const tmp_adapt_filename{"ace_adapt_temporary.e"};
@@ -955,7 +951,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     // Hack: fix status test parameter list. For some reason a dummy test gets added.
     // Extract the correct list and set it as the status test list.
     {
-      //*fos_ << "\n***\n*** Status Tests parameter list\n***\n\n";
       auto const app_params_rcp = app.getAppPL();
       auto&      piro_params    = app_params_rcp->sublist("Piro");
       auto&      nox_params     = piro_params.sublist("NOX");
@@ -965,8 +960,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
       st_params.remove("Test 0");
       st_params.remove("Test 1");
       st_params.setParameters(new_params);
-      // app_params_rcp->print();
-      // exit(0);
     }
 
     if (status == NOX::StatusTest::Failed) {
@@ -975,44 +968,52 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
       return;
     }
 
-    auto& solution_manager   = *(piro_tr_solver.getSolutionManager());
-    auto  solution_rcp       = solution_manager.getCurrentSolution();
-    auto  x_rcp              = solution_rcp->col(0)->clone_v();
-    auto  xdot_rcp           = solution_rcp->col(1)->clone_v();
-    auto  xdotdot_rcp        = solution_rcp->col(2)->clone_v();
-    auto  a_nrm              = norm_2(*xdotdot_rcp);
-    this_x_[subdomain]       = x_rcp;
-    this_xdot_[subdomain]    = xdot_rcp;
-    this_xdotdot_[subdomain] = xdotdot_rcp;
+    // Obtain the solution and its time derivatives
+    auto& tr_decorator = *(piro_tr_solver.getDecorator());
+    auto  x_rcp        = tr_decorator.get_x();
+    auto  xdot_rcp     = tr_decorator.get_x_dot();
+    auto  xdotdot_rcp  = tr_decorator.get_x_dotdot();
+    auto  a_nrm        = norm_2(*xdotdot_rcp);
 
-    // Acummulate values of failed cells and report.
-    auto& thyra_solution_manager    = *(piro_tr_solver.getSolutionManager());
-    auto& adaptive_solution_manager = static_cast<AAdapt::AdaptiveSolutionManager&>(thyra_solution_manager);
-    auto& adapter                   = *(adaptive_solution_manager.getAdapter());
-    auto& erosion_adapter           = static_cast<AAdapt::Erosion&>(adapter);
-    auto& topology                  = *(erosion_adapter.getTopology());
-    auto& failure_criterion         = *(topology.get_failure_criterion());
-    auto& bulk_failure_criterion    = static_cast<BulkFailureCriterion&>(failure_criterion);
+    this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
+    this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
+    this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
 
-    count_displacement += bulk_failure_criterion.count_displacement;
-    count_angle += bulk_failure_criterion.count_angle;
-    count_yield += bulk_failure_criterion.count_yield;
-    count_strain += bulk_failure_criterion.count_strain;
-    count_tension += bulk_failure_criterion.count_tension;
+    Thyra::copy(*x_rcp, this_x_[subdomain].ptr());
+    Thyra::copy(*xdot_rcp, this_xdot_[subdomain].ptr());
+    Thyra::copy(*xdotdot_rcp, this_xdotdot_[subdomain].ptr());
 
-    auto&      fos                 = *Teuchos::VerboseObjectBase::getDefaultOStream();
-    auto const failed_displacement = count_displacement / bulk_failure_criterion.failed_threshold;
-    auto const failed_angle        = count_angle / bulk_failure_criterion.failed_threshold;
-    auto const failed_yield        = count_yield / bulk_failure_criterion.failed_threshold;
-    auto const failed_strain       = count_strain / bulk_failure_criterion.failed_threshold;
-    auto const failed_tension      = count_tension / bulk_failure_criterion.failed_threshold;
-    fos << "INFO: Failed element count";
-    fos << ": displacement:" << failed_displacement;
-    fos << ", angle:" << failed_angle;
-    fos << ", yield:" << failed_yield;
-    fos << ", strain:" << failed_strain;
-    fos << ", tension:" << failed_tension;
-    fos << '\n';
+    // Acummulate values of failed cells and report if applicable
+    auto thyra_solution_manager_rcp = piro_tr_solver.getSolutionManager();
+    if (thyra_solution_manager_rcp != Teuchos::null) {
+      auto& thyra_solution_manager    = *(piro_tr_solver.getSolutionManager());
+      auto& adaptive_solution_manager = static_cast<AAdapt::AdaptiveSolutionManager&>(thyra_solution_manager);
+      auto& adapter                   = *(adaptive_solution_manager.getAdapter());
+      auto& erosion_adapter           = static_cast<AAdapt::Erosion&>(adapter);
+      auto& topology                  = *(erosion_adapter.getTopology());
+      auto& failure_criterion         = *(topology.get_failure_criterion());
+      auto& bulk_failure_criterion    = static_cast<BulkFailureCriterion&>(failure_criterion);
+
+      count_displacement += bulk_failure_criterion.count_displacement;
+      count_angle += bulk_failure_criterion.count_angle;
+      count_yield += bulk_failure_criterion.count_yield;
+      count_strain += bulk_failure_criterion.count_strain;
+      count_tension += bulk_failure_criterion.count_tension;
+
+      auto&      fos                 = *Teuchos::VerboseObjectBase::getDefaultOStream();
+      auto const failed_displacement = count_displacement / bulk_failure_criterion.failed_threshold;
+      auto const failed_angle        = count_angle / bulk_failure_criterion.failed_threshold;
+      auto const failed_yield        = count_yield / bulk_failure_criterion.failed_threshold;
+      auto const failed_strain       = count_strain / bulk_failure_criterion.failed_threshold;
+      auto const failed_tension      = count_tension / bulk_failure_criterion.failed_threshold;
+      fos << "INFO: Failed element count";
+      fos << ": displacement:" << failed_displacement;
+      fos << ", angle:" << failed_angle;
+      fos << ", yield:" << failed_yield;
+      fos << ", strain:" << failed_strain;
+      fos << ", tension:" << failed_tension;
+      fos << '\n';
+    }
   } else {
     ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");
   }

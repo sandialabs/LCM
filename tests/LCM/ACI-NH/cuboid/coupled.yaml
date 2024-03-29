@@ -1,0 +1,17 @@
+LCM:
+  Alternating System:
+    Model Input Files: ['thermal.yaml', 'mechanical.yaml']
+    Initial Time: 0.0 #   [sec]
+    Final Time: 86400.0 #  [sec]
+    Initial Time Step: 3600.0 # [sec]
+    Maximum Steps: 10000
+    Minimum Time Step: 1.0e-04 # [sec]
+    Maximum Time Step: 3600.0 # [sec]
+    Reduction Factor: 0.5
+    Amplification Factor: 1.1
+    Exodus Write Interval: 1
+    Exodus ACE Output File Initial Index: 0
+  Problem:
+    Solution Method: ACE Sequential Thermo-Mechanical
+    Phalanx Graph Visualization Detail: 0
+...

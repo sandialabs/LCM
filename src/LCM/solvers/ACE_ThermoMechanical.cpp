@@ -69,6 +69,7 @@ deleteParallel(std::string const& filename, Teuchos::RCP<Teuchos::Comm<int> cons
 void
 renameParallel(std::string const& old_filename, std::string const& new_filename, Teuchos::RCP<Teuchos::Comm<int> const> comm)
 {
+  if (old_filename == new_filename) return;
   int const num_ranks = comm->getSize();
   int const this_rank = comm->getRank();
   if (num_ranks > 1) {

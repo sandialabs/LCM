@@ -259,19 +259,25 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
         for (int pt = 0; pt < num_pts; ++pt) {
           if (this->ip_field_layouts_[field] == "Scalar") {
             // save the scalar component
-            data_nonconstView[node_var_offset][local_row] += this->ip_fields_[field](cell, pt) * this->weights_(cell, pt);
+            PHX::MDField<ScalarT const>& scalar_field = this->ip_fields_[field];
+            auto const                   ipval        = scalar_field(cell, pt);
+            auto const                   weight       = this->weights_(cell, pt);
+            data_nonconstView[node_var_offset][local_row] += ipval * weight;
           } else if (this->ip_field_layouts_[field] == "Vector") {
             for (int i = 0; i < num_dims; ++i) {
               // save the vector component
-              data_nonconstView[node_var_offset + i][local_row] += this->ip_fields_[field](cell, pt, i) * this->weights_(cell, pt);
+              PHX::MDField<ScalarT const>& vector_field = this->ip_fields_[field];
+              auto const                   ipval        = vector_field(cell, pt, i);
+              auto const                   weight       = this->weights_(cell, pt);
+              data_nonconstView[node_var_offset + i][local_row] += ipval * weight;
             }
           } else if (this->ip_field_layouts_[field] == "Tensor") {
             for (int i = 0; i < num_dims; ++i) {
               for (int j = 0; j < num_dims; ++j) {
                 // save the tensor component
                 PHX::MDField<ScalarT const>& tensor_field = this->ip_fields_[field];
-                ScalarT                      ipval        = tensor_field(cell, pt, i, j);
-                ScalarT                      weight       = this->weights_(cell, pt);
+                auto const                   ipval        = tensor_field(cell, pt, i, j);
+                auto const                   weight       = this->weights_(cell, pt);
                 data_nonconstView[node_var_offset + j * num_dims + i][local_row] += ipval * weight;
               }
             }

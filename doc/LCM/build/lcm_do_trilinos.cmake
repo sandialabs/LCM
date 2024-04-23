@@ -136,15 +136,23 @@ function(lcm_do_trilinos)
   if (EXISTS "${SOURCE_DIR}/DataTransferKit")
     set(EXTRA_REPOS ${EXTRA_REPOS} DataTransferKit)
     set(CONFIG_OPTS ${CONFIG_OPTS}
-      "-DTpetra_INST_INT_LONG_LONG:BOOL=ON"
+      "-DDataTransferKit_ENABLE_DBC:BOOL=ON"
+      "-DDataTransferKit_ENABLE_EXAMPLES:BOOL=OFF"
+      "-DDataTransferKit_ENABLE_TESTS:BOOL=OFF"
+      "-DTPL_ENABLE_Libmesh:BOOL=OFF"
+      "-DTPL_ENABLE_MOAB:BOOL=OFF"
       "-DTpetra_INST_INT_INT:BOOL=OFF"
       "-DTpetra_INST_INT_LONG:BOOL=OFF"
+      "-DTpetra_INST_INT_LONG_LONG:BOOL=ON"
       "-DTrilinos_ENABLE_DataTransferKit:BOOL=ON"
-      "-DDataTransferKit_ENABLE_DBC:BOOL=ON"
-      "-DDataTransferKit_ENABLE_TESTS:BOOL=OFF"
-      "-DDataTransferKit_ENABLE_EXAMPLES:BOOL=OFF"
-      "-DTPL_ENABLE_MOAB:BOOL=OFF"
-      "-DTPL_ENABLE_Libmesh:BOOL=OFF"
+      "-DTrilinos_ENABLE_DataTransferKitC_API=ON"
+      "-DTrilinos_ENABLE_DataTransferKitClassicDTKAdapters=ON"
+      "-DTrilinos_ENABLE_DataTransferKitFortran_API=ON"
+      "-DTrilinos_ENABLE_DataTransferKitIntrepidAdapters=ON"
+      "-DTrilinos_ENABLE_DataTransferKitLibmeshAdapters=OFF"
+      "-DTrilinos_ENABLE_DataTransferKitMoabAdapters=OFF"
+      "-DTrilinos_ENABLE_DataTransferKitSTKMeshAdapters=ON"
+      "-DTrilinos_EXTRA_REPOSITORIES:STRING=DataTransferKit"
       )
   else()
     set(CONFIG_OPTS ${CONFIG_OPTS}

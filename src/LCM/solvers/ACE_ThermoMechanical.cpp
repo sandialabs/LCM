@@ -786,6 +786,7 @@ ACEThermoMechanical::AdvanceThermalDynamics(
     double const next_time,
     double const time_step) const
 {
+  failed_ = false;
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
@@ -848,6 +849,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     double const next_time,
     double const time_step) const
 {
+  failed_ = false;
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 

@@ -642,10 +642,8 @@ ACEThermoMechanical::continueSolve() const
   // Also set converged_ to true, which is equally irrelevant unless doing
   // Schwarz-like coupling
   converged_ = true;
-  if (num_iter_ > 0)
-    return false;
-  else
-    return true;
+  if (num_iter_ > 0) return false;
+  else return true;
 }
 
 // Sequential ThermoMechanical coupling loop, dynamic
@@ -689,7 +687,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         if (num_iter_ == 0) {
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
-          // fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+          fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
           do_outputs_[subdomain] = true;  // We always want output in the initial step
         } else {
           if (do_outputs_init_[subdomain] == true) {
@@ -808,12 +806,10 @@ ACEThermoMechanical::AdvanceThermalDynamics(
 
   auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
-  // IKT FIXME 6/5/2020: need to check if this does the right thing for thermal problem
-  // The only relevant internal state here would be the ice saturation
   // Restore internal states
-  // auto& app       = *apps_[subdomain];
-  // auto& state_mgr = app.getStateMgr();
-  // fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+  auto& app       = *apps_[subdomain];
+  auto& state_mgr = app.getStateMgr();
+  fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
@@ -855,6 +851,11 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
+  // Restore internal states
+  auto& app       = *apps_[subdomain];
+  auto& state_mgr = app.getStateMgr();
+  fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+
   if (mechanical_solver_ == MechanicalSolver::Tempus) {
     auto& piro_tempus_solver = dynamic_cast<Piro::TempusSolver<ST>&>(solver);
     piro_tempus_solver.setStartTime(current_time);
@@ -871,11 +872,6 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
 
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-
-    // Restore internal states
-    // auto& app       = *apps_[subdomain];
-    // auto& state_mgr = app.getStateMgr();
-    // fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
     Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
     Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;

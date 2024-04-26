@@ -1193,7 +1193,9 @@ Application::computeGlobalResidual(
     *out << "Writing global solution #" << countSol << " to MatrixMarket at time t = " << current_time << ".\n";
     writeMatrixMarket(x, "disp", countSol);
     writeMatrixMarket(x_dot, "velo", countSol);
-    writeMatrixMarket(x_dotdot, "acce", countSol);
+    if (x_dotdot != Teuchos::null) {
+      writeMatrixMarket(x_dotdot, "acce", countSol);
+    }
   }
   auto const write_sol_co = writeToCoutSol != 0 && (writeToCoutSol == -1 || countSol == writeToCoutSol);
   if (write_sol_co == true) {

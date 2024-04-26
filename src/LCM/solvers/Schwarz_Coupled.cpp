@@ -12,6 +12,8 @@
 #include "Albany_ThyraUtils.hpp"
 #include "Schwarz_CoupledJacobian.hpp"
 #include "SolutionSniffer.hpp"
+#include "Thyra_VectorBase.hpp"
+#include "Thyra_VectorStdOps.hpp" 
 
 // uncomment the following to write stuff out to matrix market to debug
 

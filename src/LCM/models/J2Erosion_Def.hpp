@@ -632,7 +632,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
   if (disable_erosion_ == true) { //Set failed to 0 if erosion is disabled
-    failed = 0.0
+    failed = 0.0;
   }
 }
 }  // namespace LCM

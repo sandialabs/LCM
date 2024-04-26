@@ -17,12 +17,20 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   sat_mod_                  = p->get<RealType>("Saturation Modulus", 0.0);
   sat_exp_                  = p->get<RealType>("Saturation Exponent", 0.0);
   bulk_porosity_            = p->get<RealType>("ACE Bulk Porosity", 0.0);
-  critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
   Y_weakening_factor_       = p->get<RealType>("ACE Y Weakening Factor", 1.0);
   E_weakening_factor_       = p->get<RealType>("ACE E Weakening Factor", 1.0);
   SL_weakening_factor_      = p->get<RealType>("ACE SL Weakening Factor", 1.0);
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
+  disable_erosion_          = p->get<bool>("Disable Erosion", false);  
+  //IKT 3/21/2024 NOTE: another way to disable erosion from all but the yield criterion  without using the disable_erosion_
+  //flag is to specify:
+  /*critical_angle_ = 0.0; 
+  strain_limit_ = 0.0; 
+  maximum_displacement_ = 0.0; 
+  tensile_strength_ = 0.0; */
+  //std::cout << "IKT erosion enabled!\n"; 
+  critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   disable_erosion_          = p->get<bool>("Disable Erosion", false);
 
@@ -40,7 +48,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
     ALBANY_ABORT("ACE Strain Limit not specified in mechanics material file!  To avoid strain failure criterion, set this value to 0.0."); 
   }
   if (p->isParameter("ACE Maximum Displacement")) { 
-    maximum_displacement_     = p->get<RealType>("ACE Maximum Displacement", 0.0);
+    maximum_displacement_     = p->get<RealType>("ACE Maximum Displacement");
   }
   else {
     ALBANY_ABORT("ACE Maximum Displacement not specified in mechanics material file!  To get the old default behavior, set this parameter to 0.35."); 
@@ -78,6 +86,16 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
         "*** ERROR: Number of z values and number of peat values in "
         "ACE Peat File must match.");
   }
+  if (p->isParameter("ACE Air File") == true) {
+    auto const filename = p->get<std::string>("ACE Air File");
+    air_from_file_     = vectorFromFile(filename);
+    ALBANY_ASSERT(
+        z_above_mean_sea_level_.size() == air_from_file_.size(),
+        "*** ERROR: Number of z values and number of air values in "
+        "ACE Air File must match.");
+  }
+
+  // retrieve appropriate field name strings
 
   // retrieve appropriate field name strings
   std::string const cauchy_str     = field_name_map_["Cauchy_Stress"];
@@ -387,6 +405,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   auto const peat     = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) : 0.0;
   auto const porosity = porosity_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) : bulk_porosity_;
+  //IKT, 2/17/2024: added air for specification of snow
+  //TODO: work this variable into implementation
+  auto const air     = air_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, air_from_file_, height) : 0.0;
+  //std::cout << "IKT J2Erosion air = " << air << "\n"; 
   ScalarT    ne{1.0};
   ScalarT    ny{1.0};
   ScalarT    nk{1.0};
@@ -561,7 +583,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const tension_failure   = Smax >= tensile_strength;
     tensile_indicator_(cell, pt) = safe_quotient(Smax, tensile_strength);
     if (tension_failure == true) {
-       ALBANY_ABORT("Tensile failure!\n"); 
+      //ALBANY_ABORT("Tensile failure!\n"); 
       failed += 1.0;
     }
   }
@@ -610,7 +632,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
   if (disable_erosion_ == true) { //Set failed to 0 if erosion is disabled
-    failed = 0.0;
+    failed = 0.0
   }
 }
 }  // namespace LCM

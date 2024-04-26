@@ -25,6 +25,7 @@ ALBANY:
       ACE Silt File: './silt_frac.txt'
       ACE Clay File: './clay_frac.txt'
       ACE Peat File: './peat_frac.txt'
+      ACE Air File: './air_frac.txt'
       ACE Base Salinity: 5.0  # Used if 'bluff_salinity.txt' vector not given.
       ACE Salinity File: './bluff_salinity.txt'
       ACE Salt Enhanced D: 0.0  # Like enhanced molecular diffusion coef.

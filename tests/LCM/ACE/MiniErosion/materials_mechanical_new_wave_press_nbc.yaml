@@ -8,6 +8,7 @@ LCM:
       
   Materials:
     Permafrost:
+      Disable Erosion: false
       Material Model:
         Model Name: J2 Erosion
       Elastic Modulus:

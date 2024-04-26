@@ -103,6 +103,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType SL_weakening_factor_{1.0};
   RealType tensile_strength_{0.0};
   RealType strain_limit_{0.0};
+
   RealType maximum_displacement_{0.0};
   bool disable_erosion_{false}; //By default erosion is ON so not disabled 
 
@@ -110,6 +111,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   std::vector<RealType> z_above_mean_sea_level_;
   std::vector<RealType> peat_from_file_;
   std::vector<RealType> porosity_from_file_;
+  std::vector<RealType> air_from_file_;
   std::vector<RealType> sea_level_;
   std::vector<RealType> time_;
 

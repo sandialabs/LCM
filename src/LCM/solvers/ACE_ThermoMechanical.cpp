@@ -675,7 +675,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
         // Create new solvers, apps, discs and model evaluators
         auto const prob_type = prob_types_[subdomain];
-        if (prob_type == THERMAL && failed_ == false) {
+        if (prob_type == THERMAL) {
           createThermalSolverAppDiscME(stop, current_time);
         }
         if (prob_type == MECHANICAL && failed_ == false) {

@@ -243,74 +243,76 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
 
   if (model_name == "") {
     ALBANY_ABORT(error_msg);
-  } else if (model_name == "Neohookean") {
-    model = rcp(new NeohookeanModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Parallel Neohookean") {
-    model = rcp(new ParallelNeohookeanModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Creep") {
-    model = rcp(new CreepModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "J2") {
-    model = rcp(new J2Model<EvalT, Traits>(p, dl));
-  } else if (model_name == "Newtonian Fluid") {
-    model = rcp(new NewtonianFluidModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "CrystalPlasticity") {
-    model = rcp(new CrystalPlasticityModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "ElasticCrystal") {
-    model = rcp(new ElasticCrystalModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "ViscoElastic") {
-    model = rcp(new ViscoElasticModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "AHD") {
-    model = rcp(new AnisotropicHyperelasticDamageModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Gurson") {
-    model = rcp(new GursonModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "GursonHMR") {
-    model = rcp(new GursonHMRModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Mooney Rivlin") {
-    model = rcp(new MooneyRivlinModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "RIHMR") {
-    model = rcp(new RIHMRModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "J2Fiber") {
-    model = rcp(new J2FiberModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Anisotropic Damage") {
-    model = rcp(new AnisotropicDamageModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Elastic Damage") {
-    model = rcp(new ElasticDamageModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Saint Venant Kirchhoff") {
-    model = rcp(new StVenantKirchhoffModel<EvalT, Traits>(p, dl));
   } else if (model_name == "AAA") {
     model = rcp(new AAAModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Linear Elastic") {
-    model = rcp(new LinearElasticModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Linear Elastic Volumetric Deviatoric") {
-    model = rcp(new LinearElasticVolDevModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Hyperelastic Damage") {
-    model = rcp(new HyperelasticDamageModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Anisotropic Damage") {
+    model = rcp(new AnisotropicDamageModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "AHD") {
+    model = rcp(new AnisotropicHyperelasticDamageModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Viscoplastic") {
+    model = rcp(new AnisotropicViscoplasticModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Cap Explicit") {
     model = rcp(new CapExplicitModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Cap Implicit") {
     model = rcp(new CapImplicitModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Cap Plasticity Explicit") {
+    model = rcp(new CapPlasticityExplicitFD<EvalT, Traits>(p, dl));
+  } else if (model_name == "Creep") {
+    model = rcp(new CreepModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "CrystalPlasticity") {
+    model = rcp(new CrystalPlasticityModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Drucker Prager") {
     model = rcp(new DruckerPragerModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Tvergaard Hutchinson") {
-    model = rcp(new TvergaardHutchinsonModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Viscoplastic") {
-    model = rcp(new AnisotropicViscoplasticModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Linear HMC") {
-    model = rcp(new LinearHMCModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "J2 HMC") {
-    model = rcp(new J2HMCModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Linear Piezoelectric") {
-    model = rcp(new LinearPiezoModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Ferroic") {
-    model = rcp(new FerroicDriver<EvalT, Traits>(p, dl));
-  } else if (model_name == "Ortiz Pandolfi") {
-    model = rcp(new OrtizPandolfiModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "ElasticCrystal") {
+    model = rcp(new ElasticCrystalModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Elastic Damage") {
+    model = rcp(new ElasticDamageModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Elasto Viscoplastic") {
     model = rcp(new ElastoViscoplasticModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Ferroic") {
+    model = rcp(new FerroicDriver<EvalT, Traits>(p, dl));
+  } else if (model_name == "GursonHMR") {
+    model = rcp(new GursonHMRModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Gurson") {
+    model = rcp(new GursonModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Hyperelastic Damage") {
+    model = rcp(new HyperelasticDamageModel<EvalT, Traits>(p, dl));
   } else if (model_name == "J2 Erosion") {
     model = rcp(new J2Erosion<EvalT, Traits>(p, dl));
+  } else if (model_name == "J2Fiber") {
+    model = rcp(new J2FiberModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "J2 HMC") {
+    model = rcp(new J2HMCModel<EvalT, Traits>(p, dl));
   } else if (model_name == "J2 MiniSolver") {
     model = rcp(new J2MiniSolver<EvalT, Traits>(p, dl));
+  } else if (model_name == "J2") {
+    model = rcp(new J2Model<EvalT, Traits>(p, dl));
+  } else if (model_name == "Linear Elastic") {
+    model = rcp(new LinearElasticModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Linear Elastic Volumetric Deviatoric") {
+    model = rcp(new LinearElasticVolDevModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Linear HMC") {
+    model = rcp(new LinearHMCModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Linear Piezoelectric") {
+    model = rcp(new LinearPiezoModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Mooney Rivlin") {
+    model = rcp(new MooneyRivlinModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Neohookean") {
+    model = rcp(new NeohookeanModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Newtonian Fluid") {
+    model = rcp(new NewtonianFluidModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Ortiz Pandolfi") {
+    model = rcp(new OrtizPandolfiModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Parallel Neohookean") {
+    model = rcp(new ParallelNeohookeanModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "RIHMR") {
+    model = rcp(new RIHMRModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Saint Venant Kirchhoff") {
+    model = rcp(new StVenantKirchhoffModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Tvergaard Hutchinson") {
+    model = rcp(new TvergaardHutchinsonModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "ViscoElastic") {
+    model = rcp(new ViscoElasticModel<EvalT, Traits>(p, dl));
   } else {
     ALBANY_ABORT(error_msg);
   }

@@ -9,6 +9,7 @@
 #include "AnisotropicViscoplasticModel.hpp"
 #include "CapExplicitModel.hpp"
 #include "CapImplicitModel.hpp"
+#include "CapPlasticityExplicitFD.hpp"
 #include "CreepModel.hpp"
 #include "CrystalPlasticityModel.hpp"
 #include "DruckerPragerModel.hpp"

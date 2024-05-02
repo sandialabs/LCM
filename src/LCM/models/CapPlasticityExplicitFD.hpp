@@ -57,8 +57,14 @@ class CapPlasticityExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
     ALBANY_ABORT("Not implemented.");
   }
 
+  ///
+  /// No copy constructor
+  ///
   CapPlasticityExplicitFD(const CapPlasticityExplicitFD&) = delete;
 
+  ///
+  /// No copy assignment
+  ///
   CapPlasticityExplicitFD&
   operator=(const CapPlasticityExplicitFD&) = delete;
 

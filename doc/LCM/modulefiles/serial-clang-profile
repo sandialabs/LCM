@@ -7,7 +7,7 @@
 module load lcm-initialize
 module load lcm-serial
 module load lcm-clang
-module load lcm-mixed
+module load lcm-profile
 module load lcm-finalize
 
 

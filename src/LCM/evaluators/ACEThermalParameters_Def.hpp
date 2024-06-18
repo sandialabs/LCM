@@ -427,12 +427,21 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       thermal_conductivity_(cell, qp) = (1.0) * thermal_conductivity_(cell, qp);
 
       if (snow_given == true) {
-        ScalarT       snow_K = 0.1;              // [W/K/m]
-        ScalarT const dZ     = element_size_eb;  // [m]
-        snow_K               = snow_K * (dZ / snow_depth);
-        // std::cout << "snow_depth = " << snow_depth << " ";
-        // std::cout << "snow_K = " << snow_K << " ";
-        thermal_conductivity_(cell, qp) = std::min(snow_K, 15.0);  // [W/K/m]
+        ScalarT       snow_K = 0.1;  // [W/K/m]
+        ScalarT const dZ = element_size_eb; // [m]
+
+        // Elyce 5/23/24 Put up safeguard against K going to negative infty for snow_depth values very small but less than 0.:
+        // As long as snow_depth is nonzero, it'll get caught by the min condition not to let it go above 15
+        if(snow_depth<0.){
+          snow_depth = 0.0;
+        }
+
+        snow_K = snow_K * (dZ / snow_depth);
+        snow_K = std::min(snow_K, 15.0); // [W/K/m] // don't let it go above 15
+        thermal_conductivity_(cell, qp) = snow_K; //std::min(snow_K, 15.0);  // [W/K/m]  
+
+        // Elyce debugging: 
+        // std::cout << "\n snow_depth = " << snow_depth << " , dZ = " << dZ << "snow_K = " << snow_K << ", thermal_cond = " << thermal_conductivity_(cell, qp);
       }
 
       // Jenn's sub-grid scale model to calibrate niche formation follows.

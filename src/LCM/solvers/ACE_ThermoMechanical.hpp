@@ -216,8 +216,8 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   char const*  failure_message_{"No failure detected"};
   int          num_subdomains_{0};
   int          maximum_steps_{0};
-  ST           initial_time_{0.0};
-  ST           final_time_{0.0};
+  mutable ST   initial_time_{0.0};
+  mutable ST   final_time_{0.0};
   ST           initial_time_step_{0.0};
   ST           min_time_step_{0.0};
   ST           max_time_step_{0.0};
@@ -284,6 +284,13 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   // Min value of z-coordinate in initial mesh - needed for wave pressure NBC
   mutable double zmin_{0.0};
   mutable int    init_file_index_;
+
+  // Storage for defining time intervals where the time step will be prescribed.
+  // This is needed for time stepping through user-defined events such as
+  // impact loads, for example, aircraft loads in the ACI project.
+  std::vector<RealType> event_initial_times_;
+  std::vector<RealType> event_final_times_;
+  std::vector<RealType> event_time_steps_;
 };
 
 }  // namespace LCM

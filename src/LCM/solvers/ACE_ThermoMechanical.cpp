@@ -8,6 +8,7 @@
 #include <fstream>
 
 #include "AAdapt_Erosion.hpp"
+#include "ACEcommon.hpp"
 #include "Albany_PiroObserver.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SolverFactory.hpp"
@@ -174,16 +175,19 @@ ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> co
   init_file_index_ = alt_system_params_->get<int>("Exodus ACE Output File Initial Index", 0);
 
   // Check for existence of time intervals for events, and if so, read them.
-  auto const have_event_initial_times = alt_system_params_->isParameter("Event Initial Times");
-  auto const have_event_final_times = alt_system_params_->isParameter("Event Final Times");
-  auto const have_event_time_steps = alt_system_params_->isParameter("Event Time Steps");
+  auto const have_event_initial_times = alt_system_params_->isParameter("Event Initial Times File");
+  auto const have_event_final_times = alt_system_params_->isParameter("Event Final Times File");
+  auto const have_event_time_steps = alt_system_params_->isParameter("Event Time Steps File");
   auto const have_all = have_event_initial_times && have_event_final_times && have_event_time_steps;
   auto const have_at_least_one = have_event_initial_times || have_event_final_times || have_event_time_steps;
   ALBANY_ASSERT(have_all == have_at_least_one, "Initial Times, Final Times and Time Steps for events either must all exist or be absent.");
   if (have_all == true) {
-    event_initial_times_  = alt_system_params_->get<Teuchos::Array<ST>>("Event Initial Times").toVector();
-    event_final_times_  = alt_system_params_->get<Teuchos::Array<ST>>("Event Final Times").toVector();
-    event_time_steps_  = alt_system_params_->get<Teuchos::Array<ST>>("Event Time Steps").toVector();
+    std::string ti_filename = alt_system_params_->get<std::string>("Event Initial Times File");
+    std::string tf_filename = alt_system_params_->get<std::string>("Event Final Times File");
+    std::string dt_filename = alt_system_params_->get<std::string>("Event Time Steps File");
+    event_initial_times_  = LCM::vectorFromFile(ti_filename);
+    event_final_times_  = LCM::vectorFromFile(ti_filename);
+    event_time_steps_  = LCM::vectorFromFile(ti_filename);
     validate_intervals(event_initial_times_, event_final_times_, event_time_steps_);
   }
 

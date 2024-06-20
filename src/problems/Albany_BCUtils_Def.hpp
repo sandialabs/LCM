@@ -1078,6 +1078,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
         // Have a match of the line in input.xml
 
+	std::cout << "IKT ss = " << ss << "\n"; 
         if (BCparams.isSublist(ss)) {
           // grab the sublist
           ParameterList& sub_list = BCparams.sublist(ss);
@@ -1092,13 +1093,67 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
 
           p->set<int>("Type", traits_type::typeTd);
 
-          Teuchos::Array<RealType> timevals = sub_list.get<Teuchos::Array<RealType>>("Time Values");
+          Teuchos::Array<RealType> timevals; 
+	  if (sub_list.isParameter("Time Values")) { 
+            timevals = sub_list.get<Teuchos::Array<RealType>>("Time Values");
+	  }
+	  else {
+	    if (sub_list.isParameter("Time Values File")) { 
+              std::string const t_file = sub_list.get<std::string>("Time Values File");
+              std::vector<RealType> timevals_vec = LCM::vectorFromFile(t_file);
+              Teuchos::ArrayView<double> timevals_av = Teuchos::arrayViewFromVector(timevals_vec);
+              timevals = Teuchos::Array<double>(timevals_av);
+	    }
+	    else {
+              ALBANY_ABORT(
+                "'Time Values' or 'Time Values File' are not specified!"); 
+	    }
+	  }
 
           // Note, we use a TwoDArray here to allow the user to specify
           // multiple components of the traction vector at each "time" step.
           // This is only allowed for certain BCs (see how allowArrayNBC) is
           // set.
-          Teuchos::TwoDArray<RealType> bcvals = sub_list.get<Teuchos::TwoDArray<RealType>>("BC Values");
+          Teuchos::TwoDArray<RealType> bcvals; 
+	  if (sub_list.isParameter("BC Values")) { 
+            bcvals = sub_list.get<Teuchos::TwoDArray<RealType>>("BC Values");
+	    /*for (int i=0; i<bcvals.getNumRows(); i++) {
+	      for (int j=0; j<bcvals.getNumCols(); j++) {
+	        std::cout << "IKT i, j, bc = " << i <<", " << j << ", " << bcvals(i,j) << "\n";  
+	      }
+	    }*/
+	  }
+	  else {
+	    if (sub_list.isParameter("BC Values File")) {
+              std::string const bc_file = sub_list.get<std::string>("BC Values File");
+	      std::vector<std::vector<RealType>> bc_file_vec = LCM::twoDvectorFromFile(bc_file);
+	      auto nRows = bc_file_vec.size(); 
+	      if (nRows < 1) {
+                ALBANY_ABORT(
+                  "'Invalid size for 'BC Values File' array!"); 
+	      }
+	      auto nCols = bc_file_vec[0].size();
+	      for (int i=1; i<nRows; i++) {
+	        auto nColsi = bc_file_vec[i].size();
+	        if (nColsi != nCols) {	
+                  ALBANY_ABORT(
+                    "'Invalid size for 'BC Values File' array!"); 
+		}
+	      }
+              bcvals = Teuchos::TwoDArray<RealType>(nRows, nCols);
+	      for (int i=0; i<nRows; i++) {
+		std::vector<RealType> veci = bc_file_vec[i]; 
+	        for (int j=0; j<nCols; j++) {
+		  bcvals(i,j) = veci[j];
+		  //std::cout << "IKT i, j, bc = " << i <<", " << j << ", " << bcvals(i,j) << "\n";  
+		}
+	      }
+	    }
+	    else {
+              ALBANY_ABORT(
+                "'BC Values' or 'BC Values File' are not specified!"); 
+	    }
+	  }
 
           // Check that bcvals and timevals have the same size.  If they do not,
           // throw an error.

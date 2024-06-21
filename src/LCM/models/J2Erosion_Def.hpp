@@ -22,36 +22,26 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   SL_weakening_factor_      = p->get<RealType>("ACE SL Weakening Factor", 1.0);
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
-  disable_erosion_          = p->get<bool>("Disable Erosion", false);  
-  //IKT 3/21/2024 NOTE: another way to disable erosion from all but the yield criterion  without using the disable_erosion_
-  //flag is to specify:
-  /*critical_angle_ = 0.0; 
-  strain_limit_ = 0.0; 
-  maximum_displacement_ = 0.0; 
+  // IKT 3/21/2024 NOTE: another way to disable erosion from all but the yield criterion  without using the disable_erosion_
+  // flag is to specify:
+  /*critical_angle_ = 0.0;
+  strain_limit_ = 0.0;
+  maximum_displacement_ = 0.0;
   tensile_strength_ = 0.0; */
-  //std::cout << "IKT erosion enabled!\n"; 
-  critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
-  tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
-  disable_erosion_          = p->get<bool>("Disable Erosion", false);
+  // std::cout << "IKT erosion enabled!\n";
+  critical_angle_   = p->get<RealType>("ACE Critical Angle", 0.0);
+  tensile_strength_ = p->get<RealType>("ACE Tensile Strength", 0.0);
+  disable_erosion_  = p->get<bool>("Disable Erosion", false);
 
-  //IKT 3/21/2024 NOTE: another way to disable erosion from all but the yield 
-  //criterion  without using the disable_erosion_ flag is to specify:
-  /*critical_angle_ = 0.0; 
-  strain_limit_ = 0.0; 
-  maximum_displacement_ = 0.0; 
-  tensile_strength_ = 0.0; */
-
-  if (p->isParameter("ACE Strain Limit")) { 
-    strain_limit_             = p->get<RealType>("ACE Strain Limit");
+  if (p->isParameter("ACE Strain Limit")) {
+    strain_limit_ = p->get<RealType>("ACE Strain Limit");
+  } else {
+    ALBANY_ABORT("ACE Strain Limit not specified in mechanics material file!  To avoid strain failure criterion, set this value to 0.0.");
   }
-  else {
-    ALBANY_ABORT("ACE Strain Limit not specified in mechanics material file!  To avoid strain failure criterion, set this value to 0.0."); 
-  }
-  if (p->isParameter("ACE Maximum Displacement")) { 
-    maximum_displacement_     = p->get<RealType>("ACE Maximum Displacement");
-  }
-  else {
-    ALBANY_ABORT("ACE Maximum Displacement not specified in mechanics material file!  To get the old default behavior, set this parameter to 0.35."); 
+  if (p->isParameter("ACE Maximum Displacement")) {
+    maximum_displacement_ = p->get<RealType>("ACE Maximum Displacement");
+  } else {
+    ALBANY_ABORT("ACE Maximum Displacement not specified in mechanics material file!  To get the old default behavior, set this parameter to 0.35.");
   }
 
   if (p->isParameter("ACE Sea Level File") == true) {
@@ -88,7 +78,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   }
   if (p->isParameter("ACE Air File") == true) {
     auto const filename = p->get<std::string>("ACE Air File");
-    air_from_file_     = vectorFromFile(filename);
+    air_from_file_      = vectorFromFile(filename);
     ALBANY_ASSERT(
         z_above_mean_sea_level_.size() == air_from_file_.size(),
         "*** ERROR: Number of z values and number of air values in "
@@ -405,13 +395,13 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   auto const peat     = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) : 0.0;
   auto const porosity = porosity_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) : bulk_porosity_;
-  //IKT, 2/17/2024: added air for specification of snow
-  //TODO: work this variable into implementation
-  auto const air     = air_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, air_from_file_, height) : 0.0;
-  //std::cout << "IKT J2Erosion air = " << air << "\n"; 
-  ScalarT    ne{1.0};
-  ScalarT    ny{1.0};
-  ScalarT    nk{1.0};
+  // IKT, 2/17/2024: added air for specification of snow
+  // TODO: work this variable into implementation
+  auto const air = air_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, air_from_file_, height) : 0.0;
+  // std::cout << "IKT J2Erosion air = " << air << "\n";
+  ScalarT ne{1.0};
+  ScalarT ny{1.0};
+  ScalarT nk{1.0};
 
   std::tie(ne, ny, nk) = unit_fit(ice_saturation, porosity);
 
@@ -441,8 +431,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // Make the elements exposed to ocean "weaker"
   auto tensile_strength = tensile_strength_;
   if ((is_erodible == true) && (height <= sea_level)) {
-    Y            = Y / (Y_weakening_factor_);
-    E            = E / (E_weakening_factor_);
+    Y = Y / (Y_weakening_factor_);
+    E = E / (E_weakening_factor_);
     if (strain_limit > 0.0) {
       strain_limit = 1.0 + ((strain_limit - 1.0) / SL_weakening_factor_);
     }
@@ -583,7 +573,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const tension_failure   = Smax >= tensile_strength;
     tensile_indicator_(cell, pt) = safe_quotient(Smax, tensile_strength);
     if (tension_failure == true) {
-      //ALBANY_ABORT("Tensile failure!\n"); 
+      // ALBANY_ABORT("Tensile failure!\n");
       failed += 1.0;
     }
   }
@@ -598,14 +588,14 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     bool const     strain_failure = distortion >= strain_limit;
     strain_indicator_(cell, pt)   = safe_quotient(distortion, strain_limit);
     if (strain_failure == true) {
-      //ALBANY_ABORT("Strain failure!\n"); 
+      // ALBANY_ABORT("Strain failure!\n");
       failed += 10.0;
     }
   }
 
   // Determine if critical stress is exceeded
   if (yielded == true) {
-    //ALBANY_ABORT("Yield failure!\n"); 
+    // ALBANY_ABORT("Yield failure!\n");
     failed += 100.0;
   }
 
@@ -617,7 +607,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   if (critical_angle > 0.0) {
     auto const theta_abs = std::abs(theta);
     if (theta_abs >= critical_angle) {
-      //ALBANY_ABORT("Critical angle failure!\n"); 
+      // ALBANY_ABORT("Critical angle failure!\n");
       failed += 1000.0;
     }
     angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
@@ -626,12 +616,12 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto const displacement_norm      = minitensor::norm(disp_val);
   displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement_);
   if ((maximum_displacement_ > 0.0) && (displacement_norm > maximum_displacement_)) {
-    //std::cout << "displacement_norm, maximum_displacement = " << displacement_norm << ", " << maximum_displacement_ << "\n"; 
-    //ALBANY_ABORT("Kinematic failure!\n"); 
+    // std::cout << "displacement_norm, maximum_displacement = " << displacement_norm << ", " << maximum_displacement_ << "\n";
+    // ALBANY_ABORT("Kinematic failure!\n");
     failed += 10000.0;
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
-  if (disable_erosion_ == true) { //Set failed to 0 if erosion is disabled
+  if (disable_erosion_ == true) {  // Set failed to 0 if erosion is disabled
     failed = 0.0;
   }
 }

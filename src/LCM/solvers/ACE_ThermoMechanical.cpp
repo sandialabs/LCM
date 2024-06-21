@@ -86,14 +86,16 @@ renameParallel(std::string const& old_filename, std::string const& new_filename,
 }
 
 void
-validate_intervals(std::vector<ST> const & initial_times, std::vector<ST> const & final_times, std::vector<ST> const & time_steps)
+validate_intervals(std::vector<ST> const& initial_times, std::vector<ST> const& final_times, std::vector<ST> const& time_steps)
 {
   auto const initials_size = initial_times.size();
-  auto const finals_size = final_times.size();
-  auto const steps_size = time_steps.size();
-  auto const all_equal = initials_size == finals_size == steps_size;
-  ALBANY_ASSERT(all_equal == true, "Event interval arrays have different sizes, " <<
-    "Initial Times : " << initials_size << ", Final Times : " << finals_size << ", Steps Size" << steps_size);
+  auto const finals_size   = final_times.size();
+  auto const steps_size    = time_steps.size();
+  auto const all_equal     = initials_size == finals_size == steps_size;
+  ALBANY_ASSERT(
+      all_equal == true,
+      "Event interval arrays have different sizes, "
+          << "Initial Times : " << initials_size << ", Final Times : " << finals_size << ", Steps Size" << steps_size);
   auto prev_ti = initial_times[0];
   auto prev_tf = final_times[0];
   for (auto i = 0; i < steps_size; ++i) {
@@ -101,12 +103,15 @@ validate_intervals(std::vector<ST> const & initial_times, std::vector<ST> const 
     auto const tf = final_times[i];
     auto const dt = time_steps[i];
     if (i > 0) {
-      ALBANY_ASSERT(ti > prev_ti, "Initial Times must be monotonically increasing. " <<
-        "At index " << i << " found initial time " << ti << " less or equal than previous " << prev_ti);
-      ALBANY_ASSERT(tf > prev_tf, "Final Times must be monotonically increasing. " <<
-        "At index " << i << " found final time " << tf << " less or equal than previous " << prev_tf);
-      ALBANY_ASSERT(ti > prev_tf, "Intervals must not overlap. At index " << i <<
-        " found initial time less or equal than previous final time " << prev_tf);
+      ALBANY_ASSERT(
+          ti > prev_ti,
+          "Initial Times must be monotonically increasing. "
+              << "At index " << i << " found initial time " << ti << " less or equal than previous " << prev_ti);
+      ALBANY_ASSERT(
+          tf > prev_tf,
+          "Final Times must be monotonically increasing. "
+              << "At index " << i << " found final time " << tf << " less or equal than previous " << prev_tf);
+      ALBANY_ASSERT(ti > prev_tf, "Intervals must not overlap. At index " << i << " found initial time less or equal than previous final time " << prev_tf);
     }
     ALBANY_ASSERT(tf > ti, "At event interval index " << i << " found initial time " << ti << " greater or equal than final time " << tf);
     ALBANY_ASSERT(dt > 0.0, "At event interval index " << i << " found non-positive time step " << dt);
@@ -117,18 +122,18 @@ validate_intervals(std::vector<ST> const & initial_times, std::vector<ST> const 
 }
 
 int
-find_time_interval_index(std::vector<ST> const & initial_times, std::vector<ST> const & final_times, ST time)
+find_time_interval_index(std::vector<ST> const& initial_times, std::vector<ST> const& final_times, ST time)
 {
   for (size_t i = 0; i < initial_times.size(); ++i) {
     if (time >= initial_times[i] && time <= final_times[i]) {
-      return i; // Time value is within this interval
+      return i;  // Time value is within this interval
     }
   }
-  return -1; // Time value is not within any interval
+  return -1;  // Time value is not within any interval
 }
 
 int
-find_next_interval_index(std::vector<ST> const & initial_times, std::vector<ST> const & final_times, ST time)
+find_next_interval_index(std::vector<ST> const& initial_times, std::vector<ST> const& final_times, ST time)
 {
   for (size_t i = 0; i < initial_times.size(); ++i) {
     if (time < initial_times[i]) {
@@ -139,7 +144,7 @@ find_next_interval_index(std::vector<ST> const & initial_times, std::vector<ST> 
 }
 
 bool
-is_within_interval(std::vector<ST> const & initial_times, std::vector<ST> const & final_times, ST time, int interval_index)
+is_within_interval(std::vector<ST> const& initial_times, std::vector<ST> const& final_times, ST time, int interval_index)
 {
   if (interval_index == -1) return false;
   return initial_times[interval_index] <= time && time <= final_times[interval_index];
@@ -176,18 +181,18 @@ ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> co
 
   // Check for existence of time intervals for events, and if so, read them.
   auto const have_event_initial_times = alt_system_params_->isParameter("Event Initial Times File");
-  auto const have_event_final_times = alt_system_params_->isParameter("Event Final Times File");
-  auto const have_event_time_steps = alt_system_params_->isParameter("Event Time Steps File");
-  auto const have_all = have_event_initial_times && have_event_final_times && have_event_time_steps;
-  auto const have_at_least_one = have_event_initial_times || have_event_final_times || have_event_time_steps;
+  auto const have_event_final_times   = alt_system_params_->isParameter("Event Final Times File");
+  auto const have_event_time_steps    = alt_system_params_->isParameter("Event Time Steps File");
+  auto const have_all                 = have_event_initial_times && have_event_final_times && have_event_time_steps;
+  auto const have_at_least_one        = have_event_initial_times || have_event_final_times || have_event_time_steps;
   ALBANY_ASSERT(have_all == have_at_least_one, "Initial Times, Final Times and Time Steps for events either must all exist or be absent.");
   if (have_all == true) {
     std::string ti_filename = alt_system_params_->get<std::string>("Event Initial Times File");
     std::string tf_filename = alt_system_params_->get<std::string>("Event Final Times File");
     std::string dt_filename = alt_system_params_->get<std::string>("Event Time Steps File");
-    event_initial_times_  = LCM::vectorFromFile(ti_filename);
-    event_final_times_  = LCM::vectorFromFile(ti_filename);
-    event_time_steps_  = LCM::vectorFromFile(ti_filename);
+    event_initial_times_    = LCM::vectorFromFile(ti_filename);
+    event_final_times_      = LCM::vectorFromFile(ti_filename);
+    event_time_steps_       = LCM::vectorFromFile(ti_filename);
     validate_intervals(event_initial_times_, event_final_times_, event_time_steps_);
   }
 
@@ -722,8 +727,10 @@ ACEThermoMechanical::continueSolve() const
   // Also set converged_ to true, which is equally irrelevant unless doing
   // Schwarz-like coupling
   converged_ = true;
-  if (num_iter_ > 0) return false;
-  else return true;
+  if (num_iter_ > 0)
+    return false;
+  else
+    return true;
 }
 
 // Sequential ThermoMechanical coupling loop, dynamic
@@ -735,18 +742,17 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   *fos_ << std::scientific << std::setprecision(17);
 
   // If initial time is within an interval, reset to its beginning
-  ST time_step{initial_time_step_};
+  ST   time_step{initial_time_step_};
   auto interval_index = find_time_interval_index(event_initial_times_, event_final_times_, initial_time_);
   if (interval_index != -1) {
     initial_time_ = event_initial_times_[interval_index];
-    time_step = event_time_steps_[interval_index];
+    time_step     = event_time_steps_[interval_index];
   }
   int stop{0};
   ST  current_time{initial_time_};
 
   // Time-stepping loop
   while (stop < maximum_steps_ && current_time < final_time_) {
-
     if (interval_index != -1) {
       *fos_ << delim << std::endl;
       *fos_ << "Subclycling within an event interval.\n";
@@ -860,7 +866,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
     ++stop;
     current_time += time_step;
-    interval_index = find_time_interval_index(event_initial_times_, event_final_times_, current_time);
+    interval_index         = find_time_interval_index(event_initial_times_, event_final_times_, current_time);
     auto const in_interval = is_within_interval(event_initial_times_, event_final_times_, current_time, interval_index);
 
     // Step successful. Try to increase the time step.
@@ -1029,7 +1035,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto        x_init = nv.get_x();
     auto        v_init = nv.get_x_dot();
     auto        a_init = me.get_x_dotdot();
-    auto& app = *apps_[subdomain];
+    auto&       app    = *apps_[subdomain];
 
     // Make sure there is no leftover adapted mesh from before.
     std::string const tmp_adapt_filename{"ace_adapt_temporary.e"};

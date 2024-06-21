@@ -12,13 +12,13 @@ namespace LCM {
 std::vector<RealType>
 vectorFromFile(std::string const& filename);
 
-std::istream& 
-operator>>(std::istream& is, std::vector<RealType>& vec); 
+std::istream&
+operator>>(std::istream& is, std::vector<RealType>& vec);
 
-std::istream& 
-operator>>(std::istream& is, std::vector<std::vector<RealType>>& m); 
+std::istream&
+operator>>(std::istream& is, std::vector<std::vector<RealType>>& m);
 
-std::ostream& 
+std::ostream&
 operator<<(std::ostream& os, const std::vector<RealType>& t);
 
 std::vector<std::vector<RealType>>

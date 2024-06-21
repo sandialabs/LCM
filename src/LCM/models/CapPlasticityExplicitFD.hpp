@@ -68,8 +68,7 @@ class CapPlasticityExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
   CapPlasticityExplicitFD&
   operator=(const CapPlasticityExplicitFD&) = delete;
 
-private:
-
+ private:
   ///
   /// functions for integrating cap model stress
   ///

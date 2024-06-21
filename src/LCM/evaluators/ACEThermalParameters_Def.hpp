@@ -165,13 +165,13 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
   std::vector<RealType> porosity_from_file_eb = this->queryElementBlockParameterMap(eb_name, porosity_from_file_map_);
   std::vector<RealType> ocean_salinity_eb     = this->queryElementBlockParameterMap(eb_name, ocean_salinity_map_);
-  std::vector<RealType> snow_depth_eb     = this->queryElementBlockParameterMap(eb_name, snow_depth_map_);
+  std::vector<RealType> snow_depth_eb         = this->queryElementBlockParameterMap(eb_name, snow_depth_map_);
   std::vector<RealType> sand_from_file_eb     = this->queryElementBlockParameterMap(eb_name, sand_from_file_map_);
   std::vector<RealType> clay_from_file_eb     = this->queryElementBlockParameterMap(eb_name, clay_from_file_map_);
   std::vector<RealType> silt_from_file_eb     = this->queryElementBlockParameterMap(eb_name, silt_from_file_map_);
   std::vector<RealType> peat_from_file_eb     = this->queryElementBlockParameterMap(eb_name, peat_from_file_map_);
-  //The following is for specifying snow for ACI/NH
-  std::vector<RealType> air_from_file_eb      = this->queryElementBlockParameterMap(eb_name, air_from_file_map_);
+  // The following is for specifying snow for ACI/NH
+  std::vector<RealType> air_from_file_eb = this->queryElementBlockParameterMap(eb_name, air_from_file_map_);
 
   ScalarT ice_density_eb         = this->queryElementBlockParameterMap(eb_name, ice_density_map_);
   ScalarT water_density_eb       = this->queryElementBlockParameterMap(eb_name, water_density_map_);
@@ -214,7 +214,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         bluff_salinity_(cell, qp) = bluff_salinity_read_(cell, qp);
       }
       const ScalarT sea_level = sea_level_eb.size() > 0 ? interpolateVectors(time_eb, sea_level_eb, current_time) : -999.0;
-      //const ScalarT sea_level = sea_level_eb.size() > 0 ? (interpolateVectors(time_eb, sea_level_eb, current_time) * 2.0) : -999.0;
+      // const ScalarT sea_level = sea_level_eb.size() > 0 ? (interpolateVectors(time_eb, sea_level_eb, current_time) * 2.0) : -999.0;
 
       // Thermal calculation
       // Calculate the depth-dependent porosity
@@ -226,16 +226,16 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         porosity_eb = interpolateVectors(z_above_mean_sea_level_eb, porosity_from_file_eb, height);
       }
       porosity_(cell, qp) = porosity_eb;
-      
-      //IKT 2/23/2024: the following was added for the snow_depth field.
-      //TODO Jenn: use this field to incorporate snow into mixture model
+
+      // IKT 2/23/2024: the following was added for the snow_depth field.
+      // TODO Jenn: use this field to incorporate snow into mixture model
       ScalarT snow_depth(0.0);
-      bool    snow_given{false};               
+      bool    snow_given{false};
       if (snow_depth_eb.size() > 0) {
         snow_depth = interpolateVectors(time_eb, snow_depth_eb, current_time);
-	snow_given = true;
+        snow_given = true;
       }
-      //std::cout << "IKT snow_depth = " << snow_depth << "\n"; 
+      // std::cout << "IKT snow_depth = " << snow_depth << "\n";
 
       // Calculate the salinity of the grid cell
       if ((is_erodible == true) && (height <= sea_level)) {
@@ -298,11 +298,11 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         Tshift = 0.1;
       }
 
-      //IKT 2/17/2024: code to use air frac goes here for Jenn to fill in.
-      //Might want to move elsewhere in this function...
+      // IKT 2/17/2024: code to use air frac goes here for Jenn to fill in.
+      // Might want to move elsewhere in this function...
       if (air_given == true) {
         auto air_frac = interpolateVectors(z_above_mean_sea_level_eb, air_from_file_eb, height);
-	//std::cout << "IKT air_frac = " << air_frac << "\n"; 
+        // std::cout << "IKT air_frac = " << air_frac << "\n";
       }
 
       // Use freezing curve to get icurr and dfdT
@@ -317,17 +317,17 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       Tdiff = Tcurr - (Tmelt + Tshift);
 
-      ScalarT const r_max    = 1.7e308; //This is the max double that can be represented in C++ w/o overflow
-      ScalarT const tol_bt   = 709.0;
-      //IKT 2/4/2025: Please see ace_thermal_param_upper_bound_to_prevent_nans.pdf in 
-      //the arctic_coastal_erosion repo for a derivation of the following tolerance.
-      //It is calcutated such that d^2f/dT^2 does not overflow.  This value comes up in the derivatives 
-      //of qebt, which are used to calculate the stiffness matrix for the problem.
-      ScalarT const d        = 1.0/0.1 + 2.0; 
-      ScalarT const tol_qebt = pow(r_max, 1.0/d) - C;
-      //std::cout << "IKT r_max, v, d, 1/d, tol_qebt = " << r_max << ", " << v << ", " << d << ", "
-      //          << 1.0/d << ", " << tol_qebt << "\n"; 
-      ScalarT const bt       = -B * Tdiff;
+      ScalarT const r_max  = 1.7e308;  // This is the max double that can be represented in C++ w/o overflow
+      ScalarT const tol_bt = 709.0;
+      // IKT 2/4/2025: Please see ace_thermal_param_upper_bound_to_prevent_nans.pdf in
+      // the arctic_coastal_erosion repo for a derivation of the following tolerance.
+      // It is calcutated such that d^2f/dT^2 does not overflow.  This value comes up in the derivatives
+      // of qebt, which are used to calculate the stiffness matrix for the problem.
+      ScalarT const d        = 1.0 / 0.1 + 2.0;
+      ScalarT const tol_qebt = pow(r_max, 1.0 / d) - C;
+      // std::cout << "IKT r_max, v, d, 1/d, tol_qebt = " << r_max << ", " << v << ", " << d << ", "
+      //           << 1.0/d << ", " << tol_qebt << "\n";
+      ScalarT const bt = -B * Tdiff;
 
       if (bt < -tol_bt) {
         dfdT  = 0.0;
@@ -380,10 +380,10 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         calc_soil_heat_capacity = (0.7e3 * sand_frac) + (0.6e3 * clay_frac) + (0.7e3 * silt_frac) + (1.93e3 * peat_frac);
         // K values in [W/K/m]
         calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.40 * peat_frac);
-        //calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.08 * peat_frac);
-        //calc_soil_thermal_cond = pow(8.0,sand_frac) * pow(0.4,clay_frac) * pow(4.9,silt_frac) * pow(0.08,peat_frac);
-        // Rho values in [kg/m3]
-        // Peat density from Emily Bristol
+        // calc_soil_thermal_cond = (8.0 * sand_frac) + (0.4 * clay_frac) + (4.9 * silt_frac) + (0.08 * peat_frac);
+        // calc_soil_thermal_cond = pow(8.0,sand_frac) * pow(0.4,clay_frac) * pow(4.9,silt_frac) * pow(0.08,peat_frac);
+        //  Rho values in [kg/m3]
+        //  Peat density from Emily Bristol
         calc_soil_density = (2600.0 * sand_frac) + (2350.0 * clay_frac) + (2500.0 * silt_frac) + (250.0 * peat_frac);
         // Update the effective material density
         density_(cell, qp) = (porosity_eb * ((ice_density_eb * icurr) + (water_density_eb * wcurr))) + ((1.0 - porosity_eb) * calc_soil_density);
@@ -392,7 +392,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       }
 
       if (snow_given == true) {
-        auto const SWE = 0.10;
+        auto const SWE     = 0.10;
         density_(cell, qp) = SWE * water_density_eb;
       }
 
@@ -409,15 +409,15 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       heat_capacity_(cell, qp) = (1.0) * heat_capacity_(cell, qp);
 
       if (snow_given == true) {
-        heat_capacity_(cell, qp) = 2090.0;  // [J/kg/K]      
+        heat_capacity_(cell, qp) = 2090.0;  // [J/kg/K]
       }
 
       // Update the effective material thermal conductivity
       if (sediment_given == true) {
         thermal_conductivity_(cell, qp) =
             (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) + ((1.0 - porosity_eb) * calc_soil_thermal_cond);
-        //thermal_conductivity_(cell, qp) =
-        //    pow(ice_thermal_cond_eb,(icurr*porosity_eb)) * pow(water_thermal_cond_eb,(wcurr*porosity_eb)) * pow(calc_soil_thermal_cond,(1.0 - porosity_eb));
+        // thermal_conductivity_(cell, qp) =
+        //     pow(ice_thermal_cond_eb,(icurr*porosity_eb)) * pow(water_thermal_cond_eb,(wcurr*porosity_eb)) * pow(calc_soil_thermal_cond,(1.0 - porosity_eb));
       } else {
         thermal_conductivity_(cell, qp) =
             (porosity_eb * ((ice_thermal_cond_eb * icurr) + (water_thermal_cond_eb * wcurr))) + ((1.0 - porosity_eb) * soil_thermal_cond_eb);
@@ -425,14 +425,14 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       // HACK!! HACK!! HACK!!
       // HACK!! HACK!! HACK!!
       thermal_conductivity_(cell, qp) = (1.0) * thermal_conductivity_(cell, qp);
-      
+
       if (snow_given == true) {
-        ScalarT       snow_K = 0.1;  // [W/K/m]
-        ScalarT const dZ = element_size_eb; // [m]
-        snow_K = snow_K * (dZ / snow_depth);
-	//std::cout << "snow_depth = " << snow_depth << " ";
-	//std::cout << "snow_K = " << snow_K << " ";
-        thermal_conductivity_(cell, qp) = std::min(snow_K, 15.0);  // [W/K/m]      
+        ScalarT       snow_K = 0.1;              // [W/K/m]
+        ScalarT const dZ     = element_size_eb;  // [m]
+        snow_K               = snow_K * (dZ / snow_depth);
+        // std::cout << "snow_depth = " << snow_depth << " ";
+        // std::cout << "snow_K = " << snow_K << " ";
+        thermal_conductivity_(cell, qp) = std::min(snow_K, 15.0);  // [W/K/m]
       }
 
       // Jenn's sub-grid scale model to calibrate niche formation follows.
@@ -520,7 +520,7 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
     ALBANY_ASSERT((soil_density_map_[eb_name] >= 0.0), "*** ERROR: ACE Soil Density must be non-negative!");
     ice_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Ice Thermal Conductivity", 2.3);
     ALBANY_ASSERT((ice_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Ice Thermal Conductivity must be non-negative!");
-    water_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.6); 
+    water_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Water Thermal Conductivity", 0.6);
     ALBANY_ASSERT((water_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Water Thermal Conductivity must be non-negative!");
     soil_thermal_cond_map_[eb_name] = material_db_->getElementBlockParam<RealType>(eb_name, "ACE Sediment Thermal Conductivity", 4.3);
     ALBANY_ASSERT((soil_thermal_cond_map_[eb_name] >= 0.0), "*** ERROR: ACE Sediment Thermal Conductivity must be non-negative!");
@@ -574,8 +574,8 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "ACE Ocean Salinity File must match.");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Snow Depth File") == true) {
-      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Snow Depth File");
-      snow_depth_map_[eb_name] = vectorFromFile(filename);
+      std::string const filename = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Snow Depth File");
+      snow_depth_map_[eb_name]   = vectorFromFile(filename);
       ALBANY_ASSERT(
           time_map_[eb_name].size() == snow_depth_map_[eb_name].size(),
           "*** ERROR: Number of time values and number of snow depth "
@@ -628,17 +628,16 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Air File") == true) {
-      std::string const filename   = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Air File");
+      std::string const filename  = material_db_->getElementBlockParam<std::string>(eb_name, "ACE Air File");
       air_from_file_map_[eb_name] = vectorFromFile(filename);
-      //IKT 2/17/2024: I am not sure if the following assert makes sense for the air.
-      //TODO: check with Jenn.
+      // IKT 2/17/2024: I am not sure if the following assert makes sense for the air.
+      // TODO: check with Jenn.
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == air_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of air values in "
           "ACE Air File must match. \n"
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
-
 
     ALBANY_ASSERT(
         time_map_[eb_name].size() == sea_level_map_[eb_name].size(),

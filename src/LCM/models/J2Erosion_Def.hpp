@@ -22,16 +22,9 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   SL_weakening_factor_      = p->get<RealType>("ACE SL Weakening Factor", 1.0);
   soil_yield_strength_      = p->get<RealType>("ACE Soil Yield Strength", 0.0);
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
-  // IKT 3/21/2024 NOTE: another way to disable erosion from all but the yield criterion  without using the disable_erosion_
-  // flag is to specify:
-  /*critical_angle_ = 0.0;
-  strain_limit_ = 0.0;
-  maximum_displacement_ = 0.0;
-  tensile_strength_ = 0.0; */
-  // std::cout << "IKT erosion enabled!\n";
-  critical_angle_   = p->get<RealType>("ACE Critical Angle", 0.0);
-  tensile_strength_ = p->get<RealType>("ACE Tensile Strength", 0.0);
-  disable_erosion_  = p->get<bool>("Disable Erosion", false);
+  critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
+  tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
+  disable_erosion_          = p->get<bool>("Disable Erosion", false);
 
   if (p->isParameter("ACE Strain Limit")) {
     strain_limit_ = p->get<RealType>("ACE Strain Limit");

@@ -727,10 +727,8 @@ ACEThermoMechanical::continueSolve() const
   // Also set converged_ to true, which is equally irrelevant unless doing
   // Schwarz-like coupling
   converged_ = true;
-  if (num_iter_ > 0)
-    return false;
-  else
-    return true;
+  if (num_iter_ > 0) return false;
+  else return true;
 }
 
 // Sequential ThermoMechanical coupling loop, dynamic

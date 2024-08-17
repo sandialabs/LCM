@@ -135,6 +135,12 @@ NeumannBase<EvalT, Traits>::NeumannBase(Teuchos::ParameterList& p)
     bc_type = ACEPRESS;
     this->registerSacadoParameter(name, paramLib);
 
+  } else if (inputConditions == "wave_pressure_hydrostatic") {  // ACE Wave Pressure boundary condition
+
+    // User has specified a pressure condition
+    bc_type = ACEPRESS_HYDROSTATIC;
+    this->registerSacadoParameter(name, paramLib);
+
   } else {
     // User has specified conditions on sideset normal
     bc_type   = NORMAL;
@@ -573,6 +579,8 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
 
         case ACEPRESS: calc_ace_press(data, physPointsSide, jacobianSide, *cellType, side, worksetNum, workset.current_time); break;
 
+        case ACEPRESS_HYDROSTATIC: calc_ace_press_hydrostatic(data, physPointsSide, jacobianSide, *cellType, side, worksetNum, workset.current_time); break;
+
         case TRACTION: calc_traction_components(data); break;
         case CLOSED_FORM: calc_closed_form(data, physPointsSide, jacobianSide, *cellType, side, workset); break;
         default: calc_gradu_dotn_const(data, jacobianSide, *cellType, side); break;
@@ -918,6 +926,51 @@ NeumannBase<EvalT, Traits>::calc_ace_press(
   }
   previous_times[workset_num]  = current_time;
   is_initial_time[workset_num] = false;
+}
+
+template <typename EvalT, typename Traits>
+void
+NeumannBase<EvalT, Traits>::calc_ace_press_hydrostatic(
+    Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+    const Kokkos::DynRankView<MeshScalarT, PHX::Device>& physPointsSide,
+    const Kokkos::DynRankView<MeshScalarT, PHX::Device>& jacobian_side_refcell,
+    const shards::CellTopology&                          celltopo,
+    int                                                  local_side_id,
+    const int                                            workset_num,
+    const double                                         current_time) const
+{
+  Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
+  //*out << "IKT in calc_ace_press_hydrostatic!\n";
+  int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
+  int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
+
+  using DynRankViewMeshScalarT = Kokkos::DynRankView<MeshScalarT, PHX::Device>;
+  DynRankViewMeshScalarT side_normals =
+      Kokkos::createDynRankViewWithType<DynRankViewMeshScalarT>(side_normals_buffer, side_normals_buffer.data(), numCells_, numPoints, cellDims);
+  DynRankViewMeshScalarT normal_lengths =
+      Kokkos::createDynRankViewWithType<DynRankViewMeshScalarT>(normal_lengths_buffer, normal_lengths_buffer.data(), numCells_, numPoints);
+
+  // for this side in the reference cell, get the components of the normal
+  // direction vector
+  ICT::getPhysicalSideNormals(side_normals, jacobian_side_refcell, local_side_id, celltopo);
+
+  // scale normals (unity)
+  IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
+  IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
+
+  const ScalarT waterH = waterH_val;      // waterH interpolated in time
+  const double  g      = inputValues[1];   // gravitational constant
+  const double  rho    = inputValues[2];   // density
+  const bool dump_wave_press_nbc_data = inputValues[5];
+
+  for (int cell = 0; cell < numCells_; cell++) {
+    for (int qp = 0; qp < numPoints; qp++) {
+      for (int dim = 0; dim < numDOFsSet; dim++) {
+        const ScalarT pval_qp = rho*g*waterH; 
+        qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
+      }
+    }
+  }
 }
 
 // The following is for the breaking wave formulation of the ACE wave pressure NBC

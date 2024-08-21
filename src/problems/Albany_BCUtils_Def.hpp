@@ -1258,6 +1258,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           Teuchos::Array<double> kvals;
           Teuchos::Array<double> wvals;
           Teuchos::Array<double> hvals;
+          Teuchos::Array<double> waterHvals;
           if (sub_list.isParameter("ACE Wave Length Values File")) {
             std::string const          L_file    = sub_list.get<std::string>("ACE Wave Length Values File");
             std::vector<double>        Lvals_vec = LCM::vectorFromFile(L_file);
@@ -1283,33 +1284,11 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
             hvals                                = Teuchos::Array<double>(svals_av);
           }
 
-          if (timevals.size() != Lvals.size()) {
-            ALBANY_ABORT(
-                "'Time Values' array (" << timevals.size()
-                                        << ") must have same length as 'Wave Length Values' "
-                                           "array ("
-                                        << Lvals.size() << ")!\n");
-          }
-          if (timevals.size() != kvals.size()) {
-            ALBANY_ABORT(
-                "'Time Values' array (" << timevals.size()
-                                        << ") must have same length as 'Wave Number Values' "
-                                           "array ("
-                                        << kvals.size() << ")!\n");
-          }
-          if (timevals.size() != hvals.size()) {
-            ALBANY_ABORT(
-                "'Time Values' array (" << timevals.size()
-                                        << ") must have same length as 'Still Water Level Values' "
-                                           "array ("
-                                        << hvals.size() << ")!\n");
-          }
-          if (timevals.size() != wvals.size()) {
-            ALBANY_ABORT(
-                "'Time Values' array (" << timevals.size()
-                                        << ") must have same length as 'Wave Height Values' "
-                                           "array ("
-                                        << wvals.size() << ")!\n");
+          if (sub_list.isParameter("ACE WaterH Values File")) {
+            std::string const          waterH_file    = sub_list.get<std::string>("ACE WaterH Values File");
+            std::vector<double>        waterHvals_vec = LCM::vectorFromFile(waterH_file);
+            Teuchos::ArrayView<double> waterHvals_av  = Teuchos::arrayViewFromVector(waterHvals_vec);
+            waterHvals                                = Teuchos::Array<double>(waterHvals_av);
           }
 
           p->set<Teuchos::Array<RealType>>("Time Values", timevals);
@@ -1317,7 +1296,7 @@ Albany::BCUtils<Albany::NeumannTraits>::buildEvaluatorsList(
           p->set<Teuchos::Array<RealType>>("Wave Number Values", kvals);
           p->set<Teuchos::Array<RealType>>("Still Water Level Values", hvals);
           p->set<Teuchos::Array<RealType>>("Wave Height Values", wvals);
-
+          p->set<Teuchos::Array<RealType>>("WaterH Values", waterHvals);
           p->set<RCP<ParamLib>>("Parameter Library", paramLib);
 
           p->set<string>("Side Set ID", meshSpecs->ssNames[i]);

@@ -37,6 +37,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::Evalu
     INTJUMP,
     PRESS,
     ACEPRESS,
+    ACEPRESS_HYDROSTATIC,
     ROBIN,
     TRACTION,
     CLOSED_FORM,
@@ -118,6 +119,17 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::Evalu
   // ACE Pressure P
   void
   calc_ace_press(
+      Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& physPointsSide,
+      Kokkos::DynRankView<MeshScalarT, PHX::Device> const& jacobian_side_refcell,
+      shards::CellTopology const&                          celltopo,
+      int                                                  local_side_id,
+      const int                                            workset_num,
+      const double                                         current_time) const;
+
+  // Basic hydrostaitc ACE wave pressure NBC
+  void
+  calc_ace_press_hydrostatic(
       Kokkos::DynRankView<ScalarT, PHX::Device>&           qp_data_returned,
       Kokkos::DynRankView<MeshScalarT, PHX::Device> const& physPointsSide,
       Kokkos::DynRankView<MeshScalarT, PHX::Device> const& jacobian_side_refcell,
@@ -216,6 +228,7 @@ class NeumannBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::Evalu
   ScalarT height_above_water_of_max_pressure_val;
   ScalarT wave_length_val;
   ScalarT wave_number_val;
+  ScalarT waterH_val;
   ScalarT s_val;
   ScalarT w_val;
 

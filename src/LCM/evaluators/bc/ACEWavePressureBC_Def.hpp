@@ -18,13 +18,20 @@ ACEWavePressureBC_Base<EvalT, Traits>::ACEWavePressureBC_Base(Teuchos::Parameter
   waveNumberValues = p.get<Teuchos::Array<RealType>>("Wave Number Values").toVector();
   sValues          = p.get<Teuchos::Array<RealType>>("Still Water Level Values").toVector();
   wValues          = p.get<Teuchos::Array<RealType>>("Wave Height Values").toVector();
+  waterHValues     = p.get<Teuchos::Array<RealType>>("WaterH Values").toVector();
 
+  auto bc_type = this->bc_type; 
   // IKT, 8/19/2021: the following checks are overkill, as we do the same checks
   // in Albany::BCUtils
-  ALBANY_PANIC(!(timeValues.size() == waveLengthValues.size()), "Dimension of \"Time Values\" and \"Wave Length Values\" do not match\n");
-  ALBANY_PANIC(!(timeValues.size() == waveNumberValues.size()), "Dimension of \"Time Values\" and \"Wave Number Values\" do not match\n");
-  ALBANY_PANIC(!(timeValues.size() == sValues.size()), "Dimension of \"Time Values\" and \"Still Water Level Values\" do not match\n");
-  ALBANY_PANIC(!(timeValues.size() == wValues.size()), "Dimension of \"Time Values\" and \"Wave Height Values\" do not match\n");
+  if (bc_type == PHAL::NeumannBase<EvalT, Traits>::ACEPRESS) {
+    ALBANY_PANIC(!(timeValues.size() == waveLengthValues.size()), "Dimension of \"Time Values\" and \"Wave Length Values\" do not match\n");
+    ALBANY_PANIC(!(timeValues.size() == waveNumberValues.size()), "Dimension of \"Time Values\" and \"Wave Number Values\" do not match\n");
+    ALBANY_PANIC(!(timeValues.size() == sValues.size()), "Dimension of \"Time Values\" and \"Still Water Level Values\" do not match\n");
+    ALBANY_PANIC(!(timeValues.size() == wValues.size()), "Dimension of \"Time Values\" and \"Wave Height Values\" do not match\n");
+  }
+  else if (bc_type == PHAL::NeumannBase<EvalT, Traits>::ACEPRESS_HYDROSTATIC) {
+    ALBANY_PANIC(!(timeValues.size() == waterHValues.size()), "Dimension of \"Time Values\" and \"WaterH Values\" do not match\n");
+  }
 }
 
 //*****
@@ -54,9 +61,31 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
     slope                 = (wValues[Index] - wValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->w_val           = wValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     // std::cout << "IKT computeVal water_height_val = " << this->water_height_val << "\n";
-
     ALBANY_PANIC(this->wave_length_val <= 0, "Wave length is non-positive!");
     ALBANY_PANIC(this->wave_number_val <= 0, "Wave number is non-positive!");
+  }
+
+  return;
+}
+
+template <typename EvalT, typename Traits>
+void
+ACEWavePressureBC_Base<EvalT, Traits>::computeValHydrostatic(RealType time)
+{
+  ALBANY_PANIC(time > timeValues.back(), "Time is growing unbounded!");
+  ScalarT      Val;
+  RealType     slope;
+  unsigned int Index(0);
+
+  while (timeValues[Index] < time) Index++;
+
+  if (Index == 0) {
+    this->waterH_val      = waterHValues[Index];
+  } else {
+    slope                 = (waterHValues[Index] - waterHValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
+    this->waterH_val       = waterHValues[Index - 1] + slope * (time - timeValues[Index - 1]);
+    // std::cout << "IKT computeVal waterH_val = " << this->waterH_val << "\n";
+    ALBANY_PANIC(this->waterH_val <= 0, "waterH is non-positive!");
   }
 
   return;
@@ -66,6 +95,7 @@ template <typename EvalT, typename Traits>
 ACEWavePressureBC<EvalT, Traits>::ACEWavePressureBC(Teuchos::ParameterList& p) : ACEWavePressureBC_Base<EvalT, Traits>(p)
 {
 }
+
 
 template <typename EvalT, typename Traits>
 void
@@ -77,6 +107,10 @@ ACEWavePressureBC<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
     case PHAL::NeumannBase<EvalT, Traits>::ACEPRESS:
       // calculate scalar value of BC based on current time
       this->computeVal(time);
+      break;
+    case PHAL::NeumannBase<EvalT, Traits>::ACEPRESS_HYDROSTATIC:
+      // calculate scalar value of BC based on current time
+      this->computeValHydrostatic(time);
       break;
 
     default:

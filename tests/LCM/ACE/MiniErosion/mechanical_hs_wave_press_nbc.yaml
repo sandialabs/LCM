@@ -1,0 +1,166 @@
+LCM:
+  Problem:
+    Name: Mechanics 3D
+    Solution Method: Transient
+    Phalanx Graph Visualization Detail: 0
+    MaterialDB Filename: 'materials_mechanical_new_wave_press_nbc.yaml'
+    Second Order: Trapezoid Rule
+    
+    Initial Condition:
+      Function: Constant
+      Function Data: [0.0, 0.0, 0.0]
+      
+    Dirichlet BCs: 
+      SDBC on NS x- for DOF X: 0.0
+      SDBC on NS y- for DOF Y: 0.0
+      SDBC on NS y+ for DOF Y: 0.0
+      SDBC on NS z- for DOF Z: 0.0
+         
+    Neumann BCs:
+      ACE Time Dependent NBC on SS bluff_face-erodible for DOF all set wave_pressure_hydrostatic:
+        ACE Time Values File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        ACE WaterH Values File: 'bcs/waterH.txt'
+        Dump Wave Press NBC Data Files: false
+    
+    Adaptation:
+      Method: Erosion
+      Rebalance: true
+      Equilibrate: false
+      Rename Exodus Output: false
+    
+    Response Functions:
+      Number: 1
+      Response 0: Project IP to Nodal Field
+      ResponseParams 0:
+        Number of Fields: 3
+        IP Field Name 0: Cauchy_Stress
+        IP Field Layout 0: Tensor
+        IP Field Name 1: eqps
+        IP Field Layout 1: Scalar
+        IP Field Name 2: Yield_Surface
+        IP Field Layout 2: Scalar
+        Output to File: true
+
+  
+  Discretization:
+    Method: Ioss
+    Exodus Input File Name: 'grid/cuboid_wave_press_nbc.g'
+    Exodus Output File Name: './mechanical_hs_wave_press_nbc.e'
+    Separate Evaluators by Element Block: true
+    Number Of Time Derivatives: 2
+    Disable Exodus Output Initial Time: true
+    Required Fields Info:
+      Number Of Fields: 2
+      Field 0:
+        Field Name: cell_boundary_indicator
+        Field Type: Elem Scalar
+        Field Origin: Mesh
+      Field 1:
+        Field Name: node_boundary_indicator
+        Field Type: Node Scalar
+        Field Origin: Mesh
+
+  Piro:
+    Trapezoid Rule:
+      Initial Time: 0.0
+      Num Time Steps: 2
+      Final Time: 3600.0
+    NOX:
+      Direction:
+        Method: Newton
+        Newton:
+          Forcing Term Method: Constant
+          Rescue Bad Newton Solve: true
+          Linear Solver:
+            Tolerance: 1.0e-6
+          Stratimikos Linear Solver:
+            NOX Stratimikos Options: { }
+            Stratimikos:
+              Linear Solver Type: Belos
+              Linear Solver Types:
+                Belos:
+                  VerboseObject:
+                    Verbosity Level: low
+                  Solver Type: Block GMRES
+                  Solver Types:
+                    Block GMRES:
+                      Output Frequency: 10
+                      Output Style: 1
+                      Verbosity: 0
+                      Maximum Iterations: 100
+                      Num Blocks: 100
+              Preconditioner Type: Ifpack2
+              Preconditioner Types:
+                Ifpack2:
+                  Overlap: 1
+                  Prec Type: ILUT
+                  Ifpack2 Settings:
+                    'fact: ilut level-of-fill': 1.00000000
+                    'fact: drop tolerance': 0.00000000e+00
+                MueLu:
+                  verbosity: none
+                  number of equations: 3
+                  'coarse: max size': 500
+                  multigrid algorithm: sa
+                  max levels: 4
+                  'aggregation: type': uncoupled
+                  'aggregation: drop scheme': classical
+                  'smoother: type': CHEBYSHEV
+                  'smoother: params':
+                    'chebyshev: degree': 2
+                    'chebyshev: ratio eigenvalue': 7.0
+                    'chebyshev: min eigenvalue': 1.0
+                    'chebyshev: zero starting solution': true
+                  'smoother: pre or post': both
+                  'repartition: enable': true
+                  'repartition: partitioner': zoltan2
+                  'repartition: start level': 2
+                  'repartition: min rows per proc': 800
+                  'repartition: max imbalance': 1.1
+                  'repartition: remap parts': false
+      Line Search:
+        Method: Backtrack
+        Full Step:
+          Full Step: 1.0
+      Nonlinear Solver: Line Search Based
+      Printing:
+        Output Precision: 3
+        Output Processor: 0
+        Output Information:
+          Error: true
+          Warning: false
+          Outer Iteration: true
+          Parameters: false
+          Details: false
+          Linear Solver Details: false
+          Stepper Iteration: true
+          Stepper Details: false
+          Stepper Parameters: false
+      Solver Options:
+        Status Test Check Type: Complete
+      Status Tests:
+        Test Type: Combo
+        Combo Type: OR
+        Number of Tests: 5
+        Test 0:
+          Test Type: RelativeNormF
+          Tolerance: 1.0e-06
+        Test 1:
+          Test Type: MaxIters
+          Maximum Iterations: 32
+        Test 2:
+          Test Type: Combo
+          Combo Type: AND
+          Number of Tests: 2
+          Test 0:
+            Test Type: NStep
+            Number of Nonlinear Iterations: 2
+          Test 1:
+            Test Type: NormF
+            Tolerance: 1.0e-04
+        Test 3:
+          Test Type: FiniteValue
+        Test 4:
+          Test Type: NormF
+          Tolerance: 1.0e-04
+...

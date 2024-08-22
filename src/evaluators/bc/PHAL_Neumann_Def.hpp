@@ -1054,8 +1054,10 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
     pval = 0.0;
     return pval;
   }
-  if (zval <= w + s) {
+  if ((zval <= w + s) && (k < 1)) {
     pval = rho * g * (s - zval) + rho * g * w * cosh(k * zval) / cosh(k * s);
+  } else if ((zval <= w+s) && (k >=1)) {
+    pval = rho * g * (s - zval) + rho * g * w; 
   } else {
     pval = 0.0;
   }

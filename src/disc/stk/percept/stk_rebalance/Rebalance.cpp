@@ -7,17 +7,23 @@
 */
 
 #include <memory>
-#include <percept/stk_rebalance/Partition.hpp>
-#include <percept/stk_rebalance/Rebalance.hpp>
-#include <percept/stk_rebalance_utils/RebalanceUtils.hpp>
 #include <stdexcept>
-#include <stk_mesh/base/BulkData.hpp>
-#include <stk_mesh/base/GetEntities.hpp>
-#include <stk_mesh/base/MetaData.hpp>
-#include <stk_util/parallel/ParallelReduce.hpp>
-#include <stk_util/util/ReportHandler.hpp>
-#include <string>
 #include <vector>
+#include <string>
+
+#include <stk_util/util/ReportHandler.hpp>
+#include <stk_util/parallel/ParallelReduce.hpp>
+
+#include <stk_mesh/base/BulkData.hpp>
+#include <stk_mesh/base/MetaData.hpp>
+#include <stk_mesh/base/GetEntities.hpp>
+//#include <stk_mesh/base/FieldData.hpp>
+//#include <stk_mesh/fem/FEMMetaData.hpp>
+
+#include <percept/stk_rebalance/Rebalance.hpp>
+#include <percept/stk_rebalance/RebalanceUtils.hpp>
+#include <percept/stk_rebalance/Partition.hpp>
+#include <stk_mesh/base/Relation.hpp>
 
 using namespace stk;
 using namespace stk::rebalance;

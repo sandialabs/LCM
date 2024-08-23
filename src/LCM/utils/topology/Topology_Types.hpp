@@ -68,10 +68,8 @@ using EdgeIterator          = boost::graph_traits<Graph>::edge_iterator;
 using OutEdgeIterator       = boost::graph_traits<Graph>::out_edge_iterator;
 using InEdgeIterator        = boost::graph_traits<Graph>::in_edge_iterator;
 
-using IntScalarFieldType = Albany::AbstractSTKFieldContainer::IntScalarFieldType;
-using ScalarFieldType    = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-using VectorFieldType    = Albany::AbstractSTKFieldContainer::VectorFieldType;
-using TensorFieldType    = Albany::AbstractSTKFieldContainer::TensorFieldType;
+using STKIntState = Albany::AbstractSTKFieldContainer::STKIntState;
+using STKFieldType    = Albany::AbstractSTKFieldContainer::STKFieldType;
 
 using EntityPair         = std::pair<stk::mesh::Entity, stk::mesh::Entity>;
 using VertexComponentMap = std::map<Vertex, size_t>;

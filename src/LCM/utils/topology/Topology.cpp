@@ -590,7 +590,7 @@ Topology::getNodalCoordinates()
 
   minitensor::Vector<double> X(dimension);
 
-  VectorFieldType& node_coordinates = *(get_stk_mesh_struct()->getCoordinatesField());
+  STKFieldType& node_coordinates = *(get_stk_mesh_struct()->getCoordinatesField());
 
   for (EntityVectorIndex i = 0; i < number_nodes; ++i) {
     stk::mesh::Entity node = entities[i];
@@ -815,7 +815,7 @@ Topology::get_normal(stk::mesh::Entity boundary_entity)
 
   stk::mesh::EntityVector nodes = getBoundaryEntityNodes(boundary_entity);
 
-  VectorFieldType& coordinates = *(get_stk_mesh_struct()->getCoordinatesField());
+  STKFieldType& coordinates = *(get_stk_mesh_struct()->getCoordinatesField());
 
   for (EntityVectorIndex i = 0; i < num_corner_nodes; ++i) {
     stk::mesh::Entity node = nodes[i];
@@ -872,7 +872,7 @@ Topology::createSurfaceElementConnectivity(stk::mesh::Entity face_top, stk::mesh
   stk::mesh::EntityVector reordered;
 
   // Ensure that the order of the bottom nodes is the same as the top ones.
-  VectorFieldType& coordinates = *(get_stk_mesh_struct()->getCoordinatesField());
+  STKFieldType& coordinates = *(get_stk_mesh_struct()->getCoordinatesField());
 
   size_t const dimension = get_space_dimension();
 
@@ -1610,7 +1610,7 @@ Topology::set_failure_state(stk::mesh::Entity e, FailureState const fs)
   auto&                bulk_data             = get_bulk_data();
   auto const           rank                  = bulk_data.entity_rank(e);
   stk::mesh::MetaData& meta_data             = get_meta_data();
-  ScalarFieldType&     failure_field         = *meta_data.get_field<ScalarFieldType>(rank, "failure_state");
+  STKFieldType&     failure_field         = *meta_data.get_field<double>(rank, "failure_state");
   *(stk::mesh::field_data(failure_field, e)) = static_cast<int>(fs);
 }
 
@@ -1630,7 +1630,7 @@ Topology::get_entity_failure_state(stk::mesh::Entity e)
   auto&                bulk_data     = get_bulk_data();
   auto const           rank          = bulk_data.entity_rank(e);
   stk::mesh::MetaData& meta_data     = get_meta_data();
-  ScalarFieldType&     failure_field = *meta_data.get_field<ScalarFieldType>(rank, "failure_state");
+  STKFieldType&     failure_field = *meta_data.get_field<double>(rank, "failure_state");
   return static_cast<FailureState>(*(stk::mesh::field_data(failure_field, e)));
 }
 

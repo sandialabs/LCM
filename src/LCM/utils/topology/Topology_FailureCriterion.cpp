@@ -11,7 +11,7 @@ namespace LCM {
 
 FractureCriterionTraction::FractureCriterionTraction(Topology& topology, std::string const& stress_name, double const critical_traction, double const beta)
     : AbstractFailureCriterion(topology),
-      stress_field_(get_meta_data().get_field<TensorFieldType>(stk::topology::NODE_RANK, stress_name)),
+      stress_field_(get_meta_data().get_field<double>(stk::topology::NODE_RANK, stress_name)),
       critical_traction_(critical_traction),
       beta_(beta)
 {
@@ -226,7 +226,7 @@ BulkFailureCriterion::BulkFailureCriterion(Topology& topology, std::string const
 bool
 BulkFailureCriterion::check(stk::mesh::BulkData& /* bulk_data */, stk::mesh::Entity element)
 {
-  failure_state_ = get_meta_data().get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, failure_state_name_);
+  failure_state_ = get_meta_data().get_field<double>(stk::topology::ELEMENT_RANK, failure_state_name_);
   ALBANY_ASSERT(failure_state_ != nullptr);
   auto const* const pfs              = reinterpret_cast<double const* const>(stk::mesh::field_data(*failure_state_, element));
   auto const        failure_modes    = static_cast<int>(pfs[0]);

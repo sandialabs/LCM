@@ -105,26 +105,24 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(typename Tra
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
 
+  typedef Albany::AbstractSTKFieldContainer::STKFieldType SFT;
+  SFT* stk_field = metaData.get_field<double> (stk::topology::ELEM_RANK, state_name);
+  ALBANY_ASSERT(stk_field != nullptr);
+
   switch (dims.size()) {
     case 2: {
-      using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-      auto scalar_field = metaData.get_field<SFT>(stk::topology::ELEM_RANK, state_name);
-      ALBANY_ASSERT(scalar_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell) {
         auto gid    = elem_lid_2_gid[cell];
         auto e      = bulkData.get_entity(stk::topology::ELEM_RANK, gid + 1);
-        auto values = stk::mesh::field_data(*scalar_field, e);
+        auto values = stk::mesh::field_data(*stk_field, e);
         field(cell) = values[0];
       }
     } break;
     case 3: {
-      using VFT         = Albany::AbstractSTKFieldContainer::VectorFieldType;
-      auto vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, state_name);
-      ALBANY_ASSERT(vector_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell) {
         auto gid    = elem_lid_2_gid[cell];
         auto e      = bulkData.get_entity(stk::topology::ELEM_RANK, gid + 1);
-        auto values = stk::mesh::field_data(*vector_field, e);
+        auto values = stk::mesh::field_data(*stk_field, e);
         for (int i = 0; i < dims[2]; ++i) field(cell, 0, i) = values[i];
       }
     } break;
@@ -156,29 +154,27 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(typename Tr
 
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
+  
+  using SFT         = Albany::AbstractSTKFieldContainer::STKFieldType;
+  auto stk_field = metaData.get_field<double>(stk::topology::NODE_RANK, state_name);
+  ALBANY_ASSERT(stk_field != nullptr);
 
   switch (dims.size()) {
     case 2: {
-      using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-      auto scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, state_name);
-      ALBANY_ASSERT(scalar_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
           auto gid          = wsElgid[workset.wsIndex][cell][node];
           auto e            = bulkData.get_entity(stk::topology::NODE_RANK, gid + 1);
-          auto values       = stk::mesh::field_data(*scalar_field, e);
+          auto values       = stk::mesh::field_data(*stk_field, e);
           field(cell, node) = values[0];
         }
     } break;
     case 3: {
-      using VFT         = Albany::AbstractSTKFieldContainer::VectorFieldType;
-      auto vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, state_name);
-      ALBANY_ASSERT(vector_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
           auto gid    = wsElgid[workset.wsIndex][cell][node];
           auto e      = bulkData.get_entity(stk::topology::NODE_RANK, gid + 1);
-          auto values = stk::mesh::field_data(*vector_field, e);
+          auto values = stk::mesh::field_data(*stk_field, e);
           for (int i = 0; i < dims[2]; ++i) field(cell, node, i) = values[i];
         }
     } break;

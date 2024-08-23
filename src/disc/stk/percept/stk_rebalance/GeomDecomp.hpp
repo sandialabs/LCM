@@ -68,7 +68,8 @@ namespace rebalance {
 class GeomDecomp : public Partition
 {
  public:
-  typedef mesh::Field<double, mesh::Cartesian> VectorField;
+  typedef mesh::Field<double> VectorField;
+  typedef mesh::Field<double> ScalarField;
 
  public:
   GeomDecomp(ParallelMachine comm) : Partition(comm) {}

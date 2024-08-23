@@ -84,7 +84,7 @@ STKFieldContainerHelper<FieldType>::fillVector(
     int const                                     offset)
 {
   constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle Scalar and Vector fields for now.\n");
 
   BucketArray<FieldType> field_array(field_stk, bucket);
 
@@ -126,7 +126,7 @@ STKFieldContainerHelper<FieldType>::saveVector(
     int const                                     offset)
 {
   constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle Scalar and Vector fields for now.\n");
 
   BucketArray<FieldType> field_array(field_stk, bucket);
 
@@ -162,7 +162,7 @@ void
 STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldType& target)
 {
   constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle Scalar and Vector fields for now.\n");
 
   const stk::mesh::BulkData&     mesh = source.get_mesh();
   const stk::mesh::BucketVector& bv   = mesh.buckets(stk::topology::NODE_RANK);

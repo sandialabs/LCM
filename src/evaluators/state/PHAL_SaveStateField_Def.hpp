@@ -192,11 +192,9 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typename Tra
 
   const auto& wsElNodeID = disc->getWsElNodeID();
 
-  typedef Albany::AbstractSTKFieldContainer::ScalarFieldType SFT;
-  typedef Albany::AbstractSTKFieldContainer::VectorFieldType VFT;
-
-  SFT* scalar_field;
-  VFT* vector_field;
+  using SFT = Albany::AbstractSTKFieldContainer::STKFieldType;
+  SFT* stk_field = metaData.get_field<double> (stk::topology::NODE_RANK, stateName);
+  ALBANY_PANIC (stk_field==nullptr, "Error! Field not found.\n");
 
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
@@ -206,24 +204,20 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typename Tra
   stk::mesh::Entity e;
   switch (dims.size()) {
     case 2:  // node_scalar
-      scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
-      ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
           nodeId    = wsElNodeID[workset.wsIndex][cell][node];
           e         = bulkData.get_entity(stk::topology::NODE_RANK, nodeId + 1);
-          values    = stk::mesh::field_data(*scalar_field, e);
+          values    = stk::mesh::field_data(*stk_field, e);
           values[0] = field(cell, node);
         }
       break;
     case 3:  // node_vector
-      vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
-      ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
           nodeId = wsElNodeID[workset.wsIndex][cell][node];
           e      = bulkData.get_entity(stk::topology::NODE_RANK, nodeId + 1);
-          values = stk::mesh::field_data(*vector_field, e);
+          values = stk::mesh::field_data(*stk_field, e);
           for (int i = 0; i < dims[2]; ++i) values[i] = field(cell, node, i);
         }
       break;

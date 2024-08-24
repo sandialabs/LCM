@@ -219,8 +219,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 
   // sphere volume is a mesh attribute read from a genesis mesh file containing
   // sphere element (used for peridynamics)
-  // IKT 8/23/2024: I am not sure if the following <double> is correct, but don't think we care b/c 
-  // we are not doing Peridynamics anymore
+  // IKT HACK 8/23/2024: the following <double> may not work.  Had <SVFT> before.
   this->sphereVolume_field = metaData_->template get_field<double>(stk::topology::ELEMENT_RANK, "volume");
   if (this->sphereVolume_field != 0) {
     buildSphereVolume = true;

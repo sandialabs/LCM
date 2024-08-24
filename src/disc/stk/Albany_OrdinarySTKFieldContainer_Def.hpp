@@ -99,8 +99,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
   // sphere volume is a mesh attribute read from a genesis mesh file containing
   // sphere element (used for peridynamics)
-  // IKT 9/23/2024: I am not sure if the following <double> is correct, but probably does 
-  // not matter, since we don't care about peridynamics
+  // IKT HACK 8/23/2024: the following <double> may not work.  Had <SVFT> before.
   this->sphereVolume_field = metaData_->template get_field<double>(stk::topology::ELEMENT_RANK, "volume");
   if (this->sphereVolume_field != 0) {
     buildSphereVolume = true;
@@ -386,8 +385,8 @@ OrdinarySTKFieldContainer<Interleaved>::fillVectorImpl(
   stk::mesh::BucketVector const& all_elements = this->bulkData->get_buckets(stk::topology::NODE_RANK, field_selection);
 
   auto field_node_vs_indexer = createGlobalLocalIndexer(field_node_vs);
+    const SFT* field = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
   using Helper     = STKFieldContainerHelper<SFT>;
-  const SFT* field = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
   for (stk::mesh::BucketVector::const_iterator it = all_elements.begin(); it != all_elements.end(); ++it) {
     const stk::mesh::Bucket& bucket = **it;
     Helper::fillVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
@@ -413,8 +412,8 @@ OrdinarySTKFieldContainer<Interleaved>::saveVectorImpl(
   stk::mesh::BucketVector const& all_elements = this->bulkData->get_buckets(stk::topology::NODE_RANK, field_selection);
 
   auto field_node_vs_indexer = createGlobalLocalIndexer(field_node_vs);
-  using Helper = STKFieldContainerHelper<SFT>;
   SFT* field   = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
+  using Helper = STKFieldContainerHelper<SFT>;
   for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
     const stk::mesh::Bucket& bucket = **it;
     Helper::saveVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);

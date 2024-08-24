@@ -22,7 +22,6 @@ set(SOURCES
     Albany_STK3DPointStruct.cpp
     Albany_TmplSTKMeshStruct.cpp)
 set(HEADERS
-    Albany_STKUtils.hpp
     Albany_AbstractSTKFieldContainer.hpp
     Albany_AbstractSTKMeshStruct.hpp
     Albany_AsciiSTKMeshStruct.hpp

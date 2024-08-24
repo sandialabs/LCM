@@ -19,8 +19,8 @@ access(BucketArrayType& array, int const i, int const j);
 
 template <>
 const double&
-access<const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
-    const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array,
+access<const BucketArray<AbstractSTKFieldContainer::STKFieldType>>(
+    const BucketArray<AbstractSTKFieldContainer::STKFieldType>& array,
     int const                                                      j,
     int const                                                      i)
 {
@@ -31,7 +31,7 @@ access<const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
 
 template <>
 double&
-access<BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array, int const j, int const i)
+access<BucketArray<AbstractSTKFieldContainer::STKFieldType>>(BucketArray<AbstractSTKFieldContainer::STKFieldType>& array, int const j, int const i)
 {
   ALBANY_EXPECT(j == 0, "Error! Attempting to access 1d array with two indices.\n");
   (void)j;
@@ -60,11 +60,14 @@ template <typename FieldType>
 constexpr int
 getRank()
 {
-  return std::is_same<FieldType, AbstractSTKFieldContainer::ScalarFieldType>::value ?
+  //IKT 8/23/2024 HACK: this routine is wrong!  Hacking to return something to scope out 
+  //conversion to new STK...
+  return 0; 
+/*  return std::is_same<FieldType, AbstractSTKFieldContainer::ScalarFieldType>::value ?
              0 :
              (std::is_same<FieldType, AbstractSTKFieldContainer::VectorFieldType>::value ?
                   1 :
-                  (std::is_same<FieldType, AbstractSTKFieldContainer::TensorFieldType>::value ? 2 : -1));
+                  (std::is_same<FieldType, AbstractSTKFieldContainer::TensorFieldType>::value ? 2 : -1));*/
 }
 
 // Fill the result vector

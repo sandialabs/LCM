@@ -752,7 +752,7 @@ STKDiscretization::transformMesh()
     double s0     = 2.0;
     double H      = 1.0;
     stkMeshStruct->PBCStruct.scale[0] *= L;
-    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "surface_height");
+    auto surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       x[0]      = L * (x[0] - 1.0);  // test case assumes domain is from [-L, L],
@@ -1960,7 +1960,7 @@ STKDiscretization::computeWorksetInfo()
   for (std::size_t b = 0; b < buckets.size(); b++) {
     stk::mesh::Bucket& buck = *buckets[b];
     for (auto css = cell_scalar_states.begin(); css != cell_scalar_states.end(); ++css) {
-      BucketArray<AbstractSTKFieldContainer::ScalarFieldType> array(**css, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**css, buck);
       MDArray                                                 ar = array;
       stateArrays.elemStateArrays[b][(*css)->name()]             = ar;
     }
@@ -1970,22 +1970,22 @@ STKDiscretization::computeWorksetInfo()
       stateArrays.elemStateArrays[b][(*cvs)->name()]             = ar;
     }
     for (auto cts = cell_tensor_states.begin(); cts != cell_tensor_states.end(); ++cts) {
-      BucketArray<AbstractSTKFieldContainer::TensorFieldType> array(**cts, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**cts, buck);
       MDArray                                                 ar = array;
       stateArrays.elemStateArrays[b][(*cts)->name()]             = ar;
     }
     for (auto qpss = qpscalar_states.begin(); qpss != qpscalar_states.end(); ++qpss) {
-      BucketArray<AbstractSTKFieldContainer::QPScalarFieldType> array(**qpss, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**qpss, buck);
       MDArray                                                   ar = array;
       stateArrays.elemStateArrays[b][(*qpss)->name()]              = ar;
     }
     for (auto qpvs = qpvector_states.begin(); qpvs != qpvector_states.end(); ++qpvs) {
-      BucketArray<AbstractSTKFieldContainer::QPSTKFieldType> array(**qpvs, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**qpvs, buck);
       MDArray                                                   ar = array;
       stateArrays.elemStateArrays[b][(*qpvs)->name()]              = ar;
     }
     for (auto qpts = qptensor_states.begin(); qpts != qptensor_states.end(); ++qpts) {
-      BucketArray<AbstractSTKFieldContainer::QPTensorFieldType> array(**qpts, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**qpts, buck);
       MDArray                                                   ar = array;
       stateArrays.elemStateArrays[b][(*qpts)->name()]              = ar;
     }

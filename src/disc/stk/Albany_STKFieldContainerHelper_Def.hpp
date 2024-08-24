@@ -10,62 +10,13 @@
 #include "Albany_Macros.hpp"
 #include "Albany_STKFieldContainerHelper.hpp"
 #include "Albany_ThyraUtils.hpp"
+#include <stk_mesh/base/FieldBase.hpp>
+#include <type_traits>
+#include <numeric>
+#include "Albany_STKUtils.hpp"
 
 namespace Albany {
 
-template <typename BucketArrayType>
-typename std::conditional<std::is_const<BucketArrayType>::value, const double&, double&>::type
-access(BucketArrayType& array, int const i, int const j);
-
-template <>
-const double&
-access<const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
-    const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array,
-    int const                                                      j,
-    int const                                                      i)
-{
-  ALBANY_EXPECT(j == 0, "Error! Attempting to access 1d array with two indices.\n");
-  (void)j;
-  return array(i);
-}
-
-template <>
-double&
-access<BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array, int const j, int const i)
-{
-  ALBANY_EXPECT(j == 0, "Error! Attempting to access 1d array with two indices.\n");
-  (void)j;
-  return array(i);
-}
-
-template <>
-const double&
-access<const BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(
-    const BucketArray<AbstractSTKFieldContainer::VectorFieldType>& array,
-    int const                                                      j,
-    int const                                                      i)
-{
-  return array(j, i);
-}
-
-template <>
-double&
-access<BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(BucketArray<AbstractSTKFieldContainer::VectorFieldType>& array, int const j, int const i)
-{
-  return array(j, i);
-}
-
-// Get the rank of a field
-template <typename FieldType>
-constexpr int
-getRank()
-{
-  return std::is_same<FieldType, AbstractSTKFieldContainer::ScalarFieldType>::value ?
-             0 :
-             (std::is_same<FieldType, AbstractSTKFieldContainer::VectorFieldType>::value ?
-                  1 :
-                  (std::is_same<FieldType, AbstractSTKFieldContainer::TensorFieldType>::value ? 2 : -1));
-}
 
 // Fill the result vector
 // Create a multidimensional array view of the
@@ -83,37 +34,68 @@ STKFieldContainerHelper<FieldType>::fillVector(
     const NodalDOFManager&                        nodalDofManager,
     int const                                     offset)
 {
-  constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle Scalar and Vector fields for now.\n");
+  //IKT 8/23/2024 HACK.  Need to bring back following logic.
+  //constexpr int rank = FieldRank<FieldType>::n;
+  //ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle Scalar and Vector fields for now.\n");
 
-  BucketArray<FieldType> field_array(field_stk, bucket);
+  using ScalarT = typename FieldScalar<FieldType>::type;
+  using ViewT = Kokkos::View<const ScalarT**,Kokkos::LayoutRight,Kokkos::HostSpace>;
 
-  using SFT                = AbstractSTKFieldContainer::ScalarFieldType;
-  constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
-  constexpr int  nodes_dim = is_SFT ? 0 : 1;
+  const auto& elem_dof_lids = dof_mgr->elem_dof_lids().host();
+  const bool restricted = dof_mgr->part_name()!=dof_mgr->elem_block_name();
 
-  int const num_nodes_in_bucket = field_array.dimension(nodes_dim);
+  auto data = getNonconstLocalData(field_thyra);
+  constexpr auto ELEM_RANK = stk::topology::ELEM_RANK;
+  const auto& elems = dof_mgr->getAlbanyConnManager()->getElementsInBlock();
+  const int num_elems = elems.size();
+  const auto indexer = dof_mgr->indexer();
 
-  const stk::mesh::BulkData& mesh = field_stk.get_mesh();
-  auto                       data = getNonconstLocalData(field_thyra);
-  int                        num_vec_components;
-  // IKT, FIXME: ideally nodalDofManager.numComponents() should return 1 for a
-  // SFT, I would think. Need to look into this more to come up with a better
-  // fix, hopefully.
-  if (is_SFT == true)
-    num_vec_components = 1;
-  else
-    num_vec_components = nodalDofManager.numComponents();
+  #ifdef ALBANY_DEBUG
+  // Safety check
+  if (elems.size()>0) {
+    const auto& e0 = bulkData.get_entity(ELEM_RANK,elems[0]+1);
+    const auto& n0 = *bulkData.begin_nodes(e0);
+    TEUCHOS_TEST_FOR_EXCEPTION (stk::mesh::field_scalars_per_entity(field_stk,n0)<components.size(),
+        std::runtime_error,
+        "Error! Number of components exceeds number of scalars per node of the STK field.\n"
+        "  - number of components: " << components.size() << "\n"
+        "  - number scalars/node : " << stk::mesh::field_scalars_per_entity(field_stk,n0) << "\n");
+  }
+#endif
 
-  for (int i = 0; i < num_nodes_in_bucket; ++i) {
-    const GO node_gid = mesh.identifier(bucket[i]) - 1;
-    const LO node_lid = indexer->getLocalElement(node_gid);
+  const auto get_offsets = [&] (const int eq) -> const std::vector<int>&
+  {
+    return dof_mgr->getGIDFieldOffsets(eq);
+  };
 
-    for (int j = 0; j < num_vec_components; ++j) {
-      data[nodalDofManager.getLocalDOF(node_lid, offset + j)] = access(field_array, j, i);
+   for (int ielem=0; ielem<num_elems; ++ielem) {
+    const auto elem_gid = elems[ielem];
+    const auto e = bulkData.get_entity(ELEM_RANK,elem_gid+1);
+    const int num_nodes = bulkData.num_nodes(e);
+    const auto nodes = bulkData.begin_nodes(e);
+    const auto& gids = dof_mgr->getElementGIDs(ielem);
+    for (int i=0; i<num_nodes; ++i) {
+      if (not overlapped) {
+        // Check right away if this node is owned. We can pick fieldId=0 from the
+        // dof manager, since we are guaranteed to own all or none of the gids on
+        // each node.
+        const auto owned_lid = indexer->getLocalElement(gids[get_offsets(0)[i]]);
+        if (owned_lid<0) {
+          continue;
+        }
+      }
+      auto stk_data = stk::mesh::field_data(field_stk,nodes[i]);
+      for (auto fid : components) {
+        const auto& offsets = get_offsets(fid);
+        const auto lid = elem_dof_lids(ielem,offsets[i]);
+        if (!restricted ||lid>=0) {
+          data[lid] = stk_data[fid];
+        }
+      }
     }
   }
 }
+
 
 template <class FieldType>
 void
@@ -125,79 +107,112 @@ STKFieldContainerHelper<FieldType>::saveVector(
     const NodalDOFManager&                        nodalDofManager,
     int const                                     offset)
 {
-  constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle Scalar and Vector fields for now.\n");
+  //IKT 8/23/2024 HACK.  Need to bring back following logic.
+  //constexpr int rank = FieldRank<FieldType>::n;
+  //ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle Scalar and Vector fields for now.\n");
 
-  BucketArray<FieldType> field_array(field_stk, bucket);
+   using ScalarT = typename FieldScalar<FieldType>::type;
+  using ViewT = Kokkos::View<ScalarT**,Kokkos::LayoutRight,Kokkos::HostSpace>;
 
-  using SFT                = AbstractSTKFieldContainer::ScalarFieldType;
-  constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
-  constexpr int  nodes_dim = is_SFT ? 0 : 1;
+  const auto& elem_dof_lids = dof_mgr->elem_dof_lids().host();
+  const bool restricted = dof_mgr->part_name()!=dof_mgr->elem_block_name();
 
-  int const num_nodes_in_bucket = field_array.dimension(nodes_dim);
+  auto data = getLocalData(field_thyra);
+  constexpr auto ELEM_RANK = stk::topology::ELEM_RANK;
+  const auto& elems = dof_mgr->getAlbanyConnManager()->getElementsInBlock();
+  const int num_elems = elems.size();
+  const auto indexer = dof_mgr->indexer();
 
-  const stk::mesh::BulkData& mesh = field_stk.get_mesh();
-  auto                       data = getLocalData(field_thyra);
-  int                        num_vec_components;
-  // IKT, FIXME: ideally nodalDofManager.numComponents() should return 1 for a
-  // SFT, I would think. Need to look into this more to come up with a better
-  // fix, hopefully.
-  if (is_SFT == true)
-    num_vec_components = 1;
-  else
-    num_vec_components = nodalDofManager.numComponents();
 
-  for (int i = 0; i < num_nodes_in_bucket; ++i) {
-    const GO node_gid = mesh.identifier(bucket[i]) - 1;
-    const LO node_lid = indexer->getLocalElement(node_gid);
+#ifdef ALBANY_DEBUG
+  // Safety check
+  if (elems.size()>0) {
+    const auto& e0 = bulkData.get_entity(ELEM_RANK,elems[0]+1);
+    const auto& n0 = *bulkData.begin_nodes(e0);
+    TEUCHOS_TEST_FOR_EXCEPTION (stk::mesh::field_scalars_per_entity(field_stk,n0)<components.size(),
+        std::runtime_error,
+        "Error! Number of components exceeds number of scalars per node of the STK field.\n"
+        "  - number of components: " << components.size() << "\n"
+        "  - number scalars/node : " << stk::mesh::field_scalars_per_entity(field_stk,n0) << "\n");
+  }
+#endif
 
-    for (int j = 0; j < num_vec_components; ++j) {
-      access(field_array, j, i) = data[nodalDofManager.getLocalDOF(node_lid, offset + j)];
+  const auto get_offsets = [&] (const int eq) -> const std::vector<int>&
+  {
+    return dof_mgr->getGIDFieldOffsets(eq);
+  };
+
+   for (int ielem=0; ielem<num_elems; ++ielem) {
+    const auto elem_gid = elems[ielem];
+    const auto e = bulkData.get_entity(ELEM_RANK,elem_gid+1);
+    const int num_nodes = bulkData.num_nodes(e);
+    const auto nodes = bulkData.begin_nodes(e);
+    const auto& gids = dof_mgr->getElementGIDs(ielem);
+    for (int i=0; i<num_nodes; ++i) {
+      if (not overlapped) {
+        // Check right away if this node is owned. We can pick fieldId=0 from the
+        // dof manager, since we are guaranteed to own all or none of the gids on
+        // each node.
+        const auto owned_lid = indexer->getLocalElement(gids[get_offsets(0)[i]]);
+        if (owned_lid<0) {
+          continue;
+        }
+      }
+      auto stk_data = stk::mesh::field_data(field_stk,nodes[i]);
+      for (auto fid : components) {
+        const auto& offsets = get_offsets(fid);
+        const auto lid = elem_dof_lids(ielem,offsets[i]);
+        if (!restricted or lid>=0) {
+          stk_data[fid] = data[lid];
+        }
+      }
     }
   }
 }
+
 
 template <class FieldType>
 void
 STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldType& target)
 {
-  constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle Scalar and Vector fields for now.\n");
+  //IKT 8/23/2024 HACK.  Need to bring back following logic.
+  //constexpr int rank = FieldRank<FieldType>::n;
+  //static_assert(rank==0 || rank==1,
+  //              "Error! Can only handle scalar and vector fields for now.\n");
+
+  using ScalarT = typename FieldScalar<FieldType>::type;
+  using SrcViewT = Kokkos::View<const ScalarT**,Kokkos::LayoutRight,Kokkos::HostSpace>;
+  using TgtViewT = Kokkos::View<      ScalarT**,Kokkos::LayoutRight,Kokkos::HostSpace>;
 
   const stk::mesh::BulkData&     mesh = source.get_mesh();
   const stk::mesh::BucketVector& bv   = mesh.buckets(stk::topology::NODE_RANK);
 
-  using SFT                = AbstractSTKFieldContainer::ScalarFieldType;
-  constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
-  constexpr int  nodes_dim = is_SFT ? 0 : 1;
+ for (auto it : bv) {
+    const stk::mesh::Bucket& bucket = *it;
+    const int num_nodes_in_bucket = bucket.size();
+    const int num_source_components = stk::mesh::field_scalars_per_entity(target, bucket);
+    const int num_target_components = stk::mesh::field_scalars_per_entity(target, bucket);
 
-  for (stk::mesh::BucketVector::const_iterator it = bv.begin(); it != bv.end(); ++it) {
-    const stk::mesh::Bucket& bucket = **it;
+    const int uneven_downsampling = num_source_components % num_target_components;
+    TEUCHOS_TEST_FOR_EXCEPTION(uneven_downsampling, std::logic_error,
+        "Error in stk fields: specification of coordinate vector vs. solution layout is incorrect.\n");
 
-    BucketArray<FieldType> source_array(source, bucket);
-    BucketArray<FieldType> target_array(target, bucket);
+    auto src_stk_data = stk::mesh::field_data(source,bucket);
+    auto tgt_stk_data = stk::mesh::field_data(target,bucket);
 
-    int const num_source_components = is_SFT ? 1 : source_array.dimension(0);
-    int const num_target_components = is_SFT ? 1 : target_array.dimension(0);
-    int const num_nodes_in_bucket   = source_array.dimension(nodes_dim);
+    SrcViewT src_view (src_stk_data,num_nodes_in_bucket,num_source_components);
+    TgtViewT tgt_view (tgt_stk_data,num_nodes_in_bucket,num_target_components);
 
-    int const uneven_downsampling = num_source_components % num_target_components;
-
-    ALBANY_PANIC(
-        (uneven_downsampling) || (num_nodes_in_bucket != target_array.dimension(nodes_dim)),
-        "Error in stk fields: specification of coordinate vector vs. solution "
-        "layout is incorrect."
-            << std::endl);
-
-    for (int i = 0; i < num_nodes_in_bucket; ++i) {
+    for(int i=0; i<num_nodes_in_bucket; ++i) {
       // In source, j varies over neq (num phys vectors * numDim)
       // We want target to only vary over the first numDim components
       // Not sure how to do this generally...
-      for (int j = 0; j < num_target_components; ++j) {
-        access(target_array, j, i) = access(source_array, j, i);
+      for(int j=0; j<num_target_components; ++j) {
+        tgt_view(i,j) = src_view(i,j);
       }
     }
   }
 }
+
 
 }  // namespace Albany

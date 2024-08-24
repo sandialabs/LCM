@@ -48,8 +48,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     const Teuchos::RCP<StateInfoStruct>&                      sis)
     : GenericSTKFieldContainer<Interleaved>(params_, metaData_, bulkData_, neq_, numDim_), buildSphereVolume(false)
 {
-  typedef typename AbstractSTKFieldContainer::VectorFieldType       VFT;
-  typedef typename AbstractSTKFieldContainer::ScalarFieldType       SFT;
+  typedef typename AbstractSTKFieldContainer::STKFieldType       SFT;
   typedef typename AbstractSTKFieldContainer::SphereVolumeFieldType SVFT;
 
   int num_time_deriv = params_->get<int>("Number Of Time Derivatives");
@@ -59,13 +58,13 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 #endif
 
   // Start STK stuff
-  this->coordinates_field = &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, "coordinates");
+  this->coordinates_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates");
   stk::mesh::put_field_on_mesh(*this->coordinates_field, metaData_->universal_part(), numDim_, nullptr);
   stk::io::set_field_role(*this->coordinates_field, Ioss::Field::MESH);
   if (numDim_ == 3) {
     this->coordinates_field3d = this->coordinates_field;
   } else {
-    this->coordinates_field3d = &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, "coordinates3d");
+    this->coordinates_field3d = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates3d");
     stk::mesh::put_field_on_mesh(*this->coordinates_field3d, metaData_->universal_part(), 3, nullptr);
     if (params_->get<bool>("Export 3d coordinates field", false)) {
       stk::io::set_field_role(*this->coordinates_field3d, Ioss::Field::TRANSIENT);
@@ -77,13 +76,13 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
   for (int num_vecs = 0; num_vecs <= num_time_deriv; num_vecs++) {
     solution_field[num_vecs] =
-        &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, params_->get<std::string>(sol_tag_name[num_vecs], sol_id_name[num_vecs]));
+        &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(sol_tag_name[num_vecs], sol_id_name[num_vecs]));
     stk::mesh::put_field_on_mesh(*solution_field[num_vecs], metaData_->universal_part(), neq_, nullptr);
 
 #if defined(ALBANY_DTK)
     if (output_dtk_field == true) {
       solution_field_dtk[num_vecs] =
-          &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, params_->get<std::string>(sol_dtk_tag_name[num_vecs], sol_dtk_id_name[num_vecs]));
+          &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(sol_dtk_tag_name[num_vecs], sol_dtk_id_name[num_vecs]));
       stk::mesh::put_field_on_mesh(*solution_field_dtk[num_vecs], metaData_->universal_part(), neq_, nullptr);
     }
 #endif
@@ -94,13 +93,15 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 #endif
   }
 
-  residual_field = &metaData_->declare_field<VFT>(stk::topology::NODE_RANK, params_->get<std::string>(res_tag_name[0], res_id_name[0]));
+  residual_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(res_tag_name[0], res_id_name[0]));
   stk::mesh::put_field_on_mesh(*residual_field, metaData_->universal_part(), neq_, nullptr);
   stk::io::set_field_role(*residual_field, Ioss::Field::TRANSIENT);
 
   // sphere volume is a mesh attribute read from a genesis mesh file containing
   // sphere element (used for peridynamics)
-  this->sphereVolume_field = metaData_->template get_field<SVFT>(stk::topology::ELEMENT_RANK, "volume");
+  // IKT 9/23/2024: I am not sure if the following <double> is correct, but probably does 
+  // not matter, since we don't care about peridynamics
+  this->sphereVolume_field = metaData_->template get_field<double>(stk::topology::ELEMENT_RANK, "volume");
   if (this->sphereVolume_field != 0) {
     buildSphereVolume = true;
     stk::io::set_field_role(*this->sphereVolume_field, Ioss::Field::ATTRIBUTE);
@@ -122,28 +123,28 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   bool const has_edge_boundary_indicator = (std::find(req.begin(), req.end(), "edge_boundary_indicator") != req.end());
   bool const has_node_boundary_indicator = (std::find(req.begin(), req.end(), "node_boundary_indicator") != req.end());
   if (has_cell_boundary_indicator) {
-    this->cell_boundary_indicator = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
+    this->cell_boundary_indicator = metaData_->template get_field<double>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
     if (this->cell_boundary_indicator != nullptr) {
       build_cell_boundary_indicator = true;
       stk::io::set_field_role(*this->cell_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
   if (has_face_boundary_indicator) {
-    this->face_boundary_indicator = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::FACE_RANK, "face_boundary_indicator");
+    this->face_boundary_indicator = metaData_->template get_field<double>(stk::topology::FACE_RANK, "face_boundary_indicator");
     if (this->face_boundary_indicator != nullptr) {
       build_face_boundary_indicator = true;
       stk::io::set_field_role(*this->face_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
   if (has_edge_boundary_indicator) {
-    this->edge_boundary_indicator = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
+    this->edge_boundary_indicator = metaData_->template get_field<double>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
     if (this->edge_boundary_indicator != nullptr) {
       build_edge_boundary_indicator = true;
       stk::io::set_field_role(*this->edge_boundary_indicator, Ioss::Field::INFORMATION);
     }
   }
   if (has_node_boundary_indicator) {
-    this->node_boundary_indicator = metaData_->template get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "node_boundary_indicator");
+    this->node_boundary_indicator = metaData_->template get_field<double>(stk::topology::NODE_RANK, "node_boundary_indicator");
     if (this->node_boundary_indicator != nullptr) {
       build_node_boundary_indicator = true;
       stk::io::set_field_role(*this->node_boundary_indicator, Ioss::Field::INFORMATION);
@@ -155,12 +156,12 @@ template <bool Interleaved>
 void
 OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
 {
-  using ISFT = AbstractSTKFieldContainer::IntScalarFieldType;
-  using SFT  = AbstractSTKFieldContainer::ScalarFieldType;
+  using ISFT = AbstractSTKFieldContainer::STKIntState;
+  using SFT  = AbstractSTKFieldContainer::STKFieldType;
 
-  this->proc_rank_field = &this->metaData->template declare_field<ISFT>(stk::topology::ELEMENT_RANK, "proc_rank");
+  this->proc_rank_field = &this->metaData->template declare_field<int>(stk::topology::ELEMENT_RANK, "proc_rank");
 
-  this->refine_field = &this->metaData->template declare_field<ISFT>(stk::topology::ELEMENT_RANK, "refine_field");
+  this->refine_field = &this->metaData->template declare_field<int>(stk::topology::ELEMENT_RANK, "refine_field");
 
   // Processor rank field, a scalar
   stk::mesh::put_field_on_mesh(*this->proc_rank_field, this->metaData->universal_part(), nullptr);
@@ -169,25 +170,25 @@ OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
 
   // Failure state used for mesh adaptation
   for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK; rank <= stk::topology::ELEMENT_RANK; ++rank) {
-    this->failure_state[rank] = &this->metaData->template declare_field<SFT>(rank, "failure_state");
+    this->failure_state[rank] = &this->metaData->template declare_field<double>(rank, "failure_state");
 
     stk::mesh::put_field_on_mesh(*this->failure_state[rank], this->metaData->universal_part(), nullptr);
   }
 
   // Cell boundary indicator
-  this->cell_boundary_indicator = &this->metaData->template declare_field<SFT>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
+  this->cell_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
   stk::mesh::put_field_on_mesh(*this->cell_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   // Face boundary indicator
-  this->face_boundary_indicator = &this->metaData->template declare_field<SFT>(stk::topology::FACE_RANK, "face_boundary_indicator");
+  this->face_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::FACE_RANK, "face_boundary_indicator");
   stk::mesh::put_field_on_mesh(*this->face_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   // Edge boundary indicator
-  this->edge_boundary_indicator = &this->metaData->template declare_field<SFT>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
+  this->edge_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
   stk::mesh::put_field_on_mesh(*this->edge_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   // Node boundary indicator
-  this->node_boundary_indicator = &this->metaData->template declare_field<SFT>(stk::topology::NODE_RANK, "node_boundary_indicator");
+  this->node_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::NODE_RANK, "node_boundary_indicator");
   stk::mesh::put_field_on_mesh(*this->node_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
@@ -228,8 +229,6 @@ OrdinarySTKFieldContainer<Interleaved>::fillSolnMultiVector(
     stk::mesh::Selector&                         sel,
     Teuchos::RCP<Thyra_VectorSpace const> const& node_vs)
 {
-  typedef typename AbstractSTKFieldContainer::VectorFieldType VFT;
-
   // Setup a dof manger on the fly (it's cheap anyways).
   // We don't care about global dofs (hence, the -1), since it's used only
   // to retrieve the local entry id in the thyra vector.
@@ -363,8 +362,8 @@ template <bool Interleaved>
 void
 OrdinarySTKFieldContainer<Interleaved>::transferSolutionToCoords()
 {
-  using VFT    = typename AbstractSTKFieldContainer::VectorFieldType;
-  using Helper = STKFieldContainerHelper<VFT>;
+  using SFT    = typename AbstractSTKFieldContainer::STKFieldType;
+  using Helper = STKFieldContainerHelper<SFT>;
   Helper::copySTKField(*solution_field[0], *this->coordinates_field);
 }
 
@@ -377,34 +376,21 @@ OrdinarySTKFieldContainer<Interleaved>::fillVectorImpl(
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager)
 {
-  using VFT = typename AbstractSTKFieldContainer::VectorFieldType;
-  using SFT = typename AbstractSTKFieldContainer::ScalarFieldType;
+  using SFT = typename AbstractSTKFieldContainer::STKFieldType;
 
   auto* raw_field = this->metaData->get_field(stk::topology::NODE_RANK, field_name);
   ALBANY_EXPECT(raw_field != nullptr, "Error! Something went wrong while retrieving a field.\n");
-  int const rank = raw_field->field_array_rank();
 
   // Iterate over the on-processor nodes by getting node buckets and iterating
   // over each bucket.
   stk::mesh::BucketVector const& all_elements = this->bulkData->get_buckets(stk::topology::NODE_RANK, field_selection);
 
   auto field_node_vs_indexer = createGlobalLocalIndexer(field_node_vs);
-  if (rank == 0) {
-    const SFT* field = this->metaData->template get_field<SFT>(stk::topology::NODE_RANK, field_name);
-    using Helper     = STKFieldContainerHelper<SFT>;
-    for (stk::mesh::BucketVector::const_iterator it = all_elements.begin(); it != all_elements.end(); ++it) {
-      const stk::mesh::Bucket& bucket = **it;
-      Helper::fillVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
-    }
-  } else if (rank == 1) {
-    const VFT* field = this->metaData->template get_field<VFT>(stk::topology::NODE_RANK, field_name);
-    using Helper     = STKFieldContainerHelper<VFT>;
-    for (stk::mesh::BucketVector::const_iterator it = all_elements.begin(); it != all_elements.end(); ++it) {
-      const stk::mesh::Bucket& bucket = **it;
-      Helper::fillVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
-    }
-  } else {
-    ALBANY_ABORT("Error! Only scalar and vector fields supported so far.\n");
+  using Helper     = STKFieldContainerHelper<SFT>;
+  const SFT* field = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
+  for (stk::mesh::BucketVector::const_iterator it = all_elements.begin(); it != all_elements.end(); ++it) {
+    const stk::mesh::Bucket& bucket = **it;
+    Helper::fillVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
   }
 }
 
@@ -417,34 +403,21 @@ OrdinarySTKFieldContainer<Interleaved>::saveVectorImpl(
     Teuchos::RCP<Thyra_VectorSpace const> const& field_node_vs,
     const NodalDOFManager&                       nodalDofManager)
 {
-  using VFT = typename AbstractSTKFieldContainer::VectorFieldType;
-  using SFT = typename AbstractSTKFieldContainer::ScalarFieldType;
+  using SFT = typename AbstractSTKFieldContainer::STKFieldType;
 
   auto* raw_field = this->metaData->get_field(stk::topology::NODE_RANK, field_name);
   ALBANY_EXPECT(raw_field != nullptr, "Error! Something went wrong while retrieving a field.\n");
-  int const rank = raw_field->field_array_rank();
 
   // Iterate over the on-processor nodes by getting node buckets and iterating
   // over each bucket.
   stk::mesh::BucketVector const& all_elements = this->bulkData->get_buckets(stk::topology::NODE_RANK, field_selection);
 
   auto field_node_vs_indexer = createGlobalLocalIndexer(field_node_vs);
-  if (rank == 0) {
-    SFT* field   = this->metaData->template get_field<SFT>(stk::topology::NODE_RANK, field_name);
-    using Helper = STKFieldContainerHelper<SFT>;
-    for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
-      const stk::mesh::Bucket& bucket = **it;
-      Helper::saveVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
-    }
-  } else if (rank == 1) {
-    VFT* field   = this->metaData->template get_field<VFT>(stk::topology::NODE_RANK, field_name);
-    using Helper = STKFieldContainerHelper<VFT>;
-    for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
-      const stk::mesh::Bucket& bucket = **it;
-      Helper::saveVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
-    }
-  } else {
-    ALBANY_ABORT("Error! Only scalar and vector fields supported so far.\n");
+  using Helper = STKFieldContainerHelper<SFT>;
+  SFT* field   = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
+  for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
+    const stk::mesh::Bucket& bucket = **it;
+    Helper::saveVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
   }
 }
 

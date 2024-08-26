@@ -247,14 +247,19 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         if (ocean_salinity_eb.size() > 0) {
           ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
         }
-        ScalarT const sal_diff   = ocean_sal - sal_curr;
-        ScalarT const sal_grad   = sal_diff / cell_half_width;
-        ScalarT const sal_update = sal_grad * delta_time * factor;
-        ScalarT       sal_trial  = sal_curr + sal_update;
-        if (sal_trial < zero_sal) sal_trial = zero_sal;
-        if (sal_trial > ocean_sal) sal_trial = ocean_sal;
-        bluff_salinity_(cell, qp) = std::min(sal_trial, ocean_sal);  // ensures the salinity doesn't exceed ocean salinity
+        // --- elyce begin commenting out (8-26-24) ---- 
+        // Note: below is being commented out because re: email thread with Jenn, it was decided to actually just take the ocean salinity at the bluff face
+        // the below code was *likely* overriden the subsequent line of code, but not necessarily... so I am commenting it out just to be safe
+        // ScalarT const sal_diff   = ocean_sal - sal_curr;
+        // ScalarT const sal_grad   = sal_diff / cell_half_width;
+        // ScalarT const sal_update = sal_grad * delta_time * factor;
+        // ScalarT       sal_trial  = sal_curr + sal_update;
+        // if (sal_trial < zero_sal) sal_trial = zero_sal;
+        // if (sal_trial > ocean_sal) sal_trial = ocean_sal;
+        // bluff_salinity_(cell, qp) = std::min(sal_trial, ocean_sal);  // ensures the salinity doesn't exceed ocean salinity
         // OVERRIDES EVERYTHING ABOVE:
+
+        // ---- end commented out
         bluff_salinity_(cell, qp) = std::max(ocean_sal, bluff_salinity_(cell, qp));
       }
 

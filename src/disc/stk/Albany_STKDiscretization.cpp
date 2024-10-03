@@ -15,6 +15,7 @@
 #include "Albany_STKNodeFieldContainer.hpp"
 #include "Albany_Utils.hpp"
 #include "Teuchos_RCPStdSharedPtrConversions.hpp"
+#include "PHAL_Dimension.hpp" 
 
 #if defined(ALBANY_CONTACT)
 #include "Albany_ContactManager.hpp"
@@ -1725,9 +1726,6 @@ STKDiscretization::computeWorksetInfo()
     elemGIDws.clear();
   }
 
-  typedef stk::mesh::Cartesian NodeTag;
-  typedef stk::mesh::Cartesian ElemTag;
-  typedef stk::mesh::Cartesian CompTag;
 
   NodalDOFsStructContainer::MapOfDOFsStructs& mapOfDOFsStructs = nodalDOFsStructContainer.mapOfDOFsStructs;
   for (auto it = mapOfDOFsStructs.begin(); it != mapOfDOFsStructs.end(); ++it) {
@@ -1768,7 +1766,7 @@ STKDiscretization::computeWorksetInfo()
           {
             const ScalarFieldType& field = *metaData.get_field<ScalarFieldType>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1]);
-            array.assign<ElemTag, NodeTag>(stateVec.data(), dim0, dim[1]);
+            array.assign<Cell, Node>(stateVec.data(), dim0, dim[1]);
             for (int i = 0; i < dim0; i++) {
               stk::mesh::Entity        element = buck[i];
               stk::mesh::Entity const* rel     = bulkData.begin_nodes(element);
@@ -1783,7 +1781,7 @@ STKDiscretization::computeWorksetInfo()
           {
             const VectorFieldType& field = *metaData.get_field<VectorFieldType>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1] * dim[2]);
-            array.assign<ElemTag, NodeTag, CompTag>(stateVec.data(), dim0, dim[1], dim[2]);
+            array.assign<Cell, Node, Dim>(stateVec.data(), dim0, dim[1], dim[2]);
             for (int i = 0; i < dim0; i++) {
               stk::mesh::Entity        element = buck[i];
               stk::mesh::Entity const* rel     = bulkData.begin_nodes(element);
@@ -1801,7 +1799,7 @@ STKDiscretization::computeWorksetInfo()
           {
             const TensorFieldType& field = *metaData.get_field<TensorFieldType>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1] * dim[2] * dim[3]);
-            array.assign<ElemTag, NodeTag, CompTag, CompTag>(stateVec.data(), dim0, dim[1], dim[2], dim[3]);
+            array.assign<Cell, Node, Dim, Dim>(stateVec.data(), dim0, dim[1], dim[2], dim[3]);
             for (int i = 0; i < dim0; i++) {
               stk::mesh::Entity        element = buck[i];
               stk::mesh::Entity const* rel     = bulkData.begin_nodes(element);
@@ -1835,9 +1833,9 @@ STKDiscretization::computeWorksetInfo()
     for (auto it = mapOfDOFsStructs.begin(); it != mapOfDOFsStructs.end(); ++it) {
       int nComp = it->first.second;
       it->second.wsElNodeEqID_rawVec[b].resize(buck.size() * nodes_per_element * nComp);
-      it->second.wsElNodeEqID[b].assign<ElemTag, NodeTag, CompTag>(it->second.wsElNodeEqID_rawVec[b].data(), (int)buck.size(), nodes_per_element, nComp);
+      it->second.wsElNodeEqID[b].assign<Cell, Node, Dim>(it->second.wsElNodeEqID_rawVec[b].data(), (int)buck.size(), nodes_per_element, nComp);
       it->second.wsElNodeID_rawVec[b].resize(buck.size() * nodes_per_element);
-      it->second.wsElNodeID[b].assign<ElemTag, NodeTag>(it->second.wsElNodeID_rawVec[b].data(), (int)buck.size(), nodes_per_element);
+      it->second.wsElNodeID[b].assign<Cell, Node>(it->second.wsElNodeID_rawVec[b].data(), (int)buck.size(), nodes_per_element);
     }
 
     // i is the element index within bucket b

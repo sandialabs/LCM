@@ -303,7 +303,20 @@ E_fit_max(T x, RealType y)
 {
   // Wed 09/21/2022 w/ BCs
   // x = ice saturation;   y = porosity
-  return (-6.4724 - 6.50845 * y - 52.9043 * x + 345.809 * y * x) / (279.9238);
+  // return (-6.4724 - 6.50845 * y - 52.9043 * x + 345.809 * y * x) / (279.9238);
+
+  // x = ice saturation;   y = porosity 
+  // Elyce 7/9/24 --> output from matlab script doing bilinear fit with four bound points, with EM (1,1) = 1000 MPa as theoretical bounding point
+  // EM_fit = -28.1630 + -174.6019*x + -29.4031*y + 813.5743*x*y 
+
+  // -Overall R2: 0.5485 
+  // -Expt pt R2: -8.3751 
+  // -Bound pt R2: 0.7061 
+  // -->Max val = 581.4063 MPa 
+
+  return (-28.1630 + -174.6019*x + -29.4031*y + 813.5743*x*y) / (581.4063); 
+  // Note: to recover the correct fit, the elastic modulus in the input deck should be specified as 581.4063 MPa or 581.4063e6 Pa
+
 }
 
 template <typename T>
@@ -337,23 +350,28 @@ unit_fit(T ice_saturation, RealType porosity)
   T          E{1.0};
   T          Y{1.0};
   T          K{1.0};
-  if (xc < x && yc < y) {
-    Y = Y_fit_max(x, y);
-    E = E_fit_max(x, y);
-    K = K_fit_min(x, y);
-  } else if (x <= xc) {
-    Y = Y_fit_max(xc, y) * x / xc;
-    E = E_fit_max(xc, y) * x / xc;
-    K = K_fit_min(xc, y) * x / xc;
-  } else if (y <= yc) {
-    Y = Y_fit_max(x, yc) * y / yc;
-    E = E_fit_max(x, yc) * y / yc;
-    K = K_fit_min(x, yc) * y / yc;
-  } else if (x <= xc && y <= yc) {
-    Y = Y_fit_max(xc, yc) * x * y / xc / yc;
-    E = E_fit_max(xc, yc) * x * y / xc / yc;
-    K = K_fit_min(xc, yc) * x * y / xc / yc;
-  }
+  // Elyce: commenting out linear decrease to zero 
+  Y = Y_fit_max(x, y);
+  E = E_fit_max(x, y);
+  K = K_fit_min(x, y);
+
+  // if (xc < x && yc < y) {
+  //   Y = Y_fit_max(x, y);
+  //   E = E_fit_max(x, y);
+  //   K = K_fit_min(x, y);
+  // } else if (x <= xc) {
+  //   Y = Y_fit_max(xc, y) * x / xc;
+  //   E = E_fit_max(xc, y) * x / xc;
+  //   K = K_fit_min(xc, y) * x / xc;
+  // } else if (y <= yc) {
+  //   Y = Y_fit_max(x, yc) * y / yc;
+  //   E = E_fit_max(x, yc) * y / yc;
+  //   K = K_fit_min(x, yc) * y / yc;
+  // } else if (x <= xc && y <= yc) {
+  //   Y = Y_fit_max(xc, yc) * x * y / xc / yc;
+  //   E = E_fit_max(xc, yc) * x * y / xc / yc;
+  //   K = K_fit_min(xc, yc) * x * y / xc / yc;
+  // }
   return std::make_tuple(E, Y, K);
 }
 
@@ -418,7 +436,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto strain_limit = strain_limit_;
   if ((porosity < 0.99) && (strain_limit > 0.0)) {
     strain_limit = 1.0 + peat;
-    strain_limit = std::max(strain_limit, 1.04);
+    // strain_limit = std::max(strain_limit, 1.04);
+    strain_limit = std::max(strain_limit, strain_limit_); // elyce 8-23-24: changed this so it actually uses the input deck value specified, otherwise that doesn't get used
+
   }
 
   // Make the elements exposed to ocean "weaker"

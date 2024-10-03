@@ -85,8 +85,11 @@ get_size<void>(stk::mesh::Bucket const&)
   return 0;
 }
 
-//IKT 8/23/2024: TODO FIXME HACK!  Bring back this routine.
-/*template <>
+//IKT 10/3/2024: removing the following routine because stk::mesh::Cartesian
+//has been removed from STK.
+/*
+template <>
+>>>>>>> origin/rework-stk-usage
 inline size_t
 get_size<stk::mesh::Cartesian>(stk::mesh::Bucket const& b)
 {
@@ -97,6 +100,7 @@ get_size<stk::mesh::Cartesian>(stk::mesh::Bucket const& b)
  *          for a given array field and bucket
  */
 template <typename ScalarType, class Tag1, class Tag2, class Tag3, class Tag4, class Tag5, class Tag6, class Tag7>
+// IKT 10/3/2024: it seems like all the Tag template arguments below are gone now in STK, correct? 
 struct BucketArray<stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>>
     : public shards::ArrayAppend<shards::Array<ScalarType, shards::FortranOrder, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Tag7>, EntityDimension>::type
 {
@@ -127,7 +131,11 @@ struct BucketArray<stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Ta
         int dim0 = stk::mesh::find_restriction(f, b.entity_rank(), b.supersets()).dimension();
         if (dim0 == 4) {
           stride[0] = dim0;
-          stride[1] = get_size<Tag2>(b) * dim0;
+	  //IKT 10/3/2024: the following changed today to avoid calling get_size
+	  //routine that is not compatible with new STK.  I am assuming this case and all 
+	  //cases below it are for tensor fields, which I believe is true.
+	  auto sz = b.mesh().mesh_meta_data().spatial_dimension();
+          stride[1] = sz * dim0;
           stride[2] = stk::mesh::field_scalars_per_entity(f, b);
         } else {
           // IKT, 12/20/18: this changes the way the qp_tensor field
@@ -137,15 +145,17 @@ struct BucketArray<stk::mesh::Field<ScalarType, Tag1, Tag2, Tag3, Tag4, Tag5, Ta
           // more clear which entry corresponds to which component/quad point.
           // I believe for 2D problems the original layout is correct, hence
           // the if statement above here.
-          stride[0] = get_size<Tag1>(b);
-          stride[1] = get_size<Tag2>(b) * stride[0];
+	  auto sz = b.mesh().mesh_meta_data().spatial_dimension();
+          stride[0] = sz;
+          stride[1] = sz * stride[0];
           stride[2] = stk::mesh::field_scalars_per_entity(f, b);
         }
       } else if (f.field_array_rank() == 4) {
         int dim0  = stk::mesh::find_restriction(f, b.entity_rank(), b.supersets()).dimension();
         stride[0] = dim0;
-        stride[1] = get_size<Tag2>(b) * dim0;
-        stride[2] = get_size<Tag3>(b) * stride[1];
+	auto sz = b.mesh().mesh_meta_data().spatial_dimension();
+        stride[1] = sz * dim0;
+        stride[2] = sz * stride[1];
         stride[3] = stk::mesh::field_scalars_per_entity(f, b);
       } else {
         assert(false);

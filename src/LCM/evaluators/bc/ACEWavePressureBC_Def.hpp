@@ -85,7 +85,11 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeValHydrostatic(RealType time)
     slope                 = (waterHValues[Index] - waterHValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->waterH_val       = waterHValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     // std::cout << "IKT computeVal waterH_val = " << this->waterH_val << "\n";
-    ALBANY_PANIC(this->waterH_val <= 0, "waterH is non-positive!");
+    // ALBANY_PANIC(this->waterH_val <= 0, "waterH is non-positive!");
+
+    if(this->waterH_val < 0.){
+      this->waterH_val = 0.;
+    }
   }
 
   return;

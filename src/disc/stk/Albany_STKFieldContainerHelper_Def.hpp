@@ -13,18 +13,6 @@
 
 namespace Albany {
 
-// Get the rank of a field
-template <typename FieldType>
-constexpr int
-getRank()
-{
-  return std::is_same<FieldType, AbstractSTKFieldContainer::ScalarFieldType>::value ?
-             0 :
-             (std::is_same<FieldType, AbstractSTKFieldContainer::VectorFieldType>::value ?
-                  1 :
-                  (std::is_same<FieldType, AbstractSTKFieldContainer::TensorFieldType>::value ? 2 : -1));
-}
-
 // Fill the result vector
 // Create a multidimensional array view of the
 // solution field data for this bucket of nodes.
@@ -41,21 +29,23 @@ STKFieldContainerHelper<FieldType>::fillVector(
     const NodalDOFManager&                        nodalDofManager,
     int const                                     offset)
 {
-  constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
 
   BucketArray<FieldType> field_array(field_stk, bucket);
-
-  using SFT                = AbstractSTKFieldContainer::ScalarFieldType;
-  constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
-  constexpr int  nodes_dim = is_SFT ? 0 : 1;
+  auto rank = field_array.rank();  
+  ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  int nodes_dim = 1; 
+  if (rank == 1) 
+    nodes_dim = 0; 
 
   int const num_nodes_in_bucket = field_array.dimension(nodes_dim);
 
   const stk::mesh::BulkData& mesh = field_stk.get_mesh();
   auto                       data = getNonconstLocalData(field_thyra);
   int                        num_vec_components;
-  num_vec_components = nodalDofManager.numComponents();
+  if (rank == 1) 
+    num_vec_components = 1; 
+  else 
+    num_vec_components = nodalDofManager.numComponents();
 
   for (int i = 0; i < num_nodes_in_bucket; ++i) {
     const GO node_gid = mesh.identifier(bucket[i]) - 1;
@@ -64,7 +54,6 @@ STKFieldContainerHelper<FieldType>::fillVector(
     auto nn = stk::mesh::field_scalars_per_entity(field_stk, bucket[i]); 
     if (nn == 1) 
       num_vec_components = nn; 
-
     for (int j = 0; j < num_vec_components; ++j) {
       data[nodalDofManager.getLocalDOF(node_lid, offset + j)] = stk_data[j];
 
@@ -82,30 +71,28 @@ STKFieldContainerHelper<FieldType>::saveVector(
     const NodalDOFManager&                        nodalDofManager,
     int const                                     offset)
 {
-  constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
 
   BucketArray<FieldType> field_array(field_stk, bucket);
-
-  using SFT                = AbstractSTKFieldContainer::ScalarFieldType;
-  constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
-  constexpr int  nodes_dim = is_SFT ? 0 : 1;
+  auto rank = field_array.rank();  
+  ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  int nodes_dim = 1; 
+  if (rank == 1) 
+    nodes_dim = 0; 
 
   int const num_nodes_in_bucket = field_array.dimension(nodes_dim);
 
   const stk::mesh::BulkData& mesh = field_stk.get_mesh();
   auto                       data = getLocalData(field_thyra);
   int                        num_vec_components;
-  num_vec_components = nodalDofManager.numComponents();
+  if (rank == 1) 
+    num_vec_components = 1; 
+  else 
+    num_vec_components = nodalDofManager.numComponents();
 
   for (int i = 0; i < num_nodes_in_bucket; ++i) {
     const GO node_gid = mesh.identifier(bucket[i]) - 1;
     const LO node_lid = indexer->getLocalElement(node_gid);
     auto stk_data = stk::mesh::field_data(field_stk,bucket[i]);
-    auto nn = stk::mesh::field_scalars_per_entity(field_stk, bucket[i]); 
-    if (nn == 1) 
-      num_vec_components = nn; 
-
     for (int j = 0; j < num_vec_components; ++j) {
       stk_data[j] = data[nodalDofManager.getLocalDOF(node_lid, offset + j)];
     }
@@ -116,25 +103,26 @@ template <class FieldType>
 void
 STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldType& target)
 {
-  constexpr int rank = getRank<FieldType>();
-  ALBANY_PANIC(rank != 0 && rank != 1, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
-
   const stk::mesh::BulkData&     mesh = source.get_mesh();
   const stk::mesh::BucketVector& bv   = mesh.buckets(stk::topology::NODE_RANK);
-
-  using SFT                = AbstractSTKFieldContainer::ScalarFieldType;
-  constexpr bool is_SFT    = std::is_same<FieldType, SFT>::value;
-  constexpr int  nodes_dim = is_SFT ? 0 : 1;
 
   for (stk::mesh::BucketVector::const_iterator it = bv.begin(); it != bv.end(); ++it) {
     const stk::mesh::Bucket& bucket = **it;
 
     BucketArray<FieldType> source_array(source, bucket);
     BucketArray<FieldType> target_array(target, bucket);
+    auto rank = source_array.rank();  
+    ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+    int nodes_dim = 1;
+    if (rank == 1) 
+      nodes_dim = 0; 
 
-    int num_source_components = source_array.dimension(0);
-    int num_target_components = target_array.dimension(0);
-
+    int num_source_components = 1; 
+    int num_target_components = 1; 
+    if (rank > 1) {
+      num_source_components = source_array.dimension(0); 
+      num_target_components = target_array.dimension(0); 
+    }
     int const num_nodes_in_bucket   = source_array.dimension(nodes_dim);
 
     int const uneven_downsampling = num_source_components % num_target_components;
@@ -151,12 +139,6 @@ STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldT
       // Not sure how to do this generally...
       auto source_stk_data = stk::mesh::field_data(source,bucket[i]);
       auto target_stk_data = stk::mesh::field_data(target,bucket[i]);
-      auto nn = stk::mesh::field_scalars_per_entity(source, bucket[i]); 
-      if (nn == 1) 
-        num_source_components = nn;
-      nn = stk::mesh::field_scalars_per_entity(target, bucket[i]); 
-      if (nn == 1) 
-        num_target_components = nn;
 
       for (int j = 0; j < num_target_components; ++j) {
 	target_stk_data[j] = source_stk_data[j]; 

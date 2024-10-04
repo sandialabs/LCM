@@ -13,48 +13,6 @@
 
 namespace Albany {
 
-template <typename BucketArrayType>
-typename std::conditional<std::is_const<BucketArrayType>::value, const double&, double&>::type
-access(BucketArrayType& array, int const i, int const j);
-
-template <>
-const double&
-access<const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(
-    const BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array,
-    int const                                                      j,
-    int const                                                      i)
-{
-  ALBANY_EXPECT(j == 0, "Error! Attempting to access 1d array with two indices.\n");
-  (void)j;
-  return array(i);
-}
-
-template <>
-double&
-access<BucketArray<AbstractSTKFieldContainer::ScalarFieldType>>(BucketArray<AbstractSTKFieldContainer::ScalarFieldType>& array, int const j, int const i)
-{
-  ALBANY_EXPECT(j == 0, "Error! Attempting to access 1d array with two indices.\n");
-  (void)j;
-  return array(i);
-}
-
-template <>
-const double&
-access<const BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(
-    const BucketArray<AbstractSTKFieldContainer::VectorFieldType>& array,
-    int const                                                      j,
-    int const                                                      i)
-{
-  return array(j, i);
-}
-
-template <>
-double&
-access<BucketArray<AbstractSTKFieldContainer::VectorFieldType>>(BucketArray<AbstractSTKFieldContainer::VectorFieldType>& array, int const j, int const i)
-{
-  return array(j, i);
-}
-
 // Get the rank of a field
 template <typename FieldType>
 constexpr int

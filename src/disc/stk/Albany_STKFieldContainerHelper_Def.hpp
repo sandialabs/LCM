@@ -97,20 +97,19 @@ STKFieldContainerHelper<FieldType>::fillVector(
   const stk::mesh::BulkData& mesh = field_stk.get_mesh();
   auto                       data = getNonconstLocalData(field_thyra);
   int                        num_vec_components;
-  // IKT, FIXME: ideally nodalDofManager.numComponents() should return 1 for a
-  // SFT, I would think. Need to look into this more to come up with a better
-  // fix, hopefully.
-  if (is_SFT == true)
-    num_vec_components = 1;
-  else
-    num_vec_components = nodalDofManager.numComponents();
+  num_vec_components = nodalDofManager.numComponents();
 
   for (int i = 0; i < num_nodes_in_bucket; ++i) {
     const GO node_gid = mesh.identifier(bucket[i]) - 1;
     const LO node_lid = indexer->getLocalElement(node_gid);
+    auto stk_data = stk::mesh::field_data(field_stk,bucket[i]);
+    auto nn = stk::mesh::field_scalars_per_entity(field_stk, bucket[i]); 
+    if (nn == 1) 
+      num_vec_components = nn; 
 
     for (int j = 0; j < num_vec_components; ++j) {
-      data[nodalDofManager.getLocalDOF(node_lid, offset + j)] = access(field_array, j, i);
+      data[nodalDofManager.getLocalDOF(node_lid, offset + j)] = stk_data[j];
+
     }
   }
 }
@@ -139,20 +138,18 @@ STKFieldContainerHelper<FieldType>::saveVector(
   const stk::mesh::BulkData& mesh = field_stk.get_mesh();
   auto                       data = getLocalData(field_thyra);
   int                        num_vec_components;
-  // IKT, FIXME: ideally nodalDofManager.numComponents() should return 1 for a
-  // SFT, I would think. Need to look into this more to come up with a better
-  // fix, hopefully.
-  if (is_SFT == true)
-    num_vec_components = 1;
-  else
-    num_vec_components = nodalDofManager.numComponents();
+  num_vec_components = nodalDofManager.numComponents();
 
   for (int i = 0; i < num_nodes_in_bucket; ++i) {
     const GO node_gid = mesh.identifier(bucket[i]) - 1;
     const LO node_lid = indexer->getLocalElement(node_gid);
+    auto stk_data = stk::mesh::field_data(field_stk,bucket[i]);
+    auto nn = stk::mesh::field_scalars_per_entity(field_stk, bucket[i]); 
+    if (nn == 1) 
+      num_vec_components = nn; 
 
     for (int j = 0; j < num_vec_components; ++j) {
-      access(field_array, j, i) = data[nodalDofManager.getLocalDOF(node_lid, offset + j)];
+      stk_data[j] = data[nodalDofManager.getLocalDOF(node_lid, offset + j)];
     }
   }
 }
@@ -177,8 +174,9 @@ STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldT
     BucketArray<FieldType> source_array(source, bucket);
     BucketArray<FieldType> target_array(target, bucket);
 
-    int const num_source_components = is_SFT ? 1 : source_array.dimension(0);
-    int const num_target_components = is_SFT ? 1 : target_array.dimension(0);
+    int num_source_components = source_array.dimension(0);
+    int num_target_components = target_array.dimension(0);
+
     int const num_nodes_in_bucket   = source_array.dimension(nodes_dim);
 
     int const uneven_downsampling = num_source_components % num_target_components;
@@ -193,8 +191,17 @@ STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldT
       // In source, j varies over neq (num phys vectors * numDim)
       // We want target to only vary over the first numDim components
       // Not sure how to do this generally...
+      auto source_stk_data = stk::mesh::field_data(source,bucket[i]);
+      auto target_stk_data = stk::mesh::field_data(target,bucket[i]);
+      auto nn = stk::mesh::field_scalars_per_entity(source, bucket[i]); 
+      if (nn == 1) 
+        num_source_components = nn;
+      nn = stk::mesh::field_scalars_per_entity(target, bucket[i]); 
+      if (nn == 1) 
+        num_target_components = nn;
+
       for (int j = 0; j < num_target_components; ++j) {
-        access(target_array, j, i) = access(source_array, j, i);
+	target_stk_data[j] = source_stk_data[j]; 
       }
     }
   }

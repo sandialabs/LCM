@@ -114,7 +114,8 @@ struct NodeData_Traits<T, 1>
       for (std::size_t i = 0; i < num_nodes_in_bucket; i++) {
         const GO global_id = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
         const LO local_id  = indexer->getLocalElement(global_id);
-        solution_array(i)  = const_overlap_node_view[local_id];
+	auto fld_stk_data  = stk::mesh::field_data(*fld,bucket[i]);
+        fld_stk_data[0]  = const_overlap_node_view[local_id];
       }
     }
   }
@@ -158,8 +159,8 @@ struct NodeData_Traits<T, 2>
         for (int i = 0; i < num_nodes_in_bucket; ++i) {
           const GO global_id = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
           const LO local_id  = indexer->getLocalElement(global_id);
-
-          solution_array(j, i) = const_overlap_node_view[local_id];
+	  auto fld_stk_data  = stk::mesh::field_data(*fld,bucket[i]);
+          fld_stk_data[j] = const_overlap_node_view[local_id];
         }
       }
     }
@@ -206,7 +207,8 @@ struct NodeData_Traits<T, 3>
           for (int i = 0; i < num_nodes_in_bucket; ++i) {
             const GO global_id      = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
             const LO local_id       = indexer->getLocalElement(global_id);
-            solution_array(k, j, i) = const_overlap_node_view[local_id];
+	    auto fld_stk_data       = stk::mesh::field_data(*fld,bucket[i]);
+            fld_stk_data[j*num_i_components + k] = const_overlap_node_view[local_id];
           }
         }
       }

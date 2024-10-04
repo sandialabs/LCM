@@ -1759,7 +1759,7 @@ STKDiscretization::computeWorksetInfo()
         MDArray&                      array    = stateArrays.elemStateArrays[b][name];
         std::vector<double>&          stateVec = nodesOnElemStateVec[b][is];
         int                           dim0     = buck.size();  // may be different from dim[0];
-	const auto& field = *metaData->get_field<double>(NODE_RANK, name);
+	const auto& field = *metaData.get_field<double>(stk::topology::NODE_RANK, name);
         switch (dim.size()) {
           case 2:  // scalar
           {

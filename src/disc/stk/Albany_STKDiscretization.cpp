@@ -505,7 +505,7 @@ STKDiscretization::getCoordinates() const
   // Coordinates are computed here, and not precomputed,
   // since the mesh can move in shape opt problems
 
-  AbstractSTKFieldContainer::VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
+  AbstractSTKFieldContainer::STKFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
 
   int const meshDim         = stkMeshStruct->numDim;
   auto      ov_node_indexer = createGlobalLocalIndexer(m_overlap_node_vs);
@@ -544,7 +544,7 @@ STKDiscretization::transformMesh()
 {
   using std::cout;
   using std::endl;
-  AbstractSTKFieldContainer::VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
+  AbstractSTKFieldContainer::STKFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
   std::string                                 transformType     = stkMeshStruct->transformType;
 
   if (transformType == "None") {
@@ -657,7 +657,7 @@ STKDiscretization::transformMesh()
     alpha        = alpha * pi / 180;  // convert alpha, read in from ParameterList, to radians
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
-    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "surface_height");
+    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       x[0]                                                          = L * x[0];
@@ -673,7 +673,7 @@ STKDiscretization::transformMesh()
     alpha        = alpha * pi / 180;  // convert alpha, read in from ParameterList, to radians
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
-    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "surface_height");
+    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       x[0]                                                          = L * x[0];
@@ -689,7 +689,7 @@ STKDiscretization::transformMesh()
     alpha        = alpha * pi / 180;  // convert alpha, read in from ParameterList, to radians
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
-    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "surface_height");
+    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       x[0]                                                          = L * x[0];
@@ -703,7 +703,7 @@ STKDiscretization::transformMesh()
     double L = 0.7071 * 30;
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
-    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "surface_height");
+    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       x[0]                                                          = L * x[0];
@@ -717,7 +717,7 @@ STKDiscretization::transformMesh()
     cout << "L: " << L << endl;
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
-    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "surface_height");
+    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       x[0]                                                          = L * x[0];
@@ -733,7 +733,7 @@ STKDiscretization::transformMesh()
     double rhoOcean = 1028.0;  // ocean density, in kg/m^3
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
-    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "surface_height");
+    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       x[0]                                                          = L * x[0];
@@ -753,7 +753,7 @@ STKDiscretization::transformMesh()
     double s0     = 2.0;
     double H      = 1.0;
     stkMeshStruct->PBCStruct.scale[0] *= L;
-    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<stk::mesh::Field<double>>(stk::topology::NODE_RANK, "surface_height");
+    stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
     for (int i = 0; i < numOverlapNodes; i++) {
       double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
       x[0]      = L * (x[0] - 1.0);  // test case assumes domain is from [-L, L],
@@ -773,7 +773,7 @@ void
 STKDiscretization::setupMLCoords()
 {
   int const                                   numDim            = stkMeshStruct->numDim;
-  AbstractSTKFieldContainer::VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
+  AbstractSTKFieldContainer::STKFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
   coordMV                                                       = Thyra::createMembers(m_node_vs, numDim);
   auto coordMV_data                                             = getNonconstLocalData(coordMV);
 
@@ -1671,12 +1671,10 @@ STKDiscretization::computeWorksetInfo()
 
   auto const num_buckets = buckets.size();
 
-  typedef AbstractSTKFieldContainer::ScalarFieldType       ScalarFieldType;
-  typedef AbstractSTKFieldContainer::VectorFieldType       VectorFieldType;
-  typedef AbstractSTKFieldContainer::TensorFieldType       TensorFieldType;
+  typedef AbstractSTKFieldContainer::STKFieldType          STKFieldType;
   typedef AbstractSTKFieldContainer::SphereVolumeFieldType SphereVolumeFieldType;
 
-  VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
+  STKFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
 
   SphereVolumeFieldType* sphereVolume_field;
   if (stkMeshStruct->getFieldContainer()->hasSphereVolumeField()) {
@@ -1761,10 +1759,10 @@ STKDiscretization::computeWorksetInfo()
         MDArray&                      array    = stateArrays.elemStateArrays[b][name];
         std::vector<double>&          stateVec = nodesOnElemStateVec[b][is];
         int                           dim0     = buck.size();  // may be different from dim[0];
+        const auto& field = *metaData.get_field<double>(stk::topology::NODE_RANK, name);
         switch (dim.size()) {
           case 2:  // scalar
           {
-            const ScalarFieldType& field = *metaData.get_field<ScalarFieldType>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1]);
             array.assign<Cell, Node>(stateVec.data(), dim0, dim[1]);
             for (int i = 0; i < dim0; i++) {
@@ -1779,7 +1777,6 @@ STKDiscretization::computeWorksetInfo()
           }
           case 3:  // vector
           {
-            const VectorFieldType& field = *metaData.get_field<VectorFieldType>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1] * dim[2]);
             array.assign<Cell, Node, Dim>(stateVec.data(), dim0, dim[1], dim[2]);
             for (int i = 0; i < dim0; i++) {
@@ -1797,7 +1794,6 @@ STKDiscretization::computeWorksetInfo()
           }
           case 4:  // tensor
           {
-            const TensorFieldType& field = *metaData.get_field<TensorFieldType>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1] * dim[2] * dim[3]);
             array.assign<Cell, Node, Dim, Dim>(stateVec.data(), dim0, dim[1], dim[2], dim[3]);
             for (int i = 0; i < dim0; i++) {
@@ -1943,58 +1939,54 @@ STKDiscretization::computeWorksetInfo()
     }
   }
 
-  typedef AbstractSTKFieldContainer::ScalarValueState ScalarValueState;
-  typedef AbstractSTKFieldContainer::QPScalarState    QPScalarState;
-  typedef AbstractSTKFieldContainer::QPVectorState    QPVectorState;
-  typedef AbstractSTKFieldContainer::QPTensorState    QPTensorState;
-
-  typedef AbstractSTKFieldContainer::ScalarState ScalarState;
-  typedef AbstractSTKFieldContainer::VectorState VectorState;
-  typedef AbstractSTKFieldContainer::TensorState TensorState;
+  using ValueState = AbstractSTKFieldContainer::ValueState;
+  using STKState = AbstractSTKFieldContainer::STKState;
 
   // Pull out pointers to shards::Arrays for every bucket, for every state
   // Code is data-type dependent
 
   AbstractSTKFieldContainer& container = *stkMeshStruct->getFieldContainer();
 
-  ScalarValueState&              scalarValue_states = container.getScalarValueStates();
-  ScalarState&                   cell_scalar_states = container.getCellScalarStates();
-  VectorState&                   cell_vector_states = container.getCellVectorStates();
-  TensorState&                   cell_tensor_states = container.getCellTensorStates();
-  QPScalarState&                 qpscalar_states    = container.getQPScalarStates();
-  QPVectorState&                 qpvector_states    = container.getQPVectorStates();
-  QPTensorState&                 qptensor_states    = container.getQPTensorStates();
-  std::map<std::string, double>& time               = container.getTime();
+  ValueState&              scalarValue_states = container.getScalarValueStates();
+  STKState&                cell_scalar_states = container.getCellScalarStates();
+  STKState&                cell_vector_states = container.getCellVectorStates();
+  STKState&                cell_tensor_states = container.getCellTensorStates();
+  STKState&                qpscalar_states    = container.getQPScalarStates();
+  STKState&                qpvector_states    = container.getQPVectorStates();
+  STKState&                qptensor_states    = container.getQPTensorStates();
+  std::map<std::string, double>& time         = container.getTime();
 
   for (std::size_t b = 0; b < buckets.size(); b++) {
     stk::mesh::Bucket& buck = *buckets[b];
+    //IKT 10/7/2024: we can probably get rid of some of the for loops below since 
+    //everything is STKFieldType now.
     for (auto css = cell_scalar_states.begin(); css != cell_scalar_states.end(); ++css) {
-      BucketArray<AbstractSTKFieldContainer::ScalarFieldType> array(**css, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**css, buck);
       MDArray                                                 ar = array;
       stateArrays.elemStateArrays[b][(*css)->name()]             = ar;
     }
     for (auto cvs = cell_vector_states.begin(); cvs != cell_vector_states.end(); ++cvs) {
-      BucketArray<AbstractSTKFieldContainer::VectorFieldType> array(**cvs, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**cvs, buck);
       MDArray                                                 ar = array;
       stateArrays.elemStateArrays[b][(*cvs)->name()]             = ar;
     }
     for (auto cts = cell_tensor_states.begin(); cts != cell_tensor_states.end(); ++cts) {
-      BucketArray<AbstractSTKFieldContainer::TensorFieldType> array(**cts, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**cts, buck);
       MDArray                                                 ar = array;
       stateArrays.elemStateArrays[b][(*cts)->name()]             = ar;
     }
     for (auto qpss = qpscalar_states.begin(); qpss != qpscalar_states.end(); ++qpss) {
-      BucketArray<AbstractSTKFieldContainer::QPScalarFieldType> array(**qpss, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**qpss, buck);
       MDArray                                                   ar = array;
       stateArrays.elemStateArrays[b][(*qpss)->name()]              = ar;
     }
     for (auto qpvs = qpvector_states.begin(); qpvs != qpvector_states.end(); ++qpvs) {
-      BucketArray<AbstractSTKFieldContainer::QPVectorFieldType> array(**qpvs, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**qpvs, buck);
       MDArray                                                   ar = array;
       stateArrays.elemStateArrays[b][(*qpvs)->name()]              = ar;
     }
     for (auto qpts = qptensor_states.begin(); qpts != qptensor_states.end(); ++qpts) {
-      BucketArray<AbstractSTKFieldContainer::QPTensorFieldType> array(**qpts, buck);
+      BucketArray<AbstractSTKFieldContainer::STKFieldType> array(**qpts, buck);
       MDArray                                                   ar = array;
       stateArrays.elemStateArrays[b][(*qpts)->name()]              = ar;
     }
@@ -2217,7 +2209,7 @@ void
 STKDiscretization::computeNodeSets()
 {
   std::map<std::string, stk::mesh::Part*>::iterator ns                = stkMeshStruct->nsPartVec.begin();
-  AbstractSTKFieldContainer::VectorFieldType*       coordinates_field = stkMeshStruct->getCoordinatesField();
+  AbstractSTKFieldContainer::STKFieldType*       coordinates_field = stkMeshStruct->getCoordinatesField();
 
   auto node_indexer = createGlobalLocalIndexer(m_node_vs);
   while (ns != stkMeshStruct->nsPartVec.end()) {  // Iterate over Node Sets

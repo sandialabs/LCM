@@ -30,40 +30,20 @@ namespace Albany {
 class AbstractSTKFieldContainer : public AbstractFieldContainer
 {
  public:
-  // Tensor per Node/Cell  - (Node, Dim, Dim) or (Cell,Dim,Dim)
-  typedef stk::mesh::Field<double, stk::mesh::Cartesian, stk::mesh::Cartesian> TensorFieldType;
-  // Vector per Node/Cell  - (Node, Dim) or (Cell,Dim)
-  typedef stk::mesh::Field<double, stk::mesh::Cartesian> VectorFieldType;
-  // Scalar per Node/Cell  - (Node) or (Cell)
-  typedef stk::mesh::Field<double> ScalarFieldType;
-  // One int scalar per Node/Cell  - (Node) or (Cell)
-  typedef stk::mesh::Field<int> IntScalarFieldType;
-  // int vector per Node/Cell  - (Node,Dim/VecDim) or (Cell,Dim/VecDim)
-  typedef stk::mesh::Field<int, stk::mesh::Cartesian> IntVectorFieldType;
 
-  typedef stk::mesh::Cartesian QPTag;  // need to invent shards::ArrayDimTag
-  // Tensor per QP   - (Cell, QP, Dim, Dim)
-  typedef stk::mesh::Field<double, QPTag, stk::mesh::Cartesian, stk::mesh::Cartesian> QPTensorFieldType;
-  // Vector per QP   - (Cell, QP, Dim)
-  typedef stk::mesh::Field<double, QPTag, stk::mesh::Cartesian> QPVectorFieldType;
-  // One scalar per QP   - (Cell, QP)
-  typedef stk::mesh::Field<double, QPTag>                  QPScalarFieldType;
-  typedef stk::mesh::Field<double, stk::mesh::Cartesian3d> SphereVolumeFieldType;
+  typedef stk::mesh::Field<double> SphereVolumeFieldType;
+  // STK field (scalar/vector/tensor , Node/Cell)
+  using STKFieldType = stk::mesh::Field<double>;
+  // STK int field
+  using STKIntState  = stk::mesh::Field<int>;
+  using ValueState = std::vector<const std::string*>;
+  using STKState   = std::vector<STKFieldType*>;
+  using MeshScalarState          = std::map<std::string, double>;
+  using MeshVectorState          = std::map<std::string, std::vector<double>>;
+  using MeshScalarIntegerState   = std::map<std::string, int>;
+  using MeshScalarInteger64State = std::map<std::string, GO>;
+  using MeshVectorIntegerState   = std::map<std::string, std::vector<int>>;
 
-  typedef std::vector<std::string const*> ScalarValueState;
-  typedef std::vector<QPScalarFieldType*> QPScalarState;
-  typedef std::vector<QPVectorFieldType*> QPVectorState;
-  typedef std::vector<QPTensorFieldType*> QPTensorState;
-
-  typedef std::vector<ScalarFieldType*> ScalarState;
-  typedef std::vector<VectorFieldType*> VectorState;
-  typedef std::vector<TensorFieldType*> TensorState;
-
-  typedef std::map<std::string, double>              MeshScalarState;
-  typedef std::map<std::string, std::vector<double>> MeshVectorState;
-
-  typedef std::map<std::string, int>              MeshScalarIntegerState;
-  typedef std::map<std::string, std::vector<int>> MeshVectorIntegerState;
   //! Destructor
   virtual ~AbstractSTKFieldContainer(){};
 
@@ -71,38 +51,38 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   addStateStructs(const Teuchos::RCP<Albany::StateInfoStruct>& sis) = 0;
 
   // Coordinates field ALWAYS in 3D
-  const VectorFieldType*
+  const STKFieldType*
   getCoordinatesField3d() const
   {
     return coordinates_field3d;
   }
-  VectorFieldType*
+  STKFieldType*
   getCoordinatesField3d()
   {
     return coordinates_field3d;
   }
 
-  const VectorFieldType*
+  const STKFieldType*
   getCoordinatesField() const
   {
     return coordinates_field;
   }
-  VectorFieldType*
+  STKFieldType*
   getCoordinatesField()
   {
     return coordinates_field;
   }
-  IntScalarFieldType*
+  STKIntState*
   getProcRankField()
   {
     return proc_rank_field;
   }
-  IntScalarFieldType*
+  STKIntState*
   getRefineField()
   {
     return refine_field;
   }
-  ScalarFieldType*
+  STKFieldType*
   getFailureState(stk::topology::rank_t rank)
   {
     return failure_state[rank];
@@ -142,7 +122,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
     return latticeOrientation_field;
   }
 
-  ScalarValueState&
+  ValueState&
   getScalarValueStates()
   {
     return scalarValue_states;
@@ -167,32 +147,32 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   {
     return mesh_vector_integer_states;
   }
-  ScalarState&
+  STKState&
   getCellScalarStates()
   {
     return cell_scalar_states;
   }
-  VectorState&
+  STKState&
   getCellVectorStates()
   {
     return cell_vector_states;
   }
-  TensorState&
+  STKState&
   getCellTensorStates()
   {
     return cell_tensor_states;
   }
-  QPScalarState&
+  STKState&
   getQPScalarStates()
   {
     return qpscalar_states;
   }
-  QPVectorState&
+  STKState&
   getQPVectorStates()
   {
     return qpvector_states;
   }
-  QPTensorState&
+  STKState&
   getQPTensorStates()
   {
     return qptensor_states;
@@ -272,11 +252,11 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   // the same field).
   //       Otherwise, coordinates_field3d stores coordinates in 3d (useful for
   //       non-flat 2d meshes)
-  VectorFieldType*          coordinates_field3d;
-  VectorFieldType*          coordinates_field;
-  IntScalarFieldType*       proc_rank_field;
-  IntScalarFieldType*       refine_field;
-  ScalarFieldType*          failure_state[stk::topology::ELEMENT_RANK + 1];
+  STKFieldType*             coordinates_field3d;
+  STKFieldType*             coordinates_field;
+  STKIntState*              proc_rank_field;
+  STKIntState*              refine_field;
+  STKFieldType*             failure_state[stk::topology::ELEMENT_RANK + 1];
   stk::mesh::Field<double>* cell_boundary_indicator;
   stk::mesh::Field<double>* face_boundary_indicator;
   stk::mesh::Field<double>* edge_boundary_indicator;
@@ -288,17 +268,17 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   // Required for certain LCM material models
   stk::mesh::Field<double>* latticeOrientation_field;
 
-  ScalarValueState       scalarValue_states;
+  ValueState             scalarValue_states;
   MeshScalarState        mesh_scalar_states;
   MeshVectorState        mesh_vector_states;
   MeshScalarIntegerState mesh_scalar_integer_states;
   MeshVectorIntegerState mesh_vector_integer_states;
-  ScalarState            cell_scalar_states;
-  VectorState            cell_vector_states;
-  TensorState            cell_tensor_states;
-  QPScalarState          qpscalar_states;
-  QPVectorState          qpvector_states;
-  QPTensorState          qptensor_states;
+  STKState               cell_scalar_states;
+  STKState               cell_vector_states;
+  STKState               cell_tensor_states;
+  STKState               qpscalar_states;
+  STKState               qpvector_states;
+  STKState               qptensor_states;
 
   StateInfoStruct nodal_sis;
   StateInfoStruct nodal_parameter_sis;

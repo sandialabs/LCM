@@ -119,8 +119,8 @@ STKAdapt<SizeField>::adaptMesh(const Teuchos::RCP<const Tpetra_Vector>& /* solut
   *output_stream_ << "Adapting mesh using STKAdapt method        " << std::endl;
   *output_stream_ << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
-  Albany::AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field = genericMeshStruct->getFieldContainer()->getProcRankField();
-  Albany::AbstractSTKFieldContainer::IntScalarFieldType* refine_field    = genericMeshStruct->getFieldContainer()->getRefineField();
+  Albany::AbstractSTKFieldContainer::STKIntState* proc_rank_field = genericMeshStruct->getFieldContainer()->getProcRankField();
+  Albany::AbstractSTKFieldContainer::STKIntState* refine_field    = genericMeshStruct->getFieldContainer()->getRefineField();
 
   // Save the current results and close the exodus file
 

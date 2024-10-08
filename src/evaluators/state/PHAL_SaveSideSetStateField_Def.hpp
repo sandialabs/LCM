@@ -276,10 +276,8 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
 
   const auto& ElNodeID = disc->getWsElNodeID()[workset.wsIndex];
 
-  typedef Albany::AbstractSTKFieldContainer::ScalarFieldType SFT;
-  typedef Albany::AbstractSTKFieldContainer::VectorFieldType VFT;
-  SFT*                                                       scalar_field;
-  VFT*                                                       vector_field;
+  typedef Albany::AbstractSTKFieldContainer::STKFieldType SFT;
+  SFT*                                                    stk_field;
 
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
@@ -321,25 +319,24 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
       //         change that) and it is easier to retrieve the id from the 3d
       //         discretization. Then, we use the id to extract the node from
       //         the 2d mesh.
+      stk_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
       switch (dims.size()) {
         case 3:  // node_scalar
-          scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
-          ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
+          ALBANY_PANIC(stk_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
             stk::mesh::EntityKey key(stk::topology::NODE_RANK, nodeId3d + 1);
             e         = bulkData.get_entity(key);
-            values    = stk::mesh::field_data(*scalar_field, e);
+            values    = stk::mesh::field_data(*stk_field, e);
             values[0] = field(cell, side, node);
           }
           break;
         case 4:  // node_vector
-          vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
-          ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
+          ALBANY_PANIC(stk_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
             e        = bulkData.get_entity(stk::topology::NODE_RANK, nodeId3d + 1);
-            values   = stk::mesh::field_data(*vector_field, e);
+            values   = stk::mesh::field_data(*stk_field, e);
             for (int i = 0; i < dims[3]; ++i) values[i] = field(cell, side, node, i);
           }
           break;
@@ -362,29 +359,28 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
       // Get the data that corresponds to the side
       int const cell = it_side.elem_LID;
       int const side = it_side.side_local_id;
+      stk_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
 
       switch (dims.size()) {
         case 3:  // node_scalar
-          scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
-          ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
+          ALBANY_PANIC(stk_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
             layeredMeshNumbering->getIndices(nodeId3d, nodeId2d, layer_id);
             stk::mesh::EntityKey key(stk::topology::NODE_RANK, nodeId2d + 1);
             e         = bulkData.get_entity(key);
-            values    = stk::mesh::field_data(*scalar_field, e);
+            values    = stk::mesh::field_data(*stk_field, e);
             values[0] = field(cell, side, node);
           }
           break;
         case 4:  // node_vector
-          vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
-          ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
+          ALBANY_PANIC(stk_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
             layeredMeshNumbering->getIndices(nodeId3d, nodeId2d, layer_id);
             stk::mesh::EntityKey key(stk::topology::NODE_RANK, nodeId2d + 1);
             e      = bulkData.get_entity(key);
-            values = stk::mesh::field_data(*vector_field, e);
+            values = stk::mesh::field_data(*stk_field, e);
             for (int i = 0; i < dims[3]; ++i) values[i] = field(cell, side, node, i);
           }
           break;

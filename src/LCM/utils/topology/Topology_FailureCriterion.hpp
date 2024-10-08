@@ -219,7 +219,7 @@ class FractureCriterionTraction : public AbstractFailureCriterion
   computeNormals();
 
  private:
-  TensorFieldType const* const stress_field_;
+  STKFieldType const* const stress_field_;
 
   double critical_traction_;
 
@@ -253,7 +253,7 @@ class BulkFailureCriterion : public AbstractFailureCriterion
   int       count_tension{0};
 
  private:
-  ScalarFieldType const* failure_state_{nullptr};
+  STKFieldType const*    failure_state_{nullptr};
   std::string            failure_state_name_{""};
 };
 }  // namespace LCM

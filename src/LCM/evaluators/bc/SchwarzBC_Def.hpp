@@ -311,7 +311,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   // Get solution name from Discretization sublist
   std::string map_name = dtk_params.get("Map Type", "Consistent Interpolation");
 
-  Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field =
+  Albany::AbstractSTKFieldContainer::STKFieldType* coupled_field =
       Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(coupled_stk_disc->getSTKMeshStruct()->getFieldContainer())->getSolutionField();
 
   stk::mesh::Selector coupled_stk_selector = stk::mesh::Selector(coupled_meta_data->universal_part());
@@ -323,7 +323,7 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   // get pointer to metadata from this_stk_disc
   Teuchos::RCP<stk::mesh::MetaData const> this_meta_data = Teuchos::rcpFromRef(this_stk_disc->getSTKMetaData());
 
-  Albany::AbstractSTKFieldContainer::VectorFieldType* this_field =
+  Albany::AbstractSTKFieldContainer::STKFieldType* this_field =
       Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(this_stk_disc->getSTKMeshStruct()->getFieldContainer())->getSolutionFieldDTK();
 
   // Get the part corresponding to this nodeset.
@@ -345,11 +345,11 @@ SchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
 
   // Create a solution vector for the source.
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> coupled_vector =
-      coupled_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(Teuchos::ptr(coupled_field), neq);
+      coupled_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::STKFieldType>(Teuchos::ptr(coupled_field), neq);
 
   // Create a solution vector for the target.
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> this_vector =
-      this_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(Teuchos::ptr(this_field), neq);
+      this_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::STKFieldType>(Teuchos::ptr(this_field), neq);
 
   // Solution transfer
 

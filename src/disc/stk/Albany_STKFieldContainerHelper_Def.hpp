@@ -32,7 +32,7 @@ STKFieldContainerHelper<FieldType>::fillVector(
 
   BucketArray<FieldType> field_array(field_stk, bucket);
   auto rank = field_array.rank();  
-  ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle Scalar and Vector fields for now.\n");
   int nodes_dim = 1; 
   if (rank == 1) 
     nodes_dim = 0; 
@@ -74,7 +74,7 @@ STKFieldContainerHelper<FieldType>::saveVector(
 
   BucketArray<FieldType> field_array(field_stk, bucket);
   auto rank = field_array.rank();  
-  ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+  ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle Scalar and Vector fields for now.\n");
   int nodes_dim = 1; 
   if (rank == 1) 
     nodes_dim = 0; 
@@ -112,7 +112,7 @@ STKFieldContainerHelper<FieldType>::copySTKField(const FieldType& source, FieldT
     BucketArray<FieldType> source_array(source, bucket);
     BucketArray<FieldType> target_array(target, bucket);
     auto rank = source_array.rank();  
-    ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle ScalarFieldType and VectorFieldType for now.\n");
+    ALBANY_PANIC(rank != 1 && rank != 2, "Error! Can only handle Scalar and Vector fields for now.\n");
     int nodes_dim = 1;
     if (rank == 1) 
       nodes_dim = 0; 

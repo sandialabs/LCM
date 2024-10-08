@@ -53,8 +53,8 @@ class StrongSchwarzBC_Base : public PHAL::SDirichlet<EvalT, Traits>
   doDTKInterpolation(
       DataTransferKit::STKMeshManager&                    coupled_manager,
       DataTransferKit::STKMeshManager&                    this_manager,
-      Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field,
-      Albany::AbstractSTKFieldContainer::VectorFieldType* this_field,
+      Albany::AbstractSTKFieldContainer::STKFieldType*    coupled_field,
+      Albany::AbstractSTKFieldContainer::STKFieldType*    this_field,
       int const                                           neq,
       Teuchos::ParameterList&                             dtk_params);
 #endif  // ALBANY_DTK

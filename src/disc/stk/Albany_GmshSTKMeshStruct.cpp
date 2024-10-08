@@ -280,8 +280,8 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
     unsigned int          ebNo   = 0;  // element block #???
     int                   sideID = 0;
 
-    AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field   = fieldContainer->getProcRankField();
-    AbstractSTKFieldContainer::VectorFieldType*    coordinates_field = fieldContainer->getCoordinatesField();
+    AbstractSTKFieldContainer::STKIntState* proc_rank_field   = fieldContainer->getProcRankField();
+    AbstractSTKFieldContainer::STKFieldType*    coordinates_field = fieldContainer->getCoordinatesField();
 
     singlePartVec[0] = nsPartVec["Node"];
 

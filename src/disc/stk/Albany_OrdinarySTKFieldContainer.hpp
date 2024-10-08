@@ -61,31 +61,31 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
     return build_node_boundary_indicator;
   }
 
-  Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>
+  Teuchos::Array<AbstractSTKFieldContainer::STKFieldType*>
   getSolutionFieldArray()
   {
     return solution_field;
   }
 
-  AbstractSTKFieldContainer::VectorFieldType*
+  AbstractSTKFieldContainer::STKFieldType*
   getSolutionField()
   {
     return solution_field[0];
   };
 
-  AbstractSTKFieldContainer::VectorFieldType*
+  AbstractSTKFieldContainer::STKFieldType*
   getResidualField()
   {
     return residual_field;
   };
 #if defined(ALBANY_DTK)
-  Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>
+  Teuchos::Array<AbstractSTKFieldContainer::STKFieldType*>
   getSolutionFieldDTKArray()
   {
     return solution_field_dtk;
   };
 
-  AbstractSTKFieldContainer::VectorFieldType*
+  AbstractSTKFieldContainer::STKFieldType*
   getSolutionFieldDTK()
   {
     return solution_field_dtk[0];
@@ -155,9 +155,9 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   bool build_edge_boundary_indicator{false};
   bool build_node_boundary_indicator{false};
 
-  Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field;
-  Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field_dtk;
-  AbstractSTKFieldContainer::VectorFieldType*                 residual_field;
+  Teuchos::Array<AbstractSTKFieldContainer::STKFieldType*> solution_field;
+  Teuchos::Array<AbstractSTKFieldContainer::STKFieldType*> solution_field_dtk;
+  AbstractSTKFieldContainer::STKFieldType*                 residual_field;
 };
 
 }  // namespace Albany

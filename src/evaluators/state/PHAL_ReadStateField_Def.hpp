@@ -105,10 +105,10 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(typename Tra
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
 
+  using SFT         = Albany::AbstractSTKFieldContainer::STKFieldType;
   switch (dims.size()) {
     case 2: {
-      using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-      auto scalar_field = metaData.get_field<SFT>(stk::topology::ELEM_RANK, state_name);
+      auto scalar_field = metaData.get_field<double>(stk::topology::ELEM_RANK, state_name);
       ALBANY_ASSERT(scalar_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell) {
         auto gid    = elem_lid_2_gid[cell];
@@ -118,8 +118,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(typename Tra
       }
     } break;
     case 3: {
-      using VFT         = Albany::AbstractSTKFieldContainer::VectorFieldType;
-      auto vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, state_name);
+      auto vector_field = metaData.get_field<double>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(vector_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell) {
         auto gid    = elem_lid_2_gid[cell];
@@ -157,10 +156,10 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(typename Tr
   std::vector<PHX::DataLayout::size_type> dims;
   field.dimensions(dims);
 
+  using SFT         = Albany::AbstractSTKFieldContainer::STKFieldType;
   switch (dims.size()) {
     case 2: {
-      using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-      auto scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, state_name);
+      auto scalar_field = metaData.get_field<double>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(scalar_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
@@ -171,8 +170,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(typename Tr
         }
     } break;
     case 3: {
-      using VFT         = Albany::AbstractSTKFieldContainer::VectorFieldType;
-      auto vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, state_name);
+      auto vector_field = metaData.get_field<double>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(vector_field != nullptr);
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {

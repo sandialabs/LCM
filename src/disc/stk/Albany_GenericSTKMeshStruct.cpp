@@ -522,7 +522,7 @@ GenericSTKMeshStruct::uniformRefineMesh(const Teuchos::RCP<Teuchos_Comm const>& 
 
   AbstractSTKFieldContainer::IntScalarFieldType* proc_rank_field = fieldContainer->getProcRankField();
 
-  if (!refinerPattern.is_null() && proc_rank_field) {
+  if (!refinerPattern.is_null() && (proc_rank_field != nullptr)) {
     stk::adapt::UniformRefiner refiner(*eMesh, *refinerPattern, proc_rank_field);
 
     int numRefinePasses = params->get<int>("Number of Refinement Passes", 1);
@@ -576,7 +576,7 @@ GenericSTKMeshStruct::rebalanceAdaptedMeshT(const Teuchos::RCP<Teuchos::Paramete
 
   double imbalance;
 
-  AbstractSTKFieldContainer::VectorFieldType* coordinates_field = fieldContainer->getCoordinatesField();
+  AbstractSTKFieldContainer::STKFieldType* coordinates_field = fieldContainer->getCoordinatesField();
 
   stk::mesh::Selector selector(metaData->universal_part());
   stk::mesh::Selector owned_selector(metaData->locally_owned_part());
@@ -774,15 +774,14 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(const Teuchos::RCP<Teuchos_Co
 
       // We need to create the 2D cell -> (3D cell, side_node_ids) map in the
       // side mesh now
-      typedef AbstractSTKFieldContainer::IntScalarFieldType ISFT;
-      ISFT* side_to_cell_map = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<ISFT>(stk::topology::ELEM_RANK, "side_to_cell_map");
+      using ISFT = AbstractSTKFieldContainer::STKIntState;
+      ISFT* side_to_cell_map = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<int> (stk::topology::ELEM_RANK, "side_to_cell_map");
       stk::mesh::put_field_on_mesh(*side_to_cell_map, this->sideSetMeshStructs[ss_name]->metaData->universal_part(), 1, nullptr);
       stk::io::set_field_role(*side_to_cell_map, Ioss::Field::TRANSIENT);
       // We need to create the 2D cell -> (3D cell, side_node_ids) map in the
       // side mesh now
       int const                                             num_nodes = sideSetMeshStructs[ss_name]->getMeshSpecs()[0]->ctd.node_count;
-      typedef AbstractSTKFieldContainer::IntVectorFieldType IVFT;
-      IVFT* side_nodes_ids = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<IVFT>(stk::topology::ELEM_RANK, "side_nodes_ids");
+      ISFT* side_nodes_ids = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<int> (stk::topology::ELEM_RANK, "side_nodes_ids");
       stk::mesh::put_field_on_mesh(*side_nodes_ids, this->sideSetMeshStructs[ss_name]->metaData->universal_part(), num_nodes, nullptr);
       stk::io::set_field_role(*side_nodes_ids, Ioss::Field::TRANSIENT);
 
@@ -886,10 +885,9 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetN
   GO                                                    cell2D_GID, side3D_GID;
   int                                                   side_lid;
   int                                                   num_sides;
-  typedef AbstractSTKFieldContainer::IntScalarFieldType ISFT;
-  typedef AbstractSTKFieldContainer::IntVectorFieldType IVFT;
-  ISFT* side_to_cell_map   = this->sideSetMeshStructs[sideSetName]->metaData->get_field<ISFT>(stk::topology::ELEM_RANK, "side_to_cell_map");
-  IVFT* side_nodes_ids_map = this->sideSetMeshStructs[sideSetName]->metaData->get_field<IVFT>(stk::topology::ELEM_RANK, "side_nodes_ids");
+  using ISFT = AbstractSTKFieldContainer::STKIntState;
+  ISFT* side_to_cell_map   = this->sideSetMeshStructs[sideSetName]->metaData->get_field<int> (stk::topology::ELEM_RANK, "side_to_cell_map");
+  ISFT* side_nodes_ids_map = this->sideSetMeshStructs[sideSetName]->metaData->get_field<int> (stk::topology::ELEM_RANK, "side_nodes_ids");
   std::vector<stk::mesh::EntityId> cell2D_nodes_ids(num_nodes), side3D_nodes_ids(num_nodes);
   const stk::mesh::Entity*         side3D_nodes;
   const stk::mesh::Entity*         cell2D_nodes;
@@ -1231,43 +1229,19 @@ GenericSTKMeshStruct::loadRequiredInputFields(const AbstractFieldContainer::Fiel
     auto field_mv_view = getLocalData(field_mv.getConst());
 
     // Now we have to stuff the vector in the mesh data
-    typedef AbstractSTKFieldContainer::ScalarFieldType SFT;
-    typedef AbstractSTKFieldContainer::VectorFieldType VFT;
-    typedef AbstractSTKFieldContainer::TensorFieldType TFT;
-
-    SFT* scalar_field = 0;
-    VFT* vector_field = 0;
-    TFT* tensor_field = 0;
+    using SFT = AbstractSTKFieldContainer::STKFieldType;
 
     stk::topology::rank_t entity_rank = nodal ? stk::topology::NODE_RANK : stk::topology::ELEM_RANK;
 
-    if (scalar && !layered) {
-      // Purely scalar field
-      scalar_field = metaData->get_field<SFT>(entity_rank, fname);
-    } else if (scalar == layered) {
-      // Either (non-layered) vector or layered scalar field
-      vector_field = metaData->get_field<VFT>(entity_rank, fname);
-    } else {
-      // Layered vector field
-      tensor_field = metaData->get_field<TFT>(entity_rank, fname);
-    }
-
+    SFT* stk_field = metaData->get_field<double> (entity_rank, fname);
     ALBANY_PANIC(
-        scalar_field == 0 && vector_field == 0 && tensor_field == 0, "Error! Field " << fname << " not present (perhaps is not '" << ftype << "'?).\n");
+        stk_field==nullptr, "Error! Field " << fname << " not present (perhaps is not '" << ftype << "'?).\n");
 
     stk::mesh::EntityId gid;
     LO                  lid;
-    double*             values;
     auto                indexer = createGlobalLocalIndexer(vs);
     for (unsigned int i(0); i < entities->size(); ++i) {
-      if (scalar_field != 0) {
-        values = stk::mesh::field_data(*scalar_field, (*entities)[i]);
-      } else if (vector_field != 0) {
-        values = stk::mesh::field_data(*vector_field, (*entities)[i]);
-      } else {
-        values = stk::mesh::field_data(*tensor_field, (*entities)[i]);
-      }
-
+      double* values = stk::mesh::field_data(*stk_field, (*entities)[i]);
       gid = bulkData->identifier((*entities)[i]) - 1;
       lid = indexer->getLocalElement(GO(gid));
       for (int iDim(0); iDim < field_mv_view.size(); ++iDim) {
@@ -1690,52 +1664,21 @@ void
 GenericSTKMeshStruct::checkFieldIsInMesh(std::string const& fname, std::string const& ftype) const
 {
   stk::topology::rank_t entity_rank;
-  if (ftype.find("Node") == std::string::npos) {
+  if (ftype.find("Node")==std::string::npos) {
     entity_rank = stk::topology::ELEM_RANK;
   } else {
     entity_rank = stk::topology::NODE_RANK;
   }
 
-  int dim = 1;
-  if (ftype.find("Vector") != std::string::npos) {
-    ++dim;
-  }
-  if (ftype.find("Layered") != std::string::npos) {
-    ++dim;
-  }
-
-  typedef AbstractSTKFieldContainer::ScalarFieldType SFT;
-  typedef AbstractSTKFieldContainer::VectorFieldType VFT;
-  typedef AbstractSTKFieldContainer::TensorFieldType TFT;
-  bool                                               missing = true;
-  switch (dim) {
-    case 1: missing = (metaData->get_field<SFT>(entity_rank, fname) == 0); break;
-    case 2: missing = (metaData->get_field<VFT>(entity_rank, fname) == 0); break;
-    case 3: missing = (metaData->get_field<TFT>(entity_rank, fname) == 0); break;
-    default: ALBANY_ABORT("Error! Invalid field dimension.\n");
-  }
+  bool missing = (metaData->get_field<double> (entity_rank, fname)==nullptr);
 
   if (missing) {
-    bool isFieldInMesh = false;
-    auto fl            = metaData->get_fields();
-    auto f             = fl.begin();
-    for (; f != fl.end(); ++f) {
-      isFieldInMesh = (fname == (*f)->name());
-      if (isFieldInMesh) break;
-    }
-    if (isFieldInMesh) {
-      ALBANY_ABORT(
-          "Error! The field '" << fname
-                               << "' in the mesh has different rank or dimensions than the ones "
-                                  "specified\n"
-                               << " Rank required: " << entity_rank << ", rank of field in mesh: " << (*f)->entity_rank() << "\n"
-                               << " Dimension required: " << dim << ", dimension of field in mesh: " << (*f)->field_array_rank() + 1 << "\n");
-    } else
-      ALBANY_ABORT(
-          "Error! The field '" << fname << "' was not found in the mesh.\n"
-                               << "  Probably it was not registered it in the state manager "
-                                  "(which forwards it to the mesh)\n");
+    TEUCHOS_TEST_FOR_EXCEPTION (
+        missing, std::runtime_error,
+        "Error! The field '" << fname << "' was not found in the mesh.\n"
+        "  Probably it was not registered it in the state manager (which forwards it to the mesh)\n");
   }
+
 }
 
 void

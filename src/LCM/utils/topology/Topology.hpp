@@ -730,7 +730,7 @@ class Topology
     return interface_block_name_;
   }
 
-  ScalarFieldType&
+  STKFieldType&
   get_failure_state_field(stk::mesh::EntityRank rank)
   {
     auto& asms = get_stk_mesh_struct();

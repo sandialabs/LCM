@@ -303,14 +303,14 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   // Get solution name from Discretization sublist
   std::string map_name = dtk_params.get("Map Type", "Consistent Interpolation");
 
-  Teuchos::Array<Albany::AbstractSTKFieldContainer::VectorFieldType*> coupled_field_array =
+  Teuchos::Array<Albany::AbstractSTKFieldContainer::STKFieldType*> coupled_field_array =
       Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(coupled_stk_disc->getSTKMeshStruct()->getFieldContainer())->getSolutionFieldArray();
 
   int num_sol_vecs = coupled_field_array.length();
 
   ALBANY_ASSERT(num_sol_vecs > 0, "coupled_field_array must have at least 1 entry!");
 
-  Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field = coupled_field_array[0];
+  Albany::AbstractSTKFieldContainer::STKFieldType* coupled_field = coupled_field_array[0];
 
   stk::mesh::Selector coupled_stk_selector = stk::mesh::Selector(coupled_meta_data->universal_part());
 
@@ -321,12 +321,12 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   // get pointer to metadata from this_stk_disc
   Teuchos::RCP<stk::mesh::MetaData const> this_meta_data = Teuchos::rcpFromRef(this_stk_disc->getSTKMetaData());
 
-  Teuchos::Array<Albany::AbstractSTKFieldContainer::VectorFieldType*> this_field_array =
+  Teuchos::Array<Albany::AbstractSTKFieldContainer::STKFieldType*> this_field_array =
       Teuchos::rcp_dynamic_cast<Albany::OrdinarySTKFieldContainer<true>>(this_stk_disc->getSTKMeshStruct()->getFieldContainer())->getSolutionFieldDTKArray();
 
   ALBANY_ASSERT(num_sol_vecs == this_field_array.length(), "coupled_field_array and this_field_array must have the same length!");
 
-  Albany::AbstractSTKFieldContainer::VectorFieldType* this_field = this_field_array[0];
+  Albany::AbstractSTKFieldContainer::STKFieldType* this_field = this_field_array[0];
 
   // Get the part corresponding to this nodeset.
   std::string const&                nodeset_name   = this->nodeSetID;
@@ -351,10 +351,10 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
   this_vector_arrays[0] = this_vector;
 
   // Do interpolation of solution time-derivatives using DTK (if applicable)
-  Albany::AbstractSTKFieldContainer::VectorFieldType* this_field_dot;
-  Albany::AbstractSTKFieldContainer::VectorFieldType* this_field_dotdot;
-  Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field_dot;
-  Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field_dotdot;
+  Albany::AbstractSTKFieldContainer::STKFieldType* this_field_dot;
+  Albany::AbstractSTKFieldContainer::STKFieldType* this_field_dotdot;
+  Albany::AbstractSTKFieldContainer::STKFieldType* coupled_field_dot;
+  Albany::AbstractSTKFieldContainer::STKFieldType* coupled_field_dotdot;
 
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> this_vector_dot;
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> this_vector_dotdot;
@@ -380,18 +380,18 @@ Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>
 StrongSchwarzBC_Base<EvalT, Traits>::doDTKInterpolation(
     DataTransferKit::STKMeshManager&                    coupled_manager,
     DataTransferKit::STKMeshManager&                    this_manager,
-    Albany::AbstractSTKFieldContainer::VectorFieldType* coupled_field,
-    Albany::AbstractSTKFieldContainer::VectorFieldType* this_field,
+    Albany::AbstractSTKFieldContainer::STKFieldType* coupled_field,
+    Albany::AbstractSTKFieldContainer::STKFieldType* this_field,
     int const                                           neq,
     Teuchos::ParameterList&                             dtk_params)
 {
   // Create a solution vector for the source.
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> coupled_vector =
-      coupled_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(Teuchos::ptr(coupled_field), neq);
+      coupled_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::STKFieldType>(Teuchos::ptr(coupled_field), neq);
 
   // Create a solution vector for the target.
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>> this_vector =
-      this_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::VectorFieldType>(Teuchos::ptr(this_field), neq);
+      this_manager.createFieldMultiVector<Albany::AbstractSTKFieldContainer::STKFieldType>(Teuchos::ptr(this_field), neq);
 
   // Solution transfer
 

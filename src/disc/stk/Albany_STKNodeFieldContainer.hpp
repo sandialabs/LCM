@@ -133,6 +133,10 @@ struct NodeData_Traits<T, 2>
   static field_type*
   createField(std::string const& name, std::vector<PHX::DataLayout::size_type> const& dim, stk::mesh::MetaData* metaData)
   {
+    //IKT 10/9/2024: TODO - remove print statements!
+    std::cout << "IKT createField vector field!\n";
+    std::cout << "IKT dim size = " << dim.size() << "\n"; 
+    std::cout << "IKT dim[0], dim[1] = " << dim[0] << ", " << dim[1] << "\n";  
     field_type* fld = &metaData->declare_field<T>(stk::topology::NODE_RANK, name);
     // Multi-dim order is Fortran Ordering, so reversed here
     stk::mesh::put_field_on_mesh(*fld, metaData->universal_part(), dim[1], nullptr);
@@ -143,17 +147,26 @@ struct NodeData_Traits<T, 2>
   static void
   saveFieldData(const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec, const stk::mesh::BucketVector& all_elements, field_type* fld, int offset)
   {
+    std::cout << "IKT saveFieldData vector field!\n";
+    std::cout << "IKT size = " << size << "\n";  
     auto indexer = createGlobalLocalIndexer(overlap_node_vec->range());
     for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
       const stk::mesh::Bucket& bucket = **it;
 
       BucketArray<field_type>    solution_array(*fld, bucket);
+      auto rank = solution_array.rank(); 
+      std::cout << "IKT rank = " << rank << "\n"; 
       stk::mesh::BulkData const& bulkData = bucket.mesh();
 
-      int const num_vec_components  = solution_array.dimension(0);
-      int const num_nodes_in_bucket = solution_array.dimension(1);
+      std::cout << "IKT solution_array size = " << solution_array.size() << "\n"; 
+      //int const num_vec_components  = solution_array.dimension(0);
+      int const num_vec_components  = rank; 
+      //std::cout << "IKT num_vec_components = " << num_vec_components << "\n"; 
+      int const num_nodes_in_bucket = solution_array.dimension(0);
+      std::cout << "IKT num_nodes_in_bucket = " << num_nodes_in_bucket << "\n"; 
 
       for (int j = 0; j < num_vec_components; ++j) {
+	std::cout << "IKT j = " << j << "\n"; 
         Teuchos::ArrayRCP<const ST> const_overlap_node_view = getLocalData(overlap_node_vec->col(offset + j));
 
         for (int i = 0; i < num_nodes_in_bucket; ++i) {
@@ -179,6 +192,9 @@ struct NodeData_Traits<T, 3>
   static field_type*
   createField(std::string const& name, std::vector<PHX::DataLayout::size_type> const& dim, stk::mesh::MetaData* metaData)
   {
+    //IKT 10/9/2024: TODO - the code here is wrong and needs to be corrected.  
+    //Will do this after other parts of code are debugged so that this can be tested.
+    std::cout << "IKT createField tensor field!\n"; 
     field_type* fld = &metaData->declare_field<T>(stk::topology::NODE_RANK, name);
     // Multi-dim order is Fortran Ordering, so reversed here
     stk::mesh::put_field_on_mesh(*fld, metaData->universal_part(), dim[2], dim[1], nullptr);
@@ -189,12 +205,16 @@ struct NodeData_Traits<T, 3>
   static void
   saveFieldData(const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec, const stk::mesh::BucketVector& all_elements, field_type* fld, int offset)
   {
+    std::cout << "IKT saveFieldData tensor field!\n"; 
     auto indexer = createGlobalLocalIndexer(overlap_node_vec->range());
     for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
       const stk::mesh::Bucket&   bucket   = **it;
       stk::mesh::BulkData const& bulkData = bucket.mesh();
 
       BucketArray<field_type> solution_array(*fld, bucket);
+      auto rank = solution_array.rank(); 
+      std::cout << "IKT rank = " << rank << "\n"; 
+      std::cout << "IKT solution_array size = " << solution_array.size() << "\n"; 
 
       int const num_i_components    = solution_array.dimension(0);
       int const num_j_components    = solution_array.dimension(1);

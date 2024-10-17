@@ -14,6 +14,10 @@
 #include <stk_mesh/base/CoordinateSystems.hpp>
 #include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/FieldTraits.hpp>
+#include <stk_io/IossBridge.hpp>
+#include <stk_mesh/base/FieldBase.hpp>
+#include <stk_mesh/base/MetaData.hpp>
+
 
 #include "Albany_AbstractFieldContainer.hpp"
 #include "Albany_DataTypes.hpp"
@@ -49,6 +53,22 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
 
   virtual void
   addStateStructs(const Teuchos::RCP<Albany::StateInfoStruct>& sis) = 0;
+
+  //! Determine if field is scalar or vector
+  bool is_scalar_or_vector_field(const stk::mesh::FieldBase & field) const
+  {
+    bool is_scalar_or_vector_field;
+    auto type = stk::io::get_field_output_type(field);
+    if ((type == stk::io::FieldOutputType::SCALAR) ||
+        (type == stk::io::FieldOutputType::VECTOR_2D) ||
+        (type == stk::io::FieldOutputType::VECTOR_3D)) {
+      is_scalar_or_vector_field = true;
+    }
+    else {
+      is_scalar_or_vector_field = false;
+    }
+    return is_scalar_or_vector_field;
+  }
 
   // Coordinates field ALWAYS in 3D
   const STKFieldType*

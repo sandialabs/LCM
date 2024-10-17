@@ -378,23 +378,23 @@ OrdinarySTKFieldContainer<Interleaved>::fillVectorImpl(
 
   auto* raw_field = this->metaData->get_field(stk::topology::NODE_RANK, field_name);
   ALBANY_EXPECT(raw_field != nullptr, "Error! Something went wrong while retrieving a field.\n");
-  //int const rank = raw_field->field_array_rank();
+  bool const is_scalar_or_vector_field = this->is_scalar_or_vector_field(*raw_field);
 
   // Iterate over the on-processor nodes by getting node buckets and iterating
   // over each bucket.
   stk::mesh::BucketVector const& all_elements = this->bulkData->get_buckets(stk::topology::NODE_RANK, field_selection);
 
   auto field_node_vs_indexer = createGlobalLocalIndexer(field_node_vs);
-  //if (rank < 2) {
-  const SFT* field = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
-  using Helper     = STKFieldContainerHelper<SFT>;
-  for (stk::mesh::BucketVector::const_iterator it = all_elements.begin(); it != all_elements.end(); ++it) {
-    const stk::mesh::Bucket& bucket = **it;
-    Helper::fillVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
-  }
-  /*} else {
+  if (is_scalar_or_vector_field == true) {
+    const SFT* field = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
+    using Helper     = STKFieldContainerHelper<SFT>;
+    for (stk::mesh::BucketVector::const_iterator it = all_elements.begin(); it != all_elements.end(); ++it) {
+      const stk::mesh::Bucket& bucket = **it;
+      Helper::fillVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
+    }
+  } else {
     ALBANY_ABORT("Error! Only scalar and vector fields supported so far.\n");
-  }*/
+  }
 }
 
 template <bool Interleaved>
@@ -410,25 +410,23 @@ OrdinarySTKFieldContainer<Interleaved>::saveVectorImpl(
 
   auto* raw_field = this->metaData->get_field(stk::topology::NODE_RANK, field_name);
   ALBANY_EXPECT(raw_field != nullptr, "Error! Something went wrong while retrieving a field.\n");
-  //IKT 10/8/2024: field_array_rank() seems to be gone from STK.  Removing logic surrounding that.  Not 100% sure if this 
-  //will cause problems.  
-  //int const rank = raw_field->field_array_rank();
+  bool const is_scalar_or_vector_field = this->is_scalar_or_vector_field(*raw_field);
 
   // Iterate over the on-processor nodes by getting node buckets and iterating
   // over each bucket.
   stk::mesh::BucketVector const& all_elements = this->bulkData->get_buckets(stk::topology::NODE_RANK, field_selection);
 
   auto field_node_vs_indexer = createGlobalLocalIndexer(field_node_vs);
-  //if (rank < 2) {
-  SFT* field   = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
-  using Helper = STKFieldContainerHelper<SFT>;
-  for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
-    const stk::mesh::Bucket& bucket = **it;
-    Helper::saveVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
-  }
-  /*} else {
+  if (is_scalar_or_vector_field == true) {
+    SFT* field   = this->metaData->template get_field<double>(stk::topology::NODE_RANK, field_name);
+    using Helper = STKFieldContainerHelper<SFT>;
+    for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
+      const stk::mesh::Bucket& bucket = **it;
+      Helper::saveVector(field_vector, *field, field_node_vs_indexer, bucket, nodalDofManager, 0);
+    }
+  } else {
     ALBANY_ABORT("Error! Only scalar and vector fields supported so far.\n");
-  }*/
+  }
 }
 
 }  // namespace Albany

@@ -95,7 +95,7 @@ function(lcm_do_trilinos)
       "-DTrilinos_ENABLE_Phalanx:BOOL=ON"
       "-DTrilinos_ENABLE_Piro:BOOL=ON"
       "-DTrilinos_ENABLE_ROL:BOOL=ON"
-      "-DTrilinos_ENABLE_Rythmos:BOOL=ON"
+      "-DTrilinos_ENABLE_Rythmos:BOOL=OFF"
       "-DTrilinos_ENABLE_SEACAS:BOOL=ON"
       "-DTrilinos_ENABLE_SEACASAprepro_lib:BOOL=ON"
       "-DTrilinos_ENABLE_STKExprEval:BOOL=ON"
@@ -125,6 +125,16 @@ function(lcm_do_trilinos)
     set(CONFIG_OPTS ${CONFIG_OPTS}
         "-DCMAKE_EXE_LINKER_FLAGS:STRING=$ENV{LCM_LINK_FLAGS}"
         "-DCMAKE_SHARED_LINKER_FLAGS:STRING=$ENV{LCM_LINK_FLAGS}"
+       )
+  endif()
+  if (DEFINED ENV{BLAS_LIB})
+    set(CONFIG_OPTS ${CONFIG_OPTS}
+        "-DTPL_BLAS_LIBRARIES:FILEPATH=$ENV{BLAS_LIB}"
+       )
+  endif()
+  if (DEFINED ENV{LAPACK_LIB})
+    set(CONFIG_OPTS ${CONFIG_OPTS}
+        "-DTPL_LAPACK_LIBRARIES:FILEPATH=$ENV{LAPACK_LIB}"
        )
   endif()
   set(EXTRA_REPOS)

@@ -18,7 +18,6 @@ setenv                  OMPI_CC         $env(CC)
 setenv                  OMPI_CXX        $env(CXX)
 setenv                  OMPI_FC         $env(FC)
 
-prepend-path            LD_LIBRARY_PATH $install_dir/lib
 prepend-path            PATH            $alb_exe_dir
 prepend-path            PATH            $alb_exe_dir/LCM
 prepend-path            PATH            $install_dir/bin

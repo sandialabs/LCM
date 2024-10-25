@@ -16,8 +16,6 @@ if { [is-loaded lcm-fedora] } {
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
-  prepend-path            LD_LIBRARY_PATH /usr/lib64/openmpi/lib
-  prepend-path            LD_LIBRARY_PATH $netcdf_lib
   prepend-path            PATH            /usr/lib64/openmpi/bin
   continue
 }
@@ -36,7 +34,6 @@ if { [is-loaded lcm-scientific-linux] } {
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
-  prepend-path            LD_LIBRARY_PATH /usr/lib64/openmpi/lib
   prepend-path            PATH            /usr/lib64/openmpi/bin
   continue
 }
@@ -55,7 +52,6 @@ if { [is-loaded lcm-ubuntu] } {
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
-  prepend-path            LD_LIBRARY_PATH /usr/lib/openmpi/lib
   continue
 }
 
@@ -84,8 +80,6 @@ if { [is-loaded lcm-sems] } {
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
-  prepend-path            LD_LIBRARY_PATH $mpi_root/lib
-  prepend-path            LD_LIBRARY_PATH $netcdf_lib
   prepend-path            PATH            $mpi_root/bin
   continue
 }
@@ -108,8 +102,6 @@ if { [is-loaded lcm-rhel] } {
     setenv                  BLAS_LIB        /lib64/libflexiblas.so
     setenv                  LAPACK_LIB      /lib64/libflexiblas.so
   }
-  prepend-path            LD_LIBRARY_PATH /usr/lib64/openmpi/lib
-  prepend-path            LD_LIBRARY_PATH $netcdf_lib
   prepend-path            PATH            /usr/lib64/openmpi/bin
   continue
 }
@@ -132,7 +124,5 @@ if { [is-loaded lcm-cluster] } {
   setenv                  NETCDF          $netcdf_root
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
-# PATHs for MPI are set by the modules
-  prepend-path            LD_LIBRARY_PATH $netcdf_lib
   continue
 }

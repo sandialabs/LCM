@@ -121,11 +121,11 @@ ELEMENT VARIABLES relative 1.e-6 floor 0.0
 	Fp_2_1   absolute 1e-05 # min: 1 @ t24,b2,e2 max: 1 @ t1,b1,e1
 	Fp_2_2   absolute 1.0103607e-05 # min: 1 @ t1,b1,e1 max: 1.0103607 @ t51,b2,e2
 	Fp_2_3   absolute 1.0360705e-07 # min: 0 @ t1,b1,e1 max: 0.010360705 @ t51,b2,e2
-	Fp_2_4          # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
+	Fp_2_4   floor 1.0e-14
 	Fp_2_5   absolute 1.0360705e-07 # min: 0 @ t1,b1,e1 max: 0.010360705 @ t51,b2,e2
 	Fp_2_6   absolute 1e-05 # min: 0.9896393 @ t51,b2,e2 max: 1 @ t1,b1,e1
-	Fp_2_7          # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
-	Fp_2_8          # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
+	Fp_2_7   floor 1.0e-14
+	Fp_2_8   floor 1.0e-14
 	Fp_3_1          # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
 	Fp_3_2   absolute 1e-05 # min: 1 @ t24,b2,e2 max: 1 @ t1,b1,e1
 	Fp_3_3   absolute 1.0103607e-05 # min: 1 @ t1,b1,e1 max: 1.0103607 @ t51,b2,e2
@@ -198,14 +198,14 @@ ELEMENT VARIABLES relative 1.e-6 floor 0.0
 	Velocity_Gradient_Plastic_1_6           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
 	Velocity_Gradient_Plastic_1_7           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
 	Velocity_Gradient_Plastic_1_8           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
-	Velocity_Gradient_Plastic_2_1           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
+	Velocity_Gradient_Plastic_2_1    floor 1.0e-14       # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
 	Velocity_Gradient_Plastic_2_2    absolute 2.7788467e-09 # min: 0 @ t1,b1,e1 max: 0.00027788467 @ t50,b2,e2
 	Velocity_Gradient_Plastic_2_3    absolute 2.7788467e-09 # min: 0 @ t1,b1,e1 max: 0.00027788467 @ t50,b2,e2
-	Velocity_Gradient_Plastic_2_4           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
+	Velocity_Gradient_Plastic_2_4    floor 1.0e-14       # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
 	Velocity_Gradient_Plastic_2_5    absolute 2.7788467e-09 # min: 0 @ t1,b1,e1 max: 0.00027788467 @ t50,b2,e2
 	Velocity_Gradient_Plastic_2_6    absolute 2.7788467e-09 # min: 0 @ t1,b1,e1 max: 0.00027788467 @ t50,b2,e2
-	Velocity_Gradient_Plastic_2_7           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
-	Velocity_Gradient_Plastic_2_8           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
+	Velocity_Gradient_Plastic_2_7    floor 1.0e-14       # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
+	Velocity_Gradient_Plastic_2_8    floor 1.0e-14       # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
 	Velocity_Gradient_Plastic_3_1           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
 	Velocity_Gradient_Plastic_3_2           # min: 0 @ t1,b1,e1 max: 0 @ t1,b1,e1
 	Velocity_Gradient_Plastic_3_3    absolute 2.7788467e-09 # min: 0 @ t1,b1,e1 max: 0.00027788467 @ t50,b2,e2

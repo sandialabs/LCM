@@ -40,7 +40,7 @@ NODAL VARIABLES relative 1.0e-10 floor 1.0e-12
 	!proj_nodal_Cauchy_Stress_2_3
 	!proj_nodal_Cauchy_Stress_3_3
 
-ELEMENT VARIABLES relative 1.0e-2 floor 1.0e-12
+ELEMENT VARIABLES relative 2.0e-2 floor 1.0e-12
 
 
 

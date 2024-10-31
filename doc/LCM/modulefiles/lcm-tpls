@@ -99,8 +99,8 @@ if { [is-loaded lcm-rhel] } {
   setenv                  NETCDF_INC      $netcdf_inc
   setenv                  NETCDF_LIB      $netcdf_lib
   if { [ file exists /lib64/libflexiblas.so ] } {
-    setenv                  BLAS_LIB        /lib64/libflexiblas.so
-    setenv                  LAPACK_LIB      /lib64/libflexiblas.so
+    setenv                  BLAS_LIB        /lib64/libopenblas.so
+    setenv                  LAPACK_LIB      /lib64/libopenblas.so
   }
   prepend-path            PATH            /usr/lib64/openmpi/bin
   continue

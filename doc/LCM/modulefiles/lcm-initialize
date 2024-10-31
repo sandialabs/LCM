@@ -13,12 +13,12 @@ if { [ file exists /etc/sl-release ] } {
   continue
 }
 
-if { [ file exists /projects/sems ] } {
-  module load lcm-sems
+if { [ file exists /etc/redhat-release ] } {
+  module load lcm-rhel
   continue
 }
 
-if { [ file exists /etc/redhat-release ] } {
-  module load lcm-rhel
+if { [ file exists /projects/sems ] } {
+  module load lcm-sems
   continue
 }

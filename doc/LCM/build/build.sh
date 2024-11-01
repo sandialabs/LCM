@@ -26,8 +26,13 @@ if [ -z $VERBOSITY ]; then
     VERBOSITY="-VV"
 fi
 
+# Append the compiler version to TOOL_CHAIN using --version and extracting the third field
+TOOL_CHAIN="${TOOL_CHAIN}-$(${TOOL_CHAIN} --version | awk '{print $3}' | head -n1)"
+
 ctest $VERBOSITY --timeout 180 -S $LCM_DIR/LCM/doc/LCM/build/lcm_build.cmake \
 -DSCRIPT_NAME:STRING=`basename $0` \
 -DPACKAGE:STRING=$PACKAGE \
 -DBUILD_THREADS:STRING=$THREADS \
+-DTOOL_CHAIN:STRING=$TOOL_CHAIN \
+-DBUILD_TYPE:STRING=$BUILD_TYPE \
 | tee $LOG_FILE

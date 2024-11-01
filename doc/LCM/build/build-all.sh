@@ -48,7 +48,7 @@ PLATFORM="unknown"
 if [[ ${KERNEL_VERSION} == *"fc"* ]]; then
     PLATFORM="fedora"
 elif [[ ${KERNEL_VERSION} == *"el"* ]]; then
-    PLATFORM="sems"
+    PLATFORM="rhel"
 elif [[ ${KERNEL_VERSION} == *"chaos"* ]]; then
     PLATFORM="cluster"
 elif [[ ${KERNEL_VERSION} == *"generic"* ]]; then

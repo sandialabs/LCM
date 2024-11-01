@@ -3,6 +3,8 @@
 #       -DSCRIPT_NAME="config-build-test.sh"
 #       -DPACKAGE="trilinos"
 #       -DBUILD_THREADS="16"
+#       -DTOOL_CHAIN="gcc"
+#       -BUILD_TYPE="release"
 
 include("${CMAKE_CURRENT_LIST_DIR}/lcm_do_package.cmake")
 
@@ -14,6 +16,8 @@ set (CTEST_COMMAND "ctest -D ${CTEST_TEST_TYPE}")
 message("SCRIPT_NAME ${SCRIPT_NAME}")
 message("PACKAGE ${PACKAGE}")
 message("BUILD_THREADS ${BUILD_THREADS}")
+message("TOOL_CHAIN ${TOOL_CHAIN}")
+message("BUILD_TYPE ${BUILD_TYPE}")
 
 set(BUILD_ID_STRING "$ENV{ARCH}-$ENV{TOOL_CHAIN}-$ENV{BUILD_TYPE}")
 message("BUILD_ID_STRING ${BUILD_ID_STRING}")
@@ -47,7 +51,7 @@ cmake_host_system_information(RESULT LCM_HOSTNAME QUERY HOSTNAME)
 
 #message("LCM_HOSTNAME ${LCM_HOSTNAME}")
 
-set(CTEST_BUILD_NAME "${LCM_HOSTNAME}-${PACKAGE}")
+set(CTEST_BUILD_NAME "${LCM_HOSTNAME}-${PACKAGE}-${TOOL_CHAIN}-${BUILD-TYPE}")
 set(CTEST_SITE "${LCM_HOSTNAME}")
 set(CTEST_SOURCE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}")
 set(CTEST_BINARY_DIRECTORY "$ENV{LCM_DIR}/${PACKAGE}-build-${BUILD_ID_STRING}")

@@ -1,0 +1,30 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: CapExplicit
+  Materials:
+    CapExplicit:
+      Material Model:
+        Model Name: Cap Explicit
+      Strain Flag: true #Tell code that doing small strain regime
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 22547.00000000
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.25240000
+      A: 689.20000000
+      B: 0.00039400
+      C: 675.20000000
+      theta: 0.00000000e+00
+      R: 28.00000000
+      kappa0: -8.05000000e+00
+      W: 0.08000000
+      D1: 0.00147000
+      D2: 0.00000000e+00
+      calpha: 100000.00000000
+      psi: 1.00000000
+      N: 6.00000000
+      L: 0.00039400
+      phi: 0.00000000e+00
+      Q: 28.00000000

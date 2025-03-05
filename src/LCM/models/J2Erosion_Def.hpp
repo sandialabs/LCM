@@ -565,7 +565,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Hack for strain limit
   if (strain_limit > 0.0) {
-    decltype(Fval) Cval           = Fval * minitensor::transpose(Fval);
+    decltype(Fval) Cval           = Fval * minitensor::transpose(Fval); // 2-14-25: FIXME: should be Fval^T * Fval
     auto const     Jval           = minitensor::det(Fval);
     auto const     Jm23val        = 1.0 / std::cbrt(Jval * Jval);
     decltype(Fval) Cdevval        = Jm23val * Cval;

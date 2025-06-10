@@ -257,7 +257,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       if (sal > 0.0) {
         sal15 = std::sqrt(sal * sal * sal);
       }
-      ScalarT const pressure_fixed = 1.0;
+      ScalarT const pressure_fixed = 0.0; // 3-5-25: fixed to be 0 instead of 1 (don't anticipate it'll make a difference but just to be thorough)
       // Tmelt is in Kelvin
       ScalarT const Tmelt = -0.057 * sal + 0.00170523 * sal15 - 0.0002154996 * sal * sal - 0.000753 / 10000.0 * pressure_fixed + 273.15;
 

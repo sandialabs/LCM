@@ -42,7 +42,7 @@ class LinearElasticVolDevModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~LinearElasticVolDevModel(){};
+  virtual ~LinearElasticVolDevModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

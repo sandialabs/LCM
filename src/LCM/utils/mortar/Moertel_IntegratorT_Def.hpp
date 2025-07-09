@@ -628,8 +628,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
           throw MoertelT::ReportError(oss);
         }
       }  // for (int i=0; i<snlmdof; ++i)
-    }    // for (int master=0; master<mseg.Nnode(); ++master)
-  }      // for (int slave=0; slave<sseg.Nnode(); ++slave)
+    }  // for (int master=0; master<mseg.Nnode(); ++master)
+  }  // for (int slave=0; slave<sseg.Nnode(); ++slave)
   return true;
 }
 
@@ -694,8 +694,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble(
           throw MoertelT::ReportError(oss);
         }
       }  // for (int i=0; i<nlmdof; ++i)
-    }    // for (int colnode=0; colnode<sseg.Nnode(); ++colnode)
-  }      // for (int rownode=0; rownode<sseg.Nnode(); ++rownode)
+    }  // for (int colnode=0; colnode<sseg.Nnode(); ++colnode)
+  }  // for (int rownode=0; rownode<sseg.Nnode(); ++rownode)
 
   return true;
 }
@@ -954,9 +954,9 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(IntegratorT)::Assemble_2D_Mod(
           }
 
         }  // for (int mdof=0; mdof<mndof; ++mdof)
-      }    // for (int master=0; master<mseg.Nnode(); ++master)
-    }      // for (int sdof=0; sdof<snlmdof; ++sdof)
-  }        // for (int slave=0; slave<sseg.Nnode(); ++slave)
+      }  // for (int master=0; master<mseg.Nnode(); ++master)
+    }  // for (int sdof=0; sdof<snlmdof; ++sdof)
+  }  // for (int slave=0; slave<sseg.Nnode(); ++slave)
   return true;
 }
 

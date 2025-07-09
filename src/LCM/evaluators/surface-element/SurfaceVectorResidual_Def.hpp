@@ -202,8 +202,8 @@ SurfaceVectorResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
         force_(cell, bottom_node, 2) += f_minus(2) * ref_area_(cell, pt);
 
       }  // end of pt
-    }    // end of numPlaneNodes
-  }      // end of cell
+    }  // end of numPlaneNodes
+  }  // end of cell
 
   // This is here just to satisfy projection operators from QPs to nodes
   if (have_topmod_adaptation_ == true) {

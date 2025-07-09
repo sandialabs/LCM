@@ -43,7 +43,7 @@ class FerroicDriver : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~FerroicDriver(){};
+  virtual ~FerroicDriver() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

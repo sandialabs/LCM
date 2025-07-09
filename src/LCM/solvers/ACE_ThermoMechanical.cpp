@@ -94,8 +94,8 @@ validate_intervals(std::vector<ST> const& initial_times, std::vector<ST> const& 
   auto const all_equal     = initials_size == finals_size == steps_size;
   ALBANY_ASSERT(
       all_equal == true,
-      "Event interval arrays have different sizes, "
-          << "Initial Times : " << initials_size << ", Final Times : " << finals_size << ", Steps Size" << steps_size);
+      "Event interval arrays have different sizes, " << "Initial Times : " << initials_size << ", Final Times : " << finals_size << ", Steps Size"
+                                                     << steps_size);
   auto prev_ti = initial_times[0];
   auto prev_tf = final_times[0];
   for (auto i = 0; i < steps_size; ++i) {
@@ -105,12 +105,10 @@ validate_intervals(std::vector<ST> const& initial_times, std::vector<ST> const& 
     if (i > 0) {
       ALBANY_ASSERT(
           ti > prev_ti,
-          "Initial Times must be monotonically increasing. "
-              << "At index " << i << " found initial time " << ti << " less or equal than previous " << prev_ti);
+          "Initial Times must be monotonically increasing. " << "At index " << i << " found initial time " << ti << " less or equal than previous " << prev_ti);
       ALBANY_ASSERT(
           tf > prev_tf,
-          "Final Times must be monotonically increasing. "
-              << "At index " << i << " found final time " << tf << " less or equal than previous " << prev_tf);
+          "Final Times must be monotonically increasing. " << "At index " << i << " found final time " << tf << " less or equal than previous " << prev_tf);
       ALBANY_ASSERT(ti > prev_tf, "Intervals must not overlap. At index " << i << " found initial time less or equal than previous final time " << prev_tf);
     }
     ALBANY_ASSERT(tf > ti, "At event interval index " << i << " found initial time " << ti << " greater or equal than final time " << tf);
@@ -727,8 +725,10 @@ ACEThermoMechanical::continueSolve() const
   // Also set converged_ to true, which is equally irrelevant unless doing
   // Schwarz-like coupling
   converged_ = true;
-  if (num_iter_ > 0) return false;
-  else return true;
+  if (num_iter_ > 0)
+    return false;
+  else
+    return true;
 }
 
 // Sequential ThermoMechanical coupling loop, dynamic

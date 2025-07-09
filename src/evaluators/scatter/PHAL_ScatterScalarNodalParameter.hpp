@@ -34,7 +34,7 @@ class ScatterScalarNodalParameterBase : public PHX::EvaluatorWithBaseImpl<Traits
 {
  public:
   ScatterScalarNodalParameterBase(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl);
-  virtual ~ScatterScalarNodalParameterBase(){};
+  virtual ~ScatterScalarNodalParameterBase() {};
 
   void
   postRegistrationSetup(typename Traits::SetupData d, PHX::FieldManager<Traits>& vm);

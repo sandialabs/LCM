@@ -86,10 +86,10 @@ class SeparableScatterScalarResponseWithExtrudedParams : public SeparableScatter
 {
  public:
   SeparableScatterScalarResponseWithExtrudedParams(Teuchos::ParameterList const& p, const Teuchos::RCP<Albany::Layouts>& dl)
-      : SeparableScatterScalarResponse<EvalT, Traits>(p, dl){
-            //    extruded_params_levels = p.get<
-            //    Teuchos::RCP<std::map<std::string, int> > >("Extruded Params
-            //    Levels");
+      : SeparableScatterScalarResponse<EvalT, Traits>(p, dl) {
+          //    extruded_params_levels = p.get<
+          //    Teuchos::RCP<std::map<std::string, int> > >("Extruded Params
+          //    Levels");
         };
 
   void

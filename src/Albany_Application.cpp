@@ -156,10 +156,7 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   }
 #endif
 
-  ALBANY_PANIC(
-      num_time_deriv > 2,
-      "Input error: number of time derivatives must be <= 2 "
-          << "(solution, solution_dot, solution_dotdot)");
+  ALBANY_PANIC(num_time_deriv > 2, "Input error: number of time derivatives must be <= 2 " << "(solution, solution_dot, solution_dotdot)");
 
   // Save the solution method to be used
   std::string solutionMethod = problemParams->get("Solution Method", "Steady");
@@ -1575,10 +1572,7 @@ Application::getValue(std::string const& name)
   for (unsigned int i = 0; i < shapeParamNames.size(); i++) {
     if (name == shapeParamNames[i]) index = i;
   }
-  ALBANY_PANIC(
-      index == -1,
-      "Error in GatherCoordinateVector::getValue, \n"
-          << "   Unrecognized param name: " << name << std::endl);
+  ALBANY_PANIC(index == -1, "Error in GatherCoordinateVector::getValue, \n" << "   Unrecognized param name: " << name << std::endl);
 
   shapeParamsHaveBeenReset = true;
 
@@ -1775,9 +1769,7 @@ Application::setScaleBCDofs(PHAL::Workset& workset, Teuchos::RCP<const Thyra_Lin
   }
 
   if (problem->getSideSetEquations().size() > 0) {
-    ALBANY_ABORT(
-        "Application::setScaleBCDofs is not yet implemented for"
-        << " sideset equations!\n");
+    ALBANY_ABORT("Application::setScaleBCDofs is not yet implemented for" << " sideset equations!\n");
   }
 }
 

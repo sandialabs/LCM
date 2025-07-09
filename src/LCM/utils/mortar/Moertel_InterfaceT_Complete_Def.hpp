@@ -58,10 +58,10 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
   Teuchos::reduceAll<LO, int>(*gcomm_, Teuchos::REDUCE_MIN, 1, &lok, &gok);
   if (!gok) return false;
 
-    // check whether all nodes for segments are present
-    // (take in account that node might be on different processor)
-    // this test is expensive and does not scale. It is therefore only performed
-    // when user requests a high output level
+  // check whether all nodes for segments are present
+  // (take in account that node might be on different processor)
+  // this test is expensive and does not scale. It is therefore only performed
+  // when user requests a high output level
 #if 1
   if (OutLevel() > 9) {
     for (int proc = 0; proc < gcomm_->getSize(); ++proc) {
@@ -114,7 +114,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
         foundit.clear();
         gfoundit.clear();
       }  // for (int size=0; side<2; ++side)
-    }    // for (int proc=0; proc<gcomm_->NumProc(); ++proc)
+    }  // for (int proc=0; proc<gcomm_->NumProc(); ++proc)
   }
 #endif
   // find all procs that have business on this interface (own nodes/segments)
@@ -287,7 +287,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Complete()
       }
       adj.clear();
     }  // for (int proc=0; proc<lcomm_->NumProc(); ++proc)
-  }    // if (lComm())
+  }  // if (lComm())
 
   // build redundant segments and nodes
   if (lcomm_ != Teuchos::null) {

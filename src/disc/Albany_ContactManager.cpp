@@ -248,7 +248,7 @@ Albany::ContactManager::processSS(
             moertelInterface->AddNode(moertel_node, contact_pair_id);
 
           }  // end add nodes to interface operations
-        }    // end loop over nodes on element side
+        }  // end loop over nodes on element side
 
         // 2D
         MOERTEL::Segment_Linear1D segment(side_GID, nodev, printLevel);

@@ -186,9 +186,7 @@ SolverFactory::createAndGetAlbanyApp(
     *out << "Printing the Piro parameter list:" << std::endl;
     piroParams->print(*out);
     // GAH: this is an error - should be fatal
-    ALBANY_ABORT(
-        "Error: cannot locate Stratimikos solver parameters in the input file."
-        << "\n");
+    ALBANY_ABORT("Error: cannot locate Stratimikos solver parameters in the input file." << "\n");
   }
 
   Teuchos::RCP<Thyra_ModelEvaluator> modelWithSolve;
@@ -215,9 +213,7 @@ SolverFactory::createAndGetAlbanyApp(
   } else {
     return piroFactory.createSolver<ST>(piroParams, modelWithSolve, Teuchos::null, observer_);
   }
-  ALBANY_ABORT(
-      "Reached end of createAndGetAlbanyAppT()"
-      << "\n");
+  ALBANY_ABORT("Reached end of createAndGetAlbanyAppT()" << "\n");
 
   // Silence compiler warning in case it wasn't used (due to ifdef logic)
   (void)solverComm;
@@ -251,10 +247,7 @@ SolverFactory::createAlbanyAppAndModel(
 
     /* TODO: this should be a boolean, not a string ! */
     std::string const secondOrder = problemParams->get("Second Order", "No");
-    ALBANY_PANIC(
-        secondOrder != "No",
-        "Second Order is not supported"
-            << "\n");
+    ALBANY_PANIC(secondOrder != "No", "Second Order is not supported" << "\n");
 
     // Populate the Piro parameter list accordingly to inform the Piro solver
     // factory

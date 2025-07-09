@@ -21,7 +21,7 @@ class LocalNonlinearSolver_Base
  public:
   using ScalarT = typename EvalT::ScalarT;
   LocalNonlinearSolver_Base();
-  ~LocalNonlinearSolver_Base(){};
+  ~LocalNonlinearSolver_Base() {};
   Teuchos::LAPACK<int, RealType> lapack;
   void
   solve(std::vector<ScalarT>& A, std::vector<ScalarT>& X, std::vector<ScalarT>& B);

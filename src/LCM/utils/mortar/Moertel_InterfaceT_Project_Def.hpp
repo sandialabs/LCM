@@ -875,7 +875,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_MastertoSlave_Orthogo
         throw MoertelT::ReportError(oss);
       }
     }  // if (proc!=lComm()->MyPID())
-  }    // for (int proc=0; proc<lComm()->NumProc(); ++proc)
+  }  // for (int proc=0; proc<lComm()->NumProc(); ++proc)
   bcast.clear();
 
   return true;
@@ -987,8 +987,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_Orthogo
 #endif
         }
       }  // for (int j=0; j<nsseg; ++j)
-    }    // for (int i=0; i<nmseg; ++i)
-  }      // for (scurr=rnode_[sside].begin(); scurr!=rnode_[sside].end(); ++scurr)
+    }  // for (int i=0; i<nmseg; ++i)
+  }  // for (scurr=rnode_[sside].begin(); scurr!=rnode_[sside].end(); ++scurr)
 
   // loop all slave nodes again and make projections redundant
   if (lcomm_->getSize() > 1) {
@@ -1069,7 +1069,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::ProjectNodes_SlavetoMaster_Orthogo
           throw MoertelT::ReportError(oss);
         }
       }  // if (proc!=lComm()->MyPID())
-    }    // for (int proc=0; proc<lComm()->NumProc(); ++proc)
+    }  // for (int proc=0; proc<lComm()->NumProc(); ++proc)
     bcast.clear();
   }  // if (lComm()->NumProc()>1)
 

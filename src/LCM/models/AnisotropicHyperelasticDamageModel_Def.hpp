@@ -256,6 +256,6 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::computeState(typename Traits:
         std::cout << "  fiber2 energy: " << energy_f2(cell, pt) << std::endl;
       }
     }  // pt
-  }    // cell
+  }  // cell
 }
 }  // namespace LCM

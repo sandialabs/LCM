@@ -92,7 +92,7 @@ template <typename EvalT, typename Traits>
 class LameStress : public LameStressBase<EvalT, Traits>
 {
  public:
-  LameStress(Teuchos::ParameterList& p) : LameStressBase<EvalT, Traits>(p){};
+  LameStress(Teuchos::ParameterList& p) : LameStressBase<EvalT, Traits>(p) {};
 };
 
 // Template Specialization: Residual Eval calls Lame with doubles.
@@ -100,7 +100,7 @@ template <typename Traits>
 class LameStress<PHAL::AlbanyTraits::Residual, Traits> : public LameStressBase<PHAL::AlbanyTraits::Residual, Traits>
 {
  public:
-  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Residual, Traits>(p){};
+  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Residual, Traits>(p) {};
   void
   evaluateFields(typename Traits::EvalData d);
 };
@@ -111,7 +111,7 @@ template <typename Traits>
 class LameStress<PHAL::AlbanyTraits::Jacobian, Traits> : public LameStressBase<PHAL::AlbanyTraits::Jacobian, Traits>
 {
  public:
-  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Jacobian, Traits>(p){};
+  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Jacobian, Traits>(p) {};
   void
   evaluateFields(typename Traits::EvalData d);
 };
@@ -122,7 +122,7 @@ template <typename Traits>
 class LameStress<PHAL::AlbanyTraits::Tangent, Traits> : public LameStressBase<PHAL::AlbanyTraits::Tangent, Traits>
 {
  public:
-  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Tangent, Traits>(p){};
+  LameStress(Teuchos::ParameterList& p) : LameStressBase<PHAL::AlbanyTraits::Tangent, Traits>(p) {};
   void
   evaluateFields(typename Traits::EvalData d);
 };

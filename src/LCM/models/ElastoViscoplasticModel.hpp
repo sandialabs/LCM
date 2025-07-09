@@ -49,7 +49,7 @@ class ElastoViscoplasticModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Denstructor
   ///
-  virtual ~ElastoViscoplasticModel(){};
+  virtual ~ElastoViscoplasticModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

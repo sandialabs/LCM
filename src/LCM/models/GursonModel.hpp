@@ -41,7 +41,7 @@ class GursonModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~GursonModel(){};
+  virtual ~GursonModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

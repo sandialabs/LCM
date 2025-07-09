@@ -46,7 +46,7 @@ class AnisotropicViscoplasticModel : public LCM::ConstitutiveModel<EvalT, Traits
   ///
   /// Virtual Denstructor
   ///
-  virtual ~AnisotropicViscoplasticModel(){};
+  virtual ~AnisotropicViscoplasticModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

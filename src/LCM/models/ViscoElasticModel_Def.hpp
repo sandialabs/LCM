@@ -321,7 +321,7 @@ ViscoElasticModel<EvalT, Traits>::computeState(typename Traits::EvalData workset
       }
 
     }  // end pt
-  }    // end cell
+  }  // end cell
 }
 
 }  // namespace LCM

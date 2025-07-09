@@ -201,7 +201,7 @@ class PointT
   std::vector<double>                                   vals_[3];  // [0] values of shape function 0 from sseg
                                                                    // [1] values of shape function 1 from sseg
                                                                    // [2] values of shape function 0 from mseg
-};                                                                 // class Point
+};  // class Point
 
 }  // namespace MoertelT
 

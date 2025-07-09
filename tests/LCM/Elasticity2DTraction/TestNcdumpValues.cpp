@@ -65,8 +65,8 @@ main()
       if (fabs(target - val) / target >= tolerance) {  // test failed
 
         std::cout << "Error: stress_22 value outside of tolerance: \n"
-                  << " target = " << target << " calculated = " << val << "\ntolerance = " << tolerance
-                  << " error = " << fabs(target - val) / target << std::endl;
+                  << " target = " << target << " calculated = " << val << "\ntolerance = " << tolerance << " error = " << fabs(target - val) / target
+                  << std::endl;
 
         return -1;
       }

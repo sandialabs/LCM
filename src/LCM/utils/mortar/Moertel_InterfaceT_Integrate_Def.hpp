@@ -284,7 +284,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Integrate_2D()
       }
 
     }  // for (mcurr=rseg_[mside].begin(); mcurr!=rseg_[mside].end(); ++mcurr)
-  }    // for (scurr=rseg_[sside].begin(); scurr!=rseg_[sside].end(); ++scurr)
+  }  // for (scurr=rseg_[sside].begin(); scurr!=rseg_[sside].end(); ++scurr)
 
   return true;
 }

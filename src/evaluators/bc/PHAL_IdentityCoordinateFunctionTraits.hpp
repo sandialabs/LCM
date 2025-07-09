@@ -33,7 +33,7 @@ class IdentityCoordFunctionTraits
   ///
   /// Destructor
   ///
-  ~IdentityCoordFunctionTraits(){};
+  ~IdentityCoordFunctionTraits() {};
 
   void
   computeBCs(double* coord, std::vector<ScalarT>& BCvals, const RealType time);

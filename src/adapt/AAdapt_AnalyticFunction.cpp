@@ -399,9 +399,9 @@ AAdapt::ConstantFunctionGaussianPerturbed::ConstantFunctionGaussianPerturbed(
 {
   ALBANY_PANIC(
       (data.size() != neq || pert_mag.size() != neq),
-      "Error! Invalid specification of initial condition: incorrect length of "
-          << "Function Data for Constant Function Gaussian Perturbed; neq = " << neq << ", data.size() = " << data.size()
-          << ", pert_mag.size() = " << pert_mag.size() << std::endl);
+      "Error! Invalid specification of initial condition: incorrect length of " << "Function Data for Constant Function Gaussian Perturbed; neq = " << neq
+                                                                                << ", data.size() = " << data.size()
+                                                                                << ", pert_mag.size() = " << pert_mag.size() << std::endl);
 
   if (data.size() > 0 && pert_mag.size() > 0)
     for (int i = 0; i < neq; i++)

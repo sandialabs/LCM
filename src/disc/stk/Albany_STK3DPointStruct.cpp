@@ -37,7 +37,7 @@ Albany::STK3DPointStruct::STK3DPointStruct(const Teuchos::RCP<Teuchos::Parameter
   this->initializeSideSetMeshStructs(commT);
 }
 
-Albany::STK3DPointStruct::~STK3DPointStruct(){};
+Albany::STK3DPointStruct::~STK3DPointStruct() {};
 
 void
 Albany::STK3DPointStruct::setFieldAndBulkData(

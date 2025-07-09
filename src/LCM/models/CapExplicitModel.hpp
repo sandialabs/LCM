@@ -43,7 +43,7 @@ class CapExplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~CapExplicitModel(){};
+  virtual ~CapExplicitModel() {};
 
   ///
   /// Implementation of physics

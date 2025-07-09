@@ -38,7 +38,7 @@ class MooneyRivlinModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Denstructor
   ///
-  virtual ~MooneyRivlinModel(){};
+  virtual ~MooneyRivlinModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

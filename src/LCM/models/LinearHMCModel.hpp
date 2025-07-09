@@ -38,7 +38,7 @@ class LinearHMCModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~LinearHMCModel(){};
+  virtual ~LinearHMCModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

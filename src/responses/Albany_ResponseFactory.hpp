@@ -28,10 +28,10 @@ class ResponseFactory
       const Teuchos::RCP<Albany::AbstractProblem>&                    problem,
       const Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>& ms,
       const Teuchos::RCP<Albany::StateManager>&                       state_manager)
-      : app(application), prob(problem), meshSpecs(ms), stateMgr(state_manager){};
+      : app(application), prob(problem), meshSpecs(ms), stateMgr(state_manager) {};
 
   //! Destructor
-  virtual ~ResponseFactory(){};
+  virtual ~ResponseFactory() {};
 
   //! Create a set of response functions
   virtual Teuchos::Array<Teuchos::RCP<AbstractResponseFunction>>

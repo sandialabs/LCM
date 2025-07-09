@@ -196,7 +196,7 @@ main(int ac, char* av[])
         mpsFile << "BOUNDS" << endl;
         mpsFile << "ENDATA" << endl;
       }  // End of second part of mps file
-    }    // End of for loop
+    }  // End of for loop
   }
   return 0;
 }

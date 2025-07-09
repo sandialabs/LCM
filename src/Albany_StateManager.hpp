@@ -40,7 +40,7 @@ class StateManager
 
   StateManager();
 
-  ~StateManager(){};
+  ~StateManager() {};
 
   typedef std::map<std::string, Teuchos::RCP<PHX::DataLayout>> RegisteredStates;
 

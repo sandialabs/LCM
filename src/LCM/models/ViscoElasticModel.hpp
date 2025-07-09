@@ -59,8 +59,8 @@ class ViscoElasticModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~ViscoElasticModel(){
-      // empty
+  virtual ~ViscoElasticModel() {
+    // empty
   };
 
   ///

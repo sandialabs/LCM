@@ -32,7 +32,7 @@ class SolutionFileResponseFunction : public SamplingBasedScalarResponseFunction
 
   //! Perform optimization setup
   virtual void
-  postRegSetup(){};
+  postRegSetup() {};
 
   //! Evaluate responses
   virtual void

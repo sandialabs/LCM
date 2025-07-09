@@ -193,8 +193,8 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
                                            refArea(cell, pt);
 
       }  // end integrartion point loop
-    }    //  end plane node loop
-  }      // end cell loop
+    }  //  end plane node loop
+  }  // end cell loop
 
   for (int cell(0); cell < workset.numCells; ++cell) {
     for (int node(0); node < numPlaneNodes; ++node) {

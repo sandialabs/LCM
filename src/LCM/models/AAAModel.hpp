@@ -44,7 +44,7 @@ class AAAModel : public LCM::ConstitutiveModel<EvalT, Traits>
   AAAModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   /// Virtual Destructor
-  virtual ~AAAModel(){};
+  virtual ~AAAModel() {};
 
   /// Method to compute the state
   virtual void

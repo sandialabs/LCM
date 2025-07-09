@@ -49,7 +49,7 @@ class NeohookeanModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~NeohookeanModel(){};
+  virtual ~NeohookeanModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

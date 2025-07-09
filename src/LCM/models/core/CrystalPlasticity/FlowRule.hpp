@@ -205,7 +205,7 @@ struct FlowRuleBase
 class FlowRuleFactory
 {
  public:
-  FlowRuleFactory(){};
+  FlowRuleFactory() {};
 
   template <typename ArgT>
   utility::StaticPointer<FlowRuleBase<ArgT>>

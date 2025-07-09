@@ -215,7 +215,7 @@ PiroObserver::observeResponse(
         storedResponses[i].resize(gsize);
         for (int j = 0; j < gsize; j++) storedResponses[i][j] = Thyra::get_ele(*g, j);
       }  // end if !firstRessponseObtained
-    }    // end of loop over outArgs.Ng()
+    }  // end of loop over outArgs.Ng()
     firstResponseObtained = true;
   }
 }

@@ -46,7 +46,7 @@ class CreepModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Denstructor
   ///
-  virtual ~CreepModel(){};
+  virtual ~CreepModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

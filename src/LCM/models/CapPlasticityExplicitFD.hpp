@@ -43,7 +43,7 @@ class CapPlasticityExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~CapPlasticityExplicitFD(){};
+  virtual ~CapPlasticityExplicitFD() {};
 
   ///
   /// Implementation of physics

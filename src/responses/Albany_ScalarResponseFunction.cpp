@@ -19,9 +19,7 @@ ScalarResponseFunction::responseVectorSpace() const
 Teuchos::RCP<Thyra_LinearOp>
 ScalarResponseFunction::createGradientOp() const
 {
-  ALBANY_ABORT(
-      "Error!  Albany::ScalarResponseFunction::createGradientOpT():  "
-      << "Operator form of dg/dx is not supported for scalar responses.");
+  ALBANY_ABORT("Error!  Albany::ScalarResponseFunction::createGradientOpT():  " << "Operator form of dg/dx is not supported for scalar responses.");
   return Teuchos::null;
 }
 

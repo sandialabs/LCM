@@ -41,7 +41,7 @@ class ElasticDamageModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructorstructor
   ///
-  virtual ~ElasticDamageModel(){};
+  virtual ~ElasticDamageModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

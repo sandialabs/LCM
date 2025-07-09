@@ -247,7 +247,7 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         if (ocean_salinity_eb.size() > 0) {
           ocean_sal = interpolateVectors(time_eb, ocean_salinity_eb, current_time);
         }
-        // --- elyce begin commenting out (8-26-24) ---- 
+        // --- elyce begin commenting out (8-26-24) ----
         // Note: below is being commented out because re: email thread with Jenn, it was decided to actually just take the ocean salinity at the bluff face
         // the below code was *likely* overriden the subsequent line of code, but not necessarily... so I am commenting it out just to be safe
         // ScalarT const sal_diff   = ocean_sal - sal_curr;

@@ -1418,7 +1418,7 @@ MechanicsProblem::constructEvaluators(
       fm0.template registerEvaluator<EvalT>(ev);
 
     }  // end if (have_mech_eq_)
-  }    // end if(surface_element)
+  }  // end if(surface_element)
 
   if (have_mech_eq_) {
     // convert Cauchy stress to first Piola-Kirchhoff

@@ -46,7 +46,7 @@ class NewtonianFluidModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Denstructor
   ///
-  virtual ~NewtonianFluidModel(){};
+  virtual ~NewtonianFluidModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

@@ -20,10 +20,10 @@ class AbstractResponseFunction
 {
  public:
   //! Default constructor
-  AbstractResponseFunction(){};
+  AbstractResponseFunction() {};
 
   //! Destructor
-  virtual ~AbstractResponseFunction(){};
+  virtual ~AbstractResponseFunction() {};
 
   //! Setup response function
   virtual void

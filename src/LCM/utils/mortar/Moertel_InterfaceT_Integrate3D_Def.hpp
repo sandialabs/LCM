@@ -343,7 +343,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, 
                       << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           }
         }  // for (int i=0; i<snlmdof; ++i)
-      }    // for (rowcurr=Drow->begin(); rowcurr!=Drow->end(); ++rowcurr)
+      }  // for (rowcurr=Drow->begin(); rowcurr!=Drow->end(); ++rowcurr)
     }
 
     // assemble the Mrow
@@ -401,7 +401,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, 
                       << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
           }
         }  // for (int i=0; i<snlmdof; ++i)
-      }    // for (rowcurr=Mrow->begin(); rowcurr!=Mrow->end(); ++rowcurr)
+      }  // for (rowcurr=Mrow->begin(); rowcurr!=Mrow->end(); ++rowcurr)
     }
 
     // assemble the Mmod block if there is any
@@ -644,7 +644,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, 
                             << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 }
               }  // for (int k=0; k<nslmdof; ++k)
-            }    // for (int j=0; j<size; ++j)
+            }  // for (int j=0; j<size; ++j)
 
             i += size;
           }
@@ -733,7 +733,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, 
                             << "MoertelT: ***WRN*** file/line: " << __FILE__ << "/" << __LINE__ << "\n";
                 }
               }  // for (int k=0; k<nslmdof; ++k)
-            }    // for (int j=0; j<size; ++j)
+            }  // for (int j=0; j<size; ++j)
 
             i += size;
           }
@@ -741,7 +741,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::Assemble_3D(Tpetra::CrsMatrix<ST, 
           else  // I am not owner of this node, skip it
             i += size;
         }  // for (int i=0; i<countMr;)
-      }    // if (proc!=lComm()->MyPID())
+      }  // if (proc!=lComm()->MyPID())
 
       colD_r.clear();
       valD_r.clear();
@@ -877,7 +877,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
           sel->AssembleNodeVal(row, col, val);
 
         }  // for (int i=0; i<snlmdof; ++i)
-      }    // for (rowcurr=Drow->begin(); rowcurr!=Drow->end(); ++rowcurr)
+      }  // for (rowcurr=Drow->begin(); rowcurr!=Drow->end(); ++rowcurr)
     }
 
     // assemble the Mrow
@@ -888,7 +888,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
 
         if (abs(val) < CONSTRAINT_MATRIX_ZERO) continue;
 
-          // std::cout << "Current colmnode: " << colnode << std::endl;
+        // std::cout << "Current colmnode: " << colnode << std::endl;
 #if defined(PDANDM)  // Save the row, col, and value
         Mmat.insertGlobalValues(curr->second->Id(), 1, &val, &colnode);
 #endif
@@ -936,7 +936,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
              */
 
         }  // for (int i=0; i<snlmdof; ++i)
-      }    // for (rowcurr=Mrow->begin(); rowcurr!=Mrow->end(); ++rowcurr)
+      }  // for (rowcurr=Mrow->begin(); rowcurr!=Mrow->end(); ++rowcurr)
     }
 
     // assemble the Mmod block if there is any
@@ -1186,7 +1186,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
                    */
 
               }  // for (int k=0; k<nslmdof; ++k)
-            }    // for (int j=0; j<size; ++j)
+            }  // for (int j=0; j<size; ++j)
 
             i += size;
           }
@@ -1268,7 +1268,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
                    */
 
               }  // for (int k=0; k<nslmdof; ++k)
-            }    // for (int j=0; j<size; ++j)
+            }  // for (int j=0; j<size; ++j)
 
             i += size;
           }
@@ -1276,7 +1276,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS(InterfaceT)::AssembleResidualVector()
           else  // I am not owner of this node, skip it
             i += size;
         }  // for (int i=0; i<countMr;)
-      }    // if (proc!=lComm()->MyPID())
+      }  // if (proc!=lComm()->MyPID())
 
       colD_r.clear();
       valD_r.clear();

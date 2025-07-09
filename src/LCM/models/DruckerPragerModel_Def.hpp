@@ -244,7 +244,7 @@ DruckerPragerModel<EvalT, Traits>::computeState(typename Traits::EvalData workse
       }
 
     }  // end loop over pt
-  }    //  end loop over cell
+  }  //  end loop over cell
 }
 // all local functions for compute state
 template <typename EvalT, typename Traits>

@@ -40,7 +40,7 @@ class StVenantKirchhoffModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~StVenantKirchhoffModel(){};
+  virtual ~StVenantKirchhoffModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

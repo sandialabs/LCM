@@ -119,8 +119,7 @@ main()
     // Three regions, fuel, clad, and cask
 
     if (rad <= r1) {
-      value =
-          (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) + (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
+      value = (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) + (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
 
     } else if (rad <= r2) {
       value = (T1 - T2) / log(r1 / r2) * log(rad / r2) + T2;
@@ -173,8 +172,7 @@ main()
     // Three regions, fuel, clad, and cask
 
     if (rad <= r1) {
-      value =
-          (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) + (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
+      value = (q / (4.0 * k1)) * (sqr(r1) - sqr(rad)) + (q * sqr(r1) / 2.0) * (log(r2 / r1) / k2 + log(r3 / r2) / k3) + T3;
 
     } else if (rad <= r2) {
       value = (T1 - T2) / log(r1 / r2) * log(rad / r2) + T2;

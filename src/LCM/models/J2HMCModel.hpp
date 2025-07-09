@@ -43,7 +43,7 @@ class J2HMCModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~J2HMCModel(){};
+  virtual ~J2HMCModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

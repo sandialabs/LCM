@@ -42,7 +42,7 @@ class MechanicsProblem : public AbstractProblem
   ///
   /// Destructor
   ///
-  virtual ~MechanicsProblem(){};
+  virtual ~MechanicsProblem() {};
 
   ///
   /// Return number of spatial dimensions

@@ -41,7 +41,7 @@ class RIHMRModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Denstructor
   ///
-  virtual ~RIHMRModel(){};
+  virtual ~RIHMRModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

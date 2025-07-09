@@ -65,7 +65,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   typedef std::map<std::string, int>              MeshScalarIntegerState;
   typedef std::map<std::string, std::vector<int>> MeshVectorIntegerState;
   //! Destructor
-  virtual ~AbstractSTKFieldContainer(){};
+  virtual ~AbstractSTKFieldContainer() {};
 
   virtual void
   addStateStructs(const Teuchos::RCP<Albany::StateInfoStruct>& sis) = 0;

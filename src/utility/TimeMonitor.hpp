@@ -22,7 +22,7 @@ class TimeMonitor : public MonitorBase<Teuchos::Time>
 {
  public:
   TimeMonitor();
-  virtual ~TimeMonitor(){};
+  virtual ~TimeMonitor() {};
 
  protected:
   virtual string

@@ -12,7 +12,7 @@ namespace Albany {
 class NodalDOFManager
 {
  public:
-  NodalDOFManager() : _numComponents(0), _numLocalDOF(0), _numGlobalDOF(0), _interleaved(true){};
+  NodalDOFManager() : _numComponents(0), _numLocalDOF(0), _numGlobalDOF(0), _interleaved(true) {};
 
   void
   setup(int numComponents, LO numLocalDOF, GO numGlobalDOF, bool interleaved = true)

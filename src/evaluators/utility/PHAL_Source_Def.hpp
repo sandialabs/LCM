@@ -24,8 +24,8 @@ template <typename EvalT, typename Traits>
 class Source_Base
 {
  public:
-  Source_Base(){};
-  virtual ~Source_Base(){};
+  Source_Base() {};
+  virtual ~Source_Base() {};
   virtual void
   EvaluatedFields(Source<EvalT, Traits>& source, Teuchos::ParameterList& p) = 0;
   virtual void

@@ -160,6 +160,6 @@ ElasticDamageModel<EvalT, Traits>::computeState(typename Traits::EvalData workse
       }  // compute_tangent_
 
     }  // pt
-  }    // cell
+  }  // cell
 }
 }  // namespace LCM

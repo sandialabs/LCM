@@ -39,7 +39,7 @@ class J2FiberModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Denstructor
   ///
-  virtual ~J2FiberModel(){};
+  virtual ~J2FiberModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

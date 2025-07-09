@@ -285,7 +285,7 @@ IPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
         }
       }
     }  // end cell loop
-  }    // end field loop
+  }  // end field loop
 }
 
 template <typename Traits>

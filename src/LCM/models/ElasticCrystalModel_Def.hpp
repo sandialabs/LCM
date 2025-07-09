@@ -252,9 +252,9 @@ ElasticCrystalModel<EvalT, Traits>::computeState(typename Traits::EvalData works
             for (int l = 0; l < num_dims_; ++l) {
               S(i, j) = S(i, j) + C_(i, j, k, l) * E(k, l);
             }  // end l
-          }    // end k
-        }      // end j
-      }        // end i
+          }  // end k
+        }  // end j
+      }  // end i
 
       // temporal variable
       tmp1        = S * C;
@@ -283,7 +283,7 @@ ElasticCrystalModel<EvalT, Traits>::computeState(typename Traits::EvalData works
       }
 
     }  // end pt
-  }    // end cell
+  }  // end cell
 }
 
 }  // namespace LCM

@@ -214,16 +214,7 @@ typedef long long blas_int;
 extern "C" void
 dgeqrf_(blas_int* m, blas_int* n, double* A, blas_int* lda, double* tau, double* work, blas_int* lwork, blas_int* info);
 extern "C" void
-dorgqr_(
-    blas_int* m,
-    blas_int* n,
-    blas_int* k,
-    double*   A,
-    blas_int* lda,
-    double*   tau,
-    double*   work,
-    blas_int* lwork,
-    blas_int* info);
+dorgqr_(blas_int* m, blas_int* n, blas_int* k, double* A, blas_int* lda, double* tau, double* work, blas_int* lwork, blas_int* info);
 // Wrapper declarations.
 template <typename T>
 void
@@ -234,23 +225,13 @@ orgqr(blas_int m, blas_int n, blas_int k, T* A, blas_int lda, T* tau, T* work, b
 // Specializations.
 template <>
 inline void
-geqrf<
-    double>(blas_int m, blas_int n, double* A, blas_int lda, double* tau, double* work, blas_int lwork, blas_int& info)
+geqrf<double>(blas_int m, blas_int n, double* A, blas_int lda, double* tau, double* work, blas_int lwork, blas_int& info)
 {
   dgeqrf_(&m, &n, A, &lda, tau, work, &lwork, &info);
 }
 template <>
 inline void
-orgqr<double>(
-    blas_int  m,
-    blas_int  n,
-    blas_int  k,
-    double*   A,
-    blas_int  lda,
-    double*   tau,
-    double*   work,
-    blas_int  lwork,
-    blas_int& info)
+orgqr<double>(blas_int m, blas_int n, blas_int k, double* A, blas_int lda, double* tau, double* work, blas_int lwork, blas_int& info)
 {
   dorgqr_(&m, &n, &k, A, &lda, tau, work, &lwork, &info);
 }

@@ -557,7 +557,7 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Clipelements()
         AddPointtoPolygon(10 * clipedge + medge, xi);
       }
     }  // for (int medge=0; medge<3; ++medge)
-  }    // for (int clipedge=0; clipedge<3; ++clipedge)
+  }  // for (int clipedge=0; clipedge<3; ++clipedge)
 
   //===========================================================================
 
@@ -1252,8 +1252,8 @@ MoertelT::MOERTEL_TEMPLATE_CLASS_1A(OverlapT, IFace)::Triangulation()
 
     if (!ok) return false;  // Area of polygon is zero
 
-      // std::cout << "Centroid xi : " << xi[0] << " / " << xi[1] << endl;
-      // fflush(stdout);
+    // std::cout << "Centroid xi : " << xi[0] << " / " << xi[1] << endl;
+    // fflush(stdout);
 #endif
 
 #if 0  // compute center point as nodal avergage

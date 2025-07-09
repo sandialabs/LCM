@@ -73,7 +73,7 @@ class AbstractProblem
       int const neq_ = 0);
 
   //! Destructor
-  virtual ~AbstractProblem(){};
+  virtual ~AbstractProblem() {};
 
   //! Get the number of equations
   unsigned int

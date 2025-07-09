@@ -46,7 +46,7 @@ class DruckerPragerModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~DruckerPragerModel(){};
+  virtual ~DruckerPragerModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

@@ -40,7 +40,7 @@ class TvergaardHutchinsonModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~TvergaardHutchinsonModel(){};
+  virtual ~TvergaardHutchinsonModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

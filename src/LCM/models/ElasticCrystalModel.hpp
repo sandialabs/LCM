@@ -59,8 +59,8 @@ class ElasticCrystalModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~ElasticCrystalModel(){
-      // empty
+  virtual ~ElasticCrystalModel() {
+    // empty
   };
 
   ///

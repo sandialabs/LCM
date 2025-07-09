@@ -123,8 +123,8 @@ SeparableScatterScalarResponse<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFi
           dg_data[res][dof] += val.dx(deriv);
 
         }  // column equations
-      }    // column nodes
-    }      // response
+      }  // column nodes
+    }  // response
 
   }  // cell
 }

@@ -46,7 +46,7 @@ class J2Model : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Denstructor
   ///
-  virtual ~J2Model(){};
+  virtual ~J2Model() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

@@ -55,8 +55,7 @@ Albany::AbstractProblem::AbstractProblem(
     SolutionMethodName   = AerasHyperviscosity;
   } else
     ALBANY_ABORT(
-        "Solution Method must be Steady, Transient, Transient Tempus, "
-        << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : " << solutionMethod);
+        "Solution Method must be Steady, Transient, Transient Tempus, " << "Continuation, Eigensolve, or Aeras Hyperviscosity, not : " << solutionMethod);
 
   // Set the number in the Problem PL
   params->set<int>("Number Of Time Derivatives", number_of_time_deriv);

@@ -37,7 +37,7 @@ class AnisotropicHyperelasticDamageModel : public LCM::ConstitutiveModel<EvalT, 
 
   ///
   /// Virtual Destructor
-  virtual ~AnisotropicHyperelasticDamageModel(){};
+  virtual ~AnisotropicHyperelasticDamageModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

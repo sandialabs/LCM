@@ -56,7 +56,7 @@ class FunctionT
   \param outlevel : Level of output information written to stdout ( 0 - 10 )
   */
 
-  FunctionT(int outlevel) : outputlevel_(outlevel){};
+  FunctionT(int outlevel) : outputlevel_(outlevel) {};
 
   /*!
   \brief Copy-Constructor

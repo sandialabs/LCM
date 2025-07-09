@@ -22,7 +22,7 @@ class CounterMonitor : public MonitorBase<Counter>
 {
  public:
   CounterMonitor();
-  virtual ~CounterMonitor(){};
+  virtual ~CounterMonitor() {};
 
  protected:
   virtual string

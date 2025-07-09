@@ -319,9 +319,7 @@ SchwarzCoupled::SchwarzCoupled(
     bool const matdb_exists = problem_params_m->isType<std::string>("MaterialDB Filename");
 
     if (matdb_exists == false) {
-      ALBANY_ABORT(
-          "Error in CoupledSchwarz! "
-          << "Input file needs to have 'MaterialDB Filename' specified.\n");
+      ALBANY_ABORT("Error in CoupledSchwarz! " << "Input file needs to have 'MaterialDB Filename' specified.\n");
     }
 
     std::string const& matdb_file = problem_params_m->get<std::string>("MaterialDB Filename");

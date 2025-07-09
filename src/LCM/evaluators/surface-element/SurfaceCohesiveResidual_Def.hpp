@@ -94,7 +94,7 @@ SurfaceCohesiveResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData
       force_(cell, top_node, 2) = f_plus(2);
 
     }  // end of planeNode loop
-  }    // end of cell loop
+  }  // end of cell loop
 }
 //*****
 }  // namespace LCM

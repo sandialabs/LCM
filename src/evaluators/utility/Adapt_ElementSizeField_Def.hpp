@@ -259,7 +259,7 @@ ElementSizeField<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename 
         }
       }
     }  // end cell loop
-  }    // end node data if
+  }  // end node data if
 }
 
 template <typename Traits>

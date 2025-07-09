@@ -335,9 +335,7 @@ class ProjectIPtoNodalFieldManager::FullMassLinearOp : public ProjectIPtoNodalFi
           const LO ret = Albany::addToGlobalRowValues(this->linear_op_, global_row, cols(), vals());
           ALBANY_PANIC(ret != 0, "Albany::addToGlobalRowValues failed: global row " << global_row << " of mass matrix is missing elements \n");
         } else {
-          ALBANY_ABORT(
-              "Albany is switching to static graph, so ProjectIPtoNodalField \n"
-              << "response is not supported with dynamic graph!\n");
+          ALBANY_ABORT("Albany is switching to static graph, so ProjectIPtoNodalField \n" << "response is not supported with dynamic graph!\n");
           // IKT, FIXME: does this case need to be implemented?
           Albany::addToGlobalRowValues(this->linear_op_, global_row, cols(), vals());
         }
@@ -371,9 +369,7 @@ class ProjectIPtoNodalFieldManager::LumpedMassLinearOp : public ProjectIPtoNodal
         if (is_static_graph) {
           Albany::addToGlobalRowValues(this->linear_op_, global_row, cols(), vals());
         } else {
-          ALBANY_ABORT(
-              "Albany is switching to static graph, so ProjectIPtoNodalField \n"
-              << "response is not supported with dynamic graph!\n");
+          ALBANY_ABORT("Albany is switching to static graph, so ProjectIPtoNodalField \n" << "response is not supported with dynamic graph!\n");
           // IKT, FIXME: does this case need to be implemented?
           Albany::addToGlobalRowValues(this->linear_op_, global_row, cols, vals);
         }
@@ -563,9 +559,7 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(ty
   mgr_->ovl_graph_factory           = p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getNodalOpFactory();
   mgr_->mass_linear_op->is_static() = true;
   if (Teuchos::is_null(mgr_->ovl_graph_factory)) {
-    ALBANY_ABORT(
-        "Construction of graph on the fly not implemented in \n"
-        << "ProjectIPtoNodalField preEvaluate routine!\n");
+    ALBANY_ABORT("Construction of graph on the fly not implemented in \n" << "ProjectIPtoNodalField preEvaluate routine!\n");
     // IKT, FIXME: implement this case?
     // Otherwise, construct the graph on the fly.
     mgr_->mass_linear_op->is_static() = false;
@@ -628,7 +622,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(const typen
         }
       }
     }  // cell
-  }    // field
+  }  // field
 }
 
 #if defined(PROJ_INTERP_TEST)
@@ -692,9 +686,7 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(t
     // Get overlapping and nonoverlapping maps.
     const Teuchos::RCP<const Thyra_LinearOp>& mm_ovl = mgr_->mass_linear_op->linear_op();
     if (!mgr_->mass_linear_op->is_static()) {
-      ALBANY_ABORT(
-          "Albany is switching to static graph, so ProjectIPtoNodalField \n"
-          << "response is not supported with dynamic graph!\n");
+      ALBANY_ABORT("Albany is switching to static graph, so ProjectIPtoNodalField \n" << "response is not supported with dynamic graph!\n");
       // If this matrix was constructed without a graph, grab the graph now and
       // store it for possible reuse later.
       // IKT, FIXME: does this case need to be implemented?

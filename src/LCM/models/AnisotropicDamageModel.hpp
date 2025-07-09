@@ -41,7 +41,7 @@ class AnisotropicDamageModel : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// Virtual Destructor
   ///
-  virtual ~AnisotropicDamageModel(){};
+  virtual ~AnisotropicDamageModel() {};
 
   ///
   /// Method to compute the state (e.g. energy, stress, tangent)

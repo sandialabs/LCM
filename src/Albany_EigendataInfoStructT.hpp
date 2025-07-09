@@ -15,8 +15,8 @@ namespace Albany {
 
 struct EigendataStructT
 {
-  EigendataStructT(){};
-  ~EigendataStructT(){};
+  EigendataStructT() {};
+  ~EigendataStructT() {};
   EigendataStructT(const EigendataStructT& copy)
   {
     eigenvalueRe  = Teuchos::rcp(new std::vector<double>(*(copy.eigenvalueRe)));

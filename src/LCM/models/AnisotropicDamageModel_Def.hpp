@@ -372,12 +372,12 @@ AnisotropicDamageModel<EvalT, Traits>::computeState(typename Traits::EvalData wo
                 // tangent(cell, pt, i, j, k, l) = tangent_m(i, j, k, l)
                 // + tangent_f1(i, j, k, l) + tangent_f2(i, j, k, l);
               }  // l
-            }    // k
-          }      // j
-        }        // i
-      }          // compute_tangent_
+            }  // k
+          }  // j
+        }  // i
+      }  // compute_tangent_
 
     }  // pt
-  }    // cell
+  }  // cell
 }
 }  // namespace LCM

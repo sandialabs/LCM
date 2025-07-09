@@ -958,15 +958,15 @@ NeumannBase<EvalT, Traits>::calc_ace_press_hydrostatic(
   IRST::vectorNorm(normal_lengths, side_normals, Intrepid2::NORM_TWO);
   IFST::scalarMultiplyDataData(side_normals, normal_lengths, side_normals, true);
 
-  const ScalarT waterH = waterH_val;      // waterH interpolated in time
-  const double  g      = inputValues[1];   // gravitational constant
-  const double  rho    = inputValues[2];   // density
-  const bool dump_wave_press_nbc_data = inputValues[5];
+  const ScalarT waterH                   = waterH_val;      // waterH interpolated in time
+  const double  g                        = inputValues[1];  // gravitational constant
+  const double  rho                      = inputValues[2];  // density
+  const bool    dump_wave_press_nbc_data = inputValues[5];
 
   for (int cell = 0; cell < numCells_; cell++) {
     for (int qp = 0; qp < numPoints; qp++) {
       for (int dim = 0; dim < numDOFsSet; dim++) {
-        const ScalarT pval_qp = rho*g*waterH; 
+        const ScalarT pval_qp           = rho * g * waterH;
         qp_data_returned(cell, qp, dim) = pval_qp * side_normals(cell, qp, dim);
       }
     }
@@ -1056,8 +1056,8 @@ NeumannBase<EvalT, Traits>::calc_ace_press_at_z_point(
   }
   if ((zval <= w + s) && (k < 1)) {
     pval = rho * g * (s - zval) + rho * g * w * cosh(k * zval) / cosh(k * s);
-  } else if ((zval <= w+s) && (k >=1)) {
-    pval = rho * g * (s - zval) + rho * g * w; 
+  } else if ((zval <= w + s) && (k >= 1)) {
+    pval = rho * g * (s - zval) + rho * g * w;
   } else {
     pval = 0.0;
   }
@@ -1127,7 +1127,7 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::E
   auto const has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const ss_id       = this->sideSetID;
   auto const is_erodible = ss_id.find("erodible") != std::string::npos;
-  auto commT             = stk_disc->getComm();
+  auto       commT       = stk_disc->getComm();
   auto const is_parallel = commT->getSize() > 1;
 
 #if defined(DEBUG)
@@ -1214,7 +1214,7 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::E
   auto const has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const ss_id       = this->sideSetID;
   auto const is_erodible = ss_id.find("erodible") != std::string::npos;
-  auto commT             = stk_disc->getComm();
+  auto       commT       = stk_disc->getComm();
   auto const is_parallel = commT->getSize() > 1;
   auto const fill        = f != Teuchos::null;
   auto       f_view      = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
@@ -1262,8 +1262,8 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::E
                 Albany::addToLocalRowValues(jac, row[0], col(), value());
               }
             }  // column equations
-          }    // column nodes
-        }      // has fast access
+          }  // column nodes
+        }  // has fast access
       }
     }
   }

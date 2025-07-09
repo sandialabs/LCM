@@ -96,7 +96,7 @@ class TmplSTKMeshStruct : public GenericSTKMeshStruct
       const Teuchos::RCP<Teuchos::ParameterList>& adaptParams,
       const Teuchos::RCP<Teuchos_Comm const>&     commT);
 
-  ~TmplSTKMeshStruct(){};
+  ~TmplSTKMeshStruct() {};
 
   //! Sets mesh generation parameters
   void

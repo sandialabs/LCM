@@ -275,8 +275,8 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::evaluateFields(typename Traits::Eva
           }
         }
       }  // end integrartion point loop
-    }    //  end plane node loop
-  }      // end cell loop
+    }  //  end plane node loop
+  }  // end cell loop
 
   // Stabilization term (if needed)
 

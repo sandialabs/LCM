@@ -247,7 +247,7 @@ GursonModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepF
         eqps(cell, pt)        = eq;
         void_volume(cell, pt) = fvoid;
 
-      }       // end of plastic loading
+      }  // end of plastic loading
       else {  // elasticity, set state variables to previous values
 
         eqps(cell, pt)        = eqps_old(cell, pt);
@@ -272,7 +272,7 @@ GursonModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepF
       }
 
     }  // end of loop over Gauss points
-  }    // end of loop over cells
+  }  // end of loop over cells
 
 }  // end of compute state
 

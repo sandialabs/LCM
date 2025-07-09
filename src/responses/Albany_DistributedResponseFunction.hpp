@@ -19,14 +19,14 @@ class DistributedResponseFunction : public AbstractResponseFunction
 {
  public:
   //! Default constructor
-  DistributedResponseFunction(){};
+  DistributedResponseFunction() {};
 
   //! Destructor
-  virtual ~DistributedResponseFunction(){};
+  virtual ~DistributedResponseFunction() {};
 
   //! Perform post registration setup (do nothing)
   virtual void
-  postRegSetup(){};
+  postRegSetup() {};
 
   //! Evaluate gradient = dg/dx, dg/dxdot, dg/dp
   virtual void

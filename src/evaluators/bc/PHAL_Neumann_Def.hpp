@@ -1127,6 +1127,8 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::E
   auto const has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const ss_id       = this->sideSetID;
   auto const is_erodible = ss_id.find("erodible") != std::string::npos;
+  auto commT             = stk_disc->getComm();
+  auto const is_parallel = commT->getSize() > 1;
 
 #if defined(DEBUG)
   {
@@ -1172,7 +1174,7 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::E
   // Place it at the appropriate offset into F
   for (auto cell = 0; cell < workset.numCells; ++cell) {
     for (auto node = 0; node < this->numNodes; ++node) {
-      if (has_nbi == true) {
+      if (has_nbi == true && is_parallel == false) {
         auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
         auto const  gid      = node_gids[cell][node] + 1;
         auto const  it       = bi_field.find(gid);
@@ -1212,6 +1214,8 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::E
   auto const has_nbi     = stk_disc->hasNodeBoundaryIndicator();
   auto const ss_id       = this->sideSetID;
   auto const is_erodible = ss_id.find("erodible") != std::string::npos;
+  auto commT             = stk_disc->getComm();
+  auto const is_parallel = commT->getSize() > 1;
   auto const fill        = f != Teuchos::null;
   auto       f_view      = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
 
@@ -1223,7 +1227,7 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::E
 
   for (auto cell = 0; cell < workset.numCells; ++cell) {
     for (auto node = 0; node < this->numNodes; ++node) {
-      if (has_nbi == true) {
+      if (has_nbi == true && is_parallel == false) {
         auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
         auto const  gid      = node_gids[cell][node] + 1;
         auto const  it       = bi_field.find(gid);

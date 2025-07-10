@@ -360,8 +360,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         icurr = 1.0;
       }
 
-      std::min(icurr, 1.0);
-      std::max(icurr, 0.0);
+      icurr = std::min(icurr, 1.0);
+      icurr = std::max(icurr, 0.0);
 
       // Update the water saturation
       ScalarT wcurr = 1.0 - icurr;
@@ -456,8 +456,22 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / thermal_factor_eb;
       }
 
+      // // EJB: temp hack to avoid oscillations of the thermal inertia term for dfdT's that are essentially zero
+      // if (dfdT<0.05){
+      //   dfdT = 0.0;
+      // }
+
+      // if(cell == 2 || cell == 6 || cell == 10 || cell == 14){
+      //   dfdT = 9.0e-3;
+      // }
+
       // Update the material thermal inertia term
       thermal_inertia_(cell, qp) = (density_(cell, qp) * heat_capacity_(cell, qp)) - (ice_density_eb * latent_heat_eb * dfdT);
+      // if(abs(dfdT) > 1.0e-7){
+      //   std::cout << "EJB: cell, qp, thermal_inertia = " << cell << ", " << qp << ", " << thermal_inertia_(cell,qp) << "\n" <<
+      //                 " density* heat_capacity = " << density_(cell, qp) * heat_capacity_(cell, qp) << "\n" <<
+      //                 "theta , dfdT = " << ice_density_eb * latent_heat_eb * dfdT << ", " << dfdT << "\n";
+      // }
       // Return values
       ice_saturation_(cell, qp)   = icurr;
       water_saturation_(cell, qp) = wcurr;

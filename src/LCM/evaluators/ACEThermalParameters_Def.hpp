@@ -26,6 +26,7 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
       bluff_salinity_(p.get<std::string>("ACE_Bluff_Salinity QP Variable Name"), dl->qp_scalar),
       bluff_salinity_read_(p.get<std::string>("ACE_Bluff_SalinityRead QP Variable Name"), dl->qp_scalar),
       ice_saturation_(p.get<std::string>("ACE_Ice_Saturation QP Variable Name"), dl->qp_scalar),
+      freezing_curve_(p.get<std::string>("ACE_Freezing_Curve QP Variable Name"), dl->qp_scalar),
       density_(p.get<std::string>("ACE_Density QP Variable Name"), dl->qp_scalar),
       heat_capacity_(p.get<std::string>("ACE_Heat_Capacity QP Variable Name"), dl->qp_scalar),
       water_saturation_(p.get<std::string>("ACE_Water_Saturation QP Variable Name"), dl->qp_scalar),
@@ -75,6 +76,7 @@ ACEThermalParameters<EvalT, Traits>::ACEThermalParameters(Teuchos::ParameterList
   this->addEvaluatedField(thermal_inertia_);
   this->addEvaluatedField(bluff_salinity_);
   this->addEvaluatedField(ice_saturation_);
+  this->addEvaluatedField(freezing_curve_);
   this->addEvaluatedField(density_);
   this->addEvaluatedField(heat_capacity_);
   this->addEvaluatedField(water_saturation_);
@@ -95,6 +97,7 @@ ACEThermalParameters<EvalT, Traits>::postRegistrationSetup(typename Traits::Setu
   this->utils.setFieldData(bluff_salinity_, fm);
   this->utils.setFieldData(bluff_salinity_read_, fm);
   this->utils.setFieldData(ice_saturation_, fm);
+  this->utils.setFieldData(freezing_curve_, fm);
   this->utils.setFieldData(density_, fm);
   this->utils.setFieldData(heat_capacity_, fm);
   this->utils.setFieldData(water_saturation_, fm);
@@ -322,38 +325,16 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
 
       Tdiff = Tcurr - (Tmelt + Tshift);
 
-      ScalarT const r_max  = 1.7e308;  // This is the max double that can be represented in C++ w/o overflow
-      ScalarT const tol_bt = 709.0;
-      // IKT 2/4/2025: Please see ace_thermal_param_upper_bound_to_prevent_nans.pdf in
-      // the arctic_coastal_erosion repo for a derivation of the following tolerance.
-      // It is calcutated such that d^2f/dT^2 does not overflow.  This value comes up in the derivatives
-      // of qebt, which are used to calculate the stiffness matrix for the problem.
-      ScalarT const d        = 1.0 / 0.1 + 2.0;
-      ScalarT const tol_qebt = pow(r_max, 1.0 / d) - C;
-      // std::cout << "IKT r_max, v, d, 1/d, tol_qebt = " << r_max << ", " << v << ", " << d << ", "
-      //           << 1.0/d << ", " << tol_qebt << "\n";
-      ScalarT const bt = -B * Tdiff;
+      // IKT 7/11/2025: Please see ace_thermal_param_upper_bound_to_prevent_nans.pdf in
+      // the arctic_coastal_erosion repo for a derivation showing that with the current freezing curve
+      // expression and relevant parameters, safeguards are no longer needed to prevent overflow in
+      // computing icurr and dfdT, as well as their derivatives.
 
-      if (bt < -tol_bt) {
-        dfdT  = 0.0;
-        icurr = 0.0;
-      } else if (bt > tol_bt) {
-        dfdT  = 0.0;
-        icurr = 1.0;
-      } else {
-        ScalarT const qebt = Q * std::exp(bt);
-        auto const    eps  = minitensor::machine_epsilon<RealType>();
-        if (qebt < eps) {  // (C + qebt) ~ C :: occurs when totally melted
-          dfdT  = 0.0;
-          icurr = 0.0;
-        } else if (qebt > tol_qebt) {  // (C + qebt) ~ qebt :: occurs in deep frozen state
-          dfdT  = 0.0;
-          icurr = 1.0;
-        } else {  // occurs when near melting temperature
-          dfdT  = -1.0 * ((B * Q * (G - A)) * pow(C + qebt, -1.0 / v) * (qebt / Q)) / (v * (C + qebt));
-          icurr = 1.0 - (A + ((G - A) / (pow(C + qebt, 1.0 / v))));
-        }
-      }
+      ScalarT const bt = -B * Tdiff;
+      ScalarT const qebt = Q * std::exp(bt);
+
+      dfdT = -((B * (G - A)) * std::pow(C + qebt, -1.0 / v - 1.0) * (qebt )) / v;
+      icurr = 1.0 - (A + ((G - A) * (std::pow(C + qebt, -1.0 / v))));
 
       if (snow_given == true) {
         dfdT  = 0.0;
@@ -444,9 +425,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         snow_K                          = snow_K * (dZ / snow_depth);
         snow_K                          = std::min(snow_K, 15.0);  // [W/K/m] // don't let it go above 15
         thermal_conductivity_(cell, qp) = snow_K;                  // std::min(snow_K, 15.0);  // [W/K/m]
-
-        // Elyce debugging:
-        // std::cout << "\n snow_depth = " << snow_depth << " , dZ = " << dZ << "snow_K = " << snow_K << ", thermal_cond = " << thermal_conductivity_(cell, qp);
       }
 
       // Jenn's sub-grid scale model to calibrate niche formation follows.
@@ -456,25 +434,13 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         heat_capacity_(cell, qp)        = heat_capacity_(cell, qp) / thermal_factor_eb;
       }
 
-      // // EJB: temp hack to avoid oscillations of the thermal inertia term for dfdT's that are essentially zero
-      // if (dfdT<0.05){
-      //   dfdT = 0.0;
-      // }
-
-      // if(cell == 2 || cell == 6 || cell == 10 || cell == 14){
-      //   dfdT = 9.0e-3;
-      // }
-
       // Update the material thermal inertia term
       thermal_inertia_(cell, qp) = (density_(cell, qp) * heat_capacity_(cell, qp)) - (ice_density_eb * latent_heat_eb * dfdT);
-      // if(abs(dfdT) > 1.0e-7){
-      //   std::cout << "EJB: cell, qp, thermal_inertia = " << cell << ", " << qp << ", " << thermal_inertia_(cell,qp) << "\n" <<
-      //                 " density* heat_capacity = " << density_(cell, qp) * heat_capacity_(cell, qp) << "\n" <<
-      //                 "theta , dfdT = " << ice_density_eb * latent_heat_eb * dfdT << ", " << dfdT << "\n";
-      // }
+
       // Return values
       ice_saturation_(cell, qp)   = icurr;
       water_saturation_(cell, qp) = wcurr;
+      freezing_curve_(cell, qp) = dfdT;
     }
   }
   // Calculate thermal conductivity gradient at nodes using thermal conductivity and wgradbf

@@ -58,6 +58,7 @@ class ACEThermalParameters : public PHX::EvaluatorWithBaseImpl<Traits>, public P
   PHX::MDField<ScalarT, Cell, QuadPoint>                      bluff_salinity_;
   PHX::MDField<const ScalarT, Cell, QuadPoint>                bluff_salinity_read_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                      ice_saturation_;
+  PHX::MDField<ScalarT, Cell, QuadPoint>                      freezing_curve_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                      density_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                      heat_capacity_;
   PHX::MDField<ScalarT, Cell, QuadPoint>                      water_saturation_;

@@ -268,6 +268,7 @@ Albany::ACEThermalProblem::constructEvaluators(
     p->set<double>("Current Time", current_time);
     p->set<string>("ACE_Bluff_SalinityRead QP Variable Name", "ACE_Bluff_SalinityRead");
     p->set<string>("ACE_Ice_Saturation QP Variable Name", "ACE_Ice_Saturation");
+    p->set<string>("ACE_Freezing_Curve QP Variable Name", "ACE_Freezing_Curve");
     p->set<string>("ACE_Density QP Variable Name", "ACE_Density");
     p->set<string>("ACE_Heat_Capacity QP Variable Name", "ACE_Heat_Capacity");
     p->set<string>("ACE_Water_Saturation QP Variable Name", "ACE_Water_Saturation");
@@ -320,6 +321,21 @@ Albany::ACEThermalProblem::constructEvaluators(
 
       if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0)) fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
     }
+    // Save ACE_Freezing_Curve to the output Exodus file
+    {
+      std::string stateName = "ACE_Freezing_Curve";
+      entity                = Albany::StateStruct::QuadPoint;
+      p                     = state_mgr.registerStateVariable(stateName, dl_->qp_scalar, mesh_specs.ebName, true, &entity, "");
+      p->set<std::string>("Field Name", "ACE_Freezing_Curve");
+      p->set("Field Layout", dl_->qp_scalar);
+      p->set<bool>("Nodal State", false);
+
+      ev = rcp(new PHAL::SaveStateField<EvalT, AlbanyTraits>(*p));
+      fm0.template registerEvaluator<EvalT>(ev);
+
+      if ((field_manager_choice == Albany::BUILD_RESID_FM) && (ev->evaluatedFields().size() > 0)) fm0.template requireField<EvalT>(*ev->evaluatedFields()[0]);
+    }
+
     // Save ACE_Density to the output Exodus file
     {
       std::string stateName = "ACE_Density";

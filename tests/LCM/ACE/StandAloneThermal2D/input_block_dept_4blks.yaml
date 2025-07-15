@@ -7,13 +7,13 @@ ALBANY:
     Solution Method: Transient Tempus
     MaterialDB Filename: materials_4blks.yaml
     Dirichlet BCs: 
-      ExpressionEvaluated SDBC on NS top_right for DOF T: '200.0 + 5.0e-04 * t'
-      ExpressionEvaluated SDBC on NS top_left for DOF T: '200.0 + 5.0e-04 * t'
+      ExpressionEvaluated SDBC on NS top_right for DOF T: '250.0 + 5.0e-04 * t'
+      ExpressionEvaluated SDBC on NS top_left for DOF T: '250.0 + 5.0e-04 * t'
       #ExpressionEvaluated SDBC on NS top_right for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
       #ExpressionEvaluated SDBC on NS top_left for DOF T: '250.0 *cosh(5.421312110550360e-02) * exp(0.0015*0.0015*t)'
     Initial Condition:
       Function: Expression Parser
-      Function Expressions: ['200']
+      Function Expressions: ['250.0']
       #Function Expressions: ['250 * cosh(5.421312110550360e-02*x)']
     Response Functions:
       Number: 2
@@ -46,7 +46,7 @@ ALBANY:
     Workset Size: -1
   Regression Results: 
     Number of Comparisons: 5
-    Test Values: [0.0, 0.0, 0.0, 0.0, 2.141984159658e+02]
+    Test Values: [0.0, 0.0, 0.0, 0.0, 2.625330479563e+02]
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
   Piro: 

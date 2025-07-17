@@ -328,7 +328,13 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       // IKT 7/11/2025: Please see ace_thermal_param_upper_bound_to_prevent_nans.pdf in
       // the arctic_coastal_erosion repo for a derivation showing that with the current freezing curve
       // expression and relevant parameters, safeguards are no longer needed to prevent overflow in
-      // computing icurr and dfdT, as well as their derivatives.
+      // computing icurr and dfdT, as well as their derivatives, provided 
+      // Tcurr > Tmelt - 1/B*ln(r_max) + Tshift, where r_max = 1.7977e308 
+      // is the largest real (double) value that can be represented in C++.
+      // We throw an error if T is below this value to prevent user error.
+      if (Tcurr <= Tmelt - 1/B*std::log(std::numeric_limits<double>::max()) + Tshift) {
+        ALBANY_ABORT("\nError!  A temperature value that will lead to numerical overlfow has been detected in ACE::ThermalParameters.  Aborting.\n"); 
+      }
 
       ScalarT const bt = -B * Tdiff;
       ScalarT const qebt = Q * std::exp(bt);

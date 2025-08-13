@@ -1,5 +1,5 @@
 group, site, buildname 
-Nightly, algol.ca.sandia.gov, algol.ca.sandia.gov-trilinos
-Nightly, algol.ca.sandia.gov, algol.ca.sandia.gov-lcm
-Nightly, proxima.ca.sandia.gov, proxima.ca.sandia.gov-trilinos
-Nightly, proxima.ca.sandia.gov, proxima.ca.sandia.gov-lcm
+Nightly, rigel, rigel-trilinos-clang-release
+Nightly, rigel, rigel-trilinos-gcc-release
+Nightly, rigel, rigel-lcm-clang-release
+Nightly, rigel, rigel-lcm-gcc-release

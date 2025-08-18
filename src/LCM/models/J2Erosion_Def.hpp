@@ -301,30 +301,34 @@ template <typename T>
 T
 E_fit_max(T x, RealType y)
 {
-  // Wed 09/21/2022 w/ BCs
-  // x = ice saturation;   y = porosity
-  // return (-6.4724 - 6.50845 * y - 52.9043 * x + 345.809 * y * x) / (279.9238);
+  // UPDATE 3-5-25: changing fit to be the one derived from using purely experimental values, 
+  // instead of one using *simulated recreations* of the experiments
+  // x = ice saturation;   y = porosity 
+  // EM_fit = -24.6901 + -167.6662*x + -25.9496*y + 819.0673*x*y 
 
-  // x = ice saturation;   y = porosity
-  // Elyce 7/9/24 --> output from matlab script doing bilinear fit with four bound points, with EM (1,1) = 1000 MPa as theoretical bounding point
-  // EM_fit = -28.1630 + -174.6019*x + -29.4031*y + 813.5743*x*y
+  // -Overall R2: 0.5869 
+  // -Expt pt R2: -32.3787 
+  // -Bound pt R2: 0.7339 
+  // -->Max val = 600.7614 MPa 
 
-  // -Overall R2: 0.5485
-  // -Expt pt R2: -8.3751
-  // -Bound pt R2: 0.7061
-  // -->Max val = 581.4063 MPa
-
-  return (-28.1630 + -174.6019 * x + -29.4031 * y + 813.5743 * x * y) / (581.4063);
-  // Note: to recover the correct fit, the elastic modulus in the input deck should be specified as 581.4063 MPa or 581.4063e6 Pa
+  return (-24.6901 + -167.6662*x + -25.9496*y + 819.0673*x*y) / (600.7614); 
 }
 
 template <typename T>
 T
 Y_fit_max(T const x, RealType const y)
 {
-  // Wed 09/21/2022 w/ BCs
-  // x = ice saturation;   y = porosity
-  return (-4.374e-02 - 4.337e-02 * y - 3.610e-01 * x + 4.639 * y * x) / (4.19089);
+  // UPDATE 3-5-25: changing fit to be the one derived from using purely experimental values, 
+  // instead of one using *simulated recreations* of the experiments
+
+  // // x = ice saturation;   y = porosity 
+  // Y_fit = -0.0419 + -0.2972*x + -0.0418*y + 4.7013*x*y 
+
+  // -Overall R2: 0.9175 
+  // -Expt pt R2: -0.0225 
+  // -Bound pt R2: 0.9688 
+  // -->Max val = 4.3204 MPa 
+  return (-0.0419*y  + -0.2972*x + -0.0418*y + 4.7013*x*y) / (4.3204);
 }
 
 template <typename T>

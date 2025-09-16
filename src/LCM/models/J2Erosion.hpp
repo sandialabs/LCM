@@ -103,6 +103,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType SL_weakening_factor_{1.0};
   RealType tensile_strength_{0.0};
   RealType strain_limit_{0.0};
+  RealType ice_saturation_material_fit_truncation_{0.0};
 
   RealType maximum_displacement_{0.0};
   bool     disable_erosion_{false};  // By default erosion is ON so not disabled

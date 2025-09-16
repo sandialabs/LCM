@@ -332,15 +332,37 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
       // Tcurr > Tmelt - 1/B*ln(r_max) + Tshift, where r_max = 1.7977e308 
       // is the largest real (double) value that can be represented in C++.
       // We throw an error if T is below this value to prevent user error.
-      if (Tcurr <= Tmelt - 1/B*std::log(std::numeric_limits<double>::max()) + Tshift) {
-        ALBANY_ABORT("\nError!  A temperature value that will lead to numerical overlfow has been detected in ACE::ThermalParameters.  Aborting.\n"); 
-      }
+
 
       ScalarT const bt = -B * Tdiff;
       ScalarT const qebt = Q * std::exp(bt);
 
       dfdT = -((B * (G - A)) * std::pow(C + qebt, -1.0 / v - 1.0) * (qebt )) / v;
       icurr = 1.0 - (A + ((G - A) * (std::pow(C + qebt, -1.0 / v))));
+
+
+      if (Tcurr <= Tmelt - 1/B*std::log(std::numeric_limits<double>::max()) + Tshift) {
+        RealType const x_ = Sacado::Value<ScalarT>::eval(coord_vec_(cell, qp, 0));
+        RealType const y_ = Sacado::Value<ScalarT>::eval(coord_vec_(cell, qp, 1));
+        RealType const z_ = Sacado::Value<ScalarT>::eval(coord_vec_(cell, qp, 2));
+        std::cout << "(!!!) WARNING: EJB: temperature overflow in ACEThermalParameters_Def.hpp at (x,y,z) = (" << x_ << ", " << y_ << ", " << z_ << ")" << 
+                     ": Tcurr = " << Tcurr << 
+                     ", " << "Tmelt = " << Tmelt << ", Tshift = " << Tshift << 
+                     "1/B * ln(r_max) = " << 1/B*std::log(std::numeric_limits<double>::max()) << 
+                     "\n" << 
+                     " would create ice saturation = " << icurr << 
+                     " and dfdT = " << dfdT <<  
+                     "\n --> Changing calculation of ice saturation and dfdT to use min allowable Tcurr = " << Tmelt - 1/B*std::log(std::numeric_limits<double>::max()) + Tshift + 1.0e-3 << "\n" << std::endl;
+        
+        ScalarT const Tcurr_min_allowed = Tmelt - 1/B*std::log(std::numeric_limits<double>::max()) + Tshift + 1.0e-3;           
+        // ALBANY_ABORT("\nError!  A temperature value that will lead to numerical overflow has been detected in ACE::ThermalParameters.  Aborting.\n"); 
+        ScalarT const Tdiff_new = Tcurr_min_allowed - (Tmelt + Tshift);
+        ScalarT const bt_new = -B * Tdiff;
+        ScalarT const qebt_new = Q * std::exp(bt_new);
+        
+        dfdT = -((B * (G - A)) * std::pow(C + qebt_new, -1.0 / v - 1.0) * (qebt_new )) / v;
+        icurr = 1.0 - (A + ((G - A) * (std::pow(C + qebt_new, -1.0 / v))));
+      }
 
       if (snow_given == true) {
         dfdT  = 0.0;

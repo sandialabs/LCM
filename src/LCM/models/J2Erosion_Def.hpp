@@ -24,6 +24,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   residual_elastic_modulus_ = p->get<RealType>("ACE Residual Elastic Modulus", 0.0);
   critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
+  ice_saturation_material_fit_truncation_ = p->get<RealType>("ACE Material Fit Truncation Ice Saturation", 0.0);
   disable_erosion_          = p->get<bool>("Disable Erosion", false);
 
   if (p->isParameter("ACE Strain Limit")) {
@@ -428,6 +429,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   Y = std::max(Y, 0.0);
   E = std::max(E, 0.0);
+
+  if (ice_saturation < ice_saturation_material_fit_truncation_){
+    E = residual_elastic_modulus_;
+    Y = soil_yield_strength_;
+  }
 
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);

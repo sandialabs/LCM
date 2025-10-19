@@ -74,18 +74,18 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_hs_wave_press_nbc_gold.e-s.6
                ${CMAKE_CURRENT_BINARY_DIR}/thermal_hs_wave_press_nbc_gold.e-s.6 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_hs_wave_press_nbc_gold.e-s.6
                ${CMAKE_CURRENT_BINARY_DIR}/mechanical_hs_wave_press_nbc_gold.e-s.6 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.71
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.71 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_piro_noerosion_gold.e-s.71
                ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_piro_noerosion_gold.e-s.71 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.71.4.0
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.71.4.0 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.71.4.1
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.71.4.1 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.71.4.2
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.71.4.2 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.71.4.3
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.71.4.3 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143.4.0
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143.4.0 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143.4.1
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143.4.1 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143.4.2
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143.4.2 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143.4.3
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143.4.3 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.0
                ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.0 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.1
@@ -94,18 +94,18 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_g
                ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.2 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.3
                ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.3 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.71
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.71 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_piro_noerosion_gold.e-s.71
                ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_piro_noerosion_gold.e-s.71 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.71.4.0
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.71.4.0 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.71.4.1
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.71.4.1 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.71.4.2
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.71.4.2 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.71.4.3
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.71.4.3 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143.4.0
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143.4.0 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143.4.1
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143.4.1 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143.4.2
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143.4.2 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143.4.3
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143.4.3 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.0
                ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.0 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.1
@@ -160,10 +160,10 @@ add_test(
 set_tests_properties(ACE_${testName}_HydrostaticWavePressNBC_Serial PROPERTIES LABELS "LCM;Tpetra;Forward")
 
 #Serial test - denudation with erosion
-set(OUTFILE1 "thermal_denudation.e-s.71")
-set(REF_FILE1 "thermal_denudation_gold.e-s.71")
-set(OUTFILE2 "mechanical_denudation.e-s.71")
-set(REF_FILE2 "mechanical_denudation_gold.e-s.71")
+set(OUTFILE1 "thermal_denudation.e-s.143")
+set(REF_FILE1 "thermal_denudation_gold.e-s.143")
+set(OUTFILE2 "mechanical_denudation.e-s.143")
+set(REF_FILE2 "mechanical_denudation_gold.e-s.143")
 set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake)
 add_test(
 NAME ACE_${testName}_Denudation_Serial

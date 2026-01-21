@@ -1,0 +1,113 @@
+ALBANY:
+
+  Debug Output: 
+    Write Jacobian to MatrixMarket: 0
+    Write Residual to MatrixMarket: 0
+    Write Solution to MatrixMarket: 0
+    
+  Problem: 
+    Name: ACE Thermal 3D
+    Solution Method: Transient Tempus
+    MaterialDB Filename: './materials_thermal_new_wave_press_nbc.yaml'
+    
+    Dirichlet BCs:
+      Time Dependent SDBC on NS z+ for DOF T:
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp2.txt'
+      Time Dependent SDBC on NS interval4-erodible for DOF T:
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp2.txt'
+      Time Dependent SDBC on NS interval3-erodible for DOF T:
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp2.txt'
+      Time Dependent SDBC on NS interval2-erodible for DOF T:
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp2.txt'
+      Time Dependent SDBC on NS interval1-erodible for DOF T:
+        Time File: 'bcs/TimeHis_ExSec3600_2018MINI.txt'
+        BC File: 'bcs/Ablufftemp2.txt'
+    
+    Neumann BCs:
+      Time Dependent NBC on SS bottom for DOF T set dudn:
+        Number of points: 2
+        Time Values: [0.0, 360001.0]
+        BC Values: [[8.0e-02], [8.0e-02]] # [W/m2] geothermal heat flu
+    
+    Initial Condition:
+      Function: Constant
+      Function Data: [272.0]
+
+    Adaptation:
+      Method: Erosion
+      Rebalance: true
+      Equilibrate: false
+      Rename Exodus Output: false
+    
+    Response Functions:
+      Number: 2
+      Response 0: Project IP to Nodal Field
+      ResponseParams 0:
+        Number of Fields: 8
+        IP Field Name 0: ACE_Bluff_Salinity
+        IP Field Layout 0: Scalar
+        IP Field Name 1: ACE_Ice_Saturation
+        IP Field Layout 1: Scalar
+        IP Field Name 2: ACE_Density
+        IP Field Layout 2: Scalar
+        IP Field Name 3: ACE_Heat_Capacity
+        IP Field Layout 3: Scalar
+        IP Field Name 4: ACE_Therm_Cond
+        IP Field Layout 4: Scalar
+        IP Field Name 5: ACE_Thermal_Inertia
+        IP Field Layout 5: Scalar
+        IP Field Name 6: ACE_Water_Saturation
+        IP Field Layout 6: Scalar
+        IP Field Name 7: ACE_Porosity
+        IP Field Layout 7: Scalar
+        Output to File: true
+      Response 1: Solution Average
+      
+  Discretization: 
+    Method: Ioss
+    Exodus Input File Name: 'grid/cuboid_wave_press_nbc.g'
+    Exodus Output File Name: './thermal_hs_wave_press_nbc.e'
+    Separate Evaluators by Element Block: true
+    Workset Size: -1
+    Disable Exodus Output Initial Time: true
+    Required Fields Info:
+      Number Of Fields: 2
+      Field 0:
+        Field Name: cell_boundary_indicator
+        Field Type: Elem Scalar
+        Field Origin: Mesh
+      Field 1:
+        Field Name: node_boundary_indicator
+        Field Type: Node Scalar
+        Field Origin: Mesh
+    
+  Piro: 
+    Tempus: 
+      Integrator Name: Tempus Integrator
+      #Invert Mass Matrix: true
+      Lump Mass Matrix: true
+      Tempus Integrator: 
+        Integrator Type: Integrator Basic
+        Screen Output Index List: '1'
+        Screen Output Index Interval: 100
+        Stepper Name: Tempus Stepper
+        Solution History: 
+          Storage Type: Unlimited
+          Storage Limit: 20
+        Time Step Control: 
+          Initial Time Index: 0
+          Final Time Index: 10000000
+          Maximum Absolute Error: 1.00000000000000002e-08
+          Maximum Relative Error: 1.00000000000000002e-08
+          Output Time List: ''
+          Output Index List: ''
+          #Output Time Interval: 1.00000000000000000e+01
+          Output Index Interval: 1000
+          Maximum Number of Stepper Failures: 10
+          Maximum Number of Consecutive Stepper Failures: 5
+      Tempus Stepper: 
+        Stepper Type: Forward Euler

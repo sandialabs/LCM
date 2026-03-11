@@ -6,25 +6,82 @@ LCM:
     CapExplicit:
       Material Model:
         Model Name: Cap Explicit
-      Strain Flag: true #Tell code that doing small strain regime
-      Elastic Modulus:
-        Elastic Modulus Type: Constant
-        Value: 22547.00000000
-      Poissons Ratio:
-        Poissons Ratio Type: Constant
-        Value: 0.25240000
-      A: 689.20000000
-      B: 0.00039400
-      C: 675.20000000
-      theta: 0.00000000e+00
-      R: 28.00000000
-      kappa0: -8.05000000e+00
-      W: 0.08000000
-      D1: 0.00147000
-      D2: 0.00000000e+00
-      calpha: 100000.00000000
-      psi: 1.00000000
-      N: 6.00000000
-      L: 0.00039400
-      phi: 0.00000000e+00
-      Q: 28.00000000
+      Strain Flag: true
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
+      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
+      A: 689.2
+      B: 0.000394
+      C: 675.2
+      theta: 0.0
+      R: 28.0
+      kappa0: -8.05
+      W: 0.08
+      D1: 0.00147
+      D2: 0.0
+      calpha: 100000.0
+      psi: 1.0
+      N: 6.0
+      L: 0.000394
+      phi: 0.0
+      Q: 28.0
+    CapImplicit:
+      Material Model:
+        Model Name: Cap Implicit
+      Strain Flag: true
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
+      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
+      A: 689.2
+      B: 0.000394
+      C: 675.2
+      theta: 0.0
+      R: 28.0
+      kappa0: -8.05
+      W: 0.08
+      D1: 0.00147
+      D2: 0.0
+      calpha: 100000.0
+      psi: 1.0
+      N: 6.0
+      L: 0.000394
+      phi: 0.0
+      Q: 28.0
+    CapExplicitFD:
+      Material Model:
+        Model Name: Cap Explicit FD
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
+      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
+      A: 689.2
+      B: 0.000394
+      C: 675.2
+      theta: 0.0
+      R: 28.0
+      kappa0: -8.05
+      W: 0.08
+      D1: 0.00147
+      D2: 0.0
+      calpha: 100000.0
+      psi: 1.0
+      N: 6.0
+      L: 0.000394
+      phi: 0.0
+      Q: 28.0
+    CapImplicitFD:
+      Material Model:
+        Model Name: Cap Implicit FD
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
+      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
+      A: 689.2
+      B: 0.000394
+      C: 675.2
+      theta: 0.0
+      R: 28.0
+      kappa0: -8.05
+      W: 0.08
+      D1: 0.00147
+      D2: 0.0
+      calpha: 100000.0
+      psi: 1.0
+      N: 6.0
+      L: 0.000394
+      phi: 0.0
+      Q: 28.0

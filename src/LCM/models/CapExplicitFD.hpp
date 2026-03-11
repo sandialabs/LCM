@@ -1,8 +1,9 @@
 // Albany 3.0: Copyright 2016 National Technology & Engineering Solutions of
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
-#if !defined(CapPlasticityExplicitFD_hpp)
-#define CapPlasticityExplicitFD_hpp
+
+#if !defined(CapExplicitFD_hpp)
+#define CapExplicitFD_hpp
 
 #include <MiniTensor.h>
 
@@ -14,13 +15,15 @@
 #include "Phalanx_config.hpp"
 
 namespace LCM {
-/// CapPlasticityExplicitFD stress response
+/// \brief CapPlasticity finite deformation stress response
 ///
-/// This evaluator computes stress based on a cap plasticity model.
+/// This evaluator computes stress based on a cap plasticity model
+/// extended to the finite deformation regime using Technique A
+/// (Logarithmic Strain-based Plasticity).
 ///
 
 template <typename EvalT, typename Traits>
-class CapPlasticityExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
+class CapExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
 {
  public:
   using Base        = LCM::ConstitutiveModel<EvalT, Traits>;
@@ -34,16 +37,20 @@ class CapPlasticityExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
   using ConstitutiveModel<EvalT, Traits>::num_dims_;
   using ConstitutiveModel<EvalT, Traits>::num_pts_;
   using ConstitutiveModel<EvalT, Traits>::field_name_map_;
+  using ConstitutiveModel<EvalT, Traits>::have_temperature_;
+  using ConstitutiveModel<EvalT, Traits>::ref_temperature_;
+  using ConstitutiveModel<EvalT, Traits>::expansion_coeff_;
+  using ConstitutiveModel<EvalT, Traits>::temperature_;
 
   ///
   /// Constructor
   ///
-  CapPlasticityExplicitFD(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
+  CapExplicitFD(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
   ///
   /// Virtual Destructor
   ///
-  virtual ~CapPlasticityExplicitFD() {};
+  virtual ~CapExplicitFD() {};
 
   ///
   /// Implementation of physics
@@ -60,13 +67,13 @@ class CapPlasticityExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
   ///
   /// No copy constructor
   ///
-  CapPlasticityExplicitFD(const CapPlasticityExplicitFD&) = delete;
+  CapExplicitFD(const CapExplicitFD&) = delete;
 
   ///
   /// No copy assignment
   ///
-  CapPlasticityExplicitFD&
-  operator=(const CapPlasticityExplicitFD&) = delete;
+  CapExplicitFD&
+  operator=(const CapExplicitFD&) = delete;
 
  private:
   ///
@@ -112,19 +119,16 @@ class CapPlasticityExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
   RealType phi;
   RealType Q;
 
-  std::string strainName, stressName;
-  std::string backStressName, capParameterName, eqpsName, volPlasticStrainName;
-
   ///
   /// Tensors for local computations
   ///
   minitensor::Tensor4<ScalarT> Celastic, compliance, id1, id2, id3;
   minitensor::Tensor<ScalarT>  I;
-  minitensor::Tensor<ScalarT>  depsilon, sigmaN, strainN, sigmaVal, alphaVal;
+  minitensor::Tensor<ScalarT>  sigmaN, sigmaVal, alphaVal;
   minitensor::Tensor<ScalarT>  deps_plastic, sigmaTr, alphaTr;
   minitensor::Tensor<ScalarT>  dfdsigma, dgdsigma, dfdalpha, halpha;
   minitensor::Tensor<ScalarT>  dfdotCe, sigmaK, alphaK, dsigma, dev_plastic;
-  minitensor::Tensor<ScalarT>  xi, sN, s, strainCurrent;
+  minitensor::Tensor<ScalarT>  xi, sN, s;
   minitensor::Tensor<ScalarT>  dJ3dsigma, eps_dev;
 };
 }  // namespace LCM

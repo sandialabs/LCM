@@ -1,0 +1,10 @@
+Input FEM file                   = cuboid_01.gold.e
+LB file                          = cuboid_01.gold.e.nem
+Parallel Results File Base Name  = cuboid_01.gold
+File Extension for Spread Files  = .e
+Number of Processors             = 4 
+------------------------------------------------------------
+                Parallel I/O section
+------------------------------------------------------------
+Parallel Disk Info= number=1, offset=1, zeros, nosubdirectory
+Parallel file location = root=/home/amota/LCM/LCM/tests/LCM/Schwarz/Alternating/Dynamics/CubesInelastic/, subdir=.

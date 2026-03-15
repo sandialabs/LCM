@@ -1,0 +1,10 @@
+Input FEM file                   = mechanical_gold.e-s.23
+LB file                          = mechanical_gold.e-s.23.nem
+Parallel Results File Base Name  = mechanical_gold.e-s
+File Extension for Spread Files  = .23
+Number of Processors             = 4 
+------------------------------------------------------------
+                Parallel I/O section
+------------------------------------------------------------
+Parallel Disk Info= number=1, offset=1, zeros, nosubdirectory
+Parallel file location = root=/home/amota/LCM/LCM/tests/LCM/ACI-NH/cuboid/, subdir=.

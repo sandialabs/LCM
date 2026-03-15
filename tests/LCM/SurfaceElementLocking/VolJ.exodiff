@@ -31,9 +31,9 @@ NODAL VARIABLES relative 1.e-6 floor 0.0
 	DISP_1  # min:             0.3 @ t1,n1	max:             0.3 @ t1,n1
 	DISP_2  # min:               0 @ t1,n1	max:               0 @ t1,n1
 	DISP_3  # min:           0.375 @ t1,n1	max:           0.375 @ t1,n1
-	FINT_X  # min:       21.190608 @ t1,n2	max:       461.43483 @ t1,n1
-	FINT_Y  # min:       10787.393 @ t1,n1	max:        22752.82 @ t1,n3
-	FINT_Z  # min:       36.940577 @ t1,n4	max:       497.40888 @ t1,n1
+	FINT_1  # min:       21.190608 @ t1,n2	max:       461.43483 @ t1,n1
+	FINT_2  # min:       10787.393 @ t1,n1	max:        22752.82 @ t1,n3
+	FINT_3  # min:       36.940577 @ t1,n4	max:       497.40888 @ t1,n1
 
 ELEMENT VARIABLES relative 1.e-6 floor 0.0
 	SURF_F_1_01     # min:       1.0271452 @ t1,b1,e1	max:       1.0271452 @ t1,b1,e1

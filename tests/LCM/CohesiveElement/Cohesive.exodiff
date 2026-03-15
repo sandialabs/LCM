@@ -31,9 +31,9 @@ NODAL VARIABLES relative 1.e-6 floor 0.0
 	DISP_1  # min:               0 @ t1,n1	max:               0 @ t1,n1
 	DISP_2  # min:               0 @ t1,n5	max:             0.1 @ t1,n1
 	DISP_3  # min:               0 @ t1,n1	max:               0 @ t1,n1
-	FINT_X  # min:   1.4663608e-19 @ t1,n4	max:   5.4725331e-19 @ t1,n2
-	FINT_Y  # min:            0.05 @ t1,n4	max:            0.05 @ t1,n2
-	FINT_Z  # min:               0 @ t1,n1	max:               0 @ t1,n1
+	FINT_1  # min:   1.4663608e-19 @ t1,n4	max:   5.4725331e-19 @ t1,n2
+	FINT_2  # min:            0.05 @ t1,n4	max:            0.05 @ t1,n2
+	FINT_3  # min:               0 @ t1,n1	max:               0 @ t1,n1
 
 ELEMENT VARIABLES relative 1.e-6 floor 0.0
 	COHESIVE_TRACTION_1_1  # min:   2.7755576e-18 @ t1,b1,e1	max:   2.7755576e-18 @ t1,b1,e1

@@ -323,7 +323,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
       //         the 2d mesh.
       switch (dims.size()) {
         case 3:  // node_scalar
-          scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
+          scalar_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
           ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
@@ -334,7 +334,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
           }
           break;
         case 4:  // node_vector
-          vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
+          vector_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
           ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
@@ -365,7 +365,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
 
       switch (dims.size()) {
         case 3:  // node_scalar
-          scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
+          scalar_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
           ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];
@@ -377,7 +377,7 @@ SaveSideSetStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typen
           }
           break;
         case 4:  // node_vector
-          vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
+          vector_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
           ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
           for (int node = 0; node < dims[2]; ++node) {
             nodeId3d = ElNodeID[cell][sideNodes[side][node]];

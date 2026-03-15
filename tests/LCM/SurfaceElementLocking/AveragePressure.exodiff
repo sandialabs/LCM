@@ -28,9 +28,9 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 # No GLOBAL VARIABLES
 
 NODAL VARIABLES relative 1.e-6 floor 0.0
-	DISP_X  # min:             0.3 @ t1,n1	max:             0.3 @ t1,n1
-	DISP_Y  # min:               0 @ t1,n1	max:               0 @ t1,n1
-	DISP_Z  # min:           0.375 @ t1,n1	max:           0.375 @ t1,n1
+	DISP_1  # min:             0.3 @ t1,n1	max:             0.3 @ t1,n1
+	DISP_2  # min:               0 @ t1,n1	max:               0 @ t1,n1
+	DISP_3  # min:           0.375 @ t1,n1	max:           0.375 @ t1,n1
 	FINT_X  # min:       191.46148 @ t1,n2	max:       600.89848 @ t1,n1
 	FINT_Y  # min:       13972.263 @ t1,n1	max:       49880.006 @ t1,n3
 	FINT_Z  # min:       210.01913 @ t1,n4	max:       631.11899 @ t1,n1

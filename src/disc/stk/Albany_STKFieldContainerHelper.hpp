@@ -6,6 +6,7 @@
 #define ALBANY_STK_FIELD_CONTAINER_HELPER_HPP
 
 #include <stk_mesh/base/Bucket.hpp>
+#include <stk_mesh/base/Field.hpp>
 
 #include "Albany_NodalDOFManager.hpp"
 #include "Albany_ThyraTypes.hpp"
@@ -14,13 +15,13 @@ namespace Albany {
 
 class GlobalLocalIndexer;
 
-template <class FieldType>
+// With simple fields, all STK field types (Scalar, Vector, Tensor) are
+// stk::mesh::Field<double>. This struct is no longer a template.
 struct STKFieldContainerHelper
 {
-  // Fill (aka get) and save (aka set) methods
+  using FieldType = stk::mesh::Field<double>;
 
-  // FieldType can be either scalar or vector, the code is the same. Either way,
-  // offset must be less than the dimension of the field.
+  // Fill (aka get) and save (aka set) methods
   static void
   fillVector(
       Thyra_Vector&                                 field_thyra,

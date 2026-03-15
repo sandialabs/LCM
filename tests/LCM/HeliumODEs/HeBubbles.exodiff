@@ -28,14 +28,14 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 # No GLOBAL VARIABLES
 
 NODAL VARIABLES relative 1.e-6 floor 0.0
-	disp_x     # min:               0 @ t1,n1	max:     0.045667599 @ t1491,n6
-	disp_y     # min:               0 @ t1,n1	max:             0.1 @ t1491,n2
-	disp_z     # min:               0 @ t1,n1	max:     0.045667599 @ t1491,n1
+	disp_1     # min:               0 @ t1,n1	max:     0.045667599 @ t1491,n6
+	disp_2     # min:               0 @ t1,n1	max:             0.1 @ t1491,n2
+	disp_3     # min:               0 @ t1,n1	max:     0.045667599 @ t1491,n1
 	CL         # min:         0.00056 @ t1,n1	max:         0.00056 @ t1,n1
 	tauH       # min:               0 @ t1,n1	max:      0.29787124 @ t1491,n6
-	force_x    relative 1.e-6 floor 1.e-9 # min:               0 @ t1,n1       max:   1.6968974e-10 @ t1442,n8
-	force_y    relative 1.e-6 floor 1.e-9 # min:               0 @ t1,n1       max:      0.20309403 @ t1491,n5
-	force_z    relative 1.e-6 floor 1.e-9 # min:               0 @ t1,n1       max:   1.6968974e-10 @ t1442,n1
+	force_1    relative 1.e-6 floor 1.e-9 # min:               0 @ t1,n1       max:   1.6968974e-10 @ t1442,n8
+	force_2    relative 1.e-6 floor 1.e-9 # min:               0 @ t1,n1       max:      0.20309403 @ t1491,n5
+	force_3    relative 1.e-6 floor 1.e-9 # min:               0 @ t1,n1       max:   1.6968974e-10 @ t1442,n1
 	tauH       relative 1.e-6 floor 1.e-9 # min:               0 @ t1,n1       max:      0.29787124 @ t1491,n6
 
 # Element floor set for the Cauchy_Stress

@@ -28,14 +28,14 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 # No GLOBAL VARIABLES
 
 NODAL VARIABLES relative 1.e-6 floor 5.0e-10
-	disp_x     # min:               0 @ t1,n1	max:           0.375 @ t16,n1
-	disp_y     # min:               0 @ t1,n1	max:     0.082650813 @ t16,n2
-	disp_z     # min:               0 @ t1,n1	max:     0.074543125 @ t16,n419
+	disp_1     # min:               0 @ t1,n1	max:           0.375 @ t16,n1
+	disp_2     # min:               0 @ t1,n1	max:     0.082650813 @ t16,n2
+	disp_3     # min:               0 @ t1,n1	max:     0.074543125 @ t16,n419
 	CL         # min:        3.87e-05 @ t1,n11	max:     7.77975e-05 @ t16,n10
 	CLresid    # min:               0 @ t1,n10	max:   2.3346449e-05 @ t16,n53
-	force_x    # min:               0 @ t1,n1	max:      0.32615723 @ t16,n51
-	force_y    # min:               0 @ t1,n1	max:   5.7139427e-15 @ t2,n66
-	force_z    # min:               0 @ t1,n1	max:   2.9869135e-15 @ t2,n637
+	force_1    # min:               0 @ t1,n1	max:      0.32615723 @ t16,n51
+	force_2    # min:               0 @ t1,n1	max:   5.7139427e-15 @ t2,n66
+	force_3    # min:               0 @ t1,n1	max:   2.9869135e-15 @ t2,n637
 	tauH       # min:               0 @ t1,n1	max:       23.918197 @ t16,n419
 	tauHresid  # min:               0 @ t1,n1	max:   6.4208849e-17 @ t2,n341
 

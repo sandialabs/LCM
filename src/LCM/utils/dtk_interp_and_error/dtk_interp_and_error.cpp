@@ -38,7 +38,6 @@
 #include <stk_io/IossBridge.hpp>
 #include <stk_io/StkMeshIoBroker.hpp>
 #include <stk_mesh/base/BulkData.hpp>
-#include <stk_mesh/base/CoordinateSystems.hpp>
 #include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/GetEntities.hpp>
@@ -135,7 +134,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
   int src_timestep_count = src_io_region->get_property("state_count").get_int();
 
   // Get source_field from source mesh
-  FieldType* source_field = src_broker.meta_data().get_field<FieldType>(stk::topology::NODE_RANK, source_field_name);
+  FieldType* source_field = src_broker.meta_data().get_field<typename FieldType::value_type>(stk::topology::NODE_RANK, source_field_name);
 
   if (source_field != 0) {
     *out << "   Field with name " << source_field_name << " found in source mesh file!" << std::endl;
@@ -157,17 +156,17 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
   // Put fields on target mesh
   // Add a nodal field to the interpolated target part.
-  FieldType& target_interp_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, tgt_interp_field_name);
+  FieldType& target_interp_field = tgt_broker.meta_data().declare_field<typename FieldType::value_type>(stk::topology::NODE_RANK, tgt_interp_field_name);
 
   stk::mesh::put_field_on_mesh(target_interp_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
 
   // Add a absolute error nodal field to the target part.
-  FieldType& target_abs_error_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, abs_err_field_name);
+  FieldType& target_abs_error_field = tgt_broker.meta_data().declare_field<typename FieldType::value_type>(stk::topology::NODE_RANK, abs_err_field_name);
 
   stk::mesh::put_field_on_mesh(target_abs_error_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
 
   // Add a relative error nodal field to the target part.
-  FieldType& target_rel_error_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, rel_err_field_name);
+  FieldType& target_rel_error_field = tgt_broker.meta_data().declare_field<typename FieldType::value_type>(stk::topology::NODE_RANK, rel_err_field_name);
 
   stk::mesh::put_field_on_mesh(target_rel_error_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
 
@@ -178,7 +177,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
   // Add a nodal field to the interpolated target part.
   // Populate target_field
-  FieldType* target_field = tgt_broker.meta_data().get_field<FieldType>(stk::topology::NODE_RANK, target_field_name);
+  FieldType* target_field = tgt_broker.meta_data().get_field<typename FieldType::value_type>(stk::topology::NODE_RANK, target_field_name);
 
   if (target_field != 0) {
     *out << "   Field with name " << target_field_name;
@@ -553,7 +552,7 @@ main(int argc, char* argv[])
       *out << " Interpolating and calculating error in fields of type Node "
               "Vector..."
            << std::endl;
-      interp_and_calc_error<stk::mesh::Field<double, stk::mesh::Cartesian>>(comm, plist);
+      interp_and_calc_error<stk::mesh::Field<double>>(comm, plist);
       break;
     }
     case 1:  // ScalarFieldType
@@ -569,7 +568,7 @@ main(int argc, char* argv[])
       *out << " Interpolating and calculating error in fields of type Node "
               "Tensor..."
            << std::endl;
-      interp_and_calc_error<stk::mesh::Field<double, shards::ArrayDimension>>(comm, plist);
+      interp_and_calc_error<stk::mesh::Field<double>>(comm, plist);
       break;
     }
   }

@@ -11,7 +11,6 @@
 
 // This include is added in Tpetra branch to get all the necessary
 // Tpetra includes (e.g., Tpetra_Vector.hpp, Tpetra_Map.hpp, etc.)
-#include <stk_mesh/base/CoordinateSystems.hpp>
 #include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/FieldTraits.hpp>
 
@@ -31,24 +30,23 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
 {
  public:
   // Tensor per Node/Cell  - (Node, Dim, Dim) or (Cell,Dim,Dim)
-  typedef stk::mesh::Field<double, stk::mesh::Cartesian, stk::mesh::Cartesian> TensorFieldType;
+  typedef stk::mesh::Field<double> TensorFieldType;
   // Vector per Node/Cell  - (Node, Dim) or (Cell,Dim)
-  typedef stk::mesh::Field<double, stk::mesh::Cartesian> VectorFieldType;
+  typedef stk::mesh::Field<double> VectorFieldType;
   // Scalar per Node/Cell  - (Node) or (Cell)
   typedef stk::mesh::Field<double> ScalarFieldType;
   // One int scalar per Node/Cell  - (Node) or (Cell)
   typedef stk::mesh::Field<int> IntScalarFieldType;
   // int vector per Node/Cell  - (Node,Dim/VecDim) or (Cell,Dim/VecDim)
-  typedef stk::mesh::Field<int, stk::mesh::Cartesian> IntVectorFieldType;
+  typedef stk::mesh::Field<int> IntVectorFieldType;
 
-  typedef stk::mesh::Cartesian QPTag;  // need to invent shards::ArrayDimTag
   // Tensor per QP   - (Cell, QP, Dim, Dim)
-  typedef stk::mesh::Field<double, QPTag, stk::mesh::Cartesian, stk::mesh::Cartesian> QPTensorFieldType;
+  typedef stk::mesh::Field<double> QPTensorFieldType;
   // Vector per QP   - (Cell, QP, Dim)
-  typedef stk::mesh::Field<double, QPTag, stk::mesh::Cartesian> QPVectorFieldType;
+  typedef stk::mesh::Field<double> QPVectorFieldType;
   // One scalar per QP   - (Cell, QP)
-  typedef stk::mesh::Field<double, QPTag>                  QPScalarFieldType;
-  typedef stk::mesh::Field<double, stk::mesh::Cartesian3d> SphereVolumeFieldType;
+  typedef stk::mesh::Field<double> QPScalarFieldType;
+  typedef stk::mesh::Field<double> SphereVolumeFieldType;
 
   typedef std::vector<std::string const*> ScalarValueState;
   typedef std::vector<QPScalarFieldType*> QPScalarState;
@@ -207,6 +205,11 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   {
     return nodal_parameter_sis;
   }
+  const StateInfoStruct&
+  getElemSIS() const
+  {
+    return elem_sis;
+  }
 
   virtual bool
   hasResidualField() const = 0;
@@ -300,6 +303,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   QPVectorState          qpvector_states;
   QPTensorState          qptensor_states;
 
+  StateInfoStruct elem_sis;
   StateInfoStruct nodal_sis;
   StateInfoStruct nodal_parameter_sis;
 

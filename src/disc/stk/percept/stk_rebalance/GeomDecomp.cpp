@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/Field.hpp>
+#include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Types.hpp>
 #include <stk_util/parallel/Parallel.hpp>
 #include <stk_util/util/ReportHandler.hpp>
@@ -43,7 +44,7 @@ GeomDecomp::entity_coordinates(
     // Loop over node relations in mesh entities
     const percept::MyPairIterRelation nr(bulk_data, entity, NODE_RANK);
 
-    const unsigned      ndim = stk::mesh::field_scalars_per_entity(nodal_coor, entity);
+    const unsigned      ndim = bulk_data.mesh_meta_data().spatial_dimension();
     std::vector<double> temp(ndim);
 
     for (unsigned inr = 0; inr < nr.size(); ++inr) {

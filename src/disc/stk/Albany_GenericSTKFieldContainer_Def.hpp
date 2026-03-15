@@ -69,19 +69,20 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
     StateStruct::FieldDims& dim = st.dim;
 
     if (st.entity == StateStruct::ElemData) {
+      elem_sis.push_back((*sis)[i]);
       if (dim.size() == 1) {
         // Scalar on cell
-        cell_scalar_states.push_back(&metaData->declare_field<SFT>(stk::topology::ELEMENT_RANK, st.name));
+        cell_scalar_states.push_back(&metaData->declare_field<double>(stk::topology::ELEMENT_RANK, st.name));
         stk::mesh::put_field_on_mesh(*cell_scalar_states.back(), metaData->universal_part(), 1, nullptr);
         stk::io::set_field_role(*cell_scalar_states.back(), role_type(st.output));
       } else if (dim.size() == 2) {
         // Vector on cell
-        cell_vector_states.push_back(&metaData->declare_field<VFT>(stk::topology::ELEMENT_RANK, st.name));
+        cell_vector_states.push_back(&metaData->declare_field<double>(stk::topology::ELEMENT_RANK, st.name));
         stk::mesh::put_field_on_mesh(*cell_vector_states.back(), metaData->universal_part(), dim[1], nullptr);
         stk::io::set_field_role(*cell_vector_states.back(), role_type(st.output));
       } else if (dim.size() == 3) {
         // 2nd order tensor on cell
-        cell_tensor_states.push_back(&metaData->declare_field<TFT>(stk::topology::ELEMENT_RANK, st.name));
+        cell_tensor_states.push_back(&metaData->declare_field<double>(stk::topology::ELEMENT_RANK, st.name));
         stk::mesh::put_field_on_mesh(*cell_tensor_states.back(), metaData->universal_part(), dim[2], dim[1], nullptr);
         stk::io::set_field_role(*cell_tensor_states.back(), role_type(st.output));
       } else {
@@ -93,8 +94,9 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
       //            " size: (" << dim[0] << ", " << dim[1] << ")" <<endl;
 
     } else if (st.entity == StateStruct::QuadPoint || st.entity == StateStruct::ElemNode) {
+      elem_sis.push_back((*sis)[i]);
       if (dim.size() == 2) {  // Scalar at QPs
-        qpscalar_states.push_back(&metaData->declare_field<QPSFT>(stk::topology::ELEMENT_RANK, st.name));
+        qpscalar_states.push_back(&metaData->declare_field<double>(stk::topology::ELEMENT_RANK, st.name));
         stk::mesh::put_field_on_mesh(*qpscalar_states.back(), metaData->universal_part(), dim[1], nullptr);
         // Debug
         //      cout << "Allocating qps field name " <<
@@ -102,7 +104,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
         //            " size: (" << dim[0] << ", " << dim[1] << ")" <<endl;
         stk::io::set_field_role(*qpscalar_states.back(), role_type(st.output));
       } else if (dim.size() == 3) {  // Vector at QPs
-        qpvector_states.push_back(&metaData->declare_field<QPVFT>(stk::topology::ELEMENT_RANK, st.name));
+        qpvector_states.push_back(&metaData->declare_field<double>(stk::topology::ELEMENT_RANK, st.name));
         // Multi-dim order is Fortran Ordering, so reversed here
         stk::mesh::put_field_on_mesh(*qpvector_states.back(), metaData->universal_part(), dim[2], dim[1], nullptr);
         // Debug
@@ -112,7 +114,7 @@ GenericSTKFieldContainer<Interleaved>::addStateStructs(const Teuchos::RCP<Albany
         //            << ")" <<endl;
         stk::io::set_field_role(*qpvector_states.back(), role_type(st.output));
       } else if (dim.size() == 4) {  // Tensor at QPs
-        qptensor_states.push_back(&metaData->declare_field<QPTFT>(stk::topology::ELEMENT_RANK, st.name));
+        qptensor_states.push_back(&metaData->declare_field<double>(stk::topology::ELEMENT_RANK, st.name));
         // Multi-dim order is Fortran Ordering, so reversed here
         if (dim[1] == 4) {
           auto num_tens_entries = dim[2] * dim[1];

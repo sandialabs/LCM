@@ -11,7 +11,6 @@
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
-#include <stk_mesh/base/GetBuckets.hpp>
 #include <stk_mesh/base/GetEntities.hpp>
 #include <stk_mesh/base/Selector.hpp>
 
@@ -416,10 +415,10 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
   typedef AbstractSTKFieldContainer::ScalarFieldType ScalarFieldType;
 
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field    = fieldContainer->getCoordinatesField();
-  ScalarFieldType*                            surfaceHeight_field  = metaData->get_field<ScalarFieldType>(stk::topology::NODE_RANK, "surface_height");
-  ScalarFieldType*                            flowFactor_field     = metaData->get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, "flow_factor");
-  ScalarFieldType*                            temperature_field    = metaData->get_field<ScalarFieldType>(stk::topology::ELEMENT_RANK, "temperature");
-  ScalarFieldType*                            basal_friction_field = metaData->get_field<ScalarFieldType>(stk::topology::NODE_RANK, "basal_friction");
+  ScalarFieldType*                            surfaceHeight_field  = metaData->get_field<double>(stk::topology::NODE_RANK, "surface_height");
+  ScalarFieldType*                            flowFactor_field     = metaData->get_field<double>(stk::topology::ELEMENT_RANK, "flow_factor");
+  ScalarFieldType*                            temperature_field    = metaData->get_field<double>(stk::topology::ELEMENT_RANK, "temperature");
+  ScalarFieldType*                            basal_friction_field = metaData->get_field<double>(stk::topology::NODE_RANK, "basal_friction");
 
   if (!surfaceHeight_field) have_sh = false;
   if (!flowFactor_field) have_flwa = false;

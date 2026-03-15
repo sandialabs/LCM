@@ -9,7 +9,8 @@
 #include <stk_mesh/base/MetaData.hpp>
 
 #include "Albany_AbstractNodeFieldContainer.hpp"
-#include "Albany_BucketArray.hpp"
+#include "Albany_BucketArray.hpp"  // for EntityDimension tag
+#include <stk_mesh/base/FieldBase.hpp>
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_StateInfoStruct.hpp"  // For MDArray
 #include "Albany_ThyraUtils.hpp"
@@ -90,7 +91,7 @@ struct NodeData_Traits<T, 1>
   static field_type*
   createField(std::string const& name, std::vector<PHX::DataLayout::size_type> const& /* dim */, stk::mesh::MetaData* metaData)
   {
-    field_type* fld = &metaData->declare_field<field_type>(stk::topology::NODE_RANK, name);
+    field_type* fld = &metaData->declare_field<T>(stk::topology::NODE_RANK, name);
     // Multi-dim order is Fortran Ordering, so reversed here
     stk::mesh::put_field_on_mesh(*fld, metaData->universal_part(), nullptr);
 
@@ -107,14 +108,13 @@ struct NodeData_Traits<T, 1>
       const stk::mesh::Bucket&   bucket   = **it;
       const stk::mesh::BulkData& bulkData = bucket.mesh();
 
-      BucketArray<field_type> solution_array(*fld, bucket);
-
-      int const num_nodes_in_bucket = solution_array.dimension(0);
+      int const num_nodes_in_bucket = bucket.size();
 
       for (std::size_t i = 0; i < num_nodes_in_bucket; i++) {
         const GO global_id = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
         const LO local_id  = indexer->getLocalElement(global_id);
-        solution_array(i)  = const_overlap_node_view[local_id];
+        T* data = stk::mesh::field_data(*fld, bucket[i]);
+        data[0] = const_overlap_node_view[local_id];
       }
     }
   }
@@ -128,11 +128,11 @@ struct NodeData_Traits<T, 2>
   {
     size = 2
   };  // Two array dimension tags (Node, Dim), store type T values
-  typedef stk::mesh::Field<T, stk::mesh::Cartesian> field_type;
+  typedef stk::mesh::Field<T> field_type;
   static field_type*
   createField(std::string const& name, std::vector<PHX::DataLayout::size_type> const& dim, stk::mesh::MetaData* metaData)
   {
-    field_type* fld = &metaData->declare_field<field_type>(stk::topology::NODE_RANK, name);
+    field_type* fld = &metaData->declare_field<T>(stk::topology::NODE_RANK, name);
     // Multi-dim order is Fortran Ordering, so reversed here
     stk::mesh::put_field_on_mesh(*fld, metaData->universal_part(), dim[1], nullptr);
 
@@ -145,12 +145,10 @@ struct NodeData_Traits<T, 2>
     auto indexer = createGlobalLocalIndexer(overlap_node_vec->range());
     for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
       const stk::mesh::Bucket& bucket = **it;
-
-      BucketArray<field_type>    solution_array(*fld, bucket);
       stk::mesh::BulkData const& bulkData = bucket.mesh();
 
-      int const num_vec_components  = solution_array.dimension(0);
-      int const num_nodes_in_bucket = solution_array.dimension(1);
+      int const num_vec_components  = stk::mesh::field_scalars_per_entity(*fld, bucket);
+      int const num_nodes_in_bucket = bucket.size();
 
       for (int j = 0; j < num_vec_components; ++j) {
         Teuchos::ArrayRCP<const ST> const_overlap_node_view = getLocalData(overlap_node_vec->col(offset + j));
@@ -158,8 +156,8 @@ struct NodeData_Traits<T, 2>
         for (int i = 0; i < num_nodes_in_bucket; ++i) {
           const GO global_id = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
           const LO local_id  = indexer->getLocalElement(global_id);
-
-          solution_array(j, i) = const_overlap_node_view[local_id];
+          T* data = stk::mesh::field_data(*fld, bucket[i]);
+          data[j] = const_overlap_node_view[local_id];
         }
       }
     }
@@ -174,11 +172,11 @@ struct NodeData_Traits<T, 3>
   {
     size = 3
   };  // Three array dimension tags (Node, Dim, Dim), store type T values
-  typedef stk::mesh::Field<T, stk::mesh::Cartesian, stk::mesh::Cartesian> field_type;
+  typedef stk::mesh::Field<T> field_type;
   static field_type*
   createField(std::string const& name, std::vector<PHX::DataLayout::size_type> const& dim, stk::mesh::MetaData* metaData)
   {
-    field_type* fld = &metaData->declare_field<field_type>(stk::topology::NODE_RANK, name);
+    field_type* fld = &metaData->declare_field<T>(stk::topology::NODE_RANK, name);
     // Multi-dim order is Fortran Ordering, so reversed here
     stk::mesh::put_field_on_mesh(*fld, metaData->universal_part(), dim[2], dim[1], nullptr);
 
@@ -193,20 +191,20 @@ struct NodeData_Traits<T, 3>
       const stk::mesh::Bucket&   bucket   = **it;
       stk::mesh::BulkData const& bulkData = bucket.mesh();
 
-      BucketArray<field_type> solution_array(*fld, bucket);
-
-      int const num_i_components    = solution_array.dimension(0);
-      int const num_j_components    = solution_array.dimension(1);
-      int const num_nodes_in_bucket = solution_array.dimension(2);
+      int const num_nodes_in_bucket = bucket.size();
+      int const scalars_per = stk::mesh::field_scalars_per_entity(*fld, bucket);
+      int const num_i_components = stk::mesh::field_extent0_per_entity(*fld, bucket);
+      int const num_j_components = (num_i_components > 0) ? scalars_per / num_i_components : 1;
 
       for (int j = 0; j < num_j_components; ++j) {
         for (int k = 0; k < num_i_components; ++k) {
           Teuchos::ArrayRCP<const ST> const_overlap_node_view = getLocalData(overlap_node_vec->col(offset + j * num_i_components + k));
 
           for (int i = 0; i < num_nodes_in_bucket; ++i) {
-            const GO global_id      = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
-            const LO local_id       = indexer->getLocalElement(global_id);
-            solution_array(k, j, i) = const_overlap_node_view[local_id];
+            const GO global_id = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
+            const LO local_id  = indexer->getLocalElement(global_id);
+            T* data = stk::mesh::field_data(*fld, bucket[i]);
+            data[k + j * num_i_components] = const_overlap_node_view[local_id];
           }
         }
       }

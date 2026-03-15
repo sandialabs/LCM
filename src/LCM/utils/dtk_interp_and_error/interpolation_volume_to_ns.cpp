@@ -39,7 +39,6 @@
 #include <stk_io/IossBridge.hpp>
 #include <stk_io/StkMeshIoBroker.hpp>
 #include <stk_mesh/base/BulkData.hpp>
-#include <stk_mesh/base/CoordinateSystems.hpp>
 #include <stk_mesh/base/Field.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/GetEntities.hpp>
@@ -147,7 +146,7 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   tgt_broker.add_all_mesh_fields_as_input_fields(tmo);
 
   // Get source_field from source mesh
-  FieldType* source_field = src_broker.meta_data().get_field<FieldType>(stk::topology::NODE_RANK, source_field_name);
+  FieldType* source_field = src_broker.meta_data().get_field<typename FieldType::value_type>(stk::topology::NODE_RANK, source_field_name);
   if (source_field != 0)
     *out << "   Field with name " << source_field_name << " found in source mesh file!" << std::endl;
   else
@@ -157,9 +156,9 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
 
   // Put fields on target mesh
   // Add a nodal field to the interpolated target part.
-  FieldType& target_interp_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, tgt_interp_field_name);
+  FieldType& target_interp_field = tgt_broker.meta_data().declare_field<typename FieldType::value_type>(stk::topology::NODE_RANK, tgt_interp_field_name);
   stk::mesh::put_field_on_mesh(target_interp_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
-  FieldType& dirichlet_field = tgt_broker.meta_data().declare_field<FieldType>(stk::topology::NODE_RANK, "dirichlet_field");
+  FieldType& dirichlet_field = tgt_broker.meta_data().declare_field<typename FieldType::value_type>(stk::topology::NODE_RANK, "dirichlet_field");
   stk::mesh::put_field_on_mesh(dirichlet_field, tgt_broker.meta_data().universal_part(), neq, nullptr);
 
   // Create the target bulk data.
@@ -168,7 +167,7 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
 
   // Add a nodal field to the interpolated target part.
   // Populate target_field
-  FieldType* target_field = tgt_broker.meta_data().get_field<FieldType>(stk::topology::NODE_RANK, target_field_name);
+  FieldType* target_field = tgt_broker.meta_data().get_field<typename FieldType::value_type>(stk::topology::NODE_RANK, target_field_name);
   if (target_field != 0)
     *out << "   Field with name " << target_field_name << " found in target mesh file!" << std::endl;
   else
@@ -345,7 +344,7 @@ main(int argc, char* argv[])
     case 0:  // VectorFieldType
     {
       *out << " Interpolating fields of type Node Vector..." << std::endl;
-      interpolate<stk::mesh::Field<double, stk::mesh::Cartesian>>(comm, plist);
+      interpolate<stk::mesh::Field<double>>(comm, plist);
       break;
     }
     case 1:  // ScalarFieldType
@@ -357,7 +356,7 @@ main(int argc, char* argv[])
     case 2:  // TensorFieldType
     {
       *out << " Interpolating fields of type Node Scalar..." << std::endl;
-      interpolate<stk::mesh::Field<double, shards::ArrayDimension>>(comm, plist);
+      interpolate<stk::mesh::Field<double>>(comm, plist);
       break;
     }
   }

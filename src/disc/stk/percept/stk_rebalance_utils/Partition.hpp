@@ -40,13 +40,10 @@
 #include <stk_mesh/base/Types.hpp>
 #include <utility>
 #include <vector>
-// AGS: had to add this!
-#include <stk_mesh/base/CoordinateSystems.hpp>
-
 namespace stk {
 namespace rebalance {
 
-typedef mesh::Field<double, mesh::Cartesian> VectorField;
+typedef mesh::Field<double> VectorField;
 typedef mesh::Field<double>                  ScalarField;
 
 /** @class Partition for keeping track of a mesh entity partition.

@@ -7,9 +7,5 @@
 #include "Albany_AbstractSTKFieldContainer.hpp"
 #include "Albany_STKFieldContainerHelper_Def.hpp"
 
-namespace Albany {
-
-template struct STKFieldContainerHelper<Albany::AbstractSTKFieldContainer::ScalarFieldType>;
-template struct STKFieldContainerHelper<Albany::AbstractSTKFieldContainer::VectorFieldType>;
-
-}  // namespace Albany
+// No explicit template instantiations needed - STKFieldContainerHelper
+// is no longer a template class with simple STK fields.

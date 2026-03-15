@@ -28,15 +28,15 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 # No GLOBAL VARIABLES
 
 NODAL VARIABLES relative 1.e-6 floor 1.0e-9
-	displacement_x     # min:               0 @ t1,n1	max:            0.01 @ t21,n1
-	displacement_y     # min:               0 @ t1,n1	max:    0.0045822055 @ t21,n8
-	displacement_z     # min:               0 @ t1,n1	max:    0.0045822055 @ t21,n3
-	dirichlet_field_x  # min:               0 @ t1,n1	max:               0 @ t1,n1
-	dirichlet_field_y  # min:               0 @ t1,n1	max:               0 @ t1,n1
-	dirichlet_field_z  # min:               0 @ t1,n1	max:               0 @ t1,n1
-	force_x            # min:               0 @ t1,n1	max:       110.83421 @ t14,n5
-	force_y            # min:               0 @ t1,n1	max:   1.4508815e-10 @ t3,n3
-	force_z            # min:               0 @ t1,n1	max:   1.4508812e-10 @ t3,n3
+	displacement_1     # min:               0 @ t1,n1	max:            0.01 @ t21,n1
+	displacement_2     # min:               0 @ t1,n1	max:    0.0045822055 @ t21,n8
+	displacement_3     # min:               0 @ t1,n1	max:    0.0045822055 @ t21,n3
+	dirichlet_field_1  # min:               0 @ t1,n1	max:               0 @ t1,n1
+	dirichlet_field_2  # min:               0 @ t1,n1	max:               0 @ t1,n1
+	dirichlet_field_3  # min:               0 @ t1,n1	max:               0 @ t1,n1
+	force_1            # min:               0 @ t1,n1	max:       110.83421 @ t14,n5
+	force_2            # min:               0 @ t1,n1	max:   1.4508815e-10 @ t3,n3
+	force_3            # min:               0 @ t1,n1	max:   1.4508812e-10 @ t3,n3
 
 ELEMENT VARIABLES relative 1.e-6 floor 1.0e-9
 	Cauchy_Stress_1_1      # min:               0 @ t1,b1,e1    max:        447.3111 @ t21,b1,e1

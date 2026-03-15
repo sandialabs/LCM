@@ -775,14 +775,14 @@ GenericSTKMeshStruct::initializeSideSetMeshStructs(const Teuchos::RCP<Teuchos_Co
       // We need to create the 2D cell -> (3D cell, side_node_ids) map in the
       // side mesh now
       typedef AbstractSTKFieldContainer::IntScalarFieldType ISFT;
-      ISFT* side_to_cell_map = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<ISFT>(stk::topology::ELEM_RANK, "side_to_cell_map");
+      ISFT* side_to_cell_map = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<int>(stk::topology::ELEM_RANK, "side_to_cell_map");
       stk::mesh::put_field_on_mesh(*side_to_cell_map, this->sideSetMeshStructs[ss_name]->metaData->universal_part(), 1, nullptr);
       stk::io::set_field_role(*side_to_cell_map, Ioss::Field::TRANSIENT);
       // We need to create the 2D cell -> (3D cell, side_node_ids) map in the
       // side mesh now
       int const                                             num_nodes = sideSetMeshStructs[ss_name]->getMeshSpecs()[0]->ctd.node_count;
       typedef AbstractSTKFieldContainer::IntVectorFieldType IVFT;
-      IVFT* side_nodes_ids = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<IVFT>(stk::topology::ELEM_RANK, "side_nodes_ids");
+      IVFT* side_nodes_ids = &this->sideSetMeshStructs[ss_name]->metaData->declare_field<int>(stk::topology::ELEM_RANK, "side_nodes_ids");
       stk::mesh::put_field_on_mesh(*side_nodes_ids, this->sideSetMeshStructs[ss_name]->metaData->universal_part(), num_nodes, nullptr);
       stk::io::set_field_role(*side_nodes_ids, Ioss::Field::TRANSIENT);
 
@@ -888,8 +888,8 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetN
   int                                                   num_sides;
   typedef AbstractSTKFieldContainer::IntScalarFieldType ISFT;
   typedef AbstractSTKFieldContainer::IntVectorFieldType IVFT;
-  ISFT* side_to_cell_map   = this->sideSetMeshStructs[sideSetName]->metaData->get_field<ISFT>(stk::topology::ELEM_RANK, "side_to_cell_map");
-  IVFT* side_nodes_ids_map = this->sideSetMeshStructs[sideSetName]->metaData->get_field<IVFT>(stk::topology::ELEM_RANK, "side_nodes_ids");
+  ISFT* side_to_cell_map   = this->sideSetMeshStructs[sideSetName]->metaData->get_field<int>(stk::topology::ELEM_RANK, "side_to_cell_map");
+  IVFT* side_nodes_ids_map = this->sideSetMeshStructs[sideSetName]->metaData->get_field<int>(stk::topology::ELEM_RANK, "side_nodes_ids");
   std::vector<stk::mesh::EntityId> cell2D_nodes_ids(num_nodes), side3D_nodes_ids(num_nodes);
   const stk::mesh::Entity*         side3D_nodes;
   const stk::mesh::Entity*         cell2D_nodes;
@@ -1243,13 +1243,13 @@ GenericSTKMeshStruct::loadRequiredInputFields(const AbstractFieldContainer::Fiel
 
     if (scalar && !layered) {
       // Purely scalar field
-      scalar_field = metaData->get_field<SFT>(entity_rank, fname);
+      scalar_field = metaData->get_field<double>(entity_rank, fname);
     } else if (scalar == layered) {
       // Either (non-layered) vector or layered scalar field
-      vector_field = metaData->get_field<VFT>(entity_rank, fname);
+      vector_field = metaData->get_field<double>(entity_rank, fname);
     } else {
       // Layered vector field
-      tensor_field = metaData->get_field<TFT>(entity_rank, fname);
+      tensor_field = metaData->get_field<double>(entity_rank, fname);
     }
 
     ALBANY_PANIC(
@@ -1709,9 +1709,9 @@ GenericSTKMeshStruct::checkFieldIsInMesh(std::string const& fname, std::string c
   typedef AbstractSTKFieldContainer::TensorFieldType TFT;
   bool                                               missing = true;
   switch (dim) {
-    case 1: missing = (metaData->get_field<SFT>(entity_rank, fname) == 0); break;
-    case 2: missing = (metaData->get_field<VFT>(entity_rank, fname) == 0); break;
-    case 3: missing = (metaData->get_field<TFT>(entity_rank, fname) == 0); break;
+    case 1: missing = (metaData->get_field<double>(entity_rank, fname) == 0); break;
+    case 2: missing = (metaData->get_field<double>(entity_rank, fname) == 0); break;
+    case 3: missing = (metaData->get_field<double>(entity_rank, fname) == 0); break;
     default: ALBANY_ABORT("Error! Invalid field dimension.\n");
   }
 
@@ -1729,7 +1729,7 @@ GenericSTKMeshStruct::checkFieldIsInMesh(std::string const& fname, std::string c
                                << "' in the mesh has different rank or dimensions than the ones "
                                   "specified\n"
                                << " Rank required: " << entity_rank << ", rank of field in mesh: " << (*f)->entity_rank() << "\n"
-                               << " Dimension required: " << dim << ", dimension of field in mesh: " << (*f)->field_array_rank() + 1 << "\n");
+                               << " Dimension required: " << dim << ", max scalars per entity in mesh: " << (*f)->max_size() << "\n");
     } else
       ALBANY_ABORT(
           "Error! The field '" << fname << "' was not found in the mesh.\n"

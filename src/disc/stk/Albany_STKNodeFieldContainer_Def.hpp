@@ -4,7 +4,6 @@
 
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
-#include <stk_mesh/base/GetBuckets.hpp>
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Types.hpp>
 #include <stk_util/parallel/Parallel.hpp>
@@ -75,8 +74,18 @@ template <typename DataType, unsigned ArrayDim, class traits>
 MDArray
 STKNodeField<DataType, ArrayDim, traits>::getMDA(const stk::mesh::Bucket& buck)
 {
-  BucketArray<field_type> array(*node_field, buck);
-  return array;
+  MDArray ar;
+  double* data = stk::mesh::field_data(*node_field, buck);
+  if (data != nullptr) {
+    const MDArray::size_type num_nodes = buck.size();
+    const MDArray::size_type scalars_per = stk::mesh::field_scalars_per_entity(*node_field, buck);
+    if (scalars_per <= 1) {
+      ar.assign<Albany::EntityDimension>(data, num_nodes);
+    } else {
+      ar.assign<Albany::EntityDimension, Albany::EntityDimension>(data, num_nodes, scalars_per);
+    }
+  }
+  return ar;
 }
 
 }  // namespace Albany

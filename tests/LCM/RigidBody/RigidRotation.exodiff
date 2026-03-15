@@ -28,15 +28,15 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 # No GLOBAL VARIABLES
 
 NODAL VARIABLES relative 1.e-6 floor 1.e-9
-	displacement_x     # min:               0 @ t1,n1332	max:               1 @ t13,n1333
-	displacement_y     # min:               0 @ t1,n1332	max:               1 @ t13,n1332
-	displacement_z     # min:               0 @ t1,n1332	max:   7.2239319e-17 @ t7,n1351
-	dirichlet_field_x  # min:               0 @ t1,n1332	max:               0 @ t1,n1332
-	dirichlet_field_y  # min:               0 @ t1,n1332	max:               0 @ t1,n1332
-	dirichlet_field_z  # min:               0 @ t1,n1332	max:               0 @ t1,n1332
-	force_x            # min:               0 @ t1,n1332	max:   5.5292982e-14 @ t13,n1389
-	force_y            # min:               0 @ t1,n1332	max:   4.4152737e-14 @ t12,n1391
-	force_z            # min:               0 @ t1,n1332	max:   3.7731216e-14 @ t5,n1391
+	displacement_1     # min:               0 @ t1,n1332	max:               1 @ t13,n1333
+	displacement_2     # min:               0 @ t1,n1332	max:               1 @ t13,n1332
+	displacement_3     # min:               0 @ t1,n1332	max:   7.2239319e-17 @ t7,n1351
+	dirichlet_field_1  # min:               0 @ t1,n1332	max:               0 @ t1,n1332
+	dirichlet_field_2  # min:               0 @ t1,n1332	max:               0 @ t1,n1332
+	dirichlet_field_3  # min:               0 @ t1,n1332	max:               0 @ t1,n1332
+	force_1            # min:               0 @ t1,n1332	max:   5.5292982e-14 @ t13,n1389
+	force_2            # min:               0 @ t1,n1332	max:   4.4152737e-14 @ t12,n1391
+	force_3            # min:               0 @ t1,n1332	max:   3.7731216e-14 @ t5,n1391
 	proj_nodal_eqps    # min:               0 @ t1,n1332	max:               0 @ t1,n1332
 	proj_nodal_linear  # min:     0.033333333 @ t1,n1380	max:             1.7 @ t1,n1332
 

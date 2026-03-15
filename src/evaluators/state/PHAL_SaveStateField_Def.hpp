@@ -206,7 +206,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typename Tra
   stk::mesh::Entity e;
   switch (dims.size()) {
     case 2:  // node_scalar
-      scalar_field = metaData.get_field<SFT>(stk::topology::NODE_RANK, stateName);
+      scalar_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
       ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
@@ -217,7 +217,7 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typename Tra
         }
       break;
     case 3:  // node_vector
-      vector_field = metaData.get_field<VFT>(stk::topology::NODE_RANK, stateName);
+      vector_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
       ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {

@@ -89,9 +89,11 @@ rebalance_dependent_entities(
   for (; r_end != r_iter; ++r_iter) {
     const mesh::EntityId elem_id = bulk_data.identifier(*r_iter);
     mesh::EntityVector   related_entities;
-    mesh::EntityVector   elems(1);
-    elems[0] = *r_iter;
-    stk::mesh::get_entities_through_relations(bulk_data, elems, dep_rank, related_entities);
+    const unsigned num_conn = bulk_data.num_connectivity(*r_iter, dep_rank);
+    const mesh::Entity* conn = bulk_data.begin(*r_iter, dep_rank);
+    for (unsigned ic = 0; ic < num_conn; ++ic) {
+      related_entities.push_back(conn[ic]);
+    }
     for (size_t j = 0; j < related_entities.size(); ++j) {
       dep_entity_procs[bulk_data.identifier(related_entities[j])] = elem_procs[elem_id];
     }

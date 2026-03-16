@@ -14,7 +14,7 @@
 
 // Get Kokkos graph and matrix
 #include "KokkosSparse_CrsMatrix.hpp"
-#include "Kokkos_StaticCrsGraph.hpp"
+#include "KokkosSparse_StaticCrsGraph.hpp"
 
 // Phalanx determines the Kokkos node we use for Tpetra types
 #include "Phalanx_KokkosDeviceTypes.hpp"
@@ -35,7 +35,7 @@ template <typename Scalar, typename MemoryTraits = Kokkos::MemoryUnmanaged>
 using DeviceView2d = Kokkos::View<Scalar**, Kokkos::LayoutLeft, PHX::Device, MemoryTraits>;
 
 // Kokkos types for local graphs/matrices, to be used for on-device kernels
-using DeviceLocalGraph = Kokkos::StaticCrsGraph<LO, Kokkos::LayoutLeft, PHX::Device>;
+using DeviceLocalGraph = KokkosSparse::StaticCrsGraph<LO, Kokkos::LayoutLeft, PHX::Device>;
 
 template <typename Scalar>
 using DeviceLocalMatrix = KokkosSparse::CrsMatrix<Scalar, LO, PHX::Device, Kokkos::MemoryUnmanaged, DeviceLocalGraph::size_type>;

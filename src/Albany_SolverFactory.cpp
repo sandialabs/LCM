@@ -42,7 +42,7 @@ void
 enableMueLu(Stratimikos::DefaultLinearSolverBuilder& linearSolverBuilder)
 {
 #if defined(ALBANY_MUELU)
-  Stratimikos::enableMueLu<LO, Tpetra_GO, KokkosNode>(linearSolverBuilder);
+  Stratimikos::enableMueLu<ST, LO, Tpetra_GO, KokkosNode>(linearSolverBuilder);
 #endif
 }
 
@@ -204,15 +204,9 @@ SolverFactory::createAndGetAlbanyApp(
     modelWithSolve = rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(model_, lowsFactory));
   }
 
-  const auto solMgr = albanyApp->getAdaptSolMgr();
-
   Piro::SolverFactory piroFactory;
   observer_ = Teuchos::rcp(new PiroObserver(albanyApp, modelWithSolve));
-  if (solMgr->isAdaptive()) {
-    return piroFactory.createSolverAdaptive<ST>(piroParams, modelWithSolve, Teuchos::null, solMgr, observer_);
-  } else {
-    return piroFactory.createSolver<ST>(piroParams, modelWithSolve, Teuchos::null, observer_);
-  }
+  return piroFactory.createSolver<ST>(piroParams, modelWithSolve, Teuchos::null, observer_);
   ALBANY_ABORT("Reached end of createAndGetAlbanyAppT()" << "\n");
 
   // Silence compiler warning in case it wasn't used (due to ifdef logic)

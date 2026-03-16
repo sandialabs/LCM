@@ -268,27 +268,12 @@ scale(ArrayT& a, const T& val)
 }
 
 template <class T, class... P>
-inline typename std::enable_if<!Kokkos::is_dynrankview_fad<Kokkos::DynRankView<T, P...>>::value, typename Kokkos::DynRankView<T, P...>::non_const_type>::type
+inline typename Kokkos::DynRankView<T, P...>::non_const_type
 create_copy(std::string const& name, const Kokkos::DynRankView<T, P...>& src)
 {
   using dst_type = typename Kokkos::DynRankView<T, P...>::non_const_type;
-  auto layout    = Kokkos::Impl::reconstructLayout(src.layout(), src.rank());
-  return dst_type(name, layout);
-}
-
-template <class T, class... P>
-inline typename std::enable_if<Kokkos::is_dynrankview_fad<Kokkos::DynRankView<T, P...>>::value, typename Kokkos::DynRankView<T, P...>::non_const_type>::type
-create_copy(std::string const& /* name */, const Kokkos::DynRankView<T, P...>& src)
-{
-  using Src              = Kokkos::DynRankView<T, P...>;
-  using Dst              = typename Kokkos::DynRankView<T, P...>::non_const_type;
-  auto sm                = src.impl_map();
-  auto sl                = sm.layout();
-  auto fad_rank          = src.rank();
-  sl.dimension[fad_rank] = sm.dimension_scalar();
-  auto real_rank         = fad_rank + 1;
-  auto ml                = Kokkos::Impl::reconstructLayout(sl, real_rank);
-  auto dst               = Dst(src.label(), ml);
+  dst_type dst(name, src.layout());
+  Kokkos::deep_copy(dst, src);
   return dst;
 }
 

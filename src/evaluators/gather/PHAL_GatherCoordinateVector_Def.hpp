@@ -70,7 +70,7 @@ GatherCoordinateVector<EvalT, Traits>::evaluateFields(typename Traits::EvalData 
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>> wsCoords = workset.wsCoords;
 
   typedef Kokkos::View<MeshScalarT***, PHX::Device> view_type;
-  typedef typename view_type::HostMirror            host_view_type;
+  typedef typename view_type::host_mirror_type      host_view_type;
 
   // host_view_type coordVecHost = Kokkos::create_mirror_view
   // (coordVec.get_view());

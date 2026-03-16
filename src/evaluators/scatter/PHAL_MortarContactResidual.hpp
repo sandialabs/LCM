@@ -6,7 +6,7 @@
 #define PHAL_MORTAR_CONTACT_RESIDUAL_HPP
 
 #include "Albany_Layouts.hpp"
-#include "Kokkos_Vector.hpp"
+#include "Kokkos_DualView.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
@@ -49,7 +49,11 @@ class MortarContactResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>, pub
  protected:
   Albany::AbstractDiscretization::WorksetConn                                  nodeID;
   Albany::DeviceView1d<ST>                                                     f_kokkos;
-  Kokkos::vector<Kokkos::DynRankView<ScalarT const, PHX::Device>, PHX::Device> val_kokkos;
+  typedef Kokkos::DynRankView<ScalarT const, PHX::Device> ConstDynRankView;
+  typedef Kokkos::DualView<ConstDynRankView*, PHX::Device> ConstDRVDualView;
+  typedef typename ConstDRVDualView::t_dev ConstDRVDevView;
+  ConstDRVDualView                                                             val_kokkos;
+  ConstDRVDevView                                                              d_val_kokkos;
 };
 
 template <typename EvalT, typename Traits>
@@ -106,6 +110,7 @@ class MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits> : public Morta
   using Base::f_kokkos;
   using Base::nodeID;
   using Base::val_kokkos;
+  using Base::d_val_kokkos;
 
   typedef typename PHX::Device::execution_space                               ExecutionSpace;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank0_Tag> PHAL_MortarContactResRank0_Policy;
@@ -197,6 +202,7 @@ class MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits> : public Morta
   using Base::f_kokkos;
   using Base::nodeID;
   using Base::val_kokkos;
+  using Base::d_val_kokkos;
 
   typedef typename PHX::Device::execution_space                                       ExecutionSpace;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_MortarContactResRank0_Tag>         PHAL_MortarContactResRank0_Policy;

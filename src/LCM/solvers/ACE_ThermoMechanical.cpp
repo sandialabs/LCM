@@ -14,7 +14,6 @@
 #include "Albany_SolverFactory.hpp"
 #include "Albany_Utils.hpp"
 #include "MiniTensor.h"
-#include "Piro_LOCAAdaptiveSolver.hpp"
 #include "Piro_LOCASolver.hpp"
 #include "Piro_ObserverToLOCASaveDataStrategyAdapter.hpp"
 #include "Piro_TempusSolver.hpp"

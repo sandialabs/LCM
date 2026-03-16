@@ -30,7 +30,7 @@ MortarContactResidualBase<EvalT, Traits>::MortarContactResidualBase(Teuchos::Par
     this->addDependentField(val[eq]);
   }
 
-  val_kokkos.resize(numFieldsBase);
+  val_kokkos = ConstDRVDualView("val_kokkos", numFieldsBase);
 
   if (p.isType<int>("Offset of First DOF"))
     offset = p.get<int>("Offset of First DOF");
@@ -70,7 +70,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PH
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
-      Kokkos::atomic_fetch_add(&f_kokkos(id), val_kokkos[eq](cell, node));
+      Kokkos::atomic_fetch_add(&f_kokkos(id), d_val_kokkos(eq)(cell, node));
     }
 }
 
@@ -113,8 +113,11 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(type
 
   // Get MDField views from std::vector
   for (int i = 0; i < numFields; i++) {
-    val_kokkos[i] = this->val[i].get_view();
+    val_kokkos.view_host()(i) = this->val[i].get_view();
   }
+  val_kokkos.modify_host();
+  val_kokkos.sync_device();
+  d_val_kokkos = val_kokkos.view_device();
 
   Kokkos::parallel_for(PHAL_MortarContactResRank0_Policy(0, workset.numCells), *this);
   cudaCheckError();
@@ -148,7 +151,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PH
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
-      Kokkos::atomic_fetch_add(&f_kokkos(id), (val_kokkos[eq](cell, node)).val());
+      Kokkos::atomic_fetch_add(&f_kokkos(id), (d_val_kokkos(eq)(cell, node)).val());
     }
 }
 
@@ -175,7 +178,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PH
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       rowT        = nodeID(cell, node, this->offset + eq);
-      auto valptr = val_kokkos[eq](cell, node);
+      auto valptr = d_val_kokkos(eq)(cell, node);
       for (int lunk = 0; lunk < nunk; lunk++) {
         ST val = valptr.fastAccessDx(lunk);
         Jac_kokkos.sumIntoValues(colT[lunk], &rowT, 1, &val, false, true);
@@ -209,7 +212,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PH
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       rowT        = nodeID(cell, node, this->offset + eq);
-      auto valptr = val_kokkos[eq](cell, node);
+      auto valptr = d_val_kokkos(eq)(cell, node);
       for (int i = 0; i < nunk; ++i) vals[i] = valptr.fastAccessDx(i);
       Jac_kokkos.sumIntoValues(rowT, colT, nunk, vals, false, true);
     }
@@ -396,7 +399,10 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(type
   Jac_kokkos = Albany::getNonconstDeviceData(workset.Jac);
 
   // Get MDField views from std::vector
-  for (int i = 0; i < numFields; i++) val_kokkos[i] = this->val[i].get_view();
+  for (int i = 0; i < numFields; i++) val_kokkos.view_host()(i) = this->val[i].get_view();
+  val_kokkos.modify_host();
+  val_kokkos.sync_device();
+  d_val_kokkos = val_kokkos.view_device();
 
   if (loadResid) {
     Kokkos::parallel_for(PHAL_MortarContactResRank0_Policy(0, workset.numCells), *this);

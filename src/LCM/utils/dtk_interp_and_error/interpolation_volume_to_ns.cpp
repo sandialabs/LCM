@@ -16,7 +16,7 @@
 #include <Ionit_Initializer.h>
 #include <Ioss_SubSystem.h>
 
-#include <Intrepid_FieldContainer.hpp>
+#include <Kokkos_DynRankView.hpp>
 #include <Teuchos_Array.hpp>
 #include <Teuchos_ArrayRCP.hpp>
 #include <Teuchos_CommHelpers.hpp>
@@ -132,7 +132,7 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
   stk::mesh::BucketVector        src_part_buckets = src_stk_selector.get_buckets(stk::topology::NODE_RANK);
   std::vector<stk::mesh::Entity> src_part_nodes;
   stk::mesh::get_selected_entities(src_stk_selector, src_part_buckets, src_part_nodes);
-  Intrepid::FieldContainer<double> src_node_coords =
+  Kokkos::DynRankView<double, Kokkos::HostSpace> src_node_coords =
       DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(Teuchos::Array<stk::mesh::Entity>(src_part_nodes), *src_bulk_data);
 
   // TARGET MESH READ

@@ -7,7 +7,7 @@
 
 #include "Albany_DiscretizationUtils.hpp"
 #include "Albany_Layouts.hpp"
-#include "Kokkos_Vector.hpp"
+#include "Kokkos_DualView.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
@@ -65,9 +65,11 @@ class GatherSolutionBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX
   Albany::WorksetConn            nodeID;
   Albany::DeviceView1d<const ST> x_constView, xdot_constView, xdotdot_constView;
 
-  typedef Kokkos::vector<Kokkos::DynRankView<ScalarT, PHX::Device>, PHX::Device> KV;
-  KV                                                                             val_kokkos, val_dot_kokkos, val_dotdot_kokkos;
-  typename KV::t_dev                                                             d_val, d_val_dot, d_val_dotdot;
+  typedef Kokkos::DynRankView<ScalarT, PHX::Device> DynRankView;
+  typedef Kokkos::DualView<DynRankView*, PHX::Device> DRVDualView;
+  typedef typename DRVDualView::t_dev t_dev;
+  DRVDualView                                                                    val_kokkos, val_dot_kokkos, val_dotdot_kokkos;
+  t_dev                                                                          d_val, d_val_dot, d_val_dotdot;
 };
 
 template <typename EvalT, typename Traits>

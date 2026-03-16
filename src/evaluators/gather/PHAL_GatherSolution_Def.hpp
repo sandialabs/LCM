@@ -121,9 +121,9 @@ GatherSolutionBase<EvalT, Traits>::GatherSolutionBase(Teuchos::ParameterList con
   }
 
   if (tensorRank == 0) {
-    val_kokkos.resize(numFieldsBase);
-    if (enableTransient) val_dot_kokkos.resize(numFieldsBase);
-    if (enableAcceleration) val_dotdot_kokkos.resize(numFieldsBase);
+    val_kokkos = DRVDualView("val_kokkos", numFieldsBase);
+    if (enableTransient) val_dot_kokkos = DRVDualView("val_dot_kokkos", numFieldsBase);
+    if (enableAcceleration) val_dotdot_kokkos = DRVDualView("val_dotdot_kokkos", numFieldsBase);
   }
 
   if (p.isType<int>("Offset of First DOF"))
@@ -315,10 +315,11 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
   else {
     // Get MDField views from std::vector
     for (int i = 0; i < numFields; i++) {
-      // val_kokkos[i]=this->val[i].get_view();
-      val_kokkos[i] = this->val[i].get_static_view();
+      val_kokkos.view_host()(i) = this->val[i].get_static_view();
     }
-    d_val = val_kokkos.template view<ExecutionSpace>();
+    val_kokkos.modify_host();
+    val_kokkos.sync_device();
+    d_val = val_kokkos.view_device();
 
     Kokkos::parallel_for(PHAL_GatherSolRank0_Policy(0, workset.numCells), *this);
     cudaCheckError();
@@ -326,10 +327,11 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
     if (workset.transientTerms && this->enableTransient) {
       // Get MDField views from std::vector
       for (int i = 0; i < numFields; i++) {
-        // val_dot_kokkos[i]=this->val_dot[i].get_view();
-        val_dot_kokkos[i] = this->val_dot[i].get_static_view();
+        val_dot_kokkos.view_host()(i) = this->val_dot[i].get_static_view();
       }
-      d_val_dot = val_dot_kokkos.template view<ExecutionSpace>();
+      val_dot_kokkos.modify_host();
+      val_dot_kokkos.sync_device();
+      d_val_dot = val_dot_kokkos.view_device();
 
       Kokkos::parallel_for(PHAL_GatherSolRank0_Transient_Policy(0, workset.numCells), *this);
       cudaCheckError();
@@ -337,10 +339,11 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
     if (workset.accelerationTerms && this->enableAcceleration) {
       // Get MDField views from std::vector
       for (int i = 0; i < numFields; i++) {
-        // val_dotdot_kokkos[i]=this->val_dotdot[i].get_view();
-        val_dotdot_kokkos[i] = this->val_dotdot[i].get_static_view();
+        val_dotdot_kokkos.view_host()(i) = this->val_dotdot[i].get_static_view();
       }
-      d_val_dotdot = val_dotdot_kokkos.template view<ExecutionSpace>();
+      val_dotdot_kokkos.modify_host();
+      val_dotdot_kokkos.sync_device();
+      d_val_dotdot = val_dotdot_kokkos.view_device();
 
       Kokkos::parallel_for(PHAL_GatherSolRank0_Acceleration_Policy(0, workset.numCells), *this);
       cudaCheckError();
@@ -567,10 +570,11 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Tr
   else {
     // Get MDField views from std::vector
     for (int i = 0; i < numFields; i++) {
-      // val_kokkos[i]=this->val[i].get_view();
-      val_kokkos[i] = this->val[i].get_static_view();
+      val_kokkos.view_host()(i) = this->val[i].get_static_view();
     }
-    d_val = val_kokkos.template view<ExecutionSpace>();
+    val_kokkos.modify_host();
+    val_kokkos.sync_device();
+    d_val = val_kokkos.view_device();
 
     Kokkos::parallel_for(PHAL_GatherJacRank0_Policy(0, workset.numCells), *this);
     cudaCheckError();
@@ -578,10 +582,11 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Tr
     if (workset.transientTerms && this->enableTransient) {
       // Get MDField views from std::vector
       for (int i = 0; i < numFields; i++) {
-        // val_dot_kokkos[i]=this->val_dot[i].get_view();
-        val_dot_kokkos[i] = this->val_dot[i].get_static_view();
+        val_dot_kokkos.view_host()(i) = this->val_dot[i].get_static_view();
       }
-      d_val_dot = val_dot_kokkos.template view<ExecutionSpace>();
+      val_dot_kokkos.modify_host();
+      val_dot_kokkos.sync_device();
+      d_val_dot = val_dot_kokkos.view_device();
 
       Kokkos::parallel_for(PHAL_GatherJacRank0_Transient_Policy(0, workset.numCells), *this);
       cudaCheckError();
@@ -590,10 +595,11 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Tr
     if (workset.accelerationTerms && this->enableAcceleration) {
       // Get MDField views from std::vector
       for (int i = 0; i < numFields; i++) {
-        // val_dotdot_kokkos[i]=this->val_dotdot[i].get_view();
-        val_dotdot_kokkos[i] = this->val_dotdot[i].get_static_view();
+        val_dotdot_kokkos.view_host()(i) = this->val_dotdot[i].get_static_view();
       }
-      d_val_dot = val_dotdot_kokkos.template view<ExecutionSpace>();
+      val_dotdot_kokkos.modify_host();
+      val_dotdot_kokkos.sync_device();
+      d_val_dotdot = val_dotdot_kokkos.view_device();
 
       Kokkos::parallel_for(PHAL_GatherJacRank0_Acceleration_Policy(0, workset.numCells), *this);
       cudaCheckError();

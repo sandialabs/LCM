@@ -8,7 +8,7 @@
 #include "Albany_DiscretizationUtils.hpp"
 #include "Albany_KokkosTypes.hpp"
 #include "Albany_Layouts.hpp"
-#include "Kokkos_Vector.hpp"
+#include "Kokkos_DualView.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
@@ -54,7 +54,11 @@ class ScatterResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PH
  protected:
   Albany::WorksetConn                                                          nodeID;
   Albany::DeviceView1d<ST>                                                     f_kokkos;
-  Kokkos::vector<Kokkos::DynRankView<ScalarT const, PHX::Device>, PHX::Device> val_kokkos;
+  typedef Kokkos::DynRankView<ScalarT const, PHX::Device> ConstDynRankView;
+  typedef Kokkos::DualView<ConstDynRankView*, PHX::Device> ConstDRVDualView;
+  typedef typename ConstDRVDualView::t_dev ConstDRVDevView;
+  ConstDRVDualView                                                             val_kokkos;
+  ConstDRVDevView                                                              d_val_kokkos;
 };
 
 template <typename EvalT, typename Traits>
@@ -137,6 +141,7 @@ class ScatterResidual<PHAL::AlbanyTraits::Residual, Traits> : public ScatterResi
   using Base::f_kokkos;
   using Base::nodeID;
   using Base::val_kokkos;
+  using Base::d_val_kokkos;
 
   typedef typename PHX::Device::execution_space                         ExecutionSpace;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank0_Tag> PHAL_ScatterResRank0_Policy;
@@ -228,6 +233,7 @@ class ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits> : public ScatterResi
   using Base::f_kokkos;
   using Base::nodeID;
   using Base::val_kokkos;
+  using Base::d_val_kokkos;
 
   typedef typename PHX::Device::execution_space                                 ExecutionSpace;
   typedef Kokkos::RangePolicy<ExecutionSpace, PHAL_ScatterResRank0_Tag>         PHAL_ScatterResRank0_Policy;

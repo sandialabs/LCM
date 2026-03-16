@@ -68,7 +68,7 @@ ScatterResidualBase<EvalT, Traits>::ScatterResidualBase(Teuchos::ParameterList c
   }
 
   if (tensorRank == 0) {
-    val_kokkos.resize(numFieldsBase);
+    val_kokkos = ConstDRVDualView("val_kokkos", numFieldsBase);
   }
 
   if (p.isType<int>("Offset of First DOF")) {
@@ -120,7 +120,7 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_Sca
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
-      Kokkos::atomic_fetch_add(&f_kokkos(id), val_kokkos[eq](cell, node));
+      Kokkos::atomic_fetch_add(&f_kokkos(id), d_val_kokkos(eq)(cell, node));
     }
 }
 
@@ -165,7 +165,10 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename T
 
   if (this->tensorRank == 0) {
     // Get MDField views from std::vector
-    for (int i = 0; i < numFields; i++) val_kokkos[i] = this->val[i].get_view();
+    for (int i = 0; i < numFields; i++) val_kokkos.view_host()(i) = this->val[i].get_view();
+    val_kokkos.modify_host();
+    val_kokkos.sync_device();
+    d_val_kokkos = val_kokkos.view_device();
 
     Kokkos::parallel_for(PHAL_ScatterResRank0_Policy(0, workset.numCells), *this);
     cudaCheckError();
@@ -206,7 +209,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
-      Kokkos::atomic_fetch_add(&f_kokkos(id), (val_kokkos[eq](cell, node)).val());
+      Kokkos::atomic_fetch_add(&f_kokkos(id), (d_val_kokkos(eq)(cell, node)).val());
     }
 }
 
@@ -233,7 +236,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       row         = nodeID(cell, node, this->offset + eq);
-      auto valptr = val_kokkos[eq](cell, node);
+      auto valptr = d_val_kokkos(eq)(cell, node);
       for (int lunk = 0; lunk < nunk; lunk++) {
         ST val = valptr.fastAccessDx(lunk);
         Jac_kokkos.sumIntoValues(col[lunk], &row, 1, &val, false, true);
@@ -266,7 +269,7 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_Sca
   for (int node = 0; node < this->numNodes; ++node) {
     for (int eq = 0; eq < numFields; eq++) {
       row         = nodeID(cell, node, this->offset + eq);
-      auto valptr = val_kokkos[eq](cell, node);
+      auto valptr = d_val_kokkos(eq)(cell, node);
       for (int i = 0; i < nunk; ++i) vals[i] = valptr.fastAccessDx(i);
       Jac_kokkos.sumIntoValues(row, col, nunk, vals, false, true);
     }
@@ -451,7 +454,10 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename T
 
   if (this->tensorRank == 0) {
     // Get MDField views from std::vector
-    for (int i = 0; i < numFields; i++) val_kokkos[i] = this->val[i].get_view();
+    for (int i = 0; i < numFields; i++) val_kokkos.view_host()(i) = this->val[i].get_view();
+    val_kokkos.modify_host();
+    val_kokkos.sync_device();
+    d_val_kokkos = val_kokkos.view_device();
 
     if (loadResid) {
       Kokkos::parallel_for(PHAL_ScatterResRank0_Policy(0, workset.numCells), *this);

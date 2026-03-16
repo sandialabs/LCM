@@ -15,7 +15,7 @@
 #include <Ionit_Initializer.h>
 #include <Ioss_SubSystem.h>
 
-#include <Intrepid_FieldContainer.hpp>
+#include <Kokkos_DynRankView.hpp>
 #include <Teuchos_Array.hpp>
 #include <Teuchos_ArrayRCP.hpp>
 #include <Teuchos_CommHelpers.hpp>
@@ -266,7 +266,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
   stk::mesh::get_selected_entities(src_stk_selector, src_part_buckets, src_part_nodes);
 
-  Intrepid::FieldContainer<double> src_node_coords =
+  Kokkos::DynRankView<double, Kokkos::HostSpace> src_node_coords =
       DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(Teuchos::Array<stk::mesh::Entity>(src_part_nodes), *src_bulk_data);
 
   for (int index = 0; index < tgt_time_step_indices.size(); index++) {
@@ -358,7 +358,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
     stk::mesh::get_selected_entities(tgt_stk_selector, tgt_part_buckets, tgt_part_nodes);
 
-    Intrepid::FieldContainer<double> tgt_node_coords =
+    Kokkos::DynRankView<double, Kokkos::HostSpace> tgt_node_coords =
         DataTransferKit::STKMeshHelpers::getEntityNodeCoordinates(Teuchos::Array<stk::mesh::Entity>(tgt_part_nodes), *tgt_bulk_data);
 
     int num_tgt_part_nodes = tgt_part_nodes.size();  // number nodes (owned + overlap)

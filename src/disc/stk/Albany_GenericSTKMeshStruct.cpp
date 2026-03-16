@@ -948,7 +948,7 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetN
     stk::mesh::Entity side3D = bulkData->get_entity(SIDE_RANK, side3D_GID + 1);
 
     // Safety check
-    ALBANY_PANIC(bulkData->num_elements(side3D) != 1, "Error! Side " << side3D_GID << " has more/less than 1 adjacent element.\n");
+    ALBANY_PANIC(bulkData->num_elements(side3D) < 1, "Error! Side " << side3D_GID << " has no adjacent elements.\n");
 
     side_cells               = bulkData->begin_elements(side3D);
     stk::mesh::Entity cell3D = side_cells[0];

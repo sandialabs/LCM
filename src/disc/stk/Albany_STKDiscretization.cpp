@@ -2071,7 +2071,7 @@ STKDiscretization::computeSideSets()
     for (std::size_t localSideID = 0; localSideID < sides.size(); localSideID++) {
       stk::mesh::Entity sidee = sides[localSideID];
 
-      ALBANY_PANIC(bulkData.num_elements(sidee) != 1, "STKDisc: cannot figure out side set topology for side set " << ss->first << std::endl);
+      ALBANY_PANIC(bulkData.num_elements(sidee) < 1, "STKDisc: side in side set " << ss->first << " has no connected elements" << std::endl);
 
       stk::mesh::Entity elem = bulkData.begin_elements(sidee)[0];
 

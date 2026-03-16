@@ -105,6 +105,7 @@ function(lcm_do_trilinos)
       "-DTrilinos_ENABLE_Shards:BOOL=ON"
       "-DTrilinos_ENABLE_Stratimikos:BOOL=ON"
       "-DTrilinos_ENABLE_TESTS:BOOL=OFF"
+      "-DTPL_ENABLE_gtest:BOOL=OFF"
       "-DTrilinos_ENABLE_Teko:BOOL=ON"
       "-DTrilinos_ENABLE_Tempus:BOOL=ON"
       "-DTrilinos_ENABLE_Teuchos:BOOL=ON"

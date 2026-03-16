@@ -315,7 +315,7 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
   else {
     // Get MDField views from std::vector
     for (int i = 0; i < numFields; i++) {
-      val_kokkos.view_host()(i) = this->val[i].get_static_view();
+      val_kokkos.view_host()(i) = this->val[i].get_view();
     }
     val_kokkos.modify_host();
     val_kokkos.sync_device();
@@ -327,7 +327,7 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
     if (workset.transientTerms && this->enableTransient) {
       // Get MDField views from std::vector
       for (int i = 0; i < numFields; i++) {
-        val_dot_kokkos.view_host()(i) = this->val_dot[i].get_static_view();
+        val_dot_kokkos.view_host()(i) = this->val_dot[i].get_view();
       }
       val_dot_kokkos.modify_host();
       val_dot_kokkos.sync_device();
@@ -339,7 +339,7 @@ GatherSolution<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Tr
     if (workset.accelerationTerms && this->enableAcceleration) {
       // Get MDField views from std::vector
       for (int i = 0; i < numFields; i++) {
-        val_dotdot_kokkos.view_host()(i) = this->val_dotdot[i].get_static_view();
+        val_dotdot_kokkos.view_host()(i) = this->val_dotdot[i].get_view();
       }
       val_dotdot_kokkos.modify_host();
       val_dotdot_kokkos.sync_device();
@@ -570,7 +570,7 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Tr
   else {
     // Get MDField views from std::vector
     for (int i = 0; i < numFields; i++) {
-      val_kokkos.view_host()(i) = this->val[i].get_static_view();
+      val_kokkos.view_host()(i) = this->val[i].get_view();
     }
     val_kokkos.modify_host();
     val_kokkos.sync_device();
@@ -582,7 +582,7 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Tr
     if (workset.transientTerms && this->enableTransient) {
       // Get MDField views from std::vector
       for (int i = 0; i < numFields; i++) {
-        val_dot_kokkos.view_host()(i) = this->val_dot[i].get_static_view();
+        val_dot_kokkos.view_host()(i) = this->val_dot[i].get_view();
       }
       val_dot_kokkos.modify_host();
       val_dot_kokkos.sync_device();
@@ -595,7 +595,7 @@ GatherSolution<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Tr
     if (workset.accelerationTerms && this->enableAcceleration) {
       // Get MDField views from std::vector
       for (int i = 0; i < numFields; i++) {
-        val_dotdot_kokkos.view_host()(i) = this->val_dotdot[i].get_static_view();
+        val_dotdot_kokkos.view_host()(i) = this->val_dotdot[i].get_view();
       }
       val_dotdot_kokkos.modify_host();
       val_dotdot_kokkos.sync_device();

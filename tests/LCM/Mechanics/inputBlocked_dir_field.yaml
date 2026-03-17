@@ -7,12 +7,12 @@ LCM:
     Dirichlet BCs:
       DBC on NS nodeset0 for DOF X prescribe Field: dirichlet_field
       DBC on NS nodeset0 for DOF Y prescribe Field: dirichlet_field
-      DBC on NS nodeset1 for DOF X prescribe Field: dirichlet_field
-      DBC on NS nodeset1 for DOF Y prescribe Field: dirichlet_field
+      DBC on NS NodeSet1 for DOF X prescribe Field: dirichlet_field
+      DBC on NS NodeSet1 for DOF Y prescribe Field: dirichlet_field
     Parameters:
       Number: 3
       Parameter 0: DBC on NS nodeset0 for DOF X prescribe Field
-      Parameter 1: DBC on NS nodeset1 for DOF X prescribe Field
+      Parameter 1: DBC on NS NodeSet1 for DOF X prescribe Field
       Parameter 2: DBC on NS nodeset0 for DOF Y prescribe Field
     Response Functions:
       Number: 1

@@ -3,11 +3,11 @@ LCM:
     Name: Elasticity 3D
     Phalanx Graph Visualization Detail: 0
     Dirichlet BCs:
-      SDBC on NS fix for DOF X: 0.00000000e+00
-      SDBC on NS fix for DOF Y: 0.00000000e+00
-      SDBC on NS fix for DOF Z: 0.00000000e+00
+      SDBC on NS FIX for DOF X: 0.00000000e+00
+      SDBC on NS FIX for DOF Y: 0.00000000e+00
+      SDBC on NS FIX for DOF Z: 0.00000000e+00
     Neumann BCs:
-      NBC on SS cl1 for DOF all set P: [0.1]
+      NBC on SS CL1 for DOF all set P: [0.1]
     Elastic Modulus:
       Elastic Modulus Type: Constant
       Value: 4000.00000000
@@ -16,7 +16,7 @@ LCM:
       Value: 0.3
     Parameters:
       Number: 1
-      Parameter 0: NBC on SS cl1 for DOF all set P
+      Parameter 0: NBC on SS CL1 for DOF all set P
     Response Functions:
       Number: 1
       Response 0: Solution Min Value

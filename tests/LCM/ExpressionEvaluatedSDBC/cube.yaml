@@ -16,24 +16,24 @@ LCM:
     Displacement:
       Variable Type: DOF
     Dirichlet BCs:
-      SDBC on NS -x for DOF X: 0.0
-      ExpressionEvaluated SDBC on NS -x for DOF Y: '0.01 * x * t'
-      SDBC on NS -x for DOF Z: 0.0
-      SDBC on NS +x for DOF X: 0.0
-      ExpressionEvaluated SDBC on NS +x for DOF Y: '0.01 * x * t'
-      SDBC on NS +x for DOF Z: 0.0
-      SDBC on NS -y for DOF X: 0.0
-      ExpressionEvaluated SDBC on NS -y for DOF Y: '0.01 * x * t'
-      SDBC on NS -y for DOF Z: 0.0
-      SDBC on NS +y for DOF X: 0.0
-      ExpressionEvaluated SDBC on NS +y for DOF Y: '0.01 * x * t'
-      SDBC on NS +y for DOF Z: 0.0
-      SDBC on NS -z for DOF X: 0.0
-      ExpressionEvaluated SDBC on NS -z for DOF Y: '0.01 * x * t'
-      SDBC on NS -z for DOF Z: 0.0
-      SDBC on NS +z for DOF X: 0.0
-      ExpressionEvaluated SDBC on NS +z for DOF Y: '0.01 * x * t'
-      SDBC on NS +z for DOF Z: 0.0
+      SDBC on NS -X for DOF X: 0.0
+      ExpressionEvaluated SDBC on NS -X for DOF Y: '0.01 * x * t'
+      SDBC on NS -X for DOF Z: 0.0
+      SDBC on NS +X for DOF X: 0.0
+      ExpressionEvaluated SDBC on NS +X for DOF Y: '0.01 * x * t'
+      SDBC on NS +X for DOF Z: 0.0
+      SDBC on NS -Y for DOF X: 0.0
+      ExpressionEvaluated SDBC on NS -Y for DOF Y: '0.01 * x * t'
+      SDBC on NS -Y for DOF Z: 0.0
+      SDBC on NS +Y for DOF X: 0.0
+      ExpressionEvaluated SDBC on NS +Y for DOF Y: '0.01 * x * t'
+      SDBC on NS +Y for DOF Z: 0.0
+      SDBC on NS -Z for DOF X: 0.0
+      ExpressionEvaluated SDBC on NS -Z for DOF Y: '0.01 * x * t'
+      SDBC on NS -Z for DOF Z: 0.0
+      SDBC on NS +Z for DOF X: 0.0
+      ExpressionEvaluated SDBC on NS +Z for DOF Y: '0.01 * x * t'
+      SDBC on NS +Z for DOF Z: 0.0
     Initial Condition:
       Function: Constant
       Function Data: [0.0, 0.0, 0.0]

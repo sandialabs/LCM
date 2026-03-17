@@ -13,11 +13,11 @@ LCM:
       Function: Constant
       Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00]
     Dirichlet BCs:
-      SDBC on NS nodeset0 for DOF X: 0.00000000e+00
-      SDBC on NS nodeset1 for DOF X: 0.00000000e+00
-      SDBC on NS nodeset2 for DOF Y: 0.00000000e+00
-      SDBC on NS nodeset3 for DOF Y: 0.00000000e+00
-      SDBC on NS nodeset4 for DOF Z: 0.00000000e+00
+      SDBC on NS NodeSet0 for DOF X: 0.00000000e+00
+      SDBC on NS NodeSet1 for DOF X: 0.00000000e+00
+      SDBC on NS NodeSet2 for DOF Y: 0.00000000e+00
+      SDBC on NS NodeSet3 for DOF Y: 0.00000000e+00
+      SDBC on NS NodeSet4 for DOF Z: 0.00000000e+00
       SDBC on NS nodeset5 for DOF Z: 0.00000000e+00
     Response Functions:
       Observe Responses: true

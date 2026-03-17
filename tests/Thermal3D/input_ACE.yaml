@@ -18,10 +18,10 @@ LCM:
     ACE Temperature:
       Variable Type: DOF
     Dirichlet BCs:
-      SDBC on NS -z for DOF X: 0.0
-      SDBC on NS -z for DOF Y: 0.0
-      SDBC on NS -z for DOF Z: 0.0
-      ExpressionEvaluated SDBC on NS +z for DOF T: '200.0 + 5.0e-04 * t'
+      SDBC on NS -Z for DOF X: 0.0
+      SDBC on NS -Z for DOF Y: 0.0
+      SDBC on NS -Z for DOF Z: 0.0
+      ExpressionEvaluated SDBC on NS +Z for DOF T: '200.0 + 5.0e-04 * t'
     Initial Condition:
       Function: Expression Parser
       Function Expressions: ['0.0', '0.0', '0.0', '200.0']

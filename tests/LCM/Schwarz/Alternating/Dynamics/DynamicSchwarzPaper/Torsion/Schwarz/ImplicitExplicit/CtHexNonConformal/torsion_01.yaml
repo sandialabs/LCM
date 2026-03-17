@@ -23,7 +23,7 @@ ANONYMOUS:
         IP Field Layout 0: Tensor
         Output to File: true
     Dirichlet BCs: 
-      SDBC on NS nodeset4 for DOF StrongSchwarz:
+      SDBC on NS NodeSet4 for DOF StrongSchwarz:
         BC Function: StrongSchwarz
         Coupled Application: torsion_00_expl.yaml
         Coupled Block: Block0

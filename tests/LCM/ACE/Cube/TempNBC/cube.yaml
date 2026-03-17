@@ -23,10 +23,10 @@ LCM:
         Time Values: [0.0, 300.0, 7.0e+07]
         BC Values: [[-54.0e+03], [-54.0e+03], [-54.0e+03]] # [W/m2]
     Dirichlet BCs:
-      SDBC on NS -z for DOF X: 0.0
-      SDBC on NS -z for DOF Y: 0.0
-      SDBC on NS -z for DOF Z: 0.0
-      SDBC on NS -z for DOF T: 250.0
+      SDBC on NS -Z for DOF X: 0.0
+      SDBC on NS -Z for DOF Y: 0.0
+      SDBC on NS -Z for DOF Z: 0.0
+      SDBC on NS -Z for DOF T: 250.0
     Initial Condition:
       Function: Constant
       Function Data: [0.0, 0.0, 0.0, 250.0]

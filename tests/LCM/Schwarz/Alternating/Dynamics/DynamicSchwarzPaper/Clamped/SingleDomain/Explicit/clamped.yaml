@@ -15,12 +15,12 @@ ANONYMOUS:
       Function: Constant
       Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00]
     Dirichlet BCs: 
-      SDBC on NS -x for DOF X: 0.00000000e+00
-      SDBC on NS +x for DOF X: 0.00000000e+00
-      SDBC on NS -y for DOF Y: 0.00000000e+00
-      SDBC on NS +y for DOF Y: 0.00000000e+00
-      SDBC on NS -z for DOF Z: 0.00000000e+00
-      SDBC on NS +z for DOF Z: 0.00000000e+00
+      SDBC on NS -X for DOF X: 0.00000000e+00
+      SDBC on NS +X for DOF X: 0.00000000e+00
+      SDBC on NS -Y for DOF Y: 0.00000000e+00
+      SDBC on NS +Y for DOF Y: 0.00000000e+00
+      SDBC on NS -Z for DOF Z: 0.00000000e+00
+      SDBC on NS +Z for DOF Z: 0.00000000e+00
     Response Functions:
       Observe Responses: true
       Responses Observation Frequency: 100

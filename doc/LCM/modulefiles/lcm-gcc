@@ -14,9 +14,9 @@ setenv CC [exec which gcc]
 setenv CXX [exec which g++]
 
 if { [is-loaded lcm-fedora] } {
-  setenv CXXFLAGS "-std=c++17 -Wno-terminate -Wno-deprecated-declarations"
+  setenv CXXFLAGS "-std=c++20 -Wno-terminate -Wno-deprecated-declarations"
 } else {
-  setenv CXXFLAGS "-std=c++17"
+  setenv CXXFLAGS "-std=c++20"
 }
 
 setenv FC [exec which gfortran]

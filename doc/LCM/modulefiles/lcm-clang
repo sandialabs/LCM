@@ -13,7 +13,7 @@ setenv CXX [exec which clang++-15]
 setenv FC [exec which gfortran]
 
 if { [is-loaded lcm-fedora] } {
-  setenv CXXFLAGS "-std=c++17 -Wno-implicit-int-float-conversion"
+  setenv CXXFLAGS "-std=c++20 -Wno-implicit-int-float-conversion"
 } else {
-  setenv CXXFLAGS "-std=c++17"
+  setenv CXXFLAGS "-std=c++20"
 }

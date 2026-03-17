@@ -11,4 +11,10 @@ if { ![ file exists /etc/redhat-release ] } {
 
 module load lcm-common
 
+# Newer Trilinos requires CMake >= 3.27 (system may have older)
+set cmake_spack_dir "/opt/spack/opt/spack/linux-rhel9-zen4/gcc-11.5.0/cmake-3.27.9-z4kauuh72goxpzr6zp6jbhe22hbran7g"
+if { [ file exists $cmake_spack_dir/bin/cmake ] } {
+  prepend-path PATH $cmake_spack_dir/bin
+}
+
 conflict lcm-fedora lcm-sems lcm-cluster lcm-ubuntu lcm-scientific-linux

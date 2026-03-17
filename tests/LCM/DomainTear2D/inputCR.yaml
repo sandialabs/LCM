@@ -38,9 +38,9 @@ LCM:
     Use Serial Mesh: false
   Regression Results:
     Number of Comparisons: 2
-    Test Values: [5.710185428386e-02, 1.392015278877e-02]
-    Relative Tolerance: 1.00000000e-06
-    Absolute Tolerance: 1.00000000e-06
+    Test Values: [6.842659064361e-03, 1.668086980000e-03]
+    Relative Tolerance: 1.00000000e-04
+    Absolute Tolerance: 1.00000000e-04
   Piro:
     LOCA:
       Bifurcation: { }

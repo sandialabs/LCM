@@ -4,7 +4,7 @@ ALBANY:
     Solution Method: Steady
     MaterialDB Filename: materials.yaml
     Dirichlet BCs: 
-      DBC on NS ambient for DOF T: 3.13149999999999977e+02
+      DBC on NS Ambient for DOF T: 3.13149999999999977e+02
     ThermalConductivity: 
       ThermalConductivity Type: Block Dependent
     Response Functions: 

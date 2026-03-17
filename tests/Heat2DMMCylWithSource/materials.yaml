@@ -1,11 +1,11 @@
 ALBANY:
   Reference Material: INERT
   ElementBlocks: 
-    fuel: 
+    Fuel:
       material: UO2
-    clad: 
+    Clad:
       material: ZR4
-    environ: 
+    Environ:
       material: INERT
   Materials: 
     UO2: 

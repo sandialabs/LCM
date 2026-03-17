@@ -62,7 +62,7 @@ PHAL::PoissonResid<EvalT, Traits>::evaluateFields(typename Traits::EvalData work
   FST::integrate(PhiResidual.get_view(), PhiFlux.get_view(), wGradBF.get_view(),
                  false);  // "false" overwrites
 
-  auto neg_source = PHAL::create_copy("neg_Source", Source.get_view());
+  auto neg_source = Kokkos::createDynRankView(Source.get_view(), "neg_Source", Source.extent(0), Source.extent(1));
   if (haveSource) {
     for (int i = 0; i < Source.extent(0); i++)
       for (int j = 0; j < Source.extent(1); j++) neg_source(i, j) = -1.0 * Source(i, j);

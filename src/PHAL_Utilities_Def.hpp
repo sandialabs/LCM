@@ -271,8 +271,19 @@ template <class T, class... P>
 inline typename Kokkos::DynRankView<T, P...>::non_const_type
 create_copy(std::string const& name, const Kokkos::DynRankView<T, P...>& src)
 {
+  // Use createDynRankViewWithType which correctly handles FAD scalar
+  // dimensions via the ViewFactory mechanism. Direct use of src.layout()
+  // can double-subtract the FAD dimension in Kokkos 4.7+ with Sacado.
   using dst_type = typename Kokkos::DynRankView<T, P...>::non_const_type;
-  dst_type dst(name, src.layout());
+  dst_type dst;
+  const auto r = src.rank();
+  if      (r == 0) dst = dst_type(name);
+  else if (r == 1) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0));
+  else if (r == 2) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1));
+  else if (r == 3) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2));
+  else if (r == 4) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2), src.extent(3));
+  else if (r == 5) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2), src.extent(3), src.extent(4));
+  else             dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2), src.extent(3), src.extent(4), src.extent(5));
   Kokkos::deep_copy(dst, src);
   return dst;
 }

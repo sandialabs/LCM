@@ -18,7 +18,7 @@ LCM:
       SDBC on NS NodeSet2 for DOF Y: 0.00000000e+00
       SDBC on NS NodeSet3 for DOF Y: 0.00000000e+00
       SDBC on NS NodeSet4 for DOF Z: 0.00000000e+00
-      SDBC on NS nodeset5 for DOF Z: 0.00000000e+00
+      SDBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Response Functions:
       Observe Responses: true
       Responses Observation Frequency: 100

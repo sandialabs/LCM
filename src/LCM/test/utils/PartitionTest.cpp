@@ -94,6 +94,8 @@ main(int ac, char* av[])
     return 1;
   }
 
+  {  // Scoped block to ensure Trilinos objects are destroyed before Kokkos::finalize
+
   // Read mesh
   LCM::ConnectivityArray connectivity_array(input_file, output_file);
 
@@ -202,6 +204,8 @@ main(int ac, char* av[])
   std::chrono::duration<double> elapsed_seconds = end - start;
   std::cout << std::scientific << std::setw(16) << std::setprecision(8);
   std::cout << "PARTITION TIME [s]: " << elapsed_seconds.count() << std::endl;
+
+  }  // End scoped block — Trilinos objects destroyed here
 
   Kokkos::finalize();
   return 0;

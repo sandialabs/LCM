@@ -301,8 +301,9 @@ main(int argc, char* argv[])
 
   std::cout << "" << std::endl;
 
-  // Setup communication.
+  // Setup communication and Kokkos.
   Teuchos::GlobalMPISession mpiSession(&argc, &argv);
+  Kokkos::initialize(argc, argv);
 
   Teuchos::RCP<Teuchos::Comm<int> const> comm = Teuchos::DefaultComm<int>::getComm();
 
@@ -363,4 +364,5 @@ main(int argc, char* argv[])
 
   *out << " ...done!" << std::endl;
 
+  Kokkos::finalize();
 }  // end file interpolation_volume_to_ns.cpp

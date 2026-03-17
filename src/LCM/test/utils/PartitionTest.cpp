@@ -3,6 +3,7 @@
 // in the file license.txt in the top-level Albany directory.
 
 // Simple mesh partitioning program
+#include <Kokkos_Core.hpp>
 #include <LCMPartition.hpp>
 #include <Teuchos_CommandLineProcessor.hpp>
 #include <algorithm>
@@ -12,7 +13,8 @@
 int
 main(int ac, char* av[])
 {
-  // Initialize Zoltan
+  // Initialize Kokkos and Zoltan
+  Kokkos::initialize(ac, av);
   float version;
 
   Zoltan_Initialize(ac, av, &version);
@@ -201,5 +203,6 @@ main(int ac, char* av[])
   std::cout << std::scientific << std::setw(16) << std::setprecision(8);
   std::cout << "PARTITION TIME [s]: " << elapsed_seconds.count() << std::endl;
 
+  Kokkos::finalize();
   return 0;
 }

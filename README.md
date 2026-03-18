@@ -2,78 +2,190 @@
 
 # Albany-LCM
 
-Albany-LCM (Laboratory for Computational Mechanics) is spin-off (fork) from <a href = "https://github.com/sandialabs/Albany">Albany</a>, an implicit, unstructured grid, finite element code for the solution and analysis of multiphysics problems. The Albany-LCM repository 
-on the GitHub site contains almost 200 regression tests and examples
-that demonstrate the code's capabilities on a wide variety of problems, with a strong focus on computational 
-solid mechanics and thermo-mechanics.
+Albany-LCM (Laboratory for Computational Mechanics) is a fork of [Albany](https://github.com/sandialabs/Albany), an implicit, unstructured grid, finite element code for the solution and analysis of multiphysics problems. Albany-LCM focuses on computational solid mechanics and thermo-mechanics, with nearly 200 regression tests demonstrating capabilities across a wide variety of problems.
 
 ## Features
 
 ### Analysis of complex multiphysics problems
 
-
 ![Notched Cylinder Multi-Scale Simulation](https://github.com/sandialabs/LCM/blob/main/wiki/lcm_image_notched_cylinder.png)
-<center> Illustration of solid mechanics simulation of a notched cylinder, simulated using the <a href="https://onlinelibrary.wiley.com/doi/10.1002/nme.6982">alternating Schwarz-based multi-scale coupling capability</a> in Albany-LCM. </center>
-	
 
-### Software architecture
+Solid mechanics simulation of a notched cylinder using the [alternating Schwarz-based multi-scale coupling capability](https://onlinelibrary.wiley.com/doi/10.1002/nme.6982) in Albany-LCM.
 
-Albany-LCM heavily leverages the [Trilinos](https://trilinos.org) Framework, available at:
+### Capabilities
 
-	git clone https://github.com/trilinos/Trilinos.git
+- Large-scale parallel simulations (2.1+ billion DOFs) using MPI
+- Automatic differentiation via [Sacado](https://trilinos.github.io/sacado.html)
+- Constitutive models: linear elasticity, J2 plasticity, crystal plasticity, hyperelasticity, damage models
+- [Schwarz alternating method](https://onlinelibrary.wiley.com/doi/10.1002/nme.6982) for multi-scale coupling
+- [Arctic Coastal Erosion (ACE) model](https://www.sciencedirect.com/science/article/pii/S0377042721001527): coupled thermo-mechanical model with permafrost constitutive models, part of the [InterFACE project](https://climatemodeling.science.energy.gov/projects/interface-interdisciplinary-research-arctic-coastal-environments)
+- Data transfer between coupled domains via [DataTransferKit (DTK)](https://github.com/ikalash/DataTransferKit)
 
-Albany-LCM supports the solution of very large problems (those over 2.1 billion degrees of freedom) using MPI.
-It relies on automatic differentiation from the <a href="https://trilinos.github.io/sacado.html">Sacado library</a> of Trilinos, which makes it straightforward to add
-new PDEs/physics to the code.  Albany-LCM contains a wide variety of constitutive models for solid mechanics, 
-ranging from simple linear elasticity to sophisticated nonlinear micro-structure models with plasticity (e.g., J2 plasticity, crystal plasticity), and the <a href="https://onlinelibrary.wiley.com/doi/10.1002/nme.6982">Schwarz alternating method for multi-scale coupling in solid mechanics</a>.  It also houses the terrestrial component of the <a href="https://www.sciencedirect.com/science/article/pii/S0377042721001527?via%3Dihub">Arctic Coastal Erosion (ACE) model</a>, a coupled thermo-mechanical model with 
-some novel permafrost constitutive models currently under 
-development as part of the <a href="https://climatemodeling.science.energy.gov/projects/interface-interdisciplinary-research-arctic-coastal-environments">InterFACE project</a>.
+## Prerequisites
 
-## Building Albany
+Albany-LCM requires [Trilinos](https://trilinos.org) and the following system packages.
 
-To get started with Albany-LCM it is helpful to consult the
-build instructions for both Trilinos and Albany located on the Albany wiki at
-[https://github.com/sandialabs/Albany/wiki/Building-Albany-and-supporting-tools](https://github.com/sandialabs/Albany/wiki/Building-Albany-and-supporting-tools).
-For help with building the code, please contact <a href = www.sandia.gov/~ikalash>Irina Tezaur</a> (ikalash@sandia.gov) or Alejandro 
-Mota (amota@sandia.gov).  
+### RHEL / Fedora
 
-## Nightly Build and Test Results
+```bash
+sudo dnf install \
+  blas blas-devel boost boost-devel boost-openmpi boost-openmpi-devel \
+  cmake gcc-c++ gcc-gfortran gtest-devel git \
+  hdf5 hdf5-devel hdf5-openmpi hdf5-openmpi-devel \
+  lapack lapack-devel netcdf netcdf-devel netcdf-openmpi netcdf-openmpi-devel \
+  openblas openblas-devel openmpi openmpi-devel environment-modules
+```
 
-The Albany-LCM repository is tested nightly on several CPU-based architectures, with the 
-results posted to an internal-to-Sandia CDash site.
+Optional (for clang builds):
+```bash
+sudo dnf install clang clang-devel
+```
 
-The regression test suite is contained within the Albany-LCM repository in the directories:
+CMake 3.27+ is required. If your system cmake is older:
+```bash
+spack install cmake@3.27
+```
 
-	/tests
+### Ubuntu
 
-These tests are stand-alone and also serve as nice examples about how to describe various multiphysics problems.
-They also serve as a template for developing new simulations.
+```bash
+sudo apt install \
+  libblas-dev libboost-dev libboost-program-options-dev \
+  cmake g++ gfortran git \
+  libhdf5-openmpi-dev liblapack-dev libnetcdf-dev \
+  libopenmpi-dev mpi-default-bin environment-modules
+```
 
-Once Albany-LCM is built, the default test suite is executed by typing `ctest`
-within the build directory. Any individual test can be executed by
-moving into its sub-directory, and executing `ctest` in that
-sub-directory. Many Albany-LCM tests run in parallel using up to 4 MPI ranks.
+## Quick Start
 
-## Documentation
+### 1. Clone repositories
 
-Unfortunately, we do not have up-to-date documentation of Albany-LCM; 
-the interested user may wish to consult the (out-of-date) [HTML user guide](http://sandialabs.github.io/Albany/user-guide/guide.html) inside the Albany-LCM repository at:
+```bash
+mkdir ~/LCM && cd ~/LCM
 
-	/doc/user-guide/guide.html
+git clone git@github.com:trilinos/Trilinos.git
+git clone git@github.com:sandialabs/LCM.git
+git clone -b dtk-2.0-tpetra-static-graph git@github.com:ikalash/DataTransferKit.git
+cp -r DataTransferKit Trilinos/
+```
 
-The LaTeX Developer's Guide (also out-of-date) is located at:
+### 2. Set up environment
 
-	/doc/developersGuide
+Add to `~/.bashrc`:
+```bash
+export LCM_DIR=~/LCM
+module use $LCM_DIR/LCM/doc/LCM/modulefiles
+```
 
+Log out and back in, or `source ~/.bashrc`.
 
-## Note on Legacy and Unsupported Code
+### 3. Create the `lcm` symlink
 
-When Albany-LCM was first created by forking from the <a href="https://github.com/sandialabs/Albany">main Albany code</a>, the idea
-was to use this code primarily for analyses involving mechanics and thermo-mechanics, 
-as the name of the code suggests.  To facilitate development of the code, a decision
-was made to remove PDEs and capabilities that were no longer funded, including 
- PDEs not relevant for solid mechanics modeling, Kokkos kernels and mesh adaptation.  Users interested in these capability
-should check out the <a href="https://github.com/sandialabs/Albany">main Albany repository</a>, which houses a performance-portable land-ice model
-known as <a href="https://mpas-dev.github.io/land_ice/land_ice.html">MPAS-Albany Land Ice (MALI)</a> and the <a href="https://github.com/scorec/Albany">Albany-SCOREC repository</a>, which focuses on 
-developing capabilities for additive manufacturing and includes adaptive mesh refinement (AMR) via 
-the <a href="https://scorec.rpi.edu/pumi/">Parallel Unstructured Mesh Interface (PUMI)</a>.  
+```bash
+cd ~/LCM
+ln -s LCM/doc/LCM/build/lcm .
+```
+
+### 4. Build and test
+
+```bash
+cd ~/LCM
+module load release           # loads serial-gcc-release environment
+
+./lcm clean trilinos          # clean previous builds
+./lcm config trilinos 16      # configure Trilinos (16 = parallel threads)
+./lcm build trilinos 16       # build Trilinos
+
+./lcm clean lcm               # clean previous LCM build
+./lcm config lcm 16           # configure LCM
+./lcm build lcm 16            # build LCM
+./lcm test lcm                # run test suite
+```
+
+Or do everything at once:
+```bash
+./lcm all 16
+```
+
+### 5. Available commands
+
+```
+lcm clean   <package>        Clean build (and install for trilinos)
+lcm config  <package> [N]    Configure package
+lcm build   <package> [N]    Build package with N threads (default: nproc)
+lcm test    <package>        Run tests
+lcm all     [N]              Full pipeline: clean + config + build + test
+lcm help                     Show help
+```
+
+## Module System
+
+Modules configure the compiler, architecture, and build type. Available configurations:
+
+| Module | Compiler | Build Type |
+|--------|----------|------------|
+| `serial-gcc-release` | GCC | Release (optimized) |
+| `serial-gcc-debug` | GCC | Debug (symbols) |
+| `serial-clang-release` | Clang | Release |
+| `serial-clang-debug` | Clang | Debug |
+
+The `release` module is an alias for `serial-gcc-release`.
+
+Load a module before building:
+```bash
+module load serial-clang-release
+./lcm all 16 --module=serial-clang-release
+```
+
+Build directories are named by configuration, e.g. `lcm-build-serial-gcc-release`.
+A corresponding Trilinos installation must exist for each configuration.
+
+## Running
+
+After building, the Albany executable is in the build directory:
+```bash
+cd ~/LCM/lcm-build-serial-gcc-release/tests/LCM/Pressure
+mpiexec -np 4 ~/LCM/lcm-build-serial-gcc-release/src/Albany input_tetra4.yaml
+```
+
+The module system adds build and Trilinos install directories to `PATH`, so after loading a module, `Albany` and Trilinos tools (`decomp`, `epu`, `exodiff`) are available directly.
+
+## Testing
+
+The test suite is in `tests/` and runs via CTest:
+```bash
+./lcm test lcm
+```
+
+Individual tests can be run from their subdirectory:
+```bash
+cd ~/LCM/lcm-build-serial-gcc-release/tests/LCM/Pressure
+ctest
+```
+
+Many tests run in parallel using up to 4 MPI ranks.
+
+## Nightly Tests
+
+The `doc/LCM/build/clone-build-test.sh` script clones all repositories from scratch and runs the full build and test suite. It is typically run via cron:
+
+```bash
+# In crontab:
+00 00 * * 1-5 cd /home/lcm/LCM; bash -l -c "./clone-build-test.sh"
+```
+
+## Contributing
+
+Development discussion: https://github.com/sandialabs/LCM/issues
+
+We follow the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html). Use `clang-format` with the `.clang-format` file in `src/LCM/`:
+```bash
+clang-format -i <source file>
+```
+
+Please ensure all tests pass before pushing changes.
+
+## Contact
+
+- Alejandro Mota (amota@sandia.gov)
+- Irina Tezaur (ikalash@sandia.gov)

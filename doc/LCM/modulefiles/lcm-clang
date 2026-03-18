@@ -2,10 +2,6 @@
 
 module-whatis "LCM Clang compiler"
 
-if { [is-loaded lcm-sems] } {
-  module load sierra-devel/clang
-}
-
 setenv TOOL_CHAIN clang
 
 setenv CC [exec which clang-15]

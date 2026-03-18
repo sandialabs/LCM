@@ -17,4 +17,4 @@ if { [ file exists $cmake_spack_dir/bin/cmake ] } {
   prepend-path PATH $cmake_spack_dir/bin
 }
 
-conflict lcm-fedora lcm-sems lcm-cluster lcm-ubuntu lcm-scientific-linux
+conflict lcm-fedora lcm-ubuntu

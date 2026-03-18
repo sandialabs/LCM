@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
+    env:
+      LCM_DIR: ${{ github.workspace }}
+
     steps:
     - name: Install dependencies
       run: |
@@ -19,12 +22,12 @@ jobs:
           cmake g++ gfortran git \
           libhdf5-openmpi-dev liblapack-dev libnetcdf-dev \
           libopenmpi-dev mpi-default-bin environment-modules \
-          libgtest-dev
+          libgtest-dev openblas-dev
 
     - name: Clone Trilinos
       run: |
         git clone -q --depth 1 -b develop \
-          https://github.com/trilinos/Trilinos.git $HOME/Trilinos
+          https://github.com/trilinos/Trilinos.git $LCM_DIR/Trilinos
 
     - name: Clone LCM
       uses: actions/checkout@v4
@@ -34,56 +37,14 @@ jobs:
     - name: Clone DTK
       run: |
         git clone -q --depth 1 -b dtk-2.0-tpetra-static-graph \
-          https://github.com/ikalash/DataTransferKit.git $HOME/DataTransferKit
-        cp -r $HOME/DataTransferKit $HOME/Trilinos/
+          https://github.com/ikalash/DataTransferKit.git $LCM_DIR/DataTransferKit
+        cp -r $LCM_DIR/DataTransferKit $LCM_DIR/Trilinos/
 
-    - name: Set up environment
+    - name: Build and test
       run: |
-        echo "LCM_DIR=$HOME" >> $GITHUB_ENV
-        echo "MODULEPATH=$HOME/LCM/doc/LCM/modulefiles:$MODULEPATH" >> $GITHUB_ENV
-
-    - name: Configure Trilinos
-      run: |
-        cd $HOME
+        cd $LCM_DIR
         ln -sf LCM/doc/LCM/build/lcm .
         source /usr/share/modules/init/bash
-        export MODULEPATH=$HOME/LCM/doc/LCM/modulefiles:$MODULEPATH
-        export LCM_DIR=$HOME
+        export MODULEPATH=$LCM_DIR/LCM/doc/LCM/modulefiles:$MODULEPATH
         module load release
-        ./lcm config trilinos $(nproc)
-
-    - name: Build Trilinos
-      run: |
-        cd $HOME
-        source /usr/share/modules/init/bash
-        export MODULEPATH=$HOME/LCM/doc/LCM/modulefiles:$MODULEPATH
-        export LCM_DIR=$HOME
-        module load release
-        ./lcm build trilinos $(nproc)
-
-    - name: Configure LCM
-      run: |
-        cd $HOME
-        source /usr/share/modules/init/bash
-        export MODULEPATH=$HOME/LCM/doc/LCM/modulefiles:$MODULEPATH
-        export LCM_DIR=$HOME
-        module load release
-        ./lcm config lcm $(nproc)
-
-    - name: Build LCM
-      run: |
-        cd $HOME
-        source /usr/share/modules/init/bash
-        export MODULEPATH=$HOME/LCM/doc/LCM/modulefiles:$MODULEPATH
-        export LCM_DIR=$HOME
-        module load release
-        ./lcm build lcm $(nproc)
-
-    - name: Test LCM
-      run: |
-        cd $HOME
-        source /usr/share/modules/init/bash
-        export MODULEPATH=$HOME/LCM/doc/LCM/modulefiles:$MODULEPATH
-        export LCM_DIR=$HOME
-        module load release
-        ./lcm test lcm
+        ./lcm all $(nproc)

@@ -1,0 +1,248 @@
+#!/bin/bash
+# LCM Build System CLI
+# Usage: lcm <command> [package] [threads]
+#   lcm clean trilinos        - Clean trilinos build/install
+#   lcm clean lcm             - Clean lcm build
+#   lcm config trilinos [N]   - Configure trilinos
+#   lcm config lcm [N]        - Configure lcm
+#   lcm build trilinos [N]    - Build trilinos with N threads
+#   lcm build lcm [N]         - Build lcm with N threads
+#   lcm test lcm              - Run lcm tests
+#   lcm all [N]               - Full pipeline: clean + config + build + test
+#   lcm help                  - Show this help
+
+set -e
+
+#---------------------------------------------------------------------------
+# Resolve LCM_DIR: workspace root that contains the LCM repo directory.
+# If LCM_DIR is already set, honour it; otherwise derive from script path
+# or fall back to the current working directory.
+#---------------------------------------------------------------------------
+if [ -z "$LCM_DIR" ]; then
+    # Script lives in <workspace>/LCM/doc/LCM/build/lcm
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    CANDIDATE="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
+    if [ -d "$CANDIDATE/LCM/doc/LCM" ]; then
+        export LCM_DIR="$CANDIDATE"
+    else
+        export LCM_DIR="$(pwd)"
+    fi
+fi
+
+#---------------------------------------------------------------------------
+# Module environment
+#---------------------------------------------------------------------------
+MODULE_NAME="${LCM_MODULE:-release}"
+export MODULEPATH="$LCM_DIR/LCM/doc/LCM/modulefiles${MODULEPATH:+:$MODULEPATH}"
+
+# Source the module init if 'module' is not already a function/command
+if ! type module &>/dev/null; then
+    if [ -f /usr/share/Modules/init/bash ]; then
+        source /usr/share/Modules/init/bash
+    elif [ -f /usr/share/modules/init/bash ]; then
+        source /usr/share/modules/init/bash
+    elif [ -f /etc/profile.d/modules.sh ]; then
+        source /etc/profile.d/modules.sh
+    else
+        echo "ERROR: Cannot find Environment Modules init script."
+        echo "Install environment-modules or set module paths manually."
+        exit 1
+    fi
+fi
+
+#---------------------------------------------------------------------------
+# Parse arguments
+#---------------------------------------------------------------------------
+COMMAND="${1:-help}"
+PACKAGE="${2:-}"
+THREADS="${3:-$(nproc)}"
+
+# Accept --module flag anywhere
+for arg in "$@"; do
+    case "$arg" in
+        --module=*)
+            MODULE_NAME="${arg#--module=}"
+            ;;
+    esac
+done
+
+#---------------------------------------------------------------------------
+# Help
+#---------------------------------------------------------------------------
+show_help() {
+    cat <<'HELPTEXT'
+LCM Build System CLI
+
+Usage: lcm <command> [package] [threads]
+
+Commands:
+  clean   <package>        Clean build (and install for trilinos) directories
+  config  <package> [N]    Configure package
+  build   <package> [N]    Build package with N threads (default: nproc)
+  test    <package>        Run tests for package
+  all     [N]              Full pipeline: clean + config + build + test
+                           Builds trilinos then lcm
+  help                     Show this help
+
+Packages:
+  trilinos                 Trilinos (including DTK)
+  lcm                      LCM/Albany
+
+Options:
+  --module=<name>          Module to load (default: release)
+
+Environment:
+  LCM_DIR                  Workspace root (auto-detected if unset)
+  LCM_MODULE               Module to load (default: release)
+
+Examples:
+  lcm clean trilinos
+  lcm config trilinos 168
+  lcm build trilinos 168
+  lcm build lcm 32
+  lcm test lcm
+  lcm all 168
+  lcm all 168 --module=serial-clang-release
+HELPTEXT
+}
+
+#---------------------------------------------------------------------------
+# Validate package argument
+#---------------------------------------------------------------------------
+validate_package() {
+    if [ -z "$PACKAGE" ]; then
+        echo "ERROR: Package argument required. Use 'trilinos' or 'lcm'."
+        exit 1
+    fi
+    case "$PACKAGE" in
+        trilinos|lcm) ;;
+        *)
+            echo "ERROR: Unknown package '$PACKAGE'. Use 'trilinos' or 'lcm'."
+            exit 1
+            ;;
+    esac
+}
+
+#---------------------------------------------------------------------------
+# Load module and report environment
+#---------------------------------------------------------------------------
+load_module() {
+    module purge 2>/dev/null || true
+    module load "$MODULE_NAME"
+    echo "Module:      $MODULE_NAME"
+    echo "LCM_DIR:     $LCM_DIR"
+    echo "ARCH:        ${ARCH:-unset}"
+    echo "TOOL_CHAIN:  ${TOOL_CHAIN:-unset}"
+    echo "BUILD_TYPE:  ${BUILD_TYPE:-unset}"
+    echo "Threads:     $THREADS"
+}
+
+#---------------------------------------------------------------------------
+# Run ctest -S with explicit -D flags
+#---------------------------------------------------------------------------
+run_ctest() {
+    local CLEAN_BUILD="${1:-OFF}"
+    local DO_CONFIG="${2:-OFF}"
+    local DO_BUILD="${3:-OFF}"
+    local DO_TEST="${4:-OFF}"
+
+    local BUILD_SCRIPT="$LCM_DIR/LCM/doc/LCM/build/lcm_build.cmake"
+
+    if [ ! -f "$BUILD_SCRIPT" ]; then
+        echo "ERROR: Cannot find $BUILD_SCRIPT"
+        exit 1
+    fi
+
+    cd "$LCM_DIR"
+
+    echo "Running: ctest -VV -S lcm_build.cmake"
+    echo "  PACKAGE=$PACKAGE  CLEAN_BUILD=$CLEAN_BUILD"
+    echo "  DO_CONFIG=$DO_CONFIG  DO_BUILD=$DO_BUILD  DO_TEST=$DO_TEST"
+    echo "  BUILD_THREADS=$THREADS"
+
+    local BUILD_ID_STRING="${ARCH}-${TOOL_CHAIN}-${BUILD_TYPE}"
+    local PREFIX="${PACKAGE}-${BUILD_ID_STRING}"
+    local LOG_FILE="$LCM_DIR/${PREFIX}.log"
+
+    ctest -VV --timeout 180 -S "$BUILD_SCRIPT" \
+        -DPACKAGE:STRING="$PACKAGE" \
+        -DBUILD_THREADS:STRING="$THREADS" \
+        -DCLEAN_BUILD:BOOL="$CLEAN_BUILD" \
+        -DDO_CONFIG:BOOL="$DO_CONFIG" \
+        -DDO_BUILD:BOOL="$DO_BUILD" \
+        -DDO_TEST:BOOL="$DO_TEST" \
+        -DCTEST_DO_SUBMIT:BOOL=OFF \
+        | tee "$LOG_FILE"
+}
+
+#---------------------------------------------------------------------------
+# Command dispatch
+#---------------------------------------------------------------------------
+case "$COMMAND" in
+    help|-h|--help)
+        show_help
+        exit 0
+        ;;
+    clean)
+        validate_package
+        load_module
+        echo "--- Cleaning $PACKAGE ---"
+        run_ctest ON OFF OFF OFF
+        ;;
+    config)
+        validate_package
+        load_module
+        echo "--- Configuring $PACKAGE ---"
+        run_ctest OFF ON OFF OFF
+        ;;
+    build)
+        validate_package
+        load_module
+        echo "--- Building $PACKAGE with $THREADS threads ---"
+        run_ctest OFF OFF ON OFF
+        ;;
+    test)
+        validate_package
+        load_module
+        echo "--- Testing $PACKAGE ---"
+        run_ctest OFF OFF OFF ON
+        ;;
+    all)
+        # THREADS may be in $2 position (no package for 'all')
+        if [ -n "$PACKAGE" ] && [[ "$PACKAGE" =~ ^[0-9]+$ ]]; then
+            THREADS="$PACKAGE"
+        fi
+        load_module
+        echo "=== Full pipeline: trilinos + lcm ==="
+
+        echo "--- Cleaning trilinos ---"
+        PACKAGE=trilinos
+        run_ctest ON OFF OFF OFF
+
+        echo "--- Configuring trilinos ---"
+        run_ctest OFF ON OFF OFF
+
+        echo "--- Building trilinos with $THREADS threads ---"
+        run_ctest OFF OFF ON OFF
+
+        echo "--- Cleaning lcm ---"
+        PACKAGE=lcm
+        run_ctest ON OFF OFF OFF
+
+        echo "--- Configuring lcm ---"
+        run_ctest OFF ON OFF OFF
+
+        echo "--- Building lcm with $THREADS threads ---"
+        run_ctest OFF OFF ON OFF
+
+        echo "--- Testing lcm ---"
+        run_ctest OFF OFF OFF ON
+
+        echo "=== Full pipeline complete ==="
+        ;;
+    *)
+        echo "ERROR: Unknown command '$COMMAND'"
+        echo "Run 'lcm help' for usage information."
+        exit 1
+        ;;
+esac

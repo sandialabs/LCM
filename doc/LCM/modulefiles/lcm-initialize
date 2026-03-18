@@ -8,17 +8,12 @@ if { [ file exists /etc/fedora-release ] } {
   continue
 }
 
-if { [ file exists /etc/sl-release ] } {
-  module load lcm-scientific-linux
-  continue
-}
-
 if { [ file exists /etc/redhat-release ] } {
   module load lcm-rhel
   continue
 }
 
-if { [ file exists /projects/sems ] } {
-  module load lcm-sems
+if { [ file exists /etc/lsb-release ] } {
+  module load lcm-ubuntu
   continue
 }

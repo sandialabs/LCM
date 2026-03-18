@@ -6,7 +6,7 @@ LCM:
     CapExplicit:
       Material Model:
         Model Name: Cap Explicit
-      Strain Flag: true
+      Finite Deformation: false
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2
@@ -27,7 +27,7 @@ LCM:
     CapImplicit:
       Material Model:
         Model Name: Cap Implicit
-      Strain Flag: true
+      Finite Deformation: false
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2
@@ -47,7 +47,8 @@ LCM:
       Q: 28.0
     CapExplicitFD:
       Material Model:
-        Model Name: Cap Explicit FD
+        Model Name: Cap Explicit
+      Finite Deformation: true
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2
@@ -67,7 +68,8 @@ LCM:
       Q: 28.0
     CapImplicitFD:
       Material Model:
-        Model Name: Cap Implicit FD
+        Model Name: Cap Implicit
+      Finite Deformation: true
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2

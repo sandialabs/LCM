@@ -6,7 +6,7 @@ LCM:
     CapExplicit:
       Material Model:
         Model Name: Cap Explicit
-      Strain Flag: true #Tell code that doing small strain regime
+      Finite Deformation: false
       Elastic Modulus:
         Elastic Modulus Type: Constant
         Value: 22547.00000000

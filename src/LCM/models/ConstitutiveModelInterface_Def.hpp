@@ -7,10 +7,8 @@
 #include "AnisotropicDamageModel.hpp"
 #include "AnisotropicHyperelasticDamageModel.hpp"
 #include "AnisotropicViscoplasticModel.hpp"
-#include "CapExplicitFD.hpp"
-#include "CapExplicitModel.hpp"
-#include "CapImplicitFD.hpp"
-#include "CapImplicitModel.hpp"
+#include "CapExplicit.hpp"
+#include "CapImplicit.hpp"
 #include "CreepModel.hpp"
 #include "CrystalPlasticityModel.hpp"
 #include "DruckerPragerModel.hpp"
@@ -254,13 +252,9 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
   } else if (model_name == "Viscoplastic") {
     model = rcp(new AnisotropicViscoplasticModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Cap Explicit") {
-    model = rcp(new CapExplicitModel<EvalT, Traits>(p, dl));
+    model = rcp(new CapExplicit<EvalT, Traits>(p, dl));
   } else if (model_name == "Cap Implicit") {
-    model = rcp(new CapImplicitModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Cap Explicit FD") {
-    model = rcp(new CapExplicitFD<EvalT, Traits>(p, dl));
-  } else if (model_name == "Cap Implicit FD") {
-    model = rcp(new CapImplicitFD<EvalT, Traits>(p, dl));
+    model = rcp(new CapImplicit<EvalT, Traits>(p, dl));
   } else if (model_name == "Creep") {
     model = rcp(new CreepModel<EvalT, Traits>(p, dl));
   } else if (model_name == "CrystalPlasticity") {

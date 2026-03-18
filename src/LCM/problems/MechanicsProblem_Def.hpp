@@ -184,6 +184,12 @@ MechanicsProblem::constructEvaluators(
     small_strain = true;
   }
 
+  // Finite Deformation flag: when false, use small strain (replaces Strain Flag)
+  if (material_db_->isElementBlockParam(eb_name, "Finite Deformation")) {
+    bool const fd = material_db_->getElementBlockParam<bool>(eb_name, "Finite Deformation");
+    if (!fd) small_strain = true;
+  }
+
   // Surface element checking
   bool const surface_element = material_db_->getElementBlockParam<bool>(eb_name, "Surface Element", false);
 

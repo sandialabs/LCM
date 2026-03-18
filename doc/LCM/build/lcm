@@ -221,28 +221,13 @@ case "$COMMAND" in
         load_module
         echo "=== Full pipeline: trilinos + lcm ==="
 
-        echo "--- Cleaning trilinos ---"
+        echo "--- Trilinos: clean + config + build ($THREADS threads) ---"
         PACKAGE=trilinos
-        run_ctest ON OFF OFF OFF
+        run_ctest ON ON ON OFF
 
-        echo "--- Configuring trilinos ---"
-        run_ctest OFF ON OFF OFF
-
-        echo "--- Building trilinos with $THREADS threads ---"
-        run_ctest OFF OFF ON OFF
-
-        echo "--- Cleaning lcm ---"
+        echo "--- LCM: clean + config + build + test ($THREADS threads) ---"
         PACKAGE=lcm
-        run_ctest ON OFF OFF OFF
-
-        echo "--- Configuring lcm ---"
-        run_ctest OFF ON OFF OFF
-
-        echo "--- Building lcm with $THREADS threads ---"
-        run_ctest OFF OFF ON OFF
-
-        echo "--- Testing lcm ---"
-        run_ctest OFF OFF OFF ON
+        run_ctest ON ON ON ON
 
         echo "=== Full pipeline complete ==="
         ;;

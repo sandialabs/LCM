@@ -15,8 +15,10 @@ set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 set(CTEST_PROJECT_NAME "Albany-LCM")
 set(CTEST_COMMAND "ctest -D ${CTEST_TEST_TYPE}")
 
-# Always disable CDash submission
-set(CTEST_DO_SUBMIT OFF)
+# Default CDash submission to OFF; can be overridden via -DCTEST_DO_SUBMIT:BOOL=ON
+if (NOT DEFINED CTEST_DO_SUBMIT)
+  set(CTEST_DO_SUBMIT OFF)
+endif()
 
 message("PACKAGE ${PACKAGE}")
 message("BUILD_THREADS ${BUILD_THREADS}")

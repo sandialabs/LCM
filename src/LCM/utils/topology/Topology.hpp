@@ -228,6 +228,20 @@ class Topology
   double
   erodeFailedElements();
 
+  ///
+  /// Iterate over all elements in the mesh and mark those
+  /// that are failed as ERODED without destroying them.
+  /// Returns the total volume of newly eroded elements.
+  ///
+  double
+  deactivateFailedElements();
+
+  ///
+  /// Check if an element has been marked as ERODED.
+  ///
+  bool
+  isElementEroded(stk::mesh::Entity e) const;
+
   void
   computeExtrema();
 

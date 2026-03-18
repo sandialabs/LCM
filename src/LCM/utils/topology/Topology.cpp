@@ -1263,6 +1263,42 @@ Topology::erodeFailedElements()
   return eroded_volume;
 }
 
+double
+Topology::deactivateFailedElements()
+{
+  auto const cell_rank     = stk::topology::ELEMENT_RANK;
+  auto&      bulk_data     = get_bulk_data();
+  auto&      meta_data     = get_meta_data();
+  auto&      locally_owned = meta_data.locally_owned_part();
+  double     eroded_volume = 0.0;
+
+  auto const&             cell_buckets = bulk_data.buckets(cell_rank);
+  stk::mesh::EntityVector cells;
+  stk::mesh::get_selected_entities(locally_owned, cell_buckets, cells);
+  auto& bulk_failure_criterion      = static_cast<BulkFailureCriterion&>(*failure_criterion_);
+  bulk_failure_criterion.accumulate = true;
+  for (auto cell : cells) {
+    if (failure_criterion_->check(bulk_data, cell) == true) {
+      auto cell_volume = getCellVolume(cell);
+      eroded_volume += cell_volume;
+      set_failure_state(cell, ERODED);
+    }
+  }
+  bulk_failure_criterion.accumulate = false;
+
+  return eroded_volume;
+}
+
+bool
+Topology::isElementEroded(stk::mesh::Entity e) const
+{
+  auto&                bulk_data     = const_cast<Topology*>(this)->get_bulk_data();
+  auto&                meta_data     = const_cast<Topology*>(this)->get_meta_data();
+  ScalarFieldType&     failure_field = *meta_data.get_field<double>(stk::topology::ELEMENT_RANK, "failure_state");
+  auto const*          fs_ptr        = stk::mesh::field_data(failure_field, e);
+  return fs_ptr != nullptr && static_cast<FailureState>(static_cast<int>(*fs_ptr)) == ERODED;
+}
+
 bool
 Topology::isIsolatedNode(stk::mesh::Entity entity)
 {

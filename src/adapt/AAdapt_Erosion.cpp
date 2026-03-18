@@ -31,6 +31,7 @@ AAdapt::Erosion::Erosion(
   base_exo_filename_    = stk_mesh_struct_->exoOutFile;
   rename_exodus_output_ = params->get<bool>("Rename Exodus Output", false);
   enable_erosion_       = params->get<bool>("Enable Erosion", true);
+  deactivate_only_      = params->get<bool>("Deactivate Only", false);
   params->validateParameters(*(getValidAdapterParameters()));
   topology_               = Teuchos::rcp(new LCM::Topology(discretization_, "", ""));
   auto const lower_corner = topology_->minimumCoordinates();
@@ -233,6 +234,21 @@ AAdapt::Erosion::adaptMesh()
                   << "Adapting mesh using AAdapt::Erosion method      \n"
                   << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 
+  if (deactivate_only_ == true) {
+    // Non-destructive deactivation: mark failed elements as ERODED
+    // without removing them from the mesh
+    double const local_volume = topology_->deactivateFailedElements();
+    double global_volume{0.0};
+    auto   comm = static_cast<stk::ParallelMachine>(MPI_COMM_WORLD);
+    stk::all_reduce_sum(comm, &local_volume, &global_volume, 1);
+    erosion_volume_ += global_volume;
+
+    *output_stream_ << "*** ACE INFO: Deactivated Volume : " << erosion_volume_ << '\n';
+    *output_stream_ << "*** ACE INFO: Deactivated Length : " << erosion_volume_ / cross_section_ << '\n';
+
+    return true;
+  }
+
   // Open the new exodus file for results
   if (rename_exodus_output_ == true) {
     // Save the current results and close the exodus file
@@ -287,6 +303,7 @@ AAdapt::Erosion::getValidAdapterParameters() const
   valid_pl->set<bool>("Rebalance", true, "Rebalance mesh after adaptation in parallel runs");
   valid_pl->set<bool>("Rename Exodus Output", false, "Use different exodus file names for adapted meshes");
   valid_pl->set<bool>("Enable Erosion", true, "Allows disabling of erosion, mostly for testing");
+  valid_pl->set<bool>("Deactivate Only", false, "Mark failed elements as eroded without destroying them");
   return valid_pl;
 }
 

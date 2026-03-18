@@ -6,11 +6,11 @@
 
 #include "J2Erosion_Def.hpp"
 #include "PHAL_AlbanyTraits.hpp"
-#include "ParallelConstitutiveModel_Def.hpp"
+#include "KernelConstitutiveModel_Def.hpp"
 
 template <typename EvalT, typename Traits>
 LCM::J2Erosion<EvalT, Traits>::J2Erosion(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
-    : LCM::ParallelConstitutiveModel<EvalT, Traits, J2ErosionKernel<EvalT, Traits>>(p, dl)
+    : LCM::KernelConstitutiveModel<EvalT, Traits, J2ErosionKernel<EvalT, Traits>>(p, dl)
 {
 }
 

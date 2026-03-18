@@ -2,8 +2,8 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#if !defined(LCM_ParallelConstitutiveModel_hpp)
-#define LCM_ParallelConstitutiveModel_hpp
+#if !defined(LCM_KernelConstitutiveModel_hpp)
+#define LCM_KernelConstitutiveModel_hpp
 
 #include <functional>
 #include <memory>
@@ -189,7 +189,7 @@ struct ParallelKernel
 };
 
 template <typename EvalT, typename Traits, typename Kernel>
-class ParallelConstitutiveModel : public LCM::ConstitutiveModel<EvalT, Traits>
+class KernelConstitutiveModel : public LCM::ConstitutiveModel<EvalT, Traits>
 {
  public:
   using ScalarT     = typename EvalT::ScalarT;
@@ -198,9 +198,9 @@ class ParallelConstitutiveModel : public LCM::ConstitutiveModel<EvalT, Traits>
 
   using ConstitutiveModel<EvalT, Traits>::num_pts_;
 
-  ParallelConstitutiveModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
+  KernelConstitutiveModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 
-  virtual ~ParallelConstitutiveModel() = default;
+  virtual ~KernelConstitutiveModel() = default;
 
   void
   computeState(typename Traits::EvalData workset, FieldMap<ScalarT const> dep_fields, FieldMap<ScalarT> eval_fields) final;

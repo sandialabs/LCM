@@ -16,7 +16,7 @@
 
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
-#include "core/CrystalPlasticity/ParameterReader.hpp"
+#include "CrystalPlasticity/ParameterReader.hpp"
 
 namespace {
 // Matches ScalarT != ST

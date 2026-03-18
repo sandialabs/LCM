@@ -7,10 +7,10 @@
 
 #include "../../utility/StaticAllocator.hpp"
 #include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
-#include "ParallelConstitutiveModel.hpp"
-#include "core/CrystalPlasticity/CrystalPlasticityCore.hpp"
-#include "core/CrystalPlasticity/Integrator.hpp"
-#include "core/CrystalPlasticity/NonlinearSolver.hpp"
+#include "KernelConstitutiveModel.hpp"
+#include "CrystalPlasticity/CrystalPlasticityCore.hpp"
+#include "CrystalPlasticity/Integrator.hpp"
+#include "CrystalPlasticity/NonlinearSolver.hpp"
 
 namespace LCM {
 
@@ -267,7 +267,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class CrystalPlasticityModel : public LCM::ParallelConstitutiveModel<EvalT, Traits, CrystalPlasticityKernel<EvalT, Traits>>
+class CrystalPlasticityModel : public LCM::KernelConstitutiveModel<EvalT, Traits, CrystalPlasticityKernel<EvalT, Traits>>
 {
  public:
   CrystalPlasticityModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);

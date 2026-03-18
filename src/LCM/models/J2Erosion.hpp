@@ -5,7 +5,7 @@
 #if !defined(LCM_J2Erosion_hpp)
 #define LCM_J2Erosion_hpp
 
-#include "ParallelConstitutiveModel.hpp"
+#include "KernelConstitutiveModel.hpp"
 
 namespace LCM {
 
@@ -128,7 +128,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class J2Erosion : public LCM::ParallelConstitutiveModel<EvalT, Traits, J2ErosionKernel<EvalT, Traits>>
+class J2Erosion : public LCM::KernelConstitutiveModel<EvalT, Traits, J2ErosionKernel<EvalT, Traits>>
 {
  public:
   J2Erosion(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);

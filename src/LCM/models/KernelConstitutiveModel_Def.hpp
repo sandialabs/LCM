@@ -6,7 +6,7 @@
 
 #include "Albany_Utils.hpp"
 #include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
-#include "ParallelConstitutiveModel.hpp"
+#include "KernelConstitutiveModel.hpp"
 #include "utility/Memory.hpp"
 #include "utility/PerformanceContext.hpp"
 #include "utility/TimeGuard.hpp"
@@ -15,7 +15,7 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits, typename Kernel>
-inline ParallelConstitutiveModel<EvalT, Traits, Kernel>::ParallelConstitutiveModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
+inline KernelConstitutiveModel<EvalT, Traits, Kernel>::KernelConstitutiveModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   kernel_ = util::make_unique<EvalKernel>(*this, p, dl);
@@ -23,7 +23,7 @@ inline ParallelConstitutiveModel<EvalT, Traits, Kernel>::ParallelConstitutiveMod
 
 template <typename EvalT, typename Traits, typename Kernel>
 inline void
-ParallelConstitutiveModel<EvalT, Traits, Kernel>::computeState(
+KernelConstitutiveModel<EvalT, Traits, Kernel>::computeState(
     typename Traits::EvalData workset,
     FieldMap<ScalarT const>   dep_fields,
     FieldMap<ScalarT>         eval_fields)

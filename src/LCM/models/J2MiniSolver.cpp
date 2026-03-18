@@ -6,11 +6,11 @@
 
 #include "J2MiniSolver_Def.hpp"
 #include "PHAL_AlbanyTraits.hpp"
-#include "ParallelConstitutiveModel_Def.hpp"
+#include "KernelConstitutiveModel_Def.hpp"
 
 template <typename EvalT, typename Traits>
 LCM::J2MiniSolver<EvalT, Traits>::J2MiniSolver(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
-    : LCM::ParallelConstitutiveModel<EvalT, Traits, J2MiniKernel<EvalT, Traits>>(p, dl)
+    : LCM::KernelConstitutiveModel<EvalT, Traits, J2MiniKernel<EvalT, Traits>>(p, dl)
 {
 }
 

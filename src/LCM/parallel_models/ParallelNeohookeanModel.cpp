@@ -5,12 +5,12 @@
 #include "ParallelNeohookeanModel.hpp"
 
 #include "PHAL_AlbanyTraits.hpp"
-#include "ParallelConstitutiveModel_Def.hpp"
+#include "KernelConstitutiveModel_Def.hpp"
 #include "ParallelNeohookeanModel_Def.hpp"
 
 template <typename EvalT, typename Traits>
 LCM::ParallelNeohookeanModel<EvalT, Traits>::ParallelNeohookeanModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
-    : LCM::ParallelConstitutiveModel<EvalT, Traits, NeohookeanKernel<EvalT, Traits>>(p, dl)
+    : LCM::KernelConstitutiveModel<EvalT, Traits, NeohookeanKernel<EvalT, Traits>>(p, dl)
 {
 }
 

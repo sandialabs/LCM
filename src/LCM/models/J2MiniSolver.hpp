@@ -5,7 +5,7 @@
 #if !defined(LCM_J2MiniSolver_hpp)
 #define LCM_J2MiniSolver_hpp
 
-#include "ParallelConstitutiveModel.hpp"
+#include "KernelConstitutiveModel.hpp"
 
 namespace LCM {
 
@@ -86,7 +86,7 @@ struct J2MiniKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class J2MiniSolver : public LCM::ParallelConstitutiveModel<EvalT, Traits, J2MiniKernel<EvalT, Traits>>
+class J2MiniSolver : public LCM::KernelConstitutiveModel<EvalT, Traits, J2MiniKernel<EvalT, Traits>>
 {
  public:
   J2MiniSolver(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);

@@ -6,7 +6,7 @@
 #define LCM_ParallelNeohookeanModel_hpp
 
 #include "Albany_Layouts.hpp"
-#include "ParallelConstitutiveModel.hpp"
+#include "KernelConstitutiveModel.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
@@ -64,7 +64,7 @@ struct NeohookeanKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class ParallelNeohookeanModel : public LCM::ParallelConstitutiveModel<EvalT, Traits, NeohookeanKernel<EvalT, Traits>>
+class ParallelNeohookeanModel : public LCM::KernelConstitutiveModel<EvalT, Traits, NeohookeanKernel<EvalT, Traits>>
 {
  public:
   ParallelNeohookeanModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
@@ -73,11 +73,11 @@ class ParallelNeohookeanModel : public LCM::ParallelConstitutiveModel<EvalT, Tra
 #if 0
 //! \brief Parallel Neohookean Model
 template<typename EvalT, typename Traits>
-class ParallelNeohookeanModel: public LCM::ParallelConstitutiveModel<EvalT, Traits, detail::NeohookeanKernel<EvalT, Traits>>
+class ParallelNeohookeanModel: public LCM::KernelConstitutiveModel<EvalT, Traits, detail::NeohookeanKernel<EvalT, Traits>>
 {
 public:
 
-  using Parent = ParallelConstitutiveModel<EvalT, Traits, detail::NeohookeanKernel<EvalT, Traits>>;
+  using Parent = KernelConstitutiveModel<EvalT, Traits, detail::NeohookeanKernel<EvalT, Traits>>;
   using ScalarT = typename EvalT::ScalarT;
   using MeshScalarT = typename EvalT::MeshScalarT;
 

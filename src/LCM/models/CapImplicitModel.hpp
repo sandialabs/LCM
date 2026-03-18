@@ -140,7 +140,7 @@ class CapImplicitModel : public LCM::ConstitutiveModel<EvalT, Traits>
 
   // local temp variables
   RealType A;
-  RealType B;
+  RealType D;
   RealType C;
   RealType theta;
   RealType R;

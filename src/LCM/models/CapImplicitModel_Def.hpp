@@ -16,7 +16,7 @@ template <typename EvalT, typename Traits>
 CapImplicitModel<EvalT, Traits>::CapImplicitModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       A(p->get<RealType>("A")),
-      B(p->get<RealType>("B")),
+      D(p->get<RealType>("D")),
       C(p->get<RealType>("C")),
       theta(p->get<RealType>("theta")),
       R(p->get<RealType>("R")),
@@ -299,7 +299,7 @@ CapImplicitModel<EvalT, Traits>::computeState(typename Traits::EvalData workset,
       minitensor::Tensor<ScalarT> dev_plastic = deps_plastic - (1.0 / 3.0) * devolps * minitensor::identity<ScalarT>(3);
       // deqps = std::sqrt(2./3.) * minitensor::norm(dev_plastic);
       // use altenative definition, just differ by constants
-      deqps = std::sqrt(2) * minitensor::norm(dev_plastic);
+      deqps = std::sqrt(2.0/3.0) * minitensor::norm(dev_plastic);
 
       // stress and back stress
       for (int i = 0; i < num_dims_; ++i) {
@@ -356,9 +356,9 @@ CapImplicitModel<EvalT, Traits>::compute_f(minitensor::Tensor<T>& sigma, miniten
   if (psi != 0 && J2 != 0)
     Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) + (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
 
-  T Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
+  T Ff_I1 = A - C * std::exp(D * I1) - theta * I1;
 
-  T Ff_kappa = A - C * std::exp(B * kappa) - theta * kappa;
+  T Ff_kappa = A - C * std::exp(D * kappa) - theta * kappa;
 
   T X = kappa - R * Ff_kappa;
 

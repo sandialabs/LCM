@@ -10,7 +10,7 @@ LCM:
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2
-      B: 0.000394
+      D: 0.000394
       C: 675.2
       theta: 0.0
       R: 28.0
@@ -31,7 +31,7 @@ LCM:
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2
-      B: 0.000394
+      D: 0.000394
       C: 675.2
       theta: 0.0
       R: 28.0
@@ -51,7 +51,7 @@ LCM:
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2
-      B: 0.000394
+      D: 0.000394
       C: 675.2
       theta: 0.0
       R: 28.0
@@ -71,7 +71,7 @@ LCM:
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2
-      B: 0.000394
+      D: 0.000394
       C: 675.2
       theta: 0.0
       R: 28.0

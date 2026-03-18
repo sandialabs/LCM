@@ -13,7 +13,7 @@ template <typename EvalT, typename Traits>
 CapExplicitFD<EvalT, Traits>::CapExplicitFD(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       A(p->get<RealType>("A")),
-      B(p->get<RealType>("B")),
+      D(p->get<RealType>("D")),
       C(p->get<RealType>("C")),
       theta(p->get<RealType>("theta")),
       R(p->get<RealType>("R")),
@@ -298,7 +298,7 @@ CapExplicitFD<EvalT, Traits>::computeState(typename Traits::EvalData workset, De
         deps_plastic = minitensor::dotdot(compliance, dsigma);
         devolps      = minitensor::trace(deps_plastic);
         dev_plastic  = deps_plastic - (1. / 3.) * devolps * I;
-        deqps        = std::sqrt(2) * minitensor::norm(dev_plastic);
+        deqps        = std::sqrt(2.0/3.0) * minitensor::norm(dev_plastic);
 
       } else {
         Fpnew = Fpn;
@@ -337,8 +337,8 @@ CapExplicitFD<EvalT, Traits>::compute_f(minitensor::Tensor<ScalarT>& sigma, mini
   if (psi != 0 && J2 != 0)
     Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) + (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
 
-  ScalarT Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
-  ScalarT Ff_kappa = A - C * std::exp(B * kappa) - theta * kappa;
+  ScalarT Ff_I1 = A - C * std::exp(D * I1) - theta * I1;
+  ScalarT Ff_kappa = A - C * std::exp(D * kappa) - theta * kappa;
   ScalarT X = kappa - R * Ff_kappa;
   ScalarT Fc = 1.0;
   if ((kappa - I1) > 0 && ((X - kappa) != 0)) Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
@@ -359,8 +359,8 @@ CapExplicitFD<EvalT, Traits>::compute_dfdsigma(minitensor::Tensor<ScalarT>& sigm
   for (int i = 0; i < 3; i++)
     for (int j = 0; j < 3; j++) dJ3dsigma(i, j) = s(i, j) * s(i, j) - 2 * J2 * I(i, j) / 3;
 
-  ScalarT Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
-  ScalarT Ff_kappa = A - C * std::exp(B * kappa) - theta * kappa;
+  ScalarT Ff_I1 = A - C * std::exp(D * I1) - theta * I1;
+  ScalarT Ff_kappa = A - C * std::exp(D * kappa) - theta * kappa;
   ScalarT X = kappa - R * Ff_kappa;
   ScalarT Fc = 1.0;
   if ((kappa - I1) > 0) Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
@@ -369,7 +369,7 @@ CapExplicitFD<EvalT, Traits>::compute_dfdsigma(minitensor::Tensor<ScalarT>& sigm
   if (psi != 0 && J2 != 0)
     Gamma = 0.5 * (1 - 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5) + (1 + 3.0 * std::sqrt(3.0) * J3 / 2 / std::pow(J2, 1.5)) / psi);
 
-  ScalarT dFfdI1 = -(B * C * std::exp(B * I1) + theta);
+  ScalarT dFfdI1 = -(D * C * std::exp(D * I1) + theta);
   ScalarT dFcdI1 = 0.0;
   if ((kappa - I1) > 0 && ((X - kappa) != 0)) dFcdI1 = -2.0 * (I1 - kappa) / (X - kappa) / (X - kappa);
   ScalarT dfdI1 = -(Ff_I1 - N) * (2 * Fc * dFfdI1 + (Ff_I1 - N) * dFcdI1);
@@ -426,12 +426,12 @@ CapExplicitFD<EvalT, Traits>::compute_dfdkappa(minitensor::Tensor<ScalarT>& sigm
 {
   xi = sigma - alpha;
   ScalarT I1 = minitensor::trace(xi);
-  ScalarT Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
-  ScalarT Ff_kappa = A - C * std::exp(B * kappa) - theta * kappa;
+  ScalarT Ff_I1 = A - C * std::exp(D * I1) - theta * I1;
+  ScalarT Ff_kappa = A - C * std::exp(D * kappa) - theta * kappa;
   ScalarT X = kappa - R * Ff_kappa;
   ScalarT dFcdkappa = 0.0;
   if ((kappa - I1) > 0 && ((X - kappa) != 0)) {
-    dFcdkappa = 2 * (I1 - kappa) * ((X - kappa) + R * (I1 - kappa) * (theta + B * C * std::exp(B * kappa))) / (X - kappa) / (X - kappa) / (X - kappa);
+    dFcdkappa = 2 * (I1 - kappa) * ((X - kappa) + R * (I1 - kappa) * (theta + D * C * std::exp(D * kappa))) / (X - kappa) / (X - kappa) / (X - kappa);
   }
   return -dFcdkappa * (Ff_I1 - N) * (Ff_I1 - N);
 }

@@ -104,7 +104,7 @@ class CapExplicitFD : public LCM::ConstitutiveModel<EvalT, Traits>
   /// constant material parameters in Cap plasticity model
   ///
   RealType A;
-  RealType B;
+  RealType D;
   RealType C;
   RealType theta;
   RealType R;

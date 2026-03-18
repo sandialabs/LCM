@@ -15,7 +15,7 @@ template <typename EvalT, typename Traits>
 CapImplicitFD<EvalT, Traits>::CapImplicitFD(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl),
       A(p->get<RealType>("A")),
-      B(p->get<RealType>("B")),
+      D(p->get<RealType>("D")),
       C(p->get<RealType>("C")),
       theta(p->get<RealType>("theta")),
       R(p->get<RealType>("R")),
@@ -53,8 +53,6 @@ CapImplicitFD<EvalT, Traits>::CapImplicitFD(Teuchos::ParameterList* p, const Teu
   this->eval_field_map_.insert(std::make_pair(capParameter_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(eqps_string, dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair(volPlasticStrain_string, dl->qp_scalar));
-  this->eval_field_map_.insert(std::make_pair("Material Tangent", dl->qp_tensor4));
-
   if (compute_tangent_) {
     this->eval_field_map_.insert(std::make_pair(tangent_string, dl->qp_tensor4));
   }
@@ -276,7 +274,7 @@ CapImplicitFD<EvalT, Traits>::computeState(typename Traits::EvalData workset, De
       deps_plastic                       = minitensor::dotdot(compliance, dsigma);
       devolps                                 = minitensor::trace(deps_plastic);
       minitensor::Tensor<ScalarT> dev_plastic = deps_plastic - (1.0 / 3.0) * devolps * minitensor::identity<ScalarT>(3);
-      deqps = std::sqrt(2) * minitensor::norm(dev_plastic);
+      deqps = std::sqrt(2.0/3.0) * minitensor::norm(dev_plastic);
 
       // Cauchy stress = Kirchhoff stress / J
       ScalarT J = jac_det(cell, qp);
@@ -322,8 +320,8 @@ CapImplicitFD<EvalT, Traits>::compute_f(minitensor::Tensor<T>& sigma, minitensor
   T Gamma = 1.0;
   if (psi != 0 && J2 != 0)
     Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) + (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi);
-  T Ff_I1 = A - C * std::exp(B * I1) - theta * I1;
-  T Ff_kappa = A - C * std::exp(B * kappa) - theta * kappa;
+  T Ff_I1 = A - C * std::exp(D * I1) - theta * I1;
+  T Ff_kappa = A - C * std::exp(D * kappa) - theta * kappa;
   T X = kappa - R * Ff_kappa;
   T Fc = 1.0;
   if ((kappa - I1) > 0 && ((X - kappa) != 0)) Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);

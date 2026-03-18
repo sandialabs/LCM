@@ -40,6 +40,12 @@ function(snl_update REPO_URL BRANCH SOURCE_DIR ERR)
   set(${ERR} 0 PARENT_SCOPE)
 endfunction(snl_update)
 
+function(snl_submit PART)
+  if (CTEST_DO_SUBMIT)
+    ctest_submit(PARTS ${PART} RETRY_COUNT 3 RETRY_DELAY 10)
+  endif()
+endfunction(snl_submit)
+
 function(snl_config SOURCE_DIR BUILD_DIR CONFIG_OPTS ERR)
   snl_mkdir("${BUILD_DIR}")
   ctest_configure(
@@ -49,6 +55,7 @@ function(snl_config SOURCE_DIR BUILD_DIR CONFIG_OPTS ERR)
     OPTIONS "${CONFIG_OPTS}"
     RETURN_VALUE CONFIG_ERR
   )
+  snl_submit("Configure")
   if (CONFIG_ERR)
     message(WARNING "Cannot configure!")
     set(${ERR} ${CONFIG_ERR} PARENT_SCOPE)
@@ -72,6 +79,7 @@ function(snl_build BUILD_DIR NUM_THREADS TARGET ERR)
     message("BUILD_ERR was ${BUILD_ERR} despite NERRS being ${NERRS}")
     set(BUILD_ERR "-${NERRS}")
   endif()
+  snl_submit("Build")
   if (BUILD_ERR)
     message(WARNING "Cannot make ${TARGET}!")
     set(${ERR} ${BUILD_ERR} PARENT_SCOPE)
@@ -87,6 +95,7 @@ function(snl_test BUILD_DIR)
     BUILD "${BUILD_DIR}"
     APPEND
   )
+  snl_submit("Test")
 endfunction(snl_test)
 
 function(snl_do_subproject)

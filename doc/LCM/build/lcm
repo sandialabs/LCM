@@ -57,11 +57,15 @@ COMMAND="${1:-help}"
 PACKAGE="${2:-}"
 THREADS="${3:-$(nproc)}"
 
-# Accept --module flag anywhere
+# Accept --module and --cdash flags anywhere
+CDASH="OFF"
 for arg in "$@"; do
     case "$arg" in
         --module=*)
             MODULE_NAME="${arg#--module=}"
+            ;;
+        --cdash)
+            CDASH="ON"
             ;;
     esac
 done
@@ -90,6 +94,7 @@ Packages:
 
 Options:
   --module=<name>          Module to load (default: release)
+  --cdash                  Submit results to CDash
 
 Environment:
   LCM_DIR                  Workspace root (auto-detected if unset)
@@ -103,6 +108,7 @@ Examples:
   lcm test lcm
   lcm all 168
   lcm all 168 --module=serial-clang-release
+  lcm all 168 --cdash
 HELPTEXT
 }
 
@@ -171,7 +177,7 @@ run_ctest() {
         -DDO_CONFIG:BOOL="$DO_CONFIG" \
         -DDO_BUILD:BOOL="$DO_BUILD" \
         -DDO_TEST:BOOL="$DO_TEST" \
-        -DCTEST_DO_SUBMIT:BOOL=OFF \
+        -DCTEST_DO_SUBMIT:BOOL="$CDASH" \
         | tee "$LOG_FILE"
 }
 

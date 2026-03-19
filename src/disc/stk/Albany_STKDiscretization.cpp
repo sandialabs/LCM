@@ -1470,6 +1470,12 @@ STKDiscretization::computeGraphsUpToFillComplete()
 
   stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
 
+  // Exclude deactivated (eroded) elements if active part exists
+  auto* active_part_graph = stkMeshStruct->getActivePart();
+  if (active_part_graph != nullptr) {
+    select_owned_in_part &= stk::mesh::Selector(*active_part_graph);
+  }
+
   stk::mesh::get_selected_entities(select_owned_in_part, bulkData.buckets(stk::topology::ELEMENT_RANK), cells);
 
   if (comm->getRank() == 0) *out << "STKDisc: " << cells.size() << " elements on Proc 0 " << std::endl;
@@ -1664,6 +1670,12 @@ void
 STKDiscretization::computeWorksetInfo()
 {
   stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
+
+  // Exclude deactivated (eroded) elements if active part exists
+  auto* active_part_ws = stkMeshStruct->getActivePart();
+  if (active_part_ws != nullptr) {
+    select_owned_in_part &= stk::mesh::Selector(*active_part_ws);
+  }
 
   const stk::mesh::BucketVector& buckets = bulkData.get_buckets(stk::topology::ELEMENT_RANK, select_owned_in_part);
 
@@ -2328,7 +2340,13 @@ STKDiscretization::meshToGraph()
   sur_elem.resize(numOverlapNodes);
 
   // Get the elements owned by the current processor
-  const stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
+  stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
+
+  // Exclude deactivated (eroded) elements if active part exists
+  auto* active_part_se = stkMeshStruct->getActivePart();
+  if (active_part_se != nullptr) {
+    select_owned_in_part &= stk::mesh::Selector(*active_part_se);
+  }
 
   const stk::mesh::BucketVector& buckets = bulkData.get_buckets(stk::topology::ELEMENT_RANK, select_owned_in_part);
 

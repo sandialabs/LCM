@@ -240,6 +240,16 @@ GenericSTKMeshStruct::SetupFieldData(
 
   transferSolutionToCoords = params->get<bool>("Transfer Solution to Coordinates", false);
 
+  // Declare the active part for element deactivation (erosion) support.
+  // All element block parts are declared as subsets of this part, so
+  // all elements are automatically in the active part when the mesh is loaded.
+  // Elements removed from this part will be excluded from assembly and output.
+  activePart = &metaData->declare_part("active");
+  stk::io::put_io_part_attribute(*activePart);
+  for (auto& it : partVec) {
+    metaData->declare_part_subset(*activePart, *it.second);
+  }
+
 #if defined(ALBANY_STK_PERCEPT)
   // Build the eMesh if needed
   if (buildEMesh) eMesh = Teuchos::rcp(new stk::percept::PerceptMesh(metaData, bulkData, false));

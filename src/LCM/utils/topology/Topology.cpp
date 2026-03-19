@@ -1272,19 +1272,35 @@ Topology::deactivateFailedElements()
   auto&      locally_owned = meta_data.locally_owned_part();
   double     eroded_volume = 0.0;
 
+  // Find the active part for part-based deactivation
+  stk::mesh::Part* active_part = meta_data.get_part("active");
+
   auto const&             cell_buckets = bulk_data.buckets(cell_rank);
   stk::mesh::EntityVector cells;
   stk::mesh::get_selected_entities(locally_owned, cell_buckets, cells);
   auto& bulk_failure_criterion      = static_cast<BulkFailureCriterion&>(*failure_criterion_);
   bulk_failure_criterion.accumulate = true;
+
+  stk::mesh::EntityVector cells_to_deactivate;
   for (auto cell : cells) {
     if (failure_criterion_->check(bulk_data, cell) == true) {
       auto cell_volume = getCellVolume(cell);
       eroded_volume += cell_volume;
       set_failure_state(cell, ERODED);
+      cells_to_deactivate.push_back(cell);
     }
   }
   bulk_failure_criterion.accumulate = false;
+
+  // Remove deactivated cells from active part so they are excluded
+  // from assembly, I/O output, and workset construction.
+  if (active_part != nullptr && !cells_to_deactivate.empty()) {
+    modification_begin();
+    for (auto cell : cells_to_deactivate) {
+      bulk_data.change_entity_parts(cell, stk::mesh::ConstPartVector{}, stk::mesh::ConstPartVector{active_part});
+    }
+    modification_end();
+  }
 
   return eroded_volume;
 }

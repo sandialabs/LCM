@@ -55,6 +55,15 @@ struct AbstractSTKMeshStruct : public AbstractMeshStruct
   std::map<std::string, stk::mesh::Part*> nsPartVec;  // Node Sets
   std::map<std::string, stk::mesh::Part*> ssPartVec;  // Side Sets
 
+  //! Part containing all active (non-eroded) elements
+  stk::mesh::Part* activePart{nullptr};
+
+  stk::mesh::Part*
+  getActivePart() const
+  {
+    return activePart;
+  }
+
   Teuchos::RCP<AbstractSTKFieldContainer>
   getFieldContainer()
   {

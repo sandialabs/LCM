@@ -9,8 +9,9 @@ if { [ file exists /etc/fedora-release ] } {
 }
 
 if { [ file exists /etc/redhat-release ] } {
-  # Detect CEE LAN (SEMS v2 available) vs standalone RHEL
-  if { [ file exists /projects/sems/modulefiles/utils/sems-modules-init.sh ] } {
+  # Detect CEE LAN (hpws/cee machines) vs standalone RHEL (Rigel, etc.)
+  set hostname [exec hostname -s]
+  if { [string match "hpws*" $hostname] || [string match "cee-*" $hostname] } {
     module load lcm-cee
   } else {
     module load lcm-rhel

@@ -51,15 +51,16 @@ if ! type module &>/dev/null; then
 fi
 
 #---------------------------------------------------------------------------
-# Parse arguments
+# Parse arguments: extract commands, package, threads, and flags.
+# Commands (clean, config, build, test) can be chained.
+# Package and thread count are positional; flags start with --.
 #---------------------------------------------------------------------------
-COMMAND="${1:-help}"
-PACKAGE="${2:-}"
-THREADS="${3:-$(nproc)}"
-
-# Accept --module, --cdash, and --quiet flags anywhere
+COMMANDS=()
+PACKAGE=""
+THREADS="$(nproc)"
 CDASH="OFF"
 CTEST_VERBOSITY="-VV"
+
 for arg in "$@"; do
     case "$arg" in
         --module=*)
@@ -71,8 +72,25 @@ for arg in "$@"; do
         --quiet|-q)
             CTEST_VERBOSITY="-V"
             ;;
+        --help|-h)
+            COMMANDS=(help)
+            ;;
+        clean|config|build|test|all|help)
+            COMMANDS+=("$arg")
+            ;;
+        trilinos|lcm)
+            PACKAGE="$arg"
+            ;;
+        [0-9]*)
+            THREADS="$arg"
+            ;;
     esac
 done
+
+# Default to help if no commands given
+if [ ${#COMMANDS[@]} -eq 0 ]; then
+    COMMANDS=(help)
+fi
 
 #---------------------------------------------------------------------------
 # Help
@@ -81,16 +99,16 @@ show_help() {
     cat <<'HELPTEXT'
 LCM Build System CLI
 
-Usage: lcm <command> [package] [threads]
+Usage: lcm <commands...> <package> [threads] [options]
 
-Commands:
-  clean   <package>        Clean build (and install for trilinos) directories
-  config  <package> [N]    Configure package
-  build   <package> [N]    Build package with N threads (default: nproc)
-  test    <package>        Run tests for package
-  all     [N]              Full pipeline: clean + config + build + test
+Commands (can be chained):
+  clean                    Clean build (and install for trilinos) directories
+  config                   Configure package
+  build                    Build package with N threads (default: nproc)
+  test                     Run tests for package
+  all                      Full pipeline: clean + config + build + test
                            Builds trilinos then lcm
-  help                     Show this help
+  help, --help, -h         Show this help
 
 Packages:
   trilinos                 Trilinos (including DTK)
@@ -106,14 +124,14 @@ Environment:
   LCM_MODULE               Module to load (default: release)
 
 Examples:
-  lcm clean trilinos
-  lcm config trilinos 168
-  lcm build trilinos 168
-  lcm build lcm 32
-  lcm test lcm
-  lcm all 168
+  lcm clean trilinos                         # clean only
+  lcm config build lcm 168                   # configure + build
+  lcm clean config build lcm 32              # clean + configure + build
+  lcm clean config build test lcm 168        # full pipeline for lcm
+  lcm test lcm                               # test only
+  lcm all 168                                # full pipeline (trilinos + lcm)
   lcm all 168 --module=serial-clang-release
-  lcm all 168 --cdash
+  lcm all 168 --cdash -q
 HELPTEXT
 }
 
@@ -189,40 +207,14 @@ run_ctest() {
 #---------------------------------------------------------------------------
 # Command dispatch
 #---------------------------------------------------------------------------
-case "$COMMAND" in
-    help|-h|--help)
+
+# Handle help and all as special cases
+for CMD in "${COMMANDS[@]}"; do
+    if [ "$CMD" = "help" ]; then
         show_help
         exit 0
-        ;;
-    clean)
-        validate_package
-        load_module
-        echo "--- Cleaning $PACKAGE ---"
-        run_ctest ON OFF OFF OFF
-        ;;
-    config)
-        validate_package
-        load_module
-        echo "--- Configuring $PACKAGE ---"
-        run_ctest OFF ON OFF OFF
-        ;;
-    build)
-        validate_package
-        load_module
-        echo "--- Building $PACKAGE with $THREADS threads ---"
-        run_ctest OFF OFF ON OFF
-        ;;
-    test)
-        validate_package
-        load_module
-        echo "--- Testing $PACKAGE ---"
-        run_ctest OFF OFF OFF ON
-        ;;
-    all)
-        # THREADS may be in $2 position (no package for 'all')
-        if [ -n "$PACKAGE" ] && [[ "$PACKAGE" =~ ^[0-9]+$ ]]; then
-            THREADS="$PACKAGE"
-        fi
+    fi
+    if [ "$CMD" = "all" ]; then
         load_module
         echo "=== Full pipeline: trilinos + lcm ==="
 
@@ -235,10 +227,27 @@ case "$COMMAND" in
         run_ctest ON ON ON ON
 
         echo "=== Full pipeline complete ==="
-        ;;
-    *)
-        echo "ERROR: Unknown command '$COMMAND'"
-        echo "Run 'lcm help' for usage information."
-        exit 1
-        ;;
-esac
+        exit 0
+    fi
+done
+
+# For chained commands, build up the flags and run once
+validate_package
+load_module
+
+DO_CLEAN=OFF
+DO_CONFIG=OFF
+DO_BUILD=OFF
+DO_TEST=OFF
+
+for CMD in "${COMMANDS[@]}"; do
+    case "$CMD" in
+        clean)  DO_CLEAN=ON ;;
+        config) DO_CONFIG=ON ;;
+        build)  DO_BUILD=ON ;;
+        test)   DO_TEST=ON ;;
+    esac
+done
+
+echo "--- $PACKAGE: clean=$DO_CLEAN config=$DO_CONFIG build=$DO_BUILD test=$DO_TEST ($THREADS threads) ---"
+run_ctest $DO_CLEAN $DO_CONFIG $DO_BUILD $DO_TEST

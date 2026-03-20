@@ -1,0 +1,16 @@
+COORDINATES absolute 1.e-6
+
+TIME STEPS relative 1.e-6 floor 0.0
+
+NODAL VARIABLES relative 6.0e-6 floor 1.0e-12
+	disp_1
+	disp_2
+	disp_3
+	disp_dot_1
+	disp_dot_2
+	disp_dot_3
+	disp_dotdot_1
+	disp_dotdot_2
+	disp_dotdot_3
+
+ELEMENT VARIABLES absolute 5.e-6 floor 1.0e-12

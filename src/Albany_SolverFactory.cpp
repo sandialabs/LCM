@@ -175,7 +175,7 @@ SolverFactory::createAndGetAlbanyApp(
     return Teuchos::rcp(new LCM::ACEThermoMechanical(appParams, solverComm));
   }
 
-  if (solutionMethod == "ACE Sequential ThermoMechanical IM") {
+  if (solutionMethod == "ACE Sequential Thermo-Mechanical IM") {
     return Teuchos::rcp(new LCM::ACEThermoMechanicalIM(appParams, solverComm));
   }
 

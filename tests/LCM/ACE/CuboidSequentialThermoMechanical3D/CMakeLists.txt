@@ -9,6 +9,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/coupled-thermal-explicit.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_thermalOnly.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/coupled_thermalOnly.yaml COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_im.yaml
+                 ${CMAKE_CURRENT_BINARY_DIR}/coupled_im.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_vardt.yaml
                  ${CMAKE_CURRENT_BINARY_DIR}/coupled_vardt.yaml COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.yaml
@@ -107,4 +109,17 @@ if(NOT ALBANY_PARALLEL_ONLY)
   set_tests_properties(ACE_${testName}_vardt PROPERTIES LABELS "Demo;Tpetra;Forward")
   set_tests_properties(ACE_${testName}_vardt
 	  PROPERTIES DEPENDS ${testName})
+
+  set(OUTFILE "thermal.e-s.17")
+  set(REF_FILE "${CMAKE_CURRENT_BINARY_DIR}/../CuboidThermoMechanical3D/grid.e")
+  add_test(
+    NAME ACE_${testName}_IM
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=thermal
+      -DTEST_ARGS=coupled_im.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+      -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -P
+      ${runtest.cmake})
+  set_tests_properties(ACE_${testName}_IM PROPERTIES LABELS "LCM;Tpetra;Forward")
+  set_tests_properties(ACE_${testName}_IM
+                       PROPERTIES DEPENDS CuboidThermoMechanical3D_ThermalOnly)
 endif()

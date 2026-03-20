@@ -2,6 +2,12 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
+// NOTE: NBC (Neumann BC) propagation after element deactivation is NOT yet
+// implemented. When elements are eroded/deactivated, newly exposed surfaces
+// do not automatically receive the NBCs that were on the original boundary.
+// This requires future work to detect new boundary faces after element death
+// and apply the appropriate Neumann conditions to them.
+
 #include "ACE_ThermoMechanicalIM.hpp"
 
 #include <algorithm>
@@ -486,13 +492,15 @@ ACEThermoMechanicalIM::createPersistentApps()
       }
     }
 
-    Albany::SolverFactory solver_factory(init_pls_[subdomain], comm_);
+    // Force all subdomains to use the same workset size (-1 = one workset
+    // per element block) so that in-memory state transfer between apps
+    // operates on arrays with matching sizes.
+    disc_params.set("Workset Size", -1);
+
     solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(init_pls_[subdomain], comm_));
 
-    auto const& bt = solver_factory.getParameters();
-
     Teuchos::RCP<Albany::Application> app;
-    solvers_[subdomain] = solver_factory.createAndGetAlbanyApp(app, comm_, comm_);
+    solvers_[subdomain] = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
     apps_[subdomain] = app;
 
     auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(app->getDiscretization());
@@ -502,7 +510,7 @@ ACEThermoMechanicalIM::createPersistentApps()
     do_outputs_[subdomain]      = stk_mesh_structs_[subdomain]->exoOutput;
     do_outputs_init_[subdomain] = stk_mesh_structs_[subdomain]->exoOutput;
 
-    model_evaluators_[subdomain] = Teuchos::rcp(new ACEModelEvaluatorDelegator(solvers_[subdomain]));
+    model_evaluators_[subdomain] = solver_factories_[subdomain]->returnModel();
 
     curr_x_[subdomain] = Teuchos::null;
 
@@ -524,22 +532,30 @@ ACEThermoMechanicalIM::createPersistentApps()
 void
 ACEThermoMechanicalIM::transferThermalToMechanical(int thermal_sub, int mech_sub) const
 {
-  // Transfer state arrays (includes ACE_Ice_Saturation and all QP states)
   auto& thermal_state_mgr = apps_[thermal_sub]->getStateMgr();
   auto& mech_state_mgr = apps_[mech_sub]->getStateMgr();
 
-  // Copy specific state fields from thermal to mechanical
   auto& thermal_states = thermal_state_mgr.getStateArrays().elemStateArrays;
   auto& mech_states = mech_state_mgr.getStateArrays().elemStateArrays;
 
-  // Transfer ACE_Ice_Saturation (and any other shared QP state fields)
+  // Transfer ACE_Ice_Saturation (and any other shared QP state fields).
+  // Both apps must use the same workset configuration (enforced in
+  // createPersistentApps) so that state arrays have matching sizes.
   std::vector<std::string> shared_fields = {"ACE_Ice_Saturation"};
   for (auto const& field_name : shared_fields) {
     for (size_t ws = 0; ws < thermal_states.size() && ws < mech_states.size(); ++ws) {
       auto it_thermal = thermal_states[ws].find(field_name);
       auto it_mech = mech_states[ws].find(field_name);
       if (it_thermal != thermal_states[ws].end() && it_mech != mech_states[ws].end()) {
-        it_mech->second = it_thermal->second;
+        auto const& src = it_thermal->second;
+        auto&       dst = it_mech->second;
+        ALBANY_ASSERT(src.size() == dst.size(),
+            "ACE_Ice_Saturation size mismatch at ws=" << ws
+            << ": thermal=" << src.size() << " mechanical=" << dst.size()
+            << ". Both apps must use the same Workset Size.");
+        for (size_t i = 0; i < src.size(); ++i) {
+          dst[i] = src[i];
+        }
       }
     }
   }
@@ -640,10 +656,6 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
             // Save internal states after successful solve
             fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
             doDynamicInitialOutput(next_time, subdomain);
-            // Transfer thermal results to mechanical subdomain
-            if (mech_sub >= 0) {
-              transferThermalToMechanical(thermal_sub, mech_sub);
-            }
           }
         }
         if (prob_type == MECHANICAL && failed_ == false) {
@@ -652,6 +664,11 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
           fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+          // Transfer thermal results AFTER restoring mechanical states,
+          // so the thermal-to-mechanical transfer is not overwritten.
+          if (thermal_sub >= 0) {
+            transferThermalToMechanical(thermal_sub, subdomain);
+          }
           // Solve mechanical
           AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           if (failed_ == false) {
@@ -764,11 +781,6 @@ ACEThermoMechanicalIM::AdvanceThermalDynamics(
 
   auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
-  // Restore internal states
-  auto& app       = *apps_[subdomain];
-  auto& state_mgr = app.getStateMgr();
-  fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
@@ -809,11 +821,6 @@ ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
   failed_ = false;
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
-
-  // Restore internal states
-  auto& app       = *apps_[subdomain];
-  auto& state_mgr = app.getStateMgr();
-  fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
 
   if (mechanical_solver_ == MechanicalSolver::Tempus) {
     auto& piro_tempus_solver = dynamic_cast<Piro::TempusSolver<ST>&>(solver);
@@ -861,6 +868,8 @@ ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
 
   } else if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
     auto&             piro_tr_solver = dynamic_cast<Piro::TrapezoidRuleSolver<ST>&>(solver);
+    auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
     std::string const delim(72, '=');
     *fos_ << "Initial time       :" << current_time << '\n';
     *fos_ << "Final time         :" << next_time << '\n';
@@ -875,13 +884,10 @@ ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
     Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
     Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
 
-    auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-
     auto const& nv     = me.getNominalValues();
     auto        x_init = nv.get_x();
     auto        v_init = nv.get_x_dot();
     auto        a_init = me.get_x_dotdot();
-    auto&       app    = *apps_[subdomain];
 
     solver.evalModel(in_args, out_args);
 
@@ -891,20 +897,6 @@ ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
     auto&      const_nox_generic_solver   = *(thyra_nox_nonlinear_solver.getNOXSolver());
     auto&      nox_generic_solver         = const_cast<NOX::Solver::Generic&>(const_nox_generic_solver);
     auto const status                     = nox_generic_solver.getStatus();
-
-    // Hack: fix status test parameter list. For some reason a dummy test gets added.
-    // Extract the correct list and set it as the status test list.
-    {
-      auto const app_params_rcp = app.getAppPL();
-      auto&      piro_params    = app_params_rcp->sublist("Piro");
-      auto&      nox_params     = piro_params.sublist("NOX");
-      auto&      st_params      = nox_params.sublist("Status Tests");
-      auto&      old_params     = st_params.sublist("Test 1");
-      auto       new_params     = old_params;
-      st_params.remove("Test 0");
-      st_params.remove("Test 1");
-      st_params.setParameters(new_params);
-    }
 
     if (status == NOX::StatusTest::Failed) {
       *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
@@ -1076,18 +1068,15 @@ ACEThermoMechanicalIM::doQuasistaticOutput(ST const time) const
 void
 ACEThermoMechanicalIM::doDynamicInitialOutput(ST const time, int const subdomain) const
 {
-  auto const is_initial_time = time <= initial_time_ + initial_time_step_;
-  if (is_initial_time == false) {
-    return;
-  }
-  // Write solution at specified time to STK mesh
+  if (do_outputs_[subdomain] == false) return;
+
   auto const xMV_rcp         = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
   auto&      abs_disc        = *discs_[subdomain];
   auto&      stk_disc        = static_cast<Albany::STKDiscretization&>(abs_disc);
   auto&      stk_mesh_struct = *stk_mesh_structs_[subdomain];
 
   stk_mesh_struct.exoOutputInterval = 1;
-  stk_mesh_struct.exoOutput         = do_outputs_[subdomain];
+  stk_mesh_struct.exoOutput         = true;
   stk_disc.writeSolutionMV(*xMV_rcp, time, true);
   stk_mesh_struct.exoOutput = false;
 }

@@ -124,6 +124,7 @@ class SolverFactory
     return model_;
   };
 
+
   Teuchos::RCP<Piro::ObserverBase<double>>
   returnObserver() const
   {

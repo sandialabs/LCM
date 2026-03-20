@@ -43,7 +43,9 @@ fromTo(LCM::StateArrayVec const& src, Albany::StateArrayVec& dst)
       ALBANY_ASSERT(dst_map.find(state_name) != dst_map.end(), "The state variable " << state_name << " is missing in destination map");
       auto&&    dst_states = dst_map[state_name];
       int const num_states = src_states.size();
-      ALBANY_ASSERT(num_states == dst_states.size(), "Source and destination maps have different sizes");
+      ALBANY_ASSERT(
+          num_states == dst_states.size(),
+          "State '" << state_name << "' ws=" << ws << " src_size=" << num_states << " dst_size=" << dst_states.size());
       for (auto s = 0; s < num_states; ++s) {
         dst_states[s] = src_states[s];
       }

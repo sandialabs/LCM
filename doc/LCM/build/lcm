@@ -57,8 +57,9 @@ COMMAND="${1:-help}"
 PACKAGE="${2:-}"
 THREADS="${3:-$(nproc)}"
 
-# Accept --module and --cdash flags anywhere
+# Accept --module, --cdash, and --quiet flags anywhere
 CDASH="OFF"
+CTEST_VERBOSITY="-VV"
 for arg in "$@"; do
     case "$arg" in
         --module=*)
@@ -66,6 +67,9 @@ for arg in "$@"; do
             ;;
         --cdash)
             CDASH="ON"
+            ;;
+        --quiet|-q)
+            CTEST_VERBOSITY="-V"
             ;;
     esac
 done
@@ -95,6 +99,7 @@ Packages:
 Options:
   --module=<name>          Module to load (default: release)
   --cdash                  Submit results to CDash
+  --quiet, -q              Reduce ctest verbosity (-V instead of -VV)
 
 Environment:
   LCM_DIR                  Workspace root (auto-detected if unset)
@@ -161,7 +166,7 @@ run_ctest() {
 
     cd "$LCM_DIR"
 
-    echo "Running: ctest -VV -S lcm_build.cmake"
+    echo "Running: ctest $CTEST_VERBOSITY -S lcm_build.cmake"
     echo "  PACKAGE=$PACKAGE  CLEAN_BUILD=$CLEAN_BUILD"
     echo "  DO_CONFIG=$DO_CONFIG  DO_BUILD=$DO_BUILD  DO_TEST=$DO_TEST"
     echo "  BUILD_THREADS=$THREADS"
@@ -170,7 +175,7 @@ run_ctest() {
     local PREFIX="${PACKAGE}-${BUILD_ID_STRING}"
     local LOG_FILE="$LCM_DIR/${PREFIX}.log"
 
-    ctest -VV --timeout 180 -S "$BUILD_SCRIPT" \
+    ctest $CTEST_VERBOSITY --timeout 180 -S "$BUILD_SCRIPT" \
         -DPACKAGE:STRING="$PACKAGE" \
         -DBUILD_THREADS:STRING="$THREADS" \
         -DCLEAN_BUILD:BOOL="$CLEAN_BUILD" \

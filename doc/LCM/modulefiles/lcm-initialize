@@ -1,25 +1,13 @@
 #%Module 1.0
-
-set name lcm-initialize
-set description "LCM automatic determination of running Linux distribution"
-
 if { [ file exists /etc/fedora-release ] } {
   module load lcm-fedora
-  continue
-}
-
-if { [ file exists /etc/redhat-release ] } {
-  # Detect CEE LAN (hpws/cee machines) vs standalone RHEL (Rigel, etc.)
-  set hostname [exec hostname -s]
-  if { [string match "hpws*" $hostname] || [string match "cee-*" $hostname] } {
+} elseif { [ file exists /etc/redhat-release ] } {
+  set hn [info hostname]
+  if { [string match "hpws*" $hn] || [string match "cee-*" $hn] } {
     module load lcm-cee
   } else {
     module load lcm-rhel
   }
-  continue
-}
-
-if { [ file exists /etc/lsb-release ] } {
+} elseif { [ file exists /etc/lsb-release ] } {
   module load lcm-ubuntu
-  continue
 }

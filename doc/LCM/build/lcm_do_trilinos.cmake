@@ -25,6 +25,23 @@ function(lcm_do_trilinos)
     message(FATAL_ERROR
         "lcm_do_trilinos called with unrecognized arguments ${ARG_UNPARSED_ARGUMENTS}")
   endif()
+  # Map SEMS env vars to LCM conventions if LCM vars are not set
+  if (NOT DEFINED ENV{MPI_BIN} AND DEFINED ENV{OPENMPI_BIN})
+    set(ENV{MPI_BIN} $ENV{OPENMPI_BIN})
+    set(ENV{MPI_INC} $ENV{OPENMPI_INC})
+    set(ENV{MPI_LIB} $ENV{OPENMPI_LIB})
+  endif()
+  if (NOT DEFINED ENV{BOOST_INC} AND DEFINED ENV{BOOST_ROOT})
+    set(ENV{BOOST_INC} "$ENV{BOOST_ROOT}/include")
+    set(ENV{BOOST_LIB} "$ENV{BOOST_ROOT}/lib")
+    set(ENV{BOOSTLIB_INC} "$ENV{BOOST_ROOT}/include")
+    set(ENV{BOOSTLIB_LIB} "$ENV{BOOST_ROOT}/lib")
+  endif()
+  if (NOT DEFINED ENV{NETCDF_INC} AND DEFINED ENV{NETCDF_C_INC})
+    set(ENV{NETCDF} $ENV{NETCDF_C_ROOT})
+    set(ENV{NETCDF_INC} $ENV{NETCDF_C_INC})
+    set(ENV{NETCDF_LIB} $ENV{NETCDF_C_LIB})
+  endif()
   set(CONFIG_OPTS
       "-DBUILD_SHARED_LIBS:BOOL=ON"
       "-DCMAKE_BUILD_TYPE:STRING=$ENV{BUILD_STRING}"

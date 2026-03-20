@@ -4,19 +4,11 @@ module-whatis "LCM CEE LAN (hpws) base environment using SEMS v2 modules"
 
 setenv LCM_ENV_TYPE CEE
 
-# Initialize SEMS v2 module system
-if { [ file exists /projects/sems/modulefiles/utils/sems-modules-init.sh ] } {
-  # Source the SEMS init script to set up hierarchical module paths.
-  # This adds Core, compilers, and project-modulefiles to MODULEPATH.
-  set sems_init "/projects/sems/modulefiles/utils/sems-modules-init.sh"
-  # The sems-modules-init.sh script uses 'module use' internally,
-  # so we replicate its essential module paths here for Tcl modules.
-  module use /projects/sems/modulefiles/rhel8-x86_64/sems/linux-rhel8-x86_64/Core
-  module use /projects/sems/modulefiles/rhel8-x86_64/sems/linux-rhel8-x86_64/project-modulefiles
-} else {
-  puts stderr "lcm-cee: Cannot find SEMS v2 module init script!"
-  exit 1
-}
+# SEMS v2 modules require Lmod (for .lua module files).
+# The user must source the SEMS init script BEFORE loading LCM modules:
+#   source /projects/sems/modulefiles/utils/sems-modules-init.sh
+# This replaces the Tcl Environment Modules with Lmod and sets up
+# hierarchical SEMS module paths (compilers -> MPI -> TPLs).
 
 module load lcm-common
 

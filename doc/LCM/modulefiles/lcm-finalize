@@ -4,21 +4,45 @@ module-whatis "LCM wrap-up environment definitions"
 
 module load lcm-tpls
 
-set     arch            $env(ARCH)
-set     tool_chain      $env(TOOL_CHAIN)
-set     build_type      $env(BUILD_TYPE)
-set     build           $arch-$tool_chain-$build_type
-set     lcm_dir         $env(LCM_DIR)
-set     install_dir     $lcm_dir/trilinos-install-$build
-set     alb_exe_dir     $lcm_dir/lcm-build-$build/src
+if { [info exists ::env(ARCH)] } {
+  set arch $::env(ARCH)
+} else {
+  set arch "serial"
+}
+if { [info exists ::env(TOOL_CHAIN)] } {
+  set tool_chain $::env(TOOL_CHAIN)
+} else {
+  set tool_chain "gcc"
+}
+if { [info exists ::env(BUILD_TYPE)] } {
+  set build_type $::env(BUILD_TYPE)
+} else {
+  set build_type "release"
+}
+if { [info exists ::env(LCM_DIR)] } {
+  set lcm_dir $::env(LCM_DIR)
+} else {
+  set lcm_dir $::env(HOME)/LCM
+}
 
-setenv                  BUILD           $build
-setenv                  INSTALL_DIR     $install_dir
-setenv                  OMPI_CC         $env(CC)
-setenv                  OMPI_CXX        $env(CXX)
-setenv                  OMPI_FC         $env(FC)
+set build       $arch-$tool_chain-$build_type
+set install_dir $lcm_dir/trilinos-install-$build
+set alb_exe_dir $lcm_dir/lcm-build-$build/src
 
-prepend-path            PATH            $alb_exe_dir
-prepend-path            PATH            $alb_exe_dir/LCM
-prepend-path            PATH            $install_dir/bin
-prepend-path            PYTHONPATH      $install_dir/lib
+setenv BUILD        $build
+setenv INSTALL_DIR  $install_dir
+
+if { [info exists ::env(CC)] } {
+  setenv OMPI_CC  $::env(CC)
+}
+if { [info exists ::env(CXX)] } {
+  setenv OMPI_CXX $::env(CXX)
+}
+if { [info exists ::env(FC)] } {
+  setenv OMPI_FC  $::env(FC)
+}
+
+prepend-path PATH       $alb_exe_dir
+prepend-path PATH       $alb_exe_dir/LCM
+prepend-path PATH       $install_dir/bin
+prepend-path PYTHONPATH $install_dir/lib

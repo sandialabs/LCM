@@ -25,6 +25,10 @@ function(lcm_do_albany)
     message(FATAL_ERROR
         "lcm_do_albany called with unrecognized arguments ${ARG_UNPARSED_ARGUMENTS}")
   endif()
+  # Map SEMS env vars to LCM conventions if LCM vars are not set
+  if (NOT DEFINED ENV{MPI_BIN} AND DEFINED ENV{OPENMPI_BIN})
+    set(ENV{MPI_BIN} $ENV{OPENMPI_BIN})
+  endif()
   set(CONFIG_OPTS
     "-DALBANY_CTEST_TIMEOUT:INTEGER=60"
     "-DALBANY_TRILINOS_DIR:FILEPATH=$ENV{LCM_DIR}/trilinos-install-${ARG_BUILD_ID_STRING}"

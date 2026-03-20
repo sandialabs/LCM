@@ -22,7 +22,7 @@ jobs:
           cmake g++ gfortran git \
           libhdf5-openmpi-dev liblapack-dev libnetcdf-dev \
           libopenmpi-dev mpi-default-bin environment-modules \
-          libgtest-dev openblas-dev
+          libgtest-dev lcov
 
     - name: Clone Trilinos
       run: |
@@ -47,4 +47,27 @@ jobs:
         source /usr/share/modules/init/bash
         export MODULEPATH=$LCM_DIR/LCM/doc/LCM/modulefiles:$MODULEPATH
         module load release
+        # Add coverage flags for LCM only (not Trilinos)
+        export LCM_CXX_FLAGS="${LCM_CXX_FLAGS} --coverage"
+        export LCM_LINK_FLAGS="--coverage"
         ./lcm all $(nproc)
+
+    - name: Collect coverage
+      if: always()
+      run: |
+        lcov --capture \
+          --directory $LCM_DIR/lcm-build-serial-gcc-release \
+          --output-file coverage.info \
+          --ignore-errors mismatch
+        # Keep only LCM source, exclude Trilinos and test code
+        lcov --extract coverage.info '*/LCM/src/*' \
+          --output-file coverage_lcm.info \
+          --ignore-errors unused
+        lcov --list coverage_lcm.info
+
+    - name: Upload to Codecov
+      if: always()
+      uses: codecov/codecov-action@v5
+      with:
+        files: coverage_lcm.info
+        fail_ci_if_error: false

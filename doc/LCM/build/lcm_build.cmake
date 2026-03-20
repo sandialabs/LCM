@@ -62,9 +62,24 @@ configure_file(
   "${CTEST_BINARY_DIRECTORY}/CTestCustom.cmake"
   COPYONLY)
 
+# Copy our CTestConfig.cmake into the build directory so that
+# ctest_configure does not pick up a different project's CDash
+# settings (e.g. Trilinos's own CTestConfig.cmake).
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/CTestConfig.cmake"
+  "${CTEST_BINARY_DIRECTORY}/CTestConfig.cmake"
+  COPYONLY)
+
 # Over-write default limit for output
 set(CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE 5000000)
 set(CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE 5000000)
+
+# Force our CDash drop site settings so they are not overridden
+# by the source tree's CTestConfig.cmake during ctest_configure.
+set(CTEST_DROP_METHOD "https")
+set(CTEST_DROP_SITE "albany-lcm-cdash.sandia.gov")
+set(CTEST_DROP_LOCATION "/submit.php?project=Albany-LCM")
+set(CTEST_DROP_SITE_CDASH TRUE)
 
 ctest_start(${CTEST_TEST_TYPE})
 

@@ -4,10 +4,22 @@ module-whatis "LCM GCC compiler"
 
 setenv TOOL_CHAIN gcc
 
-# Use GCC 14 via gcc-toolset-14 with Zen4 tuning
-setenv CC /opt/rh/gcc-toolset-14/root/usr/bin/gcc
-setenv CXX /opt/rh/gcc-toolset-14/root/usr/bin/g++
-setenv FC /opt/rh/gcc-toolset-14/root/usr/bin/gfortran
+if { [is-loaded lcm-cee] } {
+  # On CEE LAN, load the SEMS GCC module
+  module load sems-gcc/13.2.0
+  setenv CC [exec which gcc]
+  setenv CXX [exec which g++]
+  setenv FC [exec which gfortran]
+} elseif { [ file exists /opt/rh/gcc-toolset-14/root/usr/bin/gcc ] } {
+  # Use GCC 14 via gcc-toolset-14 (Rigel/standalone RHEL)
+  setenv CC /opt/rh/gcc-toolset-14/root/usr/bin/gcc
+  setenv CXX /opt/rh/gcc-toolset-14/root/usr/bin/g++
+  setenv FC /opt/rh/gcc-toolset-14/root/usr/bin/gfortran
+} else {
+  setenv CC [exec which gcc]
+  setenv CXX [exec which g++]
+  setenv FC [exec which gfortran]
+}
 
 if { [is-loaded lcm-fedora] } {
   setenv CXXFLAGS "-std=c++20 -Wno-terminate -Wno-deprecated-declarations"

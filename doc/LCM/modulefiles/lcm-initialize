@@ -9,7 +9,12 @@ if { [ file exists /etc/fedora-release ] } {
 }
 
 if { [ file exists /etc/redhat-release ] } {
-  module load lcm-rhel
+  # Detect CEE LAN (SEMS v2 available) vs standalone RHEL
+  if { [ file exists /projects/sems/modulefiles/utils/sems-modules-init.sh ] } {
+    module load lcm-cee
+  } else {
+    module load lcm-rhel
+  }
   continue
 }
 

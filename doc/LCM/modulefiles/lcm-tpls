@@ -37,6 +37,37 @@ if { [is-loaded lcm-ubuntu] } {
   continue
 }
 
+if { [is-loaded lcm-cee] } {
+  # On CEE LAN, load SEMS v2 modules for TPLs.
+  # The SEMS modules are hierarchical Lua/Lmod modules under
+  # /projects/sems/modulefiles/rhel8-x86_64/sems/linux-rhel8-x86_64/
+  # After loading sems-gcc + sems-openmpi, the TPL modules become visible.
+  # The SEMS modules set BOOST_INC, BOOST_LIB, OPENMPI_BIN, etc.
+  # We map them to the names the LCM build system expects.
+
+  module load sems-cmake
+  module load sems-boost
+  module load sems-openmpi
+  module load sems-hdf5
+  module load sems-netcdf-c
+  module load sems-googletest
+
+  # Map SEMS env vars to LCM build system expectations
+  setenv MPI_INC   $env(OPENMPI_INC)
+  setenv MPI_LIB   $env(OPENMPI_LIB)
+  setenv MPI_BIN   $env(OPENMPI_BIN)
+  setenv BOOSTLIB_INC $env(BOOST_INC)
+  setenv BOOSTLIB_LIB $env(BOOST_LIB)
+  set    netcdf_inc   $env(NETCDF_C_INC)
+  set    netcdf_lib   $env(NETCDF_C_LIB)
+  setenv NETCDF       $env(NETCDF_C_ROOT)
+  setenv NETCDF_INC   $netcdf_inc
+  setenv NETCDF_LIB   $netcdf_lib
+
+  prepend-path PATH $env(OPENMPI_BIN)
+  continue
+}
+
 if { [is-loaded lcm-rhel] } {
   set                     netcdf_root     /usr
   set                     netcdf_inc      $netcdf_root/include

@@ -155,7 +155,7 @@ function(lcm_do_trilinos)
       "-DTrilinos_ENABLE_DataTransferKit:BOOL=ON"
       "-DTrilinos_ENABLE_DataTransferKitC_API=ON"
       "-DTrilinos_ENABLE_DataTransferKitClassicDTKAdapters=ON"
-      "-DTrilinos_ENABLE_DataTransferKitFortran_API=ON"
+      "-DTrilinos_ENABLE_DataTransferKitFortran_API=OFF"
       "-DTrilinos_ENABLE_DataTransferKitIntrepidAdapters=ON"
       "-DTrilinos_ENABLE_DataTransferKitLibmeshAdapters=OFF"
       "-DTrilinos_ENABLE_DataTransferKitMoabAdapters=OFF"

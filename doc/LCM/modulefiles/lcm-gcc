@@ -4,13 +4,13 @@ module-whatis "LCM GCC compiler"
 
 setenv TOOL_CHAIN gcc
 
-setenv CC [exec which gcc]
-setenv CXX [exec which g++]
+# Use GCC 14 via gcc-toolset-14 with Zen4 tuning
+setenv CC /opt/rh/gcc-toolset-14/root/usr/bin/gcc
+setenv CXX /opt/rh/gcc-toolset-14/root/usr/bin/g++
+setenv FC /opt/rh/gcc-toolset-14/root/usr/bin/gfortran
 
 if { [is-loaded lcm-fedora] } {
   setenv CXXFLAGS "-std=c++20 -Wno-terminate -Wno-deprecated-declarations"
 } else {
   setenv CXXFLAGS "-std=c++20"
 }
-
-setenv FC [exec which gfortran]

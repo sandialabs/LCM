@@ -16,6 +16,7 @@
 #include "AAdapt_Erosion.hpp"
 #include "ACEcommon.hpp"
 #include "Albany_PiroObserver.hpp"
+#include "Teuchos_TimeMonitor.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Albany_Utils.hpp"
@@ -263,6 +264,15 @@ ACEThermoMechanicalIM::ACEThermoMechanicalIM(Teuchos::RCP<Teuchos::ParameterList
       } else {
         mechanical_solver_ = MechanicalSolver::TrapezoidRule;
         ALBANY_ASSERT(is_trapezoid_rule == true, "ACE Thermomechanical Coupling requires Tempus or Trapezoid Rule for mechanical solve.");
+        // The coupling loop controls time stepping, so the TrapezoidRule
+        // solver should only do 1 internal sub-step per evalModel call.
+        // Set Initial/Final Time to span one coupling time step so that
+        // delta_t = (Final - Initial) / Num_Steps matches correctly.
+        // This matches the I/O solver's behavior.
+        Teuchos::ParameterList& tr_params = piro_params.sublist("Trapezoid Rule", true);
+        tr_params.set<int>("Num Time Steps", 1);
+        tr_params.set<double>("Initial Time", 0.0);
+        tr_params.set<double>("Final Time", initial_time_step_);
       }
     } else {
       ALBANY_ABORT("ACE Thermomechanical Coupling only supports coupling of ACE Thermal and Mechanical problems.");
@@ -481,6 +491,7 @@ centered(std::string const& str, int width)
 void
 ACEThermoMechanicalIM::createPersistentApps()
 {
+  Teuchos::TimeMonitor timer(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Create Persistent Apps"));
   for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     auto& app_params = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
@@ -646,35 +657,54 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == THERMAL) {
           *fos_ << "Problem            :Thermal\n";
-          // Restore internal states
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
-          fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-          // Solve thermal
-          AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+          {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Restore Thermal States"));
+            fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+          }
+          {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Thermal Solve"));
+            AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+          }
           if (failed_ == false) {
-            // Save internal states after successful solve
-            fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-            doDynamicInitialOutput(next_time, subdomain);
+            {
+              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Save Thermal States"));
+              fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+            }
+            {
+              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Thermal Output"));
+              doDynamicInitialOutput(next_time, subdomain);
+            }
           }
         }
         if (prob_type == MECHANICAL && failed_ == false) {
           *fos_ << "Problem            :Mechanical\n";
-          // Restore internal states
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
-          fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+          {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Restore Mechanical States"));
+            fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
+          }
           // Transfer thermal results AFTER restoring mechanical states,
           // so the thermal-to-mechanical transfer is not overwritten.
           if (thermal_sub >= 0) {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Transfer Thermal->Mechanical"));
             transferThermalToMechanical(thermal_sub, subdomain);
           }
-          // Solve mechanical
-          AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+          {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Mechanical Solve"));
+            AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+          }
           if (failed_ == false) {
-            // Save internal states after successful solve
-            fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-            doDynamicInitialOutput(next_time, subdomain);
+            {
+              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Save Mechanical States"));
+              fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+            }
+            {
+              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Mechanical Output"));
+              doDynamicInitialOutput(next_time, subdomain);
+            }
           }
         }
         if (failed_ == true) {
@@ -807,6 +837,20 @@ ACEThermoMechanicalIM::AdvanceThermalDynamics(
   Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
   Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
 
+  // Write solution back to model evaluator, app, and discretization
+  // so the next time step starts from this solution (warm start).
+  {
+    auto nv = me.getNominalValues();
+    nv.set_x(this_x_[subdomain]);
+    nv.set_x_dot(this_xdot_[subdomain]);
+    me.setNominalValues(nv);
+  }
+  auto& app = *apps_[subdomain];
+  app.setX(this_x_[subdomain]);
+  app.setXdot(this_xdot_[subdomain]);
+  app.getDiscretization()->writeSolutionToMeshDatabase(
+      *this_x_[subdomain], *this_xdot_[subdomain], next_time);
+
   failed_ = false;
 }
 
@@ -884,10 +928,11 @@ ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
     Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();
     Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
 
-    auto const& nv     = me.getNominalValues();
-    auto        x_init = nv.get_x();
-    auto        v_init = nv.get_x_dot();
-    auto        a_init = me.get_x_dotdot();
+    // Request the solution as response num_g (the extra response slot
+    // that TrapezoidRuleSolver adds for the solution vector).
+    auto const num_g = solver.Ng() - 1;
+    auto       gx_out = Thyra::createMember(solver.get_g_space(num_g));
+    out_args.set_g(num_g, gx_out);
 
     solver.evalModel(in_args, out_args);
 
@@ -904,20 +949,35 @@ ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
       return;
     }
 
-    // Obtain the solution and its time derivatives
+    // Obtain the solution from the response and time derivatives from
+    // the decorator.  Note: tr_decorator.get_x() returns the predictor,
+    // not the solved solution.  The solved x is in gx_out (response num_g).
     auto& tr_decorator = *(piro_tr_solver.getDecorator());
-    auto  x_rcp        = tr_decorator.get_x();
     auto  xdot_rcp     = tr_decorator.get_x_dot();
     auto  xdotdot_rcp  = tr_decorator.get_x_dotdot();
-    auto  a_nrm        = norm_2(*xdotdot_rcp);
 
     this_x_[subdomain]       = Thyra::createMember(me.get_x_space());
     this_xdot_[subdomain]    = Thyra::createMember(me.get_x_space());
     this_xdotdot_[subdomain] = Thyra::createMember(me.get_x_space());
 
-    Thyra::copy(*x_rcp, this_x_[subdomain].ptr());
+    Thyra::copy(*gx_out, this_x_[subdomain].ptr());
     Thyra::copy(*xdot_rcp, this_xdot_[subdomain].ptr());
     Thyra::copy(*xdotdot_rcp, this_xdotdot_[subdomain].ptr());
+
+    // Write solution back to model evaluator, app, and discretization
+    // so the next time step starts from this solution (warm start).
+    {
+      auto nv = me.getNominalValues();
+      nv.set_x(this_x_[subdomain]);
+      nv.set_x_dot(this_xdot_[subdomain]);
+      me.setNominalValues(nv);
+    }
+    auto& app = *apps_[subdomain];
+    app.setX(this_x_[subdomain]);
+    app.setXdot(this_xdot_[subdomain]);
+    app.setXdotdot(this_xdotdot_[subdomain]);
+    app.getDiscretization()->writeSolutionToMeshDatabase(
+        *this_x_[subdomain], *this_xdot_[subdomain], *this_xdotdot_[subdomain], next_time);
 
     // Acummulate values of failed cells and report if applicable
     auto thyra_solution_manager_rcp = piro_tr_solver.getSolutionManager();

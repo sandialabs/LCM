@@ -13,6 +13,7 @@
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Albany_Utils.hpp"
+#include "Teuchos_TimeMonitor.hpp"
 #include "MiniTensor.h"
 #include "Piro_LOCASolver.hpp"
 #include "Piro_ObserverToLOCASaveDataStrategyAdapter.hpp"
@@ -771,9 +772,11 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         // Create new solvers, apps, discs and model evaluators
         auto const prob_type = prob_types_[subdomain];
         if (prob_type == THERMAL) {
+          Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IO: Create Thermal App"));
           createThermalSolverAppDiscME(stop, current_time);
         }
         if (prob_type == MECHANICAL && failed_ == false) {
+          Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IO: Create Mechanical App"));
           createMechanicalSolverAppDiscME(stop, current_time, next_time, time_step);
         }
 
@@ -782,6 +785,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         if (num_iter_ == 0) {
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
+          Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IO: Save States"));
           fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
           do_outputs_[subdomain] = true;  // We always want output in the initial step
         } else {
@@ -793,16 +797,24 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == MECHANICAL) {
           *fos_ << "Problem            :Mechanical\n";
-          AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+          {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IO: Mechanical Solve"));
+            AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+          }
           if (failed_ == false) {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IO: Mechanical Output"));
             doDynamicInitialOutput(next_time, subdomain);
             renamePrevWrittenExoFiles(subdomain, stop);
           }
         }
         if (prob_type == THERMAL) {
           *fos_ << "Problem            :Thermal\n";
-          AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+          {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IO: Thermal Solve"));
+            AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
+          }
           if (failed_ == false) {
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IO: Thermal Output"));
             doDynamicInitialOutput(next_time, subdomain);
             renamePrevWrittenExoFiles(subdomain, stop);
           }

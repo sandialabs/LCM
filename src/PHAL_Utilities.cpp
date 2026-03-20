@@ -24,7 +24,15 @@ getDerivativeDimensions<PHAL::AlbanyTraits::Jacobian>(Albany::Application const*
       return app->getNumEquations() * (node_count + side_node_count * numLevels);
     }
   }
-  return app->getNumEquations() * ms->ctd.node_count;
+  auto const num_derivs = app->getNumEquations() * ms->ctd.node_count;
+#if defined(ALBANY_FAD_TYPE_SLFAD)
+  ALBANY_ASSERT(
+      num_derivs <= ALBANY_SLFAD_SIZE,
+      "Number of derivative components (" << num_derivs << " = " << app->getNumEquations() << " equations × "
+      << ms->ctd.node_count << " nodes) exceeds ALBANY_SLFAD_SIZE (" << ALBANY_SLFAD_SIZE
+      << "). Rebuild with a larger ALBANY_SLFAD_SIZE or use DFad.");
+#endif
+  return num_derivs;
 }
 
 template <>

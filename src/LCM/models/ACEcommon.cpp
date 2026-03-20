@@ -4,6 +4,7 @@
 
 #include "ACEcommon.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -86,27 +87,20 @@ LCM::twoDvectorFromFile(std::string const& filename)
 RealType
 LCM::interpolateVectors(std::vector<RealType> const& xv, std::vector<RealType> const& yv, RealType const x)
 {
-  RealType y{0.0};
-  size_t   i{0};
-
   auto const n = xv.size();
   ALBANY_ASSERT(n == yv.size(), "Vectors must have same size.\n");
 
-  while (xv[i] < x) {
-    if (i + 1 == n) break;
-    ++i;
-  }
+  if (n == 0) return 0.0;
+  if (x <= xv[0]) return yv[0];
+  if (x >= xv[n - 1]) return yv[n - 1];
 
-  if (i == 0) {
-    y = yv[0];
-  } else if (i + 1 == n) {
-    y = yv[i];
-  } else {
-    RealType const dy    = yv[i] - yv[i - 1];
-    RealType const dx    = xv[i] - xv[i - 1];
-    RealType const slope = dy / dx;
-    y                    = yv[i - 1] + slope * (x - xv[i - 1]);
-  }
+  // Binary search for the interval containing x
+  auto const it = std::lower_bound(xv.begin(), xv.end(), x);
+  auto const i  = static_cast<size_t>(it - xv.begin());
 
-  return y;
+  if (i == 0) return yv[0];
+
+  RealType const dx    = xv[i] - xv[i - 1];
+  RealType const slope = (yv[i] - yv[i - 1]) / dx;
+  return yv[i - 1] + slope * (x - xv[i - 1]);
 }

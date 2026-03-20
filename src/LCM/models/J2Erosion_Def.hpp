@@ -501,14 +501,20 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // update for output
   yield_surf_(cell, pt)      = ys;
   j2_stress_(cell, pt)       = smag;
-  auto const Fval            = Sacado::Value<decltype(F)>::eval(F);
-  auto const Q               = minitensor::polar_rotation(Fval);
-  auto       cosine          = 0.5 * (minitensor::trace(Q) - 1.0);
-  cosine                     = cosine > 1.0 ? 1.0 : cosine;
-  cosine                     = cosine < -1.0 ? -1.0 : cosine;
-  auto const theta           = std::acos(cosine);
-  tilt_angle_(cell, pt)      = theta;
   yield_indicator_(cell, pt) = safe_quotient(smag, ys);
+
+  // Compute tilt angle only when needed for the critical angle failure check.
+  // polar_rotation is expensive (SVD-based) and not worth computing for output alone.
+  auto const Fval = Sacado::Value<decltype(F)>::eval(F);
+  RealType   theta{0.0};
+  if (critical_angle_ > 0.0) {
+    auto const Q      = minitensor::polar_rotation(Fval);
+    auto       cosine = 0.5 * (minitensor::trace(Q) - 1.0);
+    cosine            = cosine > 1.0 ? 1.0 : cosine;
+    cosine            = cosine < -1.0 ? -1.0 : cosine;
+    theta             = std::acos(cosine);
+  }
+  tilt_angle_(cell, pt) = theta;
 
   RealType constexpr yield_tolerance = 1.0e-12;
   bool const yielded                 = f > yield_tolerance;

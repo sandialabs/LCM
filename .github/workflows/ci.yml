@@ -58,11 +58,11 @@ jobs:
         lcov --capture \
           --directory $LCM_DIR/lcm-build-serial-gcc-release \
           --output-file coverage.info \
-          --ignore-errors mismatch
+          --ignore-errors mismatch,empty
         # Keep only LCM source, exclude Trilinos and test code
         lcov --extract coverage.info '*/LCM/src/*' \
           --output-file coverage_lcm.info \
-          --ignore-errors unused
+          --ignore-errors unused,empty
         lcov --list coverage_lcm.info
 
     - name: Upload to Codecov
@@ -71,3 +71,4 @@ jobs:
       with:
         files: coverage_lcm.info
         fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}

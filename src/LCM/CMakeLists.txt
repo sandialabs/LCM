@@ -64,23 +64,13 @@ set(model-eval-sources
     "${LCM_DIR}/solvers/Schwarz_ObserverImpl.cpp"
     "${LCM_DIR}/solvers/ACE_ThermoMechanical.cpp"
     "${LCM_DIR}/solvers/ACE_ThermoMechanicalIM.cpp"
-    "${LCM_DIR}/solvers/Schwarz_PiroObserver.cpp"
     "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.cpp")
 set(model-eval-headers
     "${LCM_DIR}/solvers/Schwarz_Alternating.hpp"
     "${LCM_DIR}/solvers/ACE_ThermoMechanical.hpp"
     "${LCM_DIR}/solvers/ACE_ThermoMechanicalIM.hpp"
     "${LCM_DIR}/solvers/Schwarz_ObserverImpl.hpp"
-    "${LCM_DIR}/solvers/Schwarz_PiroObserver.hpp"
     "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.hpp")
-set(model-eval-sources
-    ${model-eval-sources} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.cpp"
-    "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.cpp"
-    "${LCM_DIR}/solvers/Schwarz_Coupled.cpp")
-set(model-eval-headers
-    ${model-eval-headers} "${LCM_DIR}/solvers/Schwarz_BoundaryJacobian.hpp"
-    "${LCM_DIR}/solvers/Schwarz_CoupledJacobian.hpp"
-    "${LCM_DIR}/solvers/Schwarz_Coupled.hpp")
 
 # LCM special boundary conditions
 set(bc-sources

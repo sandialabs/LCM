@@ -3,6 +3,8 @@
 // in the file license.txt in the top-level Albany directory.
 #include "Topology.hpp"
 
+#include <set>
+
 #include <Albany_CommUtils.hpp>
 #include <Albany_STKNodeSharing.hpp>
 #include <stk_mesh/base/BulkData.hpp>
@@ -1272,12 +1274,16 @@ Topology::deactivateFailedElements()
   auto&      locally_owned = meta_data.locally_owned_part();
   double     eroded_volume = 0.0;
 
-  // Find the active part for part-based deactivation
   stk::mesh::Part* active_part = meta_data.get_part("active");
+  if (active_part == nullptr) return 0.0;
+
+  // Only check elements that are still active (not already dead)
+  stk::mesh::Selector active_owned = locally_owned & stk::mesh::Selector(*active_part);
 
   auto const&             cell_buckets = bulk_data.buckets(cell_rank);
   stk::mesh::EntityVector cells;
-  stk::mesh::get_selected_entities(locally_owned, cell_buckets, cells);
+  stk::mesh::get_selected_entities(active_owned, cell_buckets, cells);
+
   auto& bulk_failure_criterion      = static_cast<BulkFailureCriterion&>(*failure_criterion_);
   bulk_failure_criterion.accumulate = true;
 
@@ -1292,15 +1298,51 @@ Topology::deactivateFailedElements()
   }
   bulk_failure_criterion.accumulate = false;
 
+  if (cells_to_deactivate.empty()) return 0.0;
+
   // Remove deactivated cells from active part so they are excluded
   // from assembly, I/O output, and workset construction.
-  if (active_part != nullptr && !cells_to_deactivate.empty()) {
-    modification_begin();
-    for (auto cell : cells_to_deactivate) {
-      bulk_data.change_entity_parts(cell, stk::mesh::ConstPartVector{}, stk::mesh::ConstPartVector{active_part});
-    }
-    modification_end();
+  modification_begin();
+
+  stk::mesh::ConstPartVector remove_parts{active_part};
+  stk::mesh::ConstPartVector empty_add;
+
+  for (auto cell : cells_to_deactivate) {
+    bulk_data.change_entity_parts(cell, empty_add, remove_parts);
   }
+
+  // Deactivate orphan nodes: nodes no longer connected to any active
+  // element on this processor.  This prevents singular rows in the
+  // stiffness matrix from nodes that belong only to dead elements.
+  stk::mesh::Selector active_selector(*active_part);
+  std::set<stk::mesh::Entity> candidate_nodes;
+
+  // Collect all nodes of deactivated elements as candidates
+  for (auto cell : cells_to_deactivate) {
+    auto const* nodes     = bulk_data.begin_nodes(cell);
+    auto const  num_nodes = bulk_data.num_nodes(cell);
+    for (unsigned n = 0; n < num_nodes; ++n) {
+      candidate_nodes.insert(nodes[n]);
+    }
+  }
+
+  // Check each candidate: if no connected element is still active, deactivate
+  for (auto node : candidate_nodes) {
+    auto const* elems     = bulk_data.begin_elements(node);
+    auto const  num_elems = bulk_data.num_elements(node);
+    bool        has_active_elem = false;
+    for (unsigned e = 0; e < num_elems; ++e) {
+      if (bulk_data.bucket(elems[e]).member(*active_part)) {
+        has_active_elem = true;
+        break;
+      }
+    }
+    if (!has_active_elem) {
+      bulk_data.change_entity_parts(node, empty_add, remove_parts);
+    }
+  }
+
+  modification_end();
 
   return eroded_volume;
 }
@@ -1961,11 +2003,23 @@ Topology::there_are_failed_cells_global()
 bool
 Topology::there_are_failed_cells_local()
 {
-  stk::mesh::EntityRank const cell_rank = stk::topology::ELEMENT_RANK;
-  stk::mesh::EntityVector     cells;
-  stk::mesh::get_entities(get_bulk_data(), cell_rank, cells);
+  auto const  cell_rank     = stk::topology::ELEMENT_RANK;
+  auto&       bulk_data     = get_bulk_data();
+  auto&       meta_data     = get_meta_data();
+  auto&       locally_owned = meta_data.locally_owned_part();
+
+  // Only check active elements (not already dead)
+  stk::mesh::Part*    active_part = meta_data.get_part("active");
+  stk::mesh::Selector selector   = locally_owned;
+  if (active_part != nullptr) {
+    selector &= stk::mesh::Selector(*active_part);
+  }
+
+  stk::mesh::EntityVector cells;
+  stk::mesh::get_selected_entities(selector, bulk_data.buckets(cell_rank), cells);
+
   for (auto cell : cells) {
-    bool const have_failed = failure_criterion_->check(get_bulk_data(), cell);
+    bool const have_failed = failure_criterion_->check(bulk_data, cell);
     if (have_failed == true) return true;
   }
   return false;
@@ -1974,9 +2028,19 @@ Topology::there_are_failed_cells_local()
 bool
 Topology::there_are_failed_boundary_cells()
 {
-  stk::mesh::EntityRank const cell_rank = stk::topology::ELEMENT_RANK;
-  stk::mesh::EntityVector     cells;
-  stk::mesh::get_entities(get_bulk_data(), cell_rank, cells);
+  auto const  cell_rank     = stk::topology::ELEMENT_RANK;
+  auto&       bulk_data     = get_bulk_data();
+  auto&       meta_data     = get_meta_data();
+  auto&       locally_owned = meta_data.locally_owned_part();
+
+  stk::mesh::Part*    active_part = meta_data.get_part("active");
+  stk::mesh::Selector selector   = locally_owned;
+  if (active_part != nullptr) {
+    selector &= stk::mesh::Selector(*active_part);
+  }
+
+  stk::mesh::EntityVector cells;
+  stk::mesh::get_selected_entities(selector, bulk_data.buckets(cell_rank), cells);
   for (auto cell : cells) {
     bool const have_failed = is_failed_boundary_cell(cell);
     if (have_failed == true) return true;

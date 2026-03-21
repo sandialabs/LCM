@@ -85,6 +85,8 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   // Workspace arrays
   Albany::MDArray Fp_old_;
   Albany::MDArray eqps_old_;
+  Albany::MDArray failed_old_;
+  bool            has_failed_old_{false};
 
   bool                       have_cell_boundary_indicator_{false};
   Teuchos::ArrayRCP<double*> cell_boundary_indicator_;

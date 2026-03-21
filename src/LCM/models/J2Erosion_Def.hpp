@@ -202,6 +202,13 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // get State Variables
   Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
+  // failure_state may not have an _old version (save_old=false),
+  // so read the current state which carries over from previous step.
+  auto it = workset.stateArrayPtr->find("failure_state");
+  has_failed_old_ = (it != workset.stateArrayPtr->end());
+  if (has_failed_old_) {
+    failed_old_ = it->second;
+  }
 
   auto& disc                    = *workset.disc;
   auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
@@ -396,6 +403,46 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   constexpr minitensor::Index MAX_DIM{3};
   using Tensor = minitensor::Tensor<ScalarT, MAX_DIM>;
   using Vector = minitensor::Vector<ScalarT, MAX_DIM>;
+
+  // Element death: if this element was previously marked as failed
+  // (checked via the old failure_state in the state array), use
+  // residual elastic modulus for near-zero stiffness and skip the
+  // full constitutive computation.
+  if (disable_erosion_ && has_failed_old_ && failed_old_(cell) > 0.0) {
+    ScalarT const nu = poissons_ratio_(cell, pt);
+    ScalarT const mu = residual_elastic_modulus_ / (2.0 * (1.0 + nu));
+    ScalarT const J1 = J_(cell, pt);
+    Tensor        F(num_dims_);
+    F.fill(def_grad_, cell, pt, 0, 0);
+    Tensor const  Fm23I = std::pow(J1, -2.0/3.0) * minitensor::eye<ScalarT, MAX_DIM>(num_dims_);
+    Tensor const  be    = Fm23I;  // approximate: ignore Fp for dead elements
+    Tensor const  s     = mu * minitensor::dev(be);
+    ScalarT const kappa = residual_elastic_modulus_ / (3.0 * (1.0 - 2.0 * nu));
+    ScalarT const p     = 0.5 * kappa * (J1 - 1.0 / J1);
+    Tensor const  I(minitensor::eye<ScalarT, MAX_DIM>(num_dims_));
+    Tensor const  sigma = p * I + s / J1;
+    for (int i(0); i < num_dims_; ++i) {
+      for (int j(0); j < num_dims_; ++j) {
+        stress_(cell, pt, i, j) = sigma(i, j);
+      }
+    }
+    eqps_(cell, pt) = eqps_old_(cell, pt);
+    for (int i{0}; i < num_dims_; ++i) {
+      for (int j{0}; j < num_dims_; ++j) {
+        Fp_(cell, pt, i, j) = ScalarT(Fp_old_(cell, pt, i, j));
+      }
+    }
+    yield_surf_(cell, pt)             = 0.0;
+    j2_stress_(cell, pt)              = 0.0;
+    tilt_angle_(cell, pt)             = 0.0;
+    yield_indicator_(cell, pt)        = 0.0;
+    tensile_indicator_(cell, pt)      = 0.0;
+    strain_indicator_(cell, pt)       = 0.0;
+    angle_indicator_(cell, pt)        = 0.0;
+    displacement_indicator_(cell, pt) = 0.0;
+    return;
+  }
+
   Tensor       F(num_dims_);
   Tensor const I(minitensor::eye<ScalarT, MAX_DIM>(num_dims_));
   Tensor       sigma(num_dims_);
@@ -623,7 +670,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Determine if critical stress is exceeded
   if (yielded == true) {
-    // ALBANY_ABORT("Yield failure!\n");
     failed += 100.0;
   }
 

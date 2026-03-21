@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <set>
 
 #include "AAdapt_Erosion.hpp"
 #include "ACEcommon.hpp"
@@ -979,37 +980,11 @@ ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
     app.getDiscretization()->writeSolutionToMeshDatabase(
         *this_x_[subdomain], *this_xdot_[subdomain], *this_xdotdot_[subdomain], next_time);
 
-    // Acummulate values of failed cells and report if applicable
-    auto thyra_solution_manager_rcp = piro_tr_solver.getSolutionManager();
-    if (thyra_solution_manager_rcp != Teuchos::null) {
-      auto& thyra_solution_manager    = *(piro_tr_solver.getSolutionManager());
-      auto& adaptive_solution_manager = static_cast<AAdapt::AdaptiveSolutionManager&>(thyra_solution_manager);
-      auto& adapter                   = *(adaptive_solution_manager.getAdapter());
-      auto& erosion_adapter           = static_cast<AAdapt::Erosion&>(adapter);
-      auto& topology                  = *(erosion_adapter.getTopology());
-      auto& failure_criterion         = *(topology.get_failure_criterion());
-      auto& bulk_failure_criterion    = static_cast<BulkFailureCriterion&>(failure_criterion);
-
-      count_displacement += bulk_failure_criterion.count_displacement;
-      count_angle += bulk_failure_criterion.count_angle;
-      count_yield += bulk_failure_criterion.count_yield;
-      count_strain += bulk_failure_criterion.count_strain;
-      count_tension += bulk_failure_criterion.count_tension;
-
-      auto&      fos                 = *Teuchos::VerboseObjectBase::getDefaultOStream();
-      auto const failed_displacement = count_displacement / bulk_failure_criterion.failed_threshold;
-      auto const failed_angle        = count_angle / bulk_failure_criterion.failed_threshold;
-      auto const failed_yield        = count_yield / bulk_failure_criterion.failed_threshold;
-      auto const failed_strain       = count_strain / bulk_failure_criterion.failed_threshold;
-      auto const failed_tension      = count_tension / bulk_failure_criterion.failed_threshold;
-      fos << "INFO: Failed element count";
-      fos << ": displacement:" << failed_displacement;
-      fos << ", angle:" << failed_angle;
-      fos << ", yield:" << failed_yield;
-      fos << ", strain:" << failed_strain;
-      fos << ", tension:" << failed_tension;
-      fos << '\n';
-    }
+    // Element death is handled inside J2Erosion::operator() via the
+    // failure_state field.  Elements marked as failed in a previous step
+    // get near-zero stiffness (residual elastic modulus) on subsequent
+    // steps, effectively removing them from the structural response
+    // without modifying STK parts or invalidating the bucket structure.
   } else {
     ALBANY_ABORT("Unknown time integrator for mechanics. Only Tempus and Piro Trapezoid Rule supported.");
   }

@@ -236,12 +236,19 @@ AAdapt::Erosion::adaptMesh()
 
   if (deactivate_only_ == true) {
     // Non-destructive deactivation: mark failed elements as ERODED
-    // without removing them from the mesh
+    // without removing them from the mesh. Elements are moved out of
+    // the "active" STK part so they are excluded from assembly and output.
     double const local_volume = topology_->deactivateFailedElements();
     double global_volume{0.0};
     auto   comm = static_cast<stk::ParallelMachine>(MPI_COMM_WORLD);
     stk::all_reduce_sum(comm, &local_volume, &global_volume, 1);
     erosion_volume_ += global_volume;
+
+    // Rebuild worksets and data structures to reflect the deactivated elements.
+    // Without this, dead elements would remain in the assembly.
+    if (global_volume > 0.0) {
+      stk_discretization_->updateMesh();
+    }
 
     *output_stream_ << "*** ACE INFO: Deactivated Volume : " << erosion_volume_ << '\n';
     *output_stream_ << "*** ACE INFO: Deactivated Length : " << erosion_volume_ / cross_section_ << '\n';

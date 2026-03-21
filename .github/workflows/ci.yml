@@ -34,12 +34,6 @@ jobs:
       with:
         path: LCM
 
-    - name: Clone DTK
-      run: |
-        git clone -q --depth 1 -b dtk-2.0-tpetra-static-graph \
-          https://github.com/ikalash/DataTransferKit.git $LCM_DIR/DataTransferKit
-        cp -r $LCM_DIR/DataTransferKit $LCM_DIR/Trilinos/
-
     - name: Build and test
       run: |
         cd $LCM_DIR

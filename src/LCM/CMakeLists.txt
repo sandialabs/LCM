@@ -511,6 +511,46 @@ set(topology-headers
     "${LCM_DIR}/utils/topology/Topology_Types.hpp"
     "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
 
+# DTK (DataTransferKit) - absorbed into LCM
+set(dtk-sources
+    "${LCM_DIR}/utils/dtk/DTK_BasicEntityPredicates.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_CoarseGlobalSearch.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_CoarseLocalSearch.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_ConsistentInterpolationOperator.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_DBC.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_Entity.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_EntityIterator.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_EntityLocalMap.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_EntitySet.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_EntityShapeFunction.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_FieldMultiVector.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_FineLocalSearch.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_FunctionSpace.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_IntegrationPointSet.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_IntrepidBasisFactory.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_IntrepidCell.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_IntrepidCellLocalMap.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_IntrepidIntegrationRule.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_IntrepidShapeFunction.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_IntrepidSideCell.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_L2ProjectionOperator.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_MapOperator.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_MapOperatorFactory.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_ParallelSearch.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_ProjectionPrimitiveNonlinearProblems.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_ProjectionPrimitives.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_SearchTreeFactory.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshEntity.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshEntityImpl.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshEntityIntegrationRule.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshEntityIterator.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshEntityLocalMap.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshEntityPredicates.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshEntitySet.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshHelpers.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshManager.cpp"
+    "${LCM_DIR}/utils/dtk/DTK_STKMeshNodalShapeFunction.cpp")
+
 set(SOURCES
     ${SOURCES}
     ${problem-sources}
@@ -526,6 +566,7 @@ set(SOURCES
     ${models-sources}
     ${utils-sources}
     ${topology-sources}
+    ${dtk-sources}
     ${residual-sources}
     ${lin-sources}
     ${proj-sources}
@@ -606,6 +647,7 @@ set(INCLUDE_DIRS
 # message("include dirs - ${INCLUDE_DIRS}")
 
 include_directories(${INCLUDE_DIRS})
+include_directories(${LCM_DIR}/utils/dtk)
 if(ALBANY_STK_REBALANCE)
   include_directories(
     ${Albany_SOURCE_DIR}/src/disc/stk/percept

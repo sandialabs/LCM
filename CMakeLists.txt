@@ -456,15 +456,9 @@ else()
   set(ALBANY_ROL FALSE)
 endif()
 
-# Check if Trilinos has DTK
-list(FIND Trilinos_PACKAGE_LIST DataTransferKit DataTransferKit_List_ID)
-if(DataTransferKit_List_ID GREATER -1)
-  message("-- Looking for DTK in Trilinos:      Found")
-  set(ALBANY_DTK TRUE)
-else()
-  message("-- Looking for DTK in Trilinos:      NOT found.")
-  set(ALBANY_DTK FALSE)
-endif()
+# DTK is now absorbed into LCM (no longer a Trilinos extra repository)
+set(ALBANY_DTK TRUE)
+message("-- DTK:                              Built-in")
 
 # Check if Trilinos has Tempus
 list(FIND Trilinos_PACKAGE_LIST Tempus Tempus_List_ID)

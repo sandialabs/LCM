@@ -488,12 +488,10 @@ set(utils-headers
     "${LCM_DIR}/utils/StateVarUtils.hpp")
 
 set(utils-sources
-    ${utils-sources} "${LCM_DIR}/utils/LCMPartition.cpp"
-    "${LCM_DIR}/utils/MiniLinearSolver.cpp"
+    ${utils-sources} "${LCM_DIR}/utils/MiniLinearSolver.cpp"
     "${LCM_DIR}/utils/MiniNonlinearSolver.cpp")
 set(utils-headers
     ${utils-headers}
-    "${LCM_DIR}/utils/LCMPartition.hpp"
     "${LCM_DIR}/utils/MiniLinearSolver.hpp"
     "${LCM_DIR}/utils/MiniLinearSolver.t.hpp"
     "${LCM_DIR}/utils/MiniNonlinearSolver.hpp"
@@ -502,8 +500,6 @@ set(utils-headers
 
 # LCM utils / topology
 set(topology-sources
-    "${LCM_DIR}/utils/topology/BarycentricSubdivision.cpp"
-    "${LCM_DIR}/utils/topology/MinimumSurface.cpp"
     "${LCM_DIR}/utils/topology/Subgraph.cpp"
     "${LCM_DIR}/utils/topology/Topology.cpp"
     "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp"
@@ -639,18 +635,7 @@ if(LCM_TEST_EXES AND ALBANY_DTK)
 endif()
 
 if(LCM_TEST_EXES)
-  add_executable(BifurcationTest test/utils/BifurcationTest.cpp)
   add_executable(MaterialPointSimulator test/utils/MaterialPointSimulator.cpp)
-  add_executable(BoundarySurfaceOutput test/utils/BoundarySurfaceOutput.cpp)
-  add_executable(MeshComponents test/utils/MeshComponents.cpp)
-  add_executable(MinSurfaceMPS test/utils/MinSurfaceMPS.cpp)
-  add_executable(MinSurfaceOutput test/utils/MinSurfaceOutput.cpp)
-  add_executable(NodeUpdate test/utils/NodeUpdate.cpp)
-  add_executable(PartitionTest test/utils/PartitionTest.cpp)
-  add_executable(Subdivision test/utils/Subdivision.cpp)
-  add_executable(Test1_Subdivision test/utils/Test1_Subdivision.cpp)
-  add_executable(Test2_Subdivision test/utils/Test2_Subdivision.cpp)
-  add_executable(TopologyBase test/utils/TopologyBase.cpp)
 
   add_executable(
     utLocalNonlinearSolver test/unit_tests/StandardUnitTestMain.cpp
@@ -738,18 +723,7 @@ endif()
 if(LCM_TEST_EXES)
   set(repeat_libs ${LCM_UT_LIBS} ${ALBANY_LIBRARIES} ${LCM_UT_LIBS}
                   ${ALBANY_LIBRARIES})
-  target_link_libraries(BifurcationTest ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(BoundarySurfaceOutput ${repeat_libs} ${ALL_LIBRARIES})
   target_link_libraries(MaterialPointSimulator ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(MeshComponents ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(MinSurfaceMPS ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(MinSurfaceOutput ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(NodeUpdate ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(PartitionTest ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(Subdivision ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(Test1_Subdivision ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(Test2_Subdivision ${repeat_libs} ${ALL_LIBRARIES})
-  target_link_libraries(TopologyBase ${repeat_libs} ${ALL_LIBRARIES})
   target_link_libraries(utLocalNonlinearSolver ${repeat_libs} ${ALL_LIBRARIES})
   target_link_libraries(utMiniSolvers ${ALL_LIBRARIES})
   if(ALBANY_ROL)

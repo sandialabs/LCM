@@ -2070,4 +2070,11 @@ Topology::execute_entity_deletion_operations(stk::mesh::EntityVector& entities)
   modification_end();
 }
 
+void
+Topology::remove_entity(stk::mesh::Entity entity)
+{
+  bool deleted = get_bulk_data().destroy_entity(entity);
+  ALBANY_ASSERT(deleted == true);
+}
+
 }  // namespace LCM

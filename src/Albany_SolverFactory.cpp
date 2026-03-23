@@ -15,6 +15,7 @@
 #include "Piro_NOXSolver.hpp"
 #include "Piro_ProviderBase.hpp"
 #include "Piro_SolverFactory.hpp"
+#include "Piro_TrapezoidRuleSolver.hpp"
 #include "Piro_StratimikosUtils.hpp"
 #include "Schwarz_Alternating.hpp"
 #include "Stratimikos_DefaultLinearSolverBuilder.hpp"
@@ -182,9 +183,26 @@ SolverFactory::createAndGetAlbanyApp(
     modelWithSolve = rcp(new Thyra::DefaultModelEvaluatorWithSolveFactory<ST>(model_, lowsFactory));
   }
 
+  const auto solMgr = albanyApp->getAdaptSolMgr();
+
   Piro::SolverFactory piroFactory;
   observer_ = Teuchos::rcp(new PiroObserver(albanyApp, modelWithSolve));
-  return piroFactory.createSolver<ST>(piroParams, modelWithSolve, Teuchos::null, observer_);
+  if (solMgr->isAdaptive()) {
+    // Pass the adaptive solution manager to the solver so that
+    // queryAdaptationCriteria / adaptProblem are called during time stepping.
+    // We construct the TrapezoidRuleSolver directly because
+    // Piro::SolverFactory::createSolverAdaptive has a latent compile error
+    // in its LOCA branch (observedLocaSolver signature mismatch).
+    std::string const solverType = piroParams->get("Solver Type", "NOX");
+    if (solverType == "Trapezoid Rule") {
+      return Teuchos::rcp(new Piro::TrapezoidRuleSolver<ST>(piroParams, modelWithSolve, solMgr, observer_));
+    }
+    // For NOX and other solver types, adaptation is handled externally
+    // (e.g., by the ACE solver calling queryAdaptationCriteria directly).
+    return piroFactory.createSolver<ST>(piroParams, modelWithSolve, Teuchos::null, observer_);
+  } else {
+    return piroFactory.createSolver<ST>(piroParams, modelWithSolve, Teuchos::null, observer_);
+  }
   ALBANY_ABORT("Reached end of createAndGetAlbanyAppT()" << "\n");
 
   // Silence compiler warning in case it wasn't used (due to ifdef logic)

@@ -5,6 +5,8 @@ set(LCM_DO_TRILINOS_CMAKE true)
 
 include(${CMAKE_CURRENT_LIST_DIR}/snl_helpers.cmake)
 
+cmake_policy(SET CMP0054 NEW)
+
 function(lcm_do_trilinos)
   set(BOOL_OPTS
       "CLEAN_BUILD"
@@ -166,13 +168,14 @@ function(lcm_do_trilinos)
   set(ARG_BOOL_OPTS)
   foreach (BOOL_OPT IN LISTS BOOL_OPTS)
     if (ARG_${BOOL_OPT})
-      if ("${BOOL_OPT}" STREQUAL "DO_BUILD")
+      if (BOOL_OPT STREQUAL "DO_BUILD")
         set(ARG_BOOL_OPTS ${ARG_BOOL_OPTS} "DO_BUILD" "DO_INSTALL")
       else()
         set(ARG_BOOL_OPTS ${ARG_BOOL_OPTS} ${BOOL_OPT})
       endif()
     endif()
   endforeach()
+  message("ARG_BOOL_OPTS: ${ARG_BOOL_OPTS}")
   snl_do_subproject(${ARG_BOOL_OPTS}
       DO_PROJECT
       "PROJECT" "Albany"

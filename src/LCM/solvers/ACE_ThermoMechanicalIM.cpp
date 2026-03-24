@@ -497,11 +497,13 @@ ACEThermoMechanicalIM::createPersistentApps()
     auto& app_params = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
 
-    // For the mechanical problem with erosion, use deactivation instead of destruction
+    // For the mechanical problem, use element death via residual stiffness
+    // instead of destructive mesh erosion.  Remove the Adaptation section
+    // so that the TrapezoidRuleSolver does not trigger mesh adaptation.
     if (prob_types_[subdomain] == MECHANICAL) {
-      if (app_params.isSublist("Adaptation")) {
-        app_params.sublist("Adaptation").set("Deactivate Only", true);
-      }
+      auto& problem_params = app_params.sublist("Problem");
+      problem_params.remove("Adaptation", false);
+      problem_params.set("Disable Erosion", true);
     }
 
     // Force all subdomains to use the same workset size (-1 = one workset
@@ -531,6 +533,28 @@ ACEThermoMechanicalIM::createPersistentApps()
       Teuchos::RCP<const Thyra_MultiVector> coord_mv = stk_disc->getCoordMV();
       Teuchos::RCP<const Thyra_Vector> z_coord = coord_mv->col(2);
       zmin_ = Thyra::min(*z_coord);
+    }
+  }
+
+  // Zero-initialize failure_state_old STK field for mechanical subdomains.
+  // STK may leave the _old field uninitialized; the IM solver bypasses
+  // Albany's updateStates so we must ensure clean initial values.
+  for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    if (prob_types_[subdomain] == MECHANICAL) {
+      auto& mesh_struct = *(stk_mesh_structs_[subdomain]);
+      auto& meta_data   = *mesh_struct.metaData;
+      auto& bulk_data   = *mesh_struct.bulkData;
+      auto* fs_field = meta_data.get_field<double>(stk::topology::ELEMENT_RANK, "failure_state_old");
+      if (fs_field != nullptr) {
+        auto const& buckets = bulk_data.buckets(stk::topology::ELEMENT_RANK);
+        for (auto* bucket : buckets) {
+          auto* data = stk::mesh::field_data(*fs_field, *bucket);
+          if (data != nullptr) {
+            auto n = stk::mesh::field_scalars_per_entity(*fs_field, *bucket) * bucket->size();
+            for (unsigned i = 0; i < n; ++i) data[i] = 0.0;
+          }
+        }
+      }
     }
   }
 
@@ -701,6 +725,19 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
             {
               Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Save Mechanical States"));
               fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
+            }
+            // Propagate converged failure_state → failure_state_old in cache.
+            // The IM solver bypasses Albany's updateStates, so we do this
+            // manually to enable element death detection in the next step.
+            {
+              auto& esa = internal_states_[subdomain].element_state_arrays;
+              for (size_t ws = 0; ws < esa.size(); ++ws) {
+                auto it_cur = esa[ws].find("failure_state");
+                auto it_old = esa[ws].find("failure_state_old");
+                if (it_cur != esa[ws].end() && it_old != esa[ws].end()) {
+                  it_old->second = it_cur->second;
+                }
+              }
             }
             {
               Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Mechanical Output"));

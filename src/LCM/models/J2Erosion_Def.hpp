@@ -2,6 +2,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 #include "ACEcommon.hpp"
+#include "Albany_Application.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "J2Erosion.hpp"
 
@@ -141,7 +142,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(strain_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
   addStateVariable(angle_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
   addStateVariable(displacement_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
-  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
+  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, true, p->get<bool>("Output Failure State", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
@@ -202,12 +203,24 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // get State Variables
   Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
-  // failure_state may not have an _old version (save_old=false),
-  // so read the current state which carries over from previous step.
-  auto it = workset.stateArrayPtr->find("failure_state");
+  // Read failure_state_old from the state array.  This reflects the
+  // previous converged step's failures, not the current iteration's.
+  auto it = workset.stateArrayPtr->find("failure_state_old");
   has_failed_old_ = (it != workset.stateArrayPtr->end());
   if (has_failed_old_) {
     failed_old_ = it->second;
+  }
+
+  // Check problem-level "Disable Erosion" flag (set by IM solver)
+  // which overrides the material-level setting.
+  if (workset.current_app_ != Teuchos::null) {
+    auto app_pl = workset.current_app_->getAppPL();
+    if (app_pl != Teuchos::null && app_pl->isSublist("Problem")) {
+      auto& prob_pl = app_pl->sublist("Problem");
+      if (prob_pl.isParameter("Disable Erosion")) {
+        disable_erosion_ = prob_pl.template get<bool>("Disable Erosion");
+      }
+    }
   }
 
   auto& disc                    = *workset.disc;
@@ -404,26 +417,14 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   using Tensor = minitensor::Tensor<ScalarT, MAX_DIM>;
   using Vector = minitensor::Vector<ScalarT, MAX_DIM>;
 
-  // Element death: if this element was previously marked as failed
-  // (checked via the old failure_state in the state array), use
-  // residual elastic modulus for near-zero stiffness and skip the
-  // full constitutive computation.
+  // Element death: if this element was previously marked as failed,
+  // set stress to zero and preserve old internal states.  The scatter
+  // evaluator will skip this element entirely, so the stress value
+  // here is only for output purposes.
   if (disable_erosion_ && has_failed_old_ && failed_old_(cell) > 0.0) {
-    ScalarT const nu = poissons_ratio_(cell, pt);
-    ScalarT const mu = residual_elastic_modulus_ / (2.0 * (1.0 + nu));
-    ScalarT const J1 = J_(cell, pt);
-    Tensor        F(num_dims_);
-    F.fill(def_grad_, cell, pt, 0, 0);
-    Tensor const  Fm23I = std::pow(J1, -2.0/3.0) * minitensor::eye<ScalarT, MAX_DIM>(num_dims_);
-    Tensor const  be    = Fm23I;  // approximate: ignore Fp for dead elements
-    Tensor const  s     = mu * minitensor::dev(be);
-    ScalarT const kappa = residual_elastic_modulus_ / (3.0 * (1.0 - 2.0 * nu));
-    ScalarT const p     = 0.5 * kappa * (J1 - 1.0 / J1);
-    Tensor const  I(minitensor::eye<ScalarT, MAX_DIM>(num_dims_));
-    Tensor const  sigma = p * I + s / J1;
     for (int i(0); i < num_dims_; ++i) {
       for (int j(0); j < num_dims_; ++j) {
-        stress_(cell, pt, i, j) = sigma(i, j);
+        stress_(cell, pt, i, j) = 0.0;
       }
     }
     eqps_(cell, pt) = eqps_old_(cell, pt);
@@ -694,9 +695,6 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // ALBANY_ABORT("Kinematic failure!\n");
     failed += 10000.0;
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
-  }
-  if (disable_erosion_ == true) {  // Set failed to 0 if erosion is disabled
-    failed = 0.0;
   }
 }
 }  // namespace LCM

@@ -131,6 +131,11 @@ struct Workset
   int spatial_dimension_{0};
 
   Albany::StateArray*              stateArrayPtr{nullptr};
+
+  // Element death status: maps cell index → death indicator (> 0 means dead).
+  // Set by the IM solver from the previous step's failure_state values.
+  // Read by the scatter evaluator to skip dead elements.
+  Teuchos::RCP<std::vector<double>> death_status_vec{Teuchos::null};
   Teuchos::RCP<Tpetra_MultiVector> auxDataPtrT;
 
   bool transientTerms{false};

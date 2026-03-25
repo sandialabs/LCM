@@ -142,7 +142,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(strain_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
   addStateVariable(angle_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
   addStateVariable(displacement_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
-  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, true, p->get<bool>("Output Failure State", false));
+  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
@@ -203,12 +203,12 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // get State Variables
   Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
-  // Read failure_state_old from the state array.  This reflects the
-  // previous converged step's failures, not the current iteration's.
-  auto it = workset.stateArrayPtr->find("failure_state_old");
-  has_failed_old_ = (it != workset.stateArrayPtr->end());
-  if (has_failed_old_) {
-    failed_old_ = it->second;
+  // Read death status from the workset.  This is set by the IM solver
+  // from the previous step's converged failure_state values.
+  has_failed_old_ = false;
+  if (workset.death_status_vec != Teuchos::null) {
+    death_status_vec_ = workset.death_status_vec;
+    has_failed_old_   = true;
   }
 
   // Check problem-level "Disable Erosion" flag (set by IM solver)
@@ -421,7 +421,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // set stress to zero and preserve old internal states.  The scatter
   // evaluator will skip this element entirely, so the stress value
   // here is only for output purposes.
-  if (disable_erosion_ && has_failed_old_ && failed_old_(cell) > 0.0) {
+  if (disable_erosion_ && has_failed_old_ && (*death_status_vec_)[cell] > 0.0) {
     for (int i(0); i < num_dims_; ++i) {
       for (int j(0); j < num_dims_; ++j) {
         stress_(cell, pt, i, j) = 0.0;

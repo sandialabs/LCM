@@ -117,6 +117,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank0_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
@@ -128,6 +129,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank1_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
@@ -139,6 +141,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::operator()(const PHAL_ScatterResRank2_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
       for (std::size_t j = 0; j < numDims; j++) {
@@ -162,6 +165,29 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename T
 
   // Get Tpetra vector view from a specific device
   f_kokkos = Albany::getNonconstDeviceData(f);
+
+  // Element death: extract death status into a device-compatible view.
+  // The death_status_vec is set by the IM solver from the previous
+  // step's converged failure_state values.  It is not modified during
+  // evaluation, so it's safe to read here.
+  this->have_death_status_ = false;
+  if (workset.death_status_vec != Teuchos::null) {
+    auto& ds = *workset.death_status_vec;
+    int   nc = ds.size();
+    bool  any_dead = false;
+    for (int c = 0; c < nc; ++c) {
+      if (ds[c] > 0.0) { any_dead = true; break; }
+    }
+    if (any_dead) {
+      if (this->death_status_.extent(0) != static_cast<size_t>(nc)) {
+        this->death_status_ = Kokkos::View<double*, PHX::Device>("death_status", nc);
+      }
+      auto h_ds = Kokkos::create_mirror_view(this->death_status_);
+      for (int c = 0; c < nc; ++c) h_ds(c) = ds[c];
+      Kokkos::deep_copy(this->death_status_, h_ds);
+      this->have_death_status_ = true;
+    }
+  }
 
   if (this->tensorRank == 0) {
     // Get MDField views from std::vector
@@ -206,6 +232,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank0_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
@@ -217,6 +244,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank0_Adjoint_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
@@ -249,6 +277,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank0_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
@@ -280,6 +309,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank1_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   for (std::size_t node = 0; node < this->numNodes; node++) {
     for (std::size_t eq = 0; eq < numFields; eq++) {
       const LO id = nodeID(cell, node, this->offset + eq);
@@ -292,6 +322,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank1_Adjoint_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
@@ -325,6 +356,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank1_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
@@ -357,6 +389,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterResRank2_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   for (std::size_t node = 0; node < this->numNodes; node++)
     for (std::size_t i = 0; i < numDims; i++)
       for (std::size_t j = 0; j < numDims; j++) {
@@ -369,6 +402,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank2_Adjoint_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
@@ -402,6 +436,7 @@ template <typename Traits>
 KOKKOS_INLINE_FUNCTION void
 ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::operator()(const PHAL_ScatterJacRank2_Tag&, int const& cell) const
 {
+  if (this->have_death_status_ && this->death_status_(cell) > 0.0) return;
   // int const neq = nodeID.extent(2);
   // int const nunk = neq*this->numNodes;
   // Irina TOFIX replace 500 with nunk with Kokkos::malloc is available
@@ -451,6 +486,29 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename T
     f_kokkos = workset.f_kokkos;
   }
   Jac_kokkos = workset.Jac_kokkos;
+
+  // Element death: extract failure_state_old into a device-compatible view.
+  this->have_death_status_ = false;
+  if (workset.stateArrayPtr != nullptr) {
+    auto it = workset.stateArrayPtr->find("death_status");
+    if (it != workset.stateArrayPtr->end()) {
+      auto& fs = it->second;
+      int   nc = fs.dimension(0);
+      bool  any_dead = false;
+      for (int c = 0; c < nc; ++c) {
+        if (fs(c, 0) > 0.0) { any_dead = true; break; }
+      }
+      if (any_dead) {
+        if (this->death_status_.extent(0) != static_cast<size_t>(nc)) {
+          this->death_status_ = Kokkos::View<double*, PHX::Device>("death_status", nc);
+        }
+        auto h_ds = Kokkos::create_mirror_view(this->death_status_);
+        for (int c = 0; c < nc; ++c) h_ds(c) = fs(c, 0);
+        Kokkos::deep_copy(this->death_status_, h_ds);
+        this->have_death_status_ = true;
+      }
+    }
+  }
 
   if (this->tensorRank == 0) {
     // Get MDField views from std::vector

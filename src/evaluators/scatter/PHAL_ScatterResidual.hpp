@@ -59,6 +59,10 @@ class ScatterResidualBase : public PHX::EvaluatorWithBaseImpl<Traits>, public PH
   typedef typename ConstDRVDualView::t_dev ConstDRVDevView;
   ConstDRVDualView                                                             val_kokkos;
   ConstDRVDevView                                                              d_val_kokkos;
+
+  // Element death: skip scatter for dead cells (failure_state_old > 0).
+  Kokkos::View<double*, PHX::Device> death_status_;
+  bool                               have_death_status_{false};
 };
 
 template <typename EvalT, typename Traits>

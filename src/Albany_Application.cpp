@@ -8,6 +8,7 @@
 
 #include "AAdapt_Erosion.hpp"
 #include "AAdapt_RC_Manager.hpp"
+#include "Albany_STKDiscretization.hpp"
 #include "Albany_DataTypes.hpp"
 #include "Albany_DiscretizationFactory.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
@@ -1026,6 +1027,112 @@ Application::writePhalanxGraph(Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits
   }
 }
 
+// Element death: fix orphan nodes after global assembly.
+// Orphan nodes are connected only to dead elements and receive no
+// stiffness contributions (dead elements are skipped in scatter).
+// Set their Jacobian diagonal to 1.0 and residual to 0.0.
+void
+Application::fixOrphanNodesForElementDeath(
+    Teuchos::RCP<Thyra_Vector>   f,
+    Teuchos::RCP<Thyra_LinearOp> jac)
+{
+  auto& state_mgr = getStateMgr();
+  auto const& ws_el_node_id = disc->getWsElNodeID();
+  int  const  num_worksets  = ws_el_node_id.size();
+  auto        neq_per_node  = disc->getNumEq();
+
+  if (death_status_vecs_.empty()) return;
+
+  bool any_dead_overall = false;
+  for (int ws = 0; ws < num_worksets; ++ws) {
+    if (ws >= static_cast<int>(death_status_vecs_.size())) break;
+    if (death_status_vecs_[ws] == Teuchos::null) continue;
+    for (auto v : *death_status_vecs_[ws]) {
+      if (v > 0.0) { any_dead_overall = true; break; }
+    }
+    if (any_dead_overall) break;
+  }
+  if (!any_dead_overall) return;
+
+  // For each node, track whether it appears in any alive element.
+  std::map<GO, bool> node_has_alive;
+
+  for (int ws = 0; ws < num_worksets; ++ws) {
+    if (ws >= static_cast<int>(death_status_vecs_.size())) break;
+    if (death_status_vecs_[ws] == Teuchos::null) continue;
+    auto& ds        = *death_status_vecs_[ws];
+    int   num_cells = ds.size();
+
+    for (int cell = 0; cell < num_cells; ++cell) {
+      bool is_dead = ds[cell] > 0.0;
+      int  nn      = ws_el_node_id[ws][cell].size();
+      for (int n = 0; n < nn; ++n) {
+        GO node_gid = ws_el_node_id[ws][cell][n];
+        if (!is_dead) {
+          node_has_alive[node_gid] = true;
+        } else if (node_has_alive.find(node_gid) == node_has_alive.end()) {
+          node_has_alive[node_gid] = false;
+        }
+      }
+    }
+  }
+
+  // Collect orphan node GIDs
+  std::vector<GO> orphan_node_gids;
+  for (auto& [gid, has_alive] : node_has_alive) {
+    if (!has_alive) {
+      orphan_node_gids.push_back(gid);
+    }
+  }
+
+  if (orphan_node_gids.empty()) return;
+
+  auto stk_disc_ptr = dynamic_cast<Albany::STKDiscretization*>(disc.get());
+  if (stk_disc_ptr == nullptr) return;
+
+  // Fix Jacobian: zero row, set diagonal to 1.0
+  if (Teuchos::nonnull(jac)) {
+    auto jac_tpetra = Albany::getTpetraMatrix(jac);
+    resumeFill(jac);
+    for (GO node_gid : orphan_node_gids) {
+      for (int eq = 0; eq < neq_per_node; ++eq) {
+        GO dof_gid = stk_disc_ptr->getGlobalDOF(node_gid, eq);
+        LO dof_lid = jac_tpetra->getRowMap()->getLocalElement(dof_gid);
+        if (dof_lid == Teuchos::OrdinalTraits<LO>::invalid()) continue;
+        auto num_entries = jac_tpetra->getNumEntriesInLocalRow(dof_lid);
+        if (num_entries > 0) {
+          typename Tpetra_CrsMatrix::local_inds_host_view_type col_inds;
+          typename Tpetra_CrsMatrix::values_host_view_type     vals;
+          jac_tpetra->getLocalRowView(dof_lid, col_inds, vals);
+          std::vector<LO> cols_vec(col_inds.extent(0));
+          std::vector<ST> vals_vec(col_inds.extent(0), 0.0);
+          for (size_t k = 0; k < col_inds.extent(0); ++k) {
+            cols_vec[k] = col_inds(k);
+            if (col_inds(k) == dof_lid) vals_vec[k] = 1.0;
+          }
+          jac_tpetra->replaceLocalValues(dof_lid, cols_vec, vals_vec);
+        }
+      }
+    }
+  }
+
+  // Fix residual: zero entries for orphan nodes
+  if (Teuchos::nonnull(f)) {
+    auto f_data    = Albany::getNonconstLocalData(f);
+    auto f_tpetra  = Albany::getTpetraVector(f);
+    auto f_row_map = f_tpetra->getMap();
+    for (GO node_gid : orphan_node_gids) {
+      for (int eq = 0; eq < neq_per_node; ++eq) {
+        GO dof_gid = stk_disc_ptr->getGlobalDOF(node_gid, eq);
+        LO dof_lid = f_row_map->getLocalElement(dof_gid);
+        if (dof_lid != Teuchos::OrdinalTraits<LO>::invalid()) {
+          f_data[dof_lid] = 0.0;
+        }
+      }
+    }
+  }
+}
+
 void
 Application::computeGlobalResidualImpl(
     double const                           current_time,
@@ -1129,6 +1236,9 @@ Application::computeGlobalResidualImpl(
     TEUCHOS_FUNC_TIME_MONITOR("Albany Residual Fill: Export");
     cas_manager->combine(overlapped_f, f, CombineMode::ADD);
   }
+
+  // Element death: fix orphan nodes
+  fixOrphanNodesForElementDeath(f, Teuchos::null);
 
   // Allocate scaleVec_
   if (scale != 1.0) {
@@ -1341,6 +1451,9 @@ Application::computeGlobalJacobianImpl(
     // Assemble global Jacobian
     cas_manager->combine(overlapped_jac, jac, CombineMode::ADD);
   }
+
+  // Element death: fix orphan nodes
+  fixOrphanNodesForElementDeath(f, jac);
 
   // scale Jacobian
   if (scaleBCdofs == false && scale != 1.0) {

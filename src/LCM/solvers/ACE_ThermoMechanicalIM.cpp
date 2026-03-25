@@ -536,28 +536,6 @@ ACEThermoMechanicalIM::createPersistentApps()
     }
   }
 
-  // Zero-initialize failure_state_old STK field for mechanical subdomains.
-  // STK may leave the _old field uninitialized; the IM solver bypasses
-  // Albany's updateStates so we must ensure clean initial values.
-  for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    if (prob_types_[subdomain] == MECHANICAL) {
-      auto& mesh_struct = *(stk_mesh_structs_[subdomain]);
-      auto& meta_data   = *mesh_struct.metaData;
-      auto& bulk_data   = *mesh_struct.bulkData;
-      auto* fs_field = meta_data.get_field<double>(stk::topology::ELEMENT_RANK, "failure_state_old");
-      if (fs_field != nullptr) {
-        auto const& buckets = bulk_data.buckets(stk::topology::ELEMENT_RANK);
-        for (auto* bucket : buckets) {
-          auto* data = stk::mesh::field_data(*fs_field, *bucket);
-          if (data != nullptr) {
-            auto n = stk::mesh::field_scalars_per_entity(*fs_field, *bucket) * bucket->size();
-            for (unsigned i = 0; i < n; ++i) data[i] = 0.0;
-          }
-        }
-      }
-    }
-  }
-
   // Cache initial internal states
   for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     auto& state_mgr = apps_[subdomain]->getStateMgr();
@@ -717,6 +695,37 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Transfer Thermal->Mechanical"));
             transferThermalToMechanical(thermal_sub, subdomain);
           }
+          // Set death status on the Application for scatter skip and orphan fix.
+          // Extract per-cell death indicators from the PREVIOUS step's
+          // cached failure_state values: index (cell, 0) in the flat array.
+          {
+            auto& app = *apps_[subdomain];
+            auto& esa = internal_states_[subdomain].element_state_arrays;
+            app.death_status_vecs_.resize(esa.size());
+            for (size_t ws = 0; ws < esa.size(); ++ws) {
+              auto it = esa[ws].find("failure_state");
+              if (it != esa[ws].end()) {
+                auto& flat = it->second;
+                // failure_state layout is (cell, qp).  Determine num_qps
+                // from the Albany state array dimensions.
+                auto& sa    = state_mgr.getStateArray(Albany::StateManager::ELEM, ws);
+                auto  sa_it = sa.find("failure_state");
+                int   num_qps   = 1;
+                int   num_cells = flat.size();
+                if (sa_it != sa.end()) {
+                  Albany::StateStruct::FieldDims dims;
+                  sa_it->second.dimensions(dims);
+                  num_cells = dims[0];
+                  if (dims.size() > 1) num_qps = dims[1];
+                }
+                auto ds = Teuchos::rcp(new std::vector<double>(num_cells, 0.0));
+                for (int c = 0; c < num_cells; ++c) {
+                  (*ds)[c] = flat[c * num_qps];
+                }
+                app.death_status_vecs_[ws] = ds;
+              }
+            }
+          }
           {
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Mechanical Solve"));
             AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
@@ -725,19 +734,6 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
             {
               Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Save Mechanical States"));
               fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-            }
-            // Propagate converged failure_state → failure_state_old in cache.
-            // The IM solver bypasses Albany's updateStates, so we do this
-            // manually to enable element death detection in the next step.
-            {
-              auto& esa = internal_states_[subdomain].element_state_arrays;
-              for (size_t ws = 0; ws < esa.size(); ++ws) {
-                auto it_cur = esa[ws].find("failure_state");
-                auto it_old = esa[ws].find("failure_state_old");
-                if (it_cur != esa[ws].end() && it_old != esa[ws].end()) {
-                  it_old->second = it_cur->second;
-                }
-              }
             }
             {
               Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Mechanical Output"));

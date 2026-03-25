@@ -228,6 +228,15 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       const Teuchos::RCP<Thyra_LinearOp>&     jac,
       double const                            dt = 0.0);
 
+  void
+  fixOrphanNodesForElementDeath(
+      Teuchos::RCP<Thyra_Vector>   f,
+      Teuchos::RCP<Thyra_LinearOp> jac);
+
+  // Element death status per workset, set by the IM solver.
+  // death_status_vecs_[ws] is a vector of per-cell death indicators.
+  std::vector<Teuchos::RCP<std::vector<double>>> death_status_vecs_;
+
  private:
   void
   computeGlobalJacobianImpl(
@@ -721,6 +730,13 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
   loadWorksetSidesetInfo(workset, ws);
 
   workset.stateArrayPtr = &stateMgr.getStateArray(Albany::StateManager::ELEM, ws);
+
+  // Element death: pass per-workset death status to the scatter evaluator
+  if (ws < static_cast<int>(death_status_vecs_.size())) {
+    workset.death_status_vec = death_status_vecs_[ws];
+  } else {
+    workset.death_status_vec = Teuchos::null;
+  }
 }
 
 }  // namespace Albany

@@ -27,8 +27,6 @@ MechanicsProblem::MechanicsProblem(
       have_temperature_eq_(false),
       have_ace_temperature_(false),
       have_ace_temperature_eq_(false),
-      have_dislocation_density_(false),
-      have_dislocation_density_eq_(false),
       have_pore_pressure_eq_(false),
       have_transport_eq_(false),
       have_hydrostress_eq_(false),
@@ -60,8 +58,6 @@ MechanicsProblem::MechanicsProblem(
 
   getVariableType(params->sublist("ACE Temperature"), "None", temperature_type_, have_ace_temperature_, have_ace_temperature_eq_);
 
-  getVariableType(params->sublist("DislocationDensity"), "None", dislocation_density_type_, have_dislocation_density_, have_dislocation_density_eq_);
-
   getVariableType(params->sublist("Pore Pressure"), "None", pore_pressure_type_, have_pore_pressure_, have_pore_pressure_eq_);
 
   getVariableType(params->sublist("Transport"), "None", transport_type_, have_transport_, have_transport_eq_);
@@ -91,9 +87,6 @@ MechanicsProblem::MechanicsProblem(
   if (have_mech_eq_) num_eq += num_dims_;
   if (have_temperature_eq_) num_eq++;
   if (have_ace_temperature_eq_) num_eq++;
-  if (have_dislocation_density_eq_) {
-    num_eq += LCM::DislocationDensity::get_num_slip(num_dims_);
-  }
   if (have_pore_pressure_eq_) num_eq++;
   if (have_transport_eq_) num_eq++;
   if (have_hydrostress_eq_) num_eq++;
@@ -107,7 +100,6 @@ MechanicsProblem::MechanicsProblem(
        << "\tSpatial dimension             : " << num_dims_ << '\n'
        << "\tMechanics variables           : " << variableTypeToString(mech_type_) << '\n'
        << "\tTemperature variables         : " << variableTypeToString(temperature_type_) << '\n'
-       << "\tDislocation Density variables : " << variableTypeToString(dislocation_density_type_) << '\n'
        << "\tPore Pressure variables       : " << variableTypeToString(pore_pressure_type_) << '\n'
        << "\tTransport variables           : " << variableTypeToString(transport_type_) << '\n'
        << "\tHydroStress variables         : " << variableTypeToString(hydrostress_type_) << '\n'
@@ -140,9 +132,6 @@ MechanicsProblem::MechanicsProblem(
   // setting the rigid body modes (RBMs) for elasticity problems (in
   // src/Albany_SolverFactory.cpp) written by IK, Feb. 2012
 
-  // Need numPDEs should be num_dims_ + nDOF for other governing equations  -SS
-
-  // FIXME: add rigid body modes for dislocation densities -CA
   int const num_PDEs = neq;
 
   int const num_eq_mech = have_mech_eq_ ? num_dims_ : 0;
@@ -352,12 +341,6 @@ MechanicsProblem::constructDirichletEvaluators(MeshSpecsStruct const& meshSpecs)
   if (have_temperature_eq_) dirichletNames[index++] = "T";
   if (have_ace_temperature_eq_) dirichletNames[index++] = "T";
 
-  if (have_dislocation_density_eq_) {
-    for (int i{0}; i < LCM::DislocationDensity::get_num_slip(num_dims_); ++i) {
-      dirichletNames[index++] = strint("DD", i, '_');
-    }
-  }
-
   if (have_pore_pressure_eq_) dirichletNames[index++] = "P";
   if (have_transport_eq_) dirichletNames[index++] = "C";
   if (have_hydrostress_eq_) dirichletNames[index++] = "TAU";
@@ -436,16 +419,6 @@ MechanicsProblem::constructNeumannEvaluators(Teuchos::RCP<MeshSpecsStruct> const
     auto num_eq_mech    = have_mech_eq_ ? num_dims_ : 0;
     offsets[index]      = Teuchos::Array<int>(1, num_eq_mech);
     index++;
-  }
-
-  if (have_dislocation_density_eq_) {
-    for (int i{0}; i < LCM::DislocationDensity::get_num_slip(num_dims_); ++i) {
-      neumannNames[index] = strint("DF", i, '_');
-      // IKT, 2/14/2020: we may want to check that this is correct, given
-      // the bug fix I made having to do with offsets for temp above...
-      offsets[index] = Teuchos::Array<int>(1, index);
-      index++;
-    }
   }
 
   // Construct BC evaluators for all possible names of conditions

@@ -11,14 +11,11 @@
 #include "Albany_MaterialDatabase.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_Utils.hpp"
-#include "DislocationDensity.hpp"
 #include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Dimension.hpp"
 #include "PHAL_Workset.hpp"
 #include "SolutionSniffer.hpp"
-
-static int dir_count = 0;  // counter for registration of dirichlet_field
 
 namespace Albany {
 
@@ -224,9 +221,6 @@ class MechanicsProblem : public AbstractProblem
   temperature_type_;
 
   MECH_VAR_TYPE
-  dislocation_density_type_;
-
-  MECH_VAR_TYPE
   pore_pressure_type_;
 
   MECH_VAR_TYPE
@@ -277,10 +271,6 @@ class MechanicsProblem : public AbstractProblem
   bool have_stab_pressure_{false};
   bool have_stab_pressure_eq_{false};
 
-  /// Dislocation transport physics
-  bool have_dislocation_density_{false};
-  bool have_dislocation_density_eq_{false};
-
   /// Have mesh adaptation - both the "Adaptation" sublist exists and the user
   /// has specified that the method
   ///    is "RPI Albany Size"
@@ -322,7 +312,7 @@ class MechanicsProblem : public AbstractProblem
   std::vector<std::string> variables_problem_ = {"Displacement"};
 
   std::vector<std::string> variables_auxiliary_ =
-      {"Temperature", "ACE Temperature", "DislocationDensity", "Pore Pressure", "Transport", "HydroStress", "Damage", "Stabilized Pressure"};
+      {"Temperature", "ACE Temperature", "Pore Pressure", "Transport", "HydroStress", "Damage", "Stabilized Pressure"};
 
 };  // class MechanicsProblem
 

@@ -129,12 +129,6 @@ MechanicsProblem::constructEvaluators(
     FieldManagerChoice                          fieldManagerChoice,
     Teuchos::RCP<Teuchos::ParameterList> const& responseList)
 {
-  // IKT: uncomment the following if wish to run stand-alone mechanics problem
-  // with ACE_Ice_Saturation field.
-  // is_ace_sequential_thermomechanical_ = true;
-  // A better way to do this at runtime is to add the ACE Sequential Thermomechanical: true option
-  // to the "Problem" PL in your input file.
-
   using Intrepid2Basis = typename Teuchos::RCP<Intrepid2::Basis<PHX::Device, RealType, RealType>>;
 
   // Collect problem-specific response parameters
@@ -698,16 +692,15 @@ MechanicsProblem::constructEvaluators(
   // IKT, 3/27/16: register dirichlet_field for specifying Dirichlet data from a
   // field
   // in the input exodus mesh, if this is requested in the input file .
-  if ((dir_count == 0) && (reg_dir_field == true)) {
-    // constructEvaluators gets called multiple times for different
-    // specializations.
-    // Make sure dirichlet_field gets registered only once via counter.
-    // I don't quite understand why this is needed for LCM but not for
-    // LANDICE... dirichlet_field
-    StateStruct::MeshFieldEntity entity = StateStruct::NodalDistParameter;
-
-    stateMgr.registerStateVariable("dirichlet_field", dl_->node_vector, eb_name, true, &entity, "");
-    dir_count++;
+  {
+    // Register dirichlet_field only once across multiple constructEvaluators
+    // calls (which happen for different evaluation type specializations).
+    static bool dirichlet_field_registered = false;
+    if (!dirichlet_field_registered && reg_dir_field) {
+      StateStruct::MeshFieldEntity entity = StateStruct::NodalDistParameter;
+      stateMgr.registerStateVariable("dirichlet_field", dl_->node_vector, eb_name, true, &entity, "");
+      dirichlet_field_registered = true;
+    }
   }
 
   if (have_mech_eq_ == true) {  // Current Coordinates
@@ -1276,10 +1269,6 @@ MechanicsProblem::constructEvaluators(
       bool const output_flag = material_db_->getElementBlockParam<bool>(eb_name, "Output Deformation Gradient", false);
 
       // Old values of the deformation gradient
-      // optional output
-      // FIXME: This currently does nothing - CA
-      bool const old_defgrad_flag = material_db_->getElementBlockParam<bool>(eb_name, "Old Deformation Gradient", false);
-
       p = stateMgr.registerStateVariable(defgrad, dl_->qp_tensor, dl_->dummy, eb_name, "identity", 1.0, true, output_flag);
 
       ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));

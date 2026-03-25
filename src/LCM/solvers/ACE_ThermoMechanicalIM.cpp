@@ -497,13 +497,22 @@ ACEThermoMechanicalIM::createPersistentApps()
     auto& app_params = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
 
-    // For the mechanical problem, use element death via residual stiffness
-    // instead of destructive mesh erosion.  Remove the Adaptation section
-    // so that the TrapezoidRuleSolver does not trigger mesh adaptation.
+    // For the mechanical problem, use element death instead of destructive
+    // mesh erosion.  Remove the Adaptation section so that the
+    // TrapezoidRuleSolver does not trigger mesh adaptation.
     if (prob_types_[subdomain] == MECHANICAL) {
       auto& problem_params = app_params.sublist("Problem");
       problem_params.remove("Adaptation", false);
       problem_params.set("Disable Erosion", true);
+      disc_params.set<std::string>("Exodus Solution Name", "displacement");
+      disc_params.set<std::string>("Exodus SolutionDot Name", "velocity");
+      disc_params.set<std::string>("Exodus SolutionDotDot Name", "acceleration");
+    }
+
+    // Name thermal fields
+    if (prob_types_[subdomain] == THERMAL) {
+      disc_params.set<std::string>("Exodus Solution Name", "temperature");
+      disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
     }
 
     // Force all subdomains to use the same workset size (-1 = one workset

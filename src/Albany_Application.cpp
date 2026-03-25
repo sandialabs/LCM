@@ -1090,10 +1090,28 @@ Application::fixOrphanNodesForElementDeath(
   auto stk_disc_ptr = dynamic_cast<Albany::STKDiscretization*>(disc.get());
   if (stk_disc_ptr == nullptr) return;
 
-  // Fix Jacobian: zero row, set diagonal to 1.0
+  // Fix Jacobian: zero row, set diagonal to a representative scale.
+  // Use the average alive diagonal magnitude so the preconditioner
+  // sees uniform scaling across alive and orphan DOFs.
   if (Teuchos::nonnull(jac)) {
     auto jac_tpetra = Albany::getTpetraMatrix(jac);
     resumeFill(jac);
+
+    // Compute average diagonal magnitude from alive DOFs
+    Tpetra_Vector diag_vec(jac_tpetra->getRowMap());
+    jac_tpetra->getLocalDiagCopy(diag_vec);
+    auto diag_data = diag_vec.getLocalViewHost(Tpetra::Access::ReadOnly);
+    ST diag_sum = 0.0;
+    LO diag_count = 0;
+    for (LO i = 0; i < static_cast<LO>(diag_data.extent(0)); ++i) {
+      ST d = std::abs(diag_data(i, 0));
+      if (d > 1.0) {  // skip orphan/dead DOFs (they have diagonal ~1 or 0)
+        diag_sum += d;
+        ++diag_count;
+      }
+    }
+    ST const diag_scale = (diag_count > 0) ? diag_sum / diag_count : 1.0;
+
     for (GO node_gid : orphan_node_gids) {
       for (int eq = 0; eq < neq_per_node; ++eq) {
         GO dof_gid = stk_disc_ptr->getGlobalDOF(node_gid, eq);
@@ -1108,7 +1126,7 @@ Application::fixOrphanNodesForElementDeath(
           std::vector<ST> vals_vec(col_inds.extent(0), 0.0);
           for (size_t k = 0; k < col_inds.extent(0); ++k) {
             cols_vec[k] = col_inds(k);
-            if (col_inds(k) == dof_lid) vals_vec[k] = 1.0;
+            if (col_inds(k) == dof_lid) vals_vec[k] = diag_scale;
           }
           jac_tpetra->replaceLocalValues(dof_lid, cols_vec, vals_vec);
         }

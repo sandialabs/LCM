@@ -1,0 +1,16 @@
+COORDINATES absolute 1.e-6
+
+TIME STEPS relative 1.e-6 floor 0.0
+
+NODAL VARIABLES relative 6.0e-6 floor 1.0e-12
+	displacement_1
+	displacement_2
+	displacement_3
+	velocity_1
+	velocity_2
+	velocity_3
+	acceleration_1
+	acceleration_2
+	acceleration_3
+
+ELEMENT VARIABLES absolute 5.e-6 floor 1.0e-12

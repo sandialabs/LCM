@@ -1,0 +1,9 @@
+COORDINATES absolute 1.e-6
+
+TIME STEPS relative 1.e-6 floor 0.0
+
+NODAL VARIABLES relative 6.0e-6 floor 1.0e-12
+	temperature
+	temperature_dot
+
+ELEMENT VARIABLES absolute 5.e-6 floor 1.0e-12

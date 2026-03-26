@@ -27,6 +27,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   ice_saturation_material_fit_truncation_ = p->get<RealType>("ACE Material Fit Truncation Ice Saturation", 0.0);
   disable_erosion_          = p->get<bool>("Disable Erosion", false);
+  disable_erosion_material_ = disable_erosion_;
 
   if (p->isParameter("ACE Strain Limit")) {
     strain_limit_ = p->get<RealType>("ACE Strain Limit");
@@ -695,6 +696,13 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // ALBANY_ABORT("Kinematic failure!\n");
     failed += 10000.0;
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
+  }
+  // Zero failed if erosion is disabled in the material file.
+  // The IM solver overrides disable_erosion_ at the problem level
+  // but needs failure_state to accumulate for element death detection;
+  // use the material-level flag to distinguish the two cases.
+  if (disable_erosion_material_) {
+    failed = 0.0;
   }
 }
 }  // namespace LCM

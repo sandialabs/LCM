@@ -108,7 +108,8 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType ice_saturation_material_fit_truncation_{0.0};
 
   RealType maximum_displacement_{0.0};
-  bool     disable_erosion_{false};  // By default erosion is ON so not disabled
+  bool     disable_erosion_{false};           // Material-level OR problem-level override
+  bool     disable_erosion_material_{false};  // Material-level only (from YAML file)
 
   // Params with depth or time:
   std::vector<RealType> z_above_mean_sea_level_;

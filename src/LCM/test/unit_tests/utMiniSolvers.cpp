@@ -4,33 +4,23 @@
 #include "MiniLinearSolver.hpp"
 #include "MiniNonlinearSolver.hpp"
 #include "MiniSolvers.hpp"
-#include "gtest/gtest.h"
 
-int
-main(int ac, char* av[])
+#include <cassert>
+#include <iostream>
+
+namespace {
+
+bool verbose = false;
+
+int num_tests  = 0;
+int num_passed = 0;
+
+void
+test_AlbanyResidual_NewtonBanana()
 {
-  Kokkos::initialize();
-
-  ::testing::GTEST_FLAG(print_time) = (ac > 1) ? true : false;
-
-  ::testing::InitGoogleTest(&ac, av);
-
-  auto const retval = RUN_ALL_TESTS();
-
-  Kokkos::finalize();
-
-  return retval;
-}
-
-// Test the LCM mini minimizer.
-TEST(AlbanyResidual, NewtonBanana)
-{
-  bool const print_output = ::testing::GTEST_FLAG(print_time);
-
-  // outputs nothing
+  ++num_tests;
   Teuchos::oblackholestream bhs;
-
-  std::ostream& os = (print_output == true) ? std::cout : bhs;
+  std::ostream&             os = verbose ? std::cout : bhs;
 
   using EvalT   = PHAL::AlbanyTraits::Residual;
   using ScalarT = typename EvalT::ScalarT;
@@ -61,18 +51,20 @@ TEST(AlbanyResidual, NewtonBanana)
 
   minimizer.printReport(os);
 
-  ASSERT_EQ(minimizer.converged, true);
+  if (minimizer.converged) {
+    ++num_passed;
+    std::cout << "  PASS: AlbanyResidual_NewtonBanana\n";
+  } else {
+    std::cerr << "  FAIL: AlbanyResidual_NewtonBanana\n";
+  }
 }
 
-// Test the LCM mini minimizer.
-TEST(AlbanyJacobian, NewtonBanana)
+void
+test_AlbanyJacobian_NewtonBanana()
 {
-  bool const print_output = ::testing::GTEST_FLAG(print_time);
-
-  // outputs nothing
+  ++num_tests;
   Teuchos::oblackholestream bhs;
-
-  std::ostream& os = (print_output == true) ? std::cout : bhs;
+  std::ostream&             os = verbose ? std::cout : bhs;
 
   using EvalT   = PHAL::AlbanyTraits::Jacobian;
   using ScalarT = typename EvalT::ScalarT;
@@ -99,5 +91,31 @@ TEST(AlbanyJacobian, NewtonBanana)
 
   minimizer.printReport(os);
 
-  ASSERT_EQ(minimizer.converged, true);
+  if (minimizer.converged) {
+    ++num_passed;
+    std::cout << "  PASS: AlbanyJacobian_NewtonBanana\n";
+  } else {
+    std::cerr << "  FAIL: AlbanyJacobian_NewtonBanana\n";
+  }
+}
+
+}  // anonymous namespace
+
+int
+main(int ac, char* av[])
+{
+  Kokkos::initialize();
+
+  verbose = (ac > 1);
+
+  std::cout << "Running utMiniSolvers tests...\n";
+
+  test_AlbanyResidual_NewtonBanana();
+  test_AlbanyJacobian_NewtonBanana();
+
+  std::cout << num_passed << "/" << num_tests << " tests passed.\n";
+
+  Kokkos::finalize();
+
+  return (num_passed == num_tests) ? 0 : 1;
 }

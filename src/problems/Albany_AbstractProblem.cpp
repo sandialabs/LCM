@@ -191,7 +191,6 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
 
   validPL->set<bool>("ACE Sequential Thermomechanical", false, "ACE Sequential Thermomechanical Problem");
   validPL->set<double>("ACE Thermomechanical Problem Current Time", 0.0, "Current Time in ACE Sequential Thermomechanical Problem");
-  validPL->set<bool>("Disable Erosion", false, "Use element death via residual stiffness instead of destructive mesh erosion");
 
   return validPL;
 }

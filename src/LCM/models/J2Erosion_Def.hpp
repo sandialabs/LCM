@@ -2,7 +2,6 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 #include "ACEcommon.hpp"
-#include "Albany_Application.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "J2Erosion.hpp"
 
@@ -27,7 +26,6 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   ice_saturation_material_fit_truncation_ = p->get<RealType>("ACE Material Fit Truncation Ice Saturation", 0.0);
   disable_erosion_          = p->get<bool>("Disable Erosion", false);
-  disable_erosion_material_ = disable_erosion_;
 
   if (p->isParameter("ACE Strain Limit")) {
     strain_limit_ = p->get<RealType>("ACE Strain Limit");
@@ -210,18 +208,6 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   if (workset.death_status_vec != Teuchos::null) {
     death_status_vec_ = workset.death_status_vec;
     has_failed_old_   = true;
-  }
-
-  // Check problem-level "Disable Erosion" flag (set by IM solver)
-  // which overrides the material-level setting.
-  if (workset.current_app_ != Teuchos::null) {
-    auto app_pl = workset.current_app_->getAppPL();
-    if (app_pl != Teuchos::null && app_pl->isSublist("Problem")) {
-      auto& prob_pl = app_pl->sublist("Problem");
-      if (prob_pl.isParameter("Disable Erosion")) {
-        disable_erosion_ = prob_pl.template get<bool>("Disable Erosion");
-      }
-    }
   }
 
   auto& disc                    = *workset.disc;
@@ -422,7 +408,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // set stress to zero and preserve old internal states.  The scatter
   // evaluator will skip this element entirely, so the stress value
   // here is only for output purposes.
-  if (disable_erosion_ && has_failed_old_ && (*death_status_vec_)[cell] > 0.0) {
+  if (has_failed_old_ && (*death_status_vec_)[cell] > 0.0) {
     for (int i(0); i < num_dims_; ++i) {
       for (int j(0); j < num_dims_; ++j) {
         stress_(cell, pt, i, j) = 0.0;
@@ -697,11 +683,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     failed += 10000.0;
     // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
   }
-  // Zero failed if erosion is disabled in the material file.
-  // The IM solver overrides disable_erosion_ at the problem level
-  // but needs failure_state to accumulate for element death detection;
-  // use the material-level flag to distinguish the two cases.
-  if (disable_erosion_material_) {
+  if (disable_erosion_) {
     failed = 0.0;
   }
 }

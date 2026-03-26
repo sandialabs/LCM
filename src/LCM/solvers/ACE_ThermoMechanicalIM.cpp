@@ -497,13 +497,13 @@ ACEThermoMechanicalIM::createPersistentApps()
     auto& app_params = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
 
-    // For the mechanical problem, use element death instead of destructive
-    // mesh erosion.  Remove the Adaptation section so that the
-    // TrapezoidRuleSolver does not trigger mesh adaptation.
+    // For the mechanical problem, remove the Adaptation section so that
+    // the TrapezoidRuleSolver does not trigger destructive mesh erosion.
+    // Element death is handled via scatter skip and is controlled by
+    // Disable Erosion in the material file (false = erosion/death active).
     if (prob_types_[subdomain] == MECHANICAL) {
       auto& problem_params = app_params.sublist("Problem");
       problem_params.remove("Adaptation", false);
-      problem_params.set("Disable Erosion", true);
       disc_params.set<std::string>("Exodus Solution Name", "displacement");
       disc_params.set<std::string>("Exodus SolutionDot Name", "velocity");
       disc_params.set<std::string>("Exodus SolutionDotDot Name", "acceleration");

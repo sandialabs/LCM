@@ -5,9 +5,8 @@ set(LCM_DO_TRILINOS_CMAKE true)
 
 include(${CMAKE_CURRENT_LIST_DIR}/snl_helpers.cmake)
 
-cmake_policy(SET CMP0054 NEW)
-
 function(lcm_do_trilinos)
+  cmake_policy(SET CMP0054 NEW)
   set(BOOL_OPTS
       "CLEAN_BUILD"
       "CLEAN_INSTALL"

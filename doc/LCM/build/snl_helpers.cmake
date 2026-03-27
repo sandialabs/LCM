@@ -167,7 +167,10 @@ function(snl_do_subproject)
   if (SNL_DO_TEST)
     snl_test("${SNL_BUILD_DIR}")
   else()
-    # Submit an empty Test part so CDash does not flag this build as incomplete
+    # Run ctest with a pattern that matches nothing to generate an empty
+    # test result set, then submit it.  CDash requires a Test submission
+    # to consider the build complete.
+    ctest_test(BUILD "${SNL_BUILD_DIR}" INCLUDE "^$" APPEND)
     snl_submit("Test")
   endif()
   if (SNL_DO_INSTALL)

@@ -58,6 +58,7 @@ if [ -f "$SEMS_INIT" ]; then
     case "$HN" in
         hpws*|cee-*)
             source "$SEMS_INIT" 2>/dev/null
+            module load aue/binutils/2.45 2>/dev/null
             module load aue/gcc/12.3.0 2>/dev/null
             module load aue/openmpi/4.1.6-gcc-12.3.0 2>/dev/null
             module load sems-cmake/3.31.8 2>/dev/null
@@ -67,12 +68,22 @@ if [ -f "$SEMS_INIT" ]; then
             module load sems-googletest/1.17.0 2>/dev/null
             # Export compiler and MPI paths for LCM modulefiles
             # (Tcl modules can't see Lmod PATH changes via 'exec which')
+            export PATH="$(dirname $(which ld)):$(dirname $(which gcc)):$(dirname $(which mpicc)):$(dirname $(which cmake)):$PATH"
+            export LD_LIBRARY_PATH="$(dirname $(which gcc))/../lib64:$(dirname $(which mpicc))/../lib:${LD_LIBRARY_PATH:-}"
             export CC="$(which gcc)"
             export CXX="$(which g++)"
             export FC="$(which gfortran)"
             export MPI_BIN="$(dirname "$(which mpicc)")"
             export MPI_INC="${MPI_BIN}/../include"
             export MPI_LIB="${MPI_BIN}/../lib"
+            # Export TPL paths
+            export BOOST_INC="$BOOST_ROOT/include"
+            export BOOST_LIB="$BOOST_ROOT/lib"
+            export BOOSTLIB_INC="$BOOST_ROOT/include"
+            export BOOSTLIB_LIB="$BOOST_ROOT/lib"
+            export NETCDF_INC="$NETCDF_ROOT/include"
+            export NETCDF_LIB="$NETCDF_ROOT/lib"
+            export NETCDF="$NETCDF_ROOT"
             # Re-add LCM modulefiles since SEMS init resets MODULEPATH
             export MODULEPATH="$LCM_DIR/LCM/doc/LCM/modulefiles${MODULEPATH:+:$MODULEPATH}"
             ;;

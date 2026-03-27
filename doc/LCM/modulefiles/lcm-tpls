@@ -15,10 +15,13 @@ if { [is-loaded lcm-cee] } {
     setenv NETCDF_INC   $::env(NETCDF_ROOT)/include
     setenv NETCDF_LIB   $::env(NETCDF_ROOT)/lib
   }
-  # MPI_BIN is derived from mpicxx location
-  setenv MPI_BIN [file dirname [exec which mpicxx]]
-  setenv MPI_INC [file dirname [exec which mpicxx]]/../include
-  setenv MPI_LIB [file dirname [exec which mpicxx]]/../lib
+  # MPI paths are exported by the lcm build script after loading
+  # AUE modules.  The Tcl module just needs to propagate them.
+  if { [info exists ::env(MPI_BIN)] } {
+    setenv MPI_BIN $::env(MPI_BIN)
+    setenv MPI_INC $::env(MPI_INC)
+    setenv MPI_LIB $::env(MPI_LIB)
+  }
 } elseif { [is-loaded lcm-fedora] } {
   setenv BOOST_INC       /usr/include/boost
   setenv BOOST_LIB       /usr/lib64

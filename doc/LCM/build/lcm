@@ -65,6 +65,14 @@ if [ -f "$SEMS_INIT" ]; then
             module load aue/hdf5/1.14.3-gcc-12.3.0-openmpi-4.1.6 2>/dev/null
             module load aue/netcdf-c/4.9.2-gcc-12.3.0-openmpi-4.1.6 2>/dev/null
             module load sems-googletest/1.17.0 2>/dev/null
+            # Export compiler and MPI paths for LCM modulefiles
+            # (Tcl modules can't see Lmod PATH changes via 'exec which')
+            export CC="$(which gcc)"
+            export CXX="$(which g++)"
+            export FC="$(which gfortran)"
+            export MPI_BIN="$(dirname "$(which mpicc)")"
+            export MPI_INC="${MPI_BIN}/../include"
+            export MPI_LIB="${MPI_BIN}/../lib"
             # Re-add LCM modulefiles since SEMS init resets MODULEPATH
             export MODULEPATH="$LCM_DIR/LCM/doc/LCM/modulefiles${MODULEPATH:+:$MODULEPATH}"
             ;;

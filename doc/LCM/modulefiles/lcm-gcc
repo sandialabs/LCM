@@ -7,9 +7,12 @@ setenv TOOL_CHAIN gcc
 if { [is-loaded lcm-cee] } {
   # On CEE LAN, compilers are loaded by the lcm build script
   # (aue/gcc via SEMS Lmod) before modules are processed.
-  setenv CC [exec which gcc]
-  setenv CXX [exec which g++]
-  setenv FC [exec which gfortran]
+  # CC/CXX/FC are exported by the lcm script; propagate them.
+  if { [info exists ::env(CC)] } {
+    setenv CC $::env(CC)
+    setenv CXX $::env(CXX)
+    setenv FC $::env(FC)
+  }
 } elseif { [ file exists /opt/rh/gcc-toolset-15/root/usr/bin/gcc ] } {
   # Use GCC 15 via gcc-toolset-15 (Rigel/standalone RHEL)
   # Prepend to PATH so MPI wrappers (mpicxx, mpif90) find these compilers

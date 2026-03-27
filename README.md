@@ -19,7 +19,7 @@ Solid mechanics simulation of a notched cylinder using the [alternating Schwarz-
 - Constitutive models: linear elasticity, J2 plasticity, crystal plasticity, hyperelasticity, damage models
 - [Schwarz alternating method](https://onlinelibrary.wiley.com/doi/10.1002/nme.6982) for multi-scale coupling
 - [Arctic Coastal Erosion (ACE) model](https://www.sciencedirect.com/science/article/pii/S0377042721001527): coupled thermo-mechanical model with permafrost constitutive models, part of the [InterFACE project](https://climatemodeling.science.energy.gov/projects/interface-interdisciplinary-research-arctic-coastal-environments)
-- Data transfer between coupled domains via [DataTransferKit (DTK)](https://github.com/ikalash/DataTransferKit)
+- Data transfer between coupled domains via DataTransferKit (DTK), bundled in-tree
 
 ## Prerequisites
 
@@ -56,6 +56,26 @@ sudo apt install \
   libopenmpi-dev mpi-default-bin environment-modules
 ```
 
+### Sandia CEE LAN (hpws / cee-* machines)
+
+No system packages need to be installed. The `lcm` build script automatically
+detects CEE LAN hosts by hostname and loads all required compilers and TPLs
+from the SEMS/AUE module system (`/projects/sems`).
+
+**No `.bashrc` edits are needed.** The `lcm` script sources the SEMS module
+init, loads AUE/SEMS modules (GCC 12.3, OpenMPI 4.1.6, CMake 3.31, Boost,
+HDF5, NetCDF, binutils), and exports all necessary environment variables
+internally. You only need `LCM_DIR` and the `lcm` symlink.
+
+**Potential conflicts:** If your `.bashrc` already sources the SEMS init
+script or loads AUE/sierra-devel modules, those may conflict with the versions
+the `lcm` script loads. Either remove those lines from `.bashrc` or start
+from a clean shell (`env -i bash --login`). In particular, pre-loaded
+`sierra-devel` modules set compiler and MPI paths that will clash with the
+AUE modules that `lcm` expects.
+
+Currently only GCC builds are supported on CEE (module `serial-gcc-release`).
+
 ## Quick Start
 
 ### 1. Clone repositories
@@ -65,8 +85,6 @@ mkdir ~/LCM && cd ~/LCM
 
 git clone git@github.com:trilinos/Trilinos.git
 git clone git@github.com:sandialabs/LCM.git
-git clone -b dtk-2.0-tpetra-static-graph git@github.com:ikalash/DataTransferKit.git
-cp -r DataTransferKit Trilinos/
 ```
 
 ### 2. Set up environment
@@ -78,6 +96,10 @@ module use $LCM_DIR/LCM/doc/LCM/modulefiles
 ```
 
 Log out and back in, or `source ~/.bashrc`.
+
+On CEE LAN machines, `module use` requires Environment Modules to be
+available. If `module` is not found, the `lcm` script will locate and source
+the init script automatically, so `.bashrc` changes are optional on CEE.
 
 ### 3. Create the `lcm` symlink
 
@@ -167,11 +189,13 @@ Many tests run in parallel using up to 4 MPI ranks.
 
 ## Nightly Tests
 
-The `doc/LCM/build/clone-build-test.sh` script clones all repositories from scratch and runs the full build and test suite. It is typically run via cron:
+The `clone-build-test-dash.sh` script (in the workspace root) clones
+Trilinos and LCM from scratch, builds with each supported compiler, and
+submits results to CDash. It is typically run via cron:
 
 ```bash
 # In crontab:
-00 00 * * 1-5 cd /home/lcm/LCM; bash -l -c "./clone-build-test.sh"
+00 00 * * 1-5 cd /home/lcm/LCM; bash -l -c "./clone-build-test-dash.sh"
 ```
 
 ## Contributing

@@ -10,11 +10,14 @@ if { [is-loaded lcm-cee] } {
   setenv CC [exec which gcc]
   setenv CXX [exec which g++]
   setenv FC [exec which gfortran]
-} elseif { [ file exists /opt/rh/gcc-toolset-14/root/usr/bin/gcc ] } {
-  # Use GCC 14 via gcc-toolset-14 (Rigel/standalone RHEL)
-  setenv CC /opt/rh/gcc-toolset-14/root/usr/bin/gcc
-  setenv CXX /opt/rh/gcc-toolset-14/root/usr/bin/g++
-  setenv FC /opt/rh/gcc-toolset-14/root/usr/bin/gfortran
+} elseif { [ file exists /opt/rh/gcc-toolset-15/root/usr/bin/gcc ] } {
+  # Use GCC 15 via gcc-toolset-15 (Rigel/standalone RHEL)
+  # Prepend to PATH so MPI wrappers (mpicxx, mpif90) find these compilers
+  prepend-path PATH /opt/rh/gcc-toolset-15/root/usr/bin
+  prepend-path LD_LIBRARY_PATH /opt/rh/gcc-toolset-15/root/usr/lib64
+  setenv CC /opt/rh/gcc-toolset-15/root/usr/bin/gcc
+  setenv CXX /opt/rh/gcc-toolset-15/root/usr/bin/g++
+  setenv FC /opt/rh/gcc-toolset-15/root/usr/bin/gfortran
 } else {
   setenv CC [exec which gcc]
   setenv CXX [exec which g++]

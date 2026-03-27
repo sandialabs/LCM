@@ -50,6 +50,20 @@ if ! type module &>/dev/null; then
     fi
 fi
 
+# On CEE LAN machines, source SEMS modules init to enable SEMS TPLs.
+# This replaces Tcl Environment Modules with Lmod and adds SEMS paths.
+SEMS_INIT=/projects/sems/modulefiles/utils/sems-modules-init.sh
+if [ -f "$SEMS_INIT" ]; then
+    HN=$(hostname)
+    case "$HN" in
+        hpws*|cee-*)
+            source "$SEMS_INIT" 2>/dev/null
+            # Re-add LCM modulefiles since SEMS init resets MODULEPATH
+            export MODULEPATH="$LCM_DIR/LCM/doc/LCM/modulefiles${MODULEPATH:+:$MODULEPATH}"
+            ;;
+    esac
+fi
+
 #---------------------------------------------------------------------------
 # Parse arguments: extract commands, package, threads, and flags.
 # Commands (clean, config, build, test) can be chained.

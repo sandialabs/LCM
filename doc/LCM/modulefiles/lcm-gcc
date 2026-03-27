@@ -5,8 +5,8 @@ module-whatis "LCM GCC compiler"
 setenv TOOL_CHAIN gcc
 
 if { [is-loaded lcm-cee] } {
-  # On CEE LAN, load the SEMS GCC module
-  module load sems-gcc/13.2.0
+  # On CEE LAN, compilers are loaded by the lcm build script
+  # (aue/gcc via SEMS Lmod) before modules are processed.
   setenv CC [exec which gcc]
   setenv CXX [exec which g++]
   setenv FC [exec which gfortran]

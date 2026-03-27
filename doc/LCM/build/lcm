@@ -50,14 +50,21 @@ if ! type module &>/dev/null; then
     fi
 fi
 
-# On CEE LAN machines, source SEMS modules init to enable SEMS TPLs.
-# This replaces Tcl Environment Modules with Lmod and adds SEMS paths.
+# On CEE LAN machines, initialize Lmod (via SEMS) and load compiler/TPL
+# modules.  This replaces Tcl Environment Modules with Lmod.
 SEMS_INIT=/projects/sems/modulefiles/utils/sems-modules-init.sh
 if [ -f "$SEMS_INIT" ]; then
     HN=$(hostname)
     case "$HN" in
         hpws*|cee-*)
             source "$SEMS_INIT" 2>/dev/null
+            module load aue/gcc/12.3.0 2>/dev/null
+            module load aue/openmpi/4.1.6-gcc-12.3.0 2>/dev/null
+            module load sems-cmake/3.31.8 2>/dev/null
+            module load aue/boost/1.85.0-gcc-12.3.0-openmpi-4.1.6 2>/dev/null
+            module load aue/hdf5/1.14.3-gcc-12.3.0-openmpi-4.1.6 2>/dev/null
+            module load aue/netcdf-c/4.9.2-gcc-12.3.0-openmpi-4.1.6 2>/dev/null
+            module load sems-googletest/1.17.0 2>/dev/null
             # Re-add LCM modulefiles since SEMS init resets MODULEPATH
             export MODULEPATH="$LCM_DIR/LCM/doc/LCM/modulefiles${MODULEPATH:+:$MODULEPATH}"
             ;;

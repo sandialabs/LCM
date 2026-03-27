@@ -2,16 +2,23 @@
 module-whatis "LCM TPLs for Trilinos/Albany"
 
 if { [is-loaded lcm-cee] } {
-  # On CEE LAN, load SEMS v2 modules for TPLs.
-  # The SEMS env vars (OPENMPI_*, NETCDF_C_*, BOOST_*) are mapped
-  # to LCM conventions (MPI_*, NETCDF_*, BOOST_*) at cmake time
-  # in lcm_do_trilinos.cmake and lcm_do_albany.cmake.
-  module load sems-cmake
-  module load sems-boost
-  module load sems-openmpi
-  module load sems-hdf5
-  module load sems-netcdf-c
-  module load sems-googletest
+  # On CEE LAN, the lcm build script loads AUE/SEMS modules via Lmod
+  # before these Tcl modules run.  Read paths from the env vars they set.
+  if { [info exists ::env(BOOST_ROOT)] } {
+    setenv BOOST_INC    $::env(BOOST_ROOT)/include
+    setenv BOOST_LIB    $::env(BOOST_ROOT)/lib
+    setenv BOOSTLIB_INC $::env(BOOST_ROOT)/include
+    setenv BOOSTLIB_LIB $::env(BOOST_ROOT)/lib
+  }
+  if { [info exists ::env(NETCDF_ROOT)] } {
+    setenv NETCDF       $::env(NETCDF_ROOT)
+    setenv NETCDF_INC   $::env(NETCDF_ROOT)/include
+    setenv NETCDF_LIB   $::env(NETCDF_ROOT)/lib
+  }
+  # MPI_BIN is derived from mpicxx location
+  setenv MPI_BIN [file dirname [exec which mpicxx]]
+  setenv MPI_INC [file dirname [exec which mpicxx]]/../include
+  setenv MPI_LIB [file dirname [exec which mpicxx]]/../lib
 } elseif { [is-loaded lcm-fedora] } {
   setenv BOOST_INC       /usr/include/boost
   setenv BOOST_LIB       /usr/lib64

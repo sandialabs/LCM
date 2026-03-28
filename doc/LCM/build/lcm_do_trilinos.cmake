@@ -156,6 +156,13 @@ function(lcm_do_trilinos)
         "-DTPL_LAPACK_LIBRARIES:FILEPATH=$ENV{LAPACK_LIB}"
        )
   endif()
+  # On Ubuntu 24.04+, boost_system is header-only (no .so/.a).  Override
+  # the default BoostLib required library list to drop boost_system.
+  if ("$ENV{LCM_ENV_TYPE}" STREQUAL "Ubuntu")
+    set(CONFIG_OPTS ${CONFIG_OPTS}
+        "-DBoostLib_LIBRARY_NAMES:STRING=boost_program_options"
+       )
+  endif()
   # DTK is now built as part of LCM, not as a Trilinos extra repository.
   # Tpetra instantiation settings needed by DTK's SupportId type.
   set(CONFIG_OPTS ${CONFIG_OPTS}

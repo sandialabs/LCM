@@ -12,6 +12,7 @@ jobs:
 
     env:
       LCM_DIR: ${{ github.workspace }}
+      OMPI_MCA_rmaps_base_oversubscribe: 1
 
     steps:
     - name: Install dependencies

@@ -45,7 +45,7 @@ jobs:
         # Add coverage flags for LCM only (not Trilinos)
         export LCM_CXX_FLAGS="${LCM_CXX_FLAGS} --coverage"
         export LCM_LINK_FLAGS="--coverage"
-        ./lcm all $(nproc)
+        ./lcm all $(nproc) --quiet
 
     - name: Collect coverage
       if: always()
@@ -58,7 +58,7 @@ jobs:
         lcov --extract coverage.info '*/LCM/src/*' \
           --output-file coverage_lcm.info \
           --ignore-errors unused,empty
-        lcov --list coverage_lcm.info
+        lcov --list coverage_lcm.info --ignore-errors empty
 
     - name: Upload to Codecov
       if: always()

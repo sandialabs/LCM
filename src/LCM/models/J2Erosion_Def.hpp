@@ -141,7 +141,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(strain_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
   addStateVariable(angle_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
   addStateVariable(displacement_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
-  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
+  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, true, p->get<bool>("Output Failure State", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
@@ -202,6 +202,16 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // get State Variables
   Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
+  // Previous step's converged failure_state, used to make failure monotonic
+  // (once a cell is flagged as failed in any mode, it stays flagged).
+  has_failure_state_old_ = false;
+  {
+    auto it = workset.stateArrayPtr->find("failure_state_old");
+    if (it != workset.stateArrayPtr->end()) {
+      failure_state_old_     = it->second;
+      has_failure_state_old_ = true;
+    }
+  }
   // Read death status from the workset.  This is set by the IM solver
   // from the previous step's converged failure_state values.
   has_failed_old_ = false;
@@ -223,9 +233,20 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
 
   current_time_ = workset.current_time;
 
+  // Seed failed_ from the previous converged step so that failure is
+  // monotonic across time steps — a cell that was flagged as failed in a
+  // previous step must remain flagged, regardless of whether the current
+  // step would re-trigger any failure mode.
   auto const num_cells = workset.numCells;
   for (auto cell = 0; cell < num_cells; ++cell) {
-    failed_(cell, 0) = 0.0;
+    double seed = 0.0;
+    if (has_failure_state_old_) {
+      seed = std::max(seed, failure_state_old_(cell, 0));
+    }
+    if (has_failed_old_) {
+      seed = std::max(seed, (*death_status_vec_)[cell]);
+    }
+    failed_(cell, 0) = seed;
   }
 }
 

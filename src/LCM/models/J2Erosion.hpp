@@ -85,8 +85,6 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   // Workspace arrays
   Albany::MDArray Fp_old_;
   Albany::MDArray eqps_old_;
-  Albany::MDArray failure_state_old_;
-  bool            has_failure_state_old_{false};
   Teuchos::RCP<std::vector<double>> death_status_vec_;
   bool            has_failed_old_{false};
 

@@ -91,10 +91,19 @@ endfunction(snl_build)
 function(snl_test BUILD_DIR)
   message("ctest_read_custom_files(${CTEST_BINARY_DIRECTORY})")
   ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
-  ctest_test(
-    BUILD "${BUILD_DIR}"
-    APPEND
-  )
+  if (DEFINED TEST_FILTER AND NOT "${TEST_FILTER}" STREQUAL "")
+    message("snl_test: filtering with INCLUDE \"${TEST_FILTER}\"")
+    ctest_test(
+      BUILD "${BUILD_DIR}"
+      INCLUDE "${TEST_FILTER}"
+      APPEND
+    )
+  else()
+    ctest_test(
+      BUILD "${BUILD_DIR}"
+      APPEND
+    )
+  endif()
   snl_submit("Test")
 endfunction(snl_test)
 

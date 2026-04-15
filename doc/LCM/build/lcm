@@ -100,6 +100,7 @@ PACKAGE=""
 THREADS="$(nproc)"
 CDASH="OFF"
 CTEST_VERBOSITY="-VV"
+TEST_FILTER=""
 
 for arg in "$@"; do
     case "$arg" in
@@ -111,6 +112,9 @@ for arg in "$@"; do
             ;;
         --quiet|-q)
             CTEST_VERBOSITY="-V"
+            ;;
+        --filter=*)
+            TEST_FILTER="${arg#--filter=}"
             ;;
         --help|-h)
             COMMANDS=(help)
@@ -158,6 +162,7 @@ Options:
   --module=<name>          Module to load (default: release)
   --cdash                  Submit results to CDash
   --quiet, -q              Reduce ctest verbosity (-V instead of -VV)
+  --filter=<regex>         Run only tests matching regex (passed to ctest INCLUDE)
 
 Environment:
   LCM_DIR                  Workspace root (auto-detected if unset)
@@ -241,6 +246,7 @@ run_ctest() {
         -DDO_BUILD:BOOL="$DO_BUILD" \
         -DDO_TEST:BOOL="$DO_TEST" \
         -DCTEST_DO_SUBMIT:BOOL="$CDASH" \
+        -DTEST_FILTER:STRING="$TEST_FILTER" \
         | tee "$LOG_FILE"
 }
 

@@ -497,13 +497,21 @@ ACEThermoMechanicalIM::createPersistentApps()
     auto& app_params = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
 
-    // For the mechanical problem, remove the Adaptation section so that
-    // the TrapezoidRuleSolver does not trigger destructive mesh erosion.
-    // Element death is handled via scatter skip and is controlled by
-    // Disable Erosion in the material file (false = erosion/death active).
-    if (prob_types_[subdomain] == MECHANICAL) {
+    // Remove the Adaptation section from both subdomains.  The IM solver
+    // handles element death via scatter skip (see ACE IM cached
+    // failure_state -> death_status_vec path), not via AAdapt::Erosion's
+    // destructive mesh topology modifications.  Keeping Adaptation
+    // instantiates AAdapt::Erosion, which in turn constructs an
+    // LCM::Topology and calls STK's create_adjacent_entities — that STK
+    // path crashes in parallel runs when resolving shared face-rank part
+    // membership.
+    {
       auto& problem_params = app_params.sublist("Problem");
       problem_params.remove("Adaptation", false);
+    }
+
+    // Name mechanical solution fields
+    if (prob_types_[subdomain] == MECHANICAL) {
       disc_params.set<std::string>("Exodus Solution Name", "displacement");
       disc_params.set<std::string>("Exodus SolutionDot Name", "velocity");
       disc_params.set<std::string>("Exodus SolutionDotDot Name", "acceleration");

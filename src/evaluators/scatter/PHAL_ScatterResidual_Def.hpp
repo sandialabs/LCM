@@ -487,26 +487,26 @@ ScatterResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename T
   }
   Jac_kokkos = workset.Jac_kokkos;
 
-  // Element death: extract failure_state_old into a device-compatible view.
+  // Element death: extract death status into a device-compatible view.
+  // Must use the same source as the Residual scatter specialization
+  // (workset.death_status_vec), otherwise the Jacobian and Residual
+  // become inconsistent for dead-cell rows and NOX fails to converge.
   this->have_death_status_ = false;
-  if (workset.stateArrayPtr != nullptr) {
-    auto it = workset.stateArrayPtr->find("death_status");
-    if (it != workset.stateArrayPtr->end()) {
-      auto& fs = it->second;
-      int   nc = fs.dimension(0);
-      bool  any_dead = false;
-      for (int c = 0; c < nc; ++c) {
-        if (fs(c, 0) > 0.0) { any_dead = true; break; }
+  if (workset.death_status_vec != Teuchos::null) {
+    auto& ds = *workset.death_status_vec;
+    int   nc = ds.size();
+    bool  any_dead = false;
+    for (int c = 0; c < nc; ++c) {
+      if (ds[c] > 0.0) { any_dead = true; break; }
+    }
+    if (any_dead) {
+      if (this->death_status_.extent(0) != static_cast<size_t>(nc)) {
+        this->death_status_ = Kokkos::View<double*, PHX::Device>("death_status", nc);
       }
-      if (any_dead) {
-        if (this->death_status_.extent(0) != static_cast<size_t>(nc)) {
-          this->death_status_ = Kokkos::View<double*, PHX::Device>("death_status", nc);
-        }
-        auto h_ds = Kokkos::create_mirror_view(this->death_status_);
-        for (int c = 0; c < nc; ++c) h_ds(c) = fs(c, 0);
-        Kokkos::deep_copy(this->death_status_, h_ds);
-        this->have_death_status_ = true;
-      }
+      auto h_ds = Kokkos::create_mirror_view(this->death_status_);
+      for (int c = 0; c < nc; ++c) h_ds(c) = ds[c];
+      Kokkos::deep_copy(this->death_status_, h_ds);
+      this->have_death_status_ = true;
     }
   }
 

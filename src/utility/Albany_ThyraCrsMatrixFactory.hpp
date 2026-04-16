@@ -70,6 +70,9 @@ struct ThyraCrsMatrixFactory
   Teuchos::RCP<Thyra_LinearOp>
   createOp() const;
 
+  Teuchos::RCP<const Tpetra_CrsGraph>
+  getTpetraGraph() const;
+
  private:
   // Struct hiding the concrete implementation. This is an implementation
   // detail of this class, so it's private and its implementation is not in the

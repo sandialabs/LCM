@@ -1618,11 +1618,50 @@ STKDiscretization::setConstrainedDOFs(std::set<GO> const& constrained_dof_gids)
   *out << "DBC elimination: " << constrained_dof_gids_.size() << " constrained DOFs, "
        << free_gids.size() << " free DOFs (was " << num_owned << " total)\n";
 
+  *out << "DBC elimination: creating reduced vector space...\n";
   m_vs = createVectorSpace(comm, free_gids());
+  *out << "DBC elimination: reduced vector space created.\n";
 
-  // Rebuild the owned Jacobian graph from the (unchanged) overlap graph
-  // projected onto the reduced owned space.
-  m_jac_factory = Teuchos::rcp(new ThyraCrsMatrixFactory(m_vs, m_vs, m_overlap_jac_factory));
+  // Rebuild the owned Jacobian graph.  We cannot use the Tpetra Export path
+  // (ThyraCrsMatrixFactory's overlap-projection constructor) because the
+  // overlap graph's column entries reference constrained GIDs that no process
+  // owns in the reduced domain map, causing fillComplete to fail.  Instead,
+  // iterate the overlap graph directly, keep only free-DOF rows that this
+  // process owns, and filter out constrained column entries.
+  auto const overlap_graph = m_overlap_jac_factory->getTpetraGraph();
+  auto const overlap_map   = overlap_graph->getRowMap();
+  auto const owned_map     = getTpetraMap(m_vs);
+
+  m_jac_factory = Teuchos::rcp(new ThyraCrsMatrixFactory(m_vs, m_vs));
+
+  for (LO ov_lid = 0; ov_lid < static_cast<LO>(overlap_map->getLocalNumElements()); ++ov_lid) {
+    GO const row_gid = overlap_map->getGlobalElement(ov_lid);
+
+    // Skip rows not in the reduced owned map.
+    if (owned_map->getLocalElement(row_gid) == Teuchos::OrdinalTraits<LO>::invalid()) continue;
+
+    // Get column indices for this row.
+    typename Tpetra_CrsGraph::local_inds_host_view_type col_lids;
+    overlap_graph->getLocalRowView(ov_lid, col_lids);
+
+    // Filter: keep only columns that are free DOFs.
+    Teuchos::Array<GO> free_cols;
+    free_cols.reserve(col_lids.size());
+    for (size_t j = 0; j < col_lids.size(); ++j) {
+      GO const col_gid = overlap_graph->getColMap()->getGlobalElement(col_lids[j]);
+      if (constrained_dof_gids_.count(col_gid) == 0) {
+        free_cols.push_back(col_gid);
+      }
+    }
+
+    if (!free_cols.empty()) {
+      m_jac_factory->insertGlobalIndices(row_gid, free_cols());
+    }
+  }
+
+  *out << "DBC elimination: calling fillComplete on reduced graph...\n";
+  m_jac_factory->fillComplete();
+  *out << "DBC elimination: graph rebuild complete.\n";
 }
 
 void

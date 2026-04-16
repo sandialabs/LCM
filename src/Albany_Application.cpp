@@ -7,10 +7,13 @@
 #include <set>
 #include <string>
 
+#include "Teuchos_DefaultMpiComm.hpp"
+
 #include "AAdapt_Erosion.hpp"
 #include "AAdapt_RC_Manager.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_DataTypes.hpp"
+#include "utility/Albany_GlobalLocalIndexer.hpp"
 #include "Albany_DiscretizationFactory.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_DummyParameterAccessor.hpp"
@@ -480,7 +483,7 @@ Application::eliminateConstrainedDOFs()
   // build the prescribed-value injection map for the overlap space.
   std::set<GO> constrained_gids;
   auto const   overlap_vs         = disc->getOverlapVectorSpace();
-  auto const   overlap_vs_indexer = createGlobalLocalIndexer(overlap_vs);
+  auto const   overlap_vs_indexer = Albany::createGlobalLocalIndexer(overlap_vs);
 
   for (std::size_t i = 0; i < node_set_ids.size(); ++i) {
     auto it = ns_gids_map.find(node_set_ids[i]);
@@ -521,9 +524,37 @@ Application::eliminateConstrainedDOFs()
     }
   }
 
-  if (!constrained_gids.empty()) {
-    disc->setConstrainedDOFs(constrained_gids);
+  // All-gather the constrained GID set so that every process knows the
+  // full global set.  This is needed for graph column filtering: a free-DOF
+  // row on process A may reference a constrained GID owned by process B.
+  {
+    std::vector<GO> local_vec(constrained_gids.begin(), constrained_gids.end());
+    int const       local_count = static_cast<int>(local_vec.size());
+    int const       num_procs   = comm->getSize();
+
+    // Gather counts from all processes.
+    std::vector<int> counts(num_procs);
+    Teuchos::gatherAll(*comm, 1, &local_count, num_procs, counts.data());
+
+    if (num_procs > 1) {
+      // Use MPI_Allgatherv for variable-length gather.
+      std::vector<int> displs(num_procs, 0);
+      for (int i = 1; i < num_procs; ++i) displs[i] = displs[i - 1] + counts[i - 1];
+      int const total = displs[num_procs - 1] + counts[num_procs - 1];
+
+      std::vector<GO> all_gids(total);
+      auto const*     mpi_comm = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
+      MPI_Allgatherv(
+          local_vec.data(), local_count, MPI_LONG_LONG,
+          all_gids.data(), counts.data(), displs.data(), MPI_LONG_LONG,
+          *mpi_comm->getRawMpiComm());
+      constrained_gids.insert(all_gids.begin(), all_gids.end());
+    }
   }
+
+  if (constrained_gids.empty()) return;
+
+  disc->setConstrainedDOFs(constrained_gids);
 }
 
 void
@@ -1369,9 +1400,10 @@ Application::computeGlobalResidualImpl(
   // be written to the output file
   disc->setResidualField(*overlapped_f);
 
-  // Apply Dirichlet conditions using dfm (Dirchelt Field Manager)
-
-  if (dfm != Teuchos::null) {
+  // Apply Dirichlet conditions using dfm (Dirchelt Field Manager).
+  // Skip when DBC DOF elimination is active — constrained DOFs are not
+  // in the owned system, so there are no rows to modify.
+  if (dfm != Teuchos::null && prescribed_dbc_values_.empty()) {
     PHAL::Workset workset = set_dfm_workset(current_time, x, x_dot, x_dotdot, f);
 
     // FillType template argument used to specialize Sacado
@@ -1575,8 +1607,10 @@ Application::computeGlobalJacobianImpl(
     countScale++;
   }
 
-  // Apply Dirichlet conditions using dfm (Dirchelt Field Manager)
-  if (Teuchos::nonnull(dfm)) {
+  // Apply Dirichlet conditions using dfm (Dirchelt Field Manager).
+  // Skip when DBC DOF elimination is active — constrained DOFs are not
+  // in the owned system, so there are no rows to modify.
+  if (Teuchos::nonnull(dfm) && prescribed_dbc_values_.empty()) {
     PHAL::Workset workset;
 
     workset.f       = f;

@@ -118,4 +118,11 @@ ThyraCrsMatrixFactory::createOp() const
   return op;
 }
 
+Teuchos::RCP<const Tpetra_CrsGraph>
+ThyraCrsMatrixFactory::getTpetraGraph() const
+{
+  ALBANY_PANIC(!m_filled, "Error! Cannot get graph if not filled.\n");
+  return m_graph->t_graph;
+}
+
 }  // namespace Albany

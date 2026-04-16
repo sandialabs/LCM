@@ -78,11 +78,6 @@ struct DirichletTraits
   {
     typeF = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_dirichlet_field
   };
-  enum
-  {
-    typeON = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_dirichlet_off_nodeset
-  };
-
   static std::string const bcParamsPl;
 
   typedef PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits> factory_type;
@@ -119,9 +114,6 @@ struct DirichletTraits
 
   static std::string
   constructTimeDepSDBCName(std::string const& ns, std::string const& dof);
-
-  static std::string
-  constructBCNameOffNodeSet(std::string const& ns, std::string const& dof);
 
   static std::string
   constructPressureDepBCName(std::string const& ns, std::string const& dof);

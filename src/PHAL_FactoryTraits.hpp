@@ -16,7 +16,6 @@
 #include "PHAL_Dirichlet.hpp"
 #include "PHAL_DirichletCoordinateFunction.hpp"
 #include "PHAL_DirichletField.hpp"
-#include "PHAL_DirichletOffNodeSet.hpp"
 #include "PHAL_ExprEvalSDBC.hpp"
 #include "PHAL_GatherCoordinateVector.hpp"
 #include "PHAL_GatherScalarNodalParameter.hpp"
@@ -50,34 +49,32 @@ struct DirichletFactoryTraits
   static int const id_dirichlet_aggregator          = 1;
   static int const id_dirichlet_coordinate_function = 2;
   static int const id_dirichlet_field               = 3;
-  static int const id_dirichlet_off_nodeset         = 4;  // eqs on side set
-  static int const id_timedep_bc                    = 5;
-  static int const id_timedep_sdbc                  = 6;
-  static int const id_sdbc                          = 7;
-  static int const id_expreval_sdbc                 = 8;
-  static int const id_kfield_bc                     = 9;
-  static int const id_eq_concentration_bc           = 10;
-  static int const id_time                          = 11;
-  static int const id_torsion_bc                    = 12;
-  static int const id_schwarz_bc                    = 13;
-  static int const id_strong_schwarz_bc             = 14;
+  static int const id_timedep_bc                    = 4;
+  static int const id_timedep_sdbc                  = 5;
+  static int const id_sdbc                          = 6;
+  static int const id_expreval_sdbc                 = 7;
+  static int const id_kfield_bc                     = 8;
+  static int const id_eq_concentration_bc           = 9;
+  static int const id_time                          = 10;
+  static int const id_torsion_bc                    = 11;
+  static int const id_schwarz_bc                    = 12;
+  static int const id_strong_schwarz_bc             = 13;
 
   typedef Sacado::mpl::vector<
       PHAL::Dirichlet<_, Traits>,                  //  0
       PHAL::DirichletAggregator<_, Traits>,        //  1
       PHAL::DirichletCoordFunction<_, Traits>,     //  2
       PHAL::DirichletField<_, Traits>,             //  3
-      PHAL::DirichletOffNodeSet<_, Traits>,        //  4
-      PHAL::TimeDepDBC<_, Traits>,                 //  5
-      PHAL::TimeDepSDBC<_, Traits>,                //  6
-      PHAL::SDirichlet<_, Traits>,                 //  7
-      PHAL::ExprEvalSDBC<_, Traits>,               //  8
-      LCM::KfieldBC<_, Traits>,                    //  9
-      LCM::EquilibriumConcentrationBC<_, Traits>,  // 10
-      LCM::Time<_, Traits>,                        // 11
-      LCM::TorsionBC<_, Traits>,                   // 12
-      LCM::SchwarzBC<_, Traits>,                   // 13
-      LCM::StrongSchwarzBC<_, Traits>              // 14
+      PHAL::TimeDepDBC<_, Traits>,                 //  4
+      PHAL::TimeDepSDBC<_, Traits>,                //  5
+      PHAL::SDirichlet<_, Traits>,                 //  6
+      PHAL::ExprEvalSDBC<_, Traits>,               //  7
+      LCM::KfieldBC<_, Traits>,                    //  8
+      LCM::EquilibriumConcentrationBC<_, Traits>,  //  9
+      LCM::Time<_, Traits>,                        // 10
+      LCM::TorsionBC<_, Traits>,                   // 11
+      LCM::SchwarzBC<_, Traits>,                   // 12
+      LCM::StrongSchwarzBC<_, Traits>              // 13
       >
       EvaluatorTypes;
 };

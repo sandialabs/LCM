@@ -58,45 +58,7 @@ imposeOrder(Teuchos::ParameterList const& bc_pl, std::map<std::string, Teuchos::
       // It is not an error to add an evaluator not directly mapped to an input
       // entry.
 
-      // LB: if the bc is of the form 'DBC off NS...', we ignore the miss,
-      //     since only one evaluator will be build for all the 'DBC off NS...'
-      //     bc specified for a given dof (and therefore, no match can be found
-      //     here).
-
-      if (name.find("DBC off NS") != std::string::npos) {
-        bool found_off_ns = false;
-        // We actually have an evaluator for this 'DBC off NS...', but it
-        // probably have more than one NS in its name
-        for (order_it = order.begin(); order_it != order.end(); ++order_it) {
-          if (order_it->first.find("DBC off NS") != std::string::npos) {
-            // We found a 'DBC off NS...' bc. Let's check the NS and DOF inside
-            // name are inside this evaluator name
-
-            // Get NS name
-            size_t      ns_pos  = name.find("NS ");
-            size_t      ns_size = name.find(" ", ns_pos + 3);
-            std::string ns_name = name.substr(ns_pos + 3, ns_size);
-
-            // Get DOF name
-            size_t      dof_pos  = name.find("DOF ");
-            size_t      dof_size = name.find(" ", dof_pos + 4);
-            std::string dof_name = name.substr(dof_pos + 4, dof_size);
-
-            // Check that NS and DOF name are inside this evaluator name
-            if (order_it->first.find(ns_name) != std::string::npos && order_it->first.find(dof_name) != std::string::npos) {
-              found_off_ns = true;
-              break;
-            }
-          }
-        }
-
-        // If we did not find the right DirichletOffNodeSet evaluator, it's
-        // really a miss
-        if (!found_off_ns) continue;
-      } else {
-        // It really is a miss
-        continue;
-      }
+      continue;
     }
     int const index = order_it->second;
     found[index]    = true;
@@ -841,58 +803,6 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
     }
   }
 
-  ///
-  /// SideSet equations case: DBC to handle nodes not on the side set
-  ///
-  for (std::size_t j = 0; j < bcNames.size(); ++j) {
-    RCP<std::vector<string>> nodeSets(new std::vector<string>(0));
-    string                   dir_name = "DBC off NS";
-    double*                  value    = NULL;
-    for (auto i = 0; i < nodeSetIDs.size(); ++i) {
-      string ss = traits_type::constructBCNameOffNodeSet(nodeSetIDs[i], bcNames[j]);
-
-      if (BCparams.isParameter(ss)) {
-        nodeSets->push_back(nodeSetIDs[i]);
-        dir_name += " " + nodeSetIDs[i];
-        if (value == NULL) {
-          value  = new double();
-          *value = BCparams.get<double>(ss);
-        } else {
-          // The solution is prescribed a unique value off the given side sets.
-          ALBANY_PANIC(
-              *value != BCparams.get<double>(ss),
-              "Error! For a given DOF, all Off-Node-Set BC MUST have the same "
-              "value.\n");
-        }
-      }
-    }
-    dir_name += " for DOF " + bcNames[j];
-
-    if (nodeSets->size() > 0) {
-      RCP<ParameterList> p = rcp(new ParameterList());
-
-      p->set<int>("Type", traits_type::typeON);
-      p->set<int>("Equation Offset", j);
-      p->set<RCP<ParamLib>>("Parameter Library", paramLib);
-
-      // Fill up ParameterList with things DirichletBase wants
-      p->set<RCP<DataLayout>>("Data Layout", dummy);
-      p->set<string>("Dirichlet Name", dir_name);
-      p->set<RealType>("Dirichlet Value", *value);
-      p->set<RCP<std::vector<string>>>("Node Sets", nodeSets);
-      p->set<RCP<ParamLib>>("Parameter Library", paramLib);
-      p->set<string>("Node Set ID", "");
-
-      std::stringstream ess;
-      ess << "Evaluator for " << dir_name;
-      evaluators_to_build[ess.str()] = p;
-
-      bcs->push_back(dir_name);
-      use_dbcs_ = true;
-    }
-    delete value;
-  }
-
   if ((use_dbcs_ == true) && (use_sdbcs_ == true)) {
     ALBANY_ABORT(
         "You are attempting to prescribe a mix of SDBCs and DBCs, which is not "
@@ -1464,12 +1374,6 @@ Albany::DirichletTraits::getValidBCParameters(std::vector<std::string> const& no
       validPL->set<std::string>(ss, "dirichlet field", "Field used to prescribe Dirichlet BCs");
       validPL->set<std::string>(st, "dirichlet field", "Field used to prescribe SDBCs");
       validPL->set<std::string>(ee, "dirichlet field", "Field used to prescribe Expression SDBCs");
-      std::string onsbc = Albany::DirichletTraits::constructBCNameOffNodeSet(nodeSetIDs[i], bcNames[j]);
-      validPL->set<double>(
-          onsbc,
-          0.0,
-          "Value of BC to prescribe off the given nodeset (use multiple "
-          "entries for multiple nodesets)");
     }
   }
 
@@ -1614,15 +1518,6 @@ Albany::DirichletTraits::constructTimeDepSDBCName(std::string const& ns, std::st
 {
   std::stringstream ss;
   ss << "Time Dependent " << Albany::DirichletTraits::constructSDBCName(ns, dof);
-  return ss.str();
-}
-
-std::string
-Albany::DirichletTraits::constructBCNameOffNodeSet(std::string const& ns, std::string const& dof)
-{
-  std::stringstream ss;
-  ss << "DBC off NS " << ns << " for DOF " << dof;
-
   return ss.str();
 }
 

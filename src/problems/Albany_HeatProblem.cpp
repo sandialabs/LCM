@@ -119,6 +119,7 @@ Albany::HeatProblem::constructDirichletEvaluators(std::vector<std::string> const
   use_sdbcs_  = bcUtils.useSDBCs();
   offsets_    = bcUtils.getOffsets();
   nodeSetIDs_ = bcUtils.getNodeSetIDs();
+  bcNames_    = bcNames;
 }
 
 // Neumann BCs

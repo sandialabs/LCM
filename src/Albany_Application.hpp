@@ -571,8 +571,16 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   //! Applied after each owned→overlap scatter to fill constrained DOF slots.
   std::vector<std::pair<LO, double>> prescribed_dbc_values_;
 
+  //! Full (pre-elimination) owned vector space; null when no elimination active.
+  Teuchos::RCP<Thyra_VectorSpace const> full_owned_vs_;
+
   void
   injectConstrainedDOFValues() const;
+
+  //! Expand reduced owned x to full owned space with BC values injected.
+  //! Returns x unchanged if no DOF elimination is active.
+  Teuchos::RCP<Thyra_Vector const>
+  expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x) const;
 
   bool is_schwarz_{false};
   bool no_dir_bcs_{false};

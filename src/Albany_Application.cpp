@@ -469,6 +469,7 @@ Application::eliminateConstrainedDOFs()
 
   auto const& node_set_ids = problem->getNodeSetIDs();
   auto const& offsets      = problem->getOffsets();
+  auto const& bc_names     = problem->getDirichletBCNames();
   auto const& ns_gids_map  = disc->getNodeSetGIDs();
 
   if (node_set_ids.empty()) return;
@@ -481,6 +482,17 @@ Application::eliminateConstrainedDOFs()
   bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
   Teuchos::ParameterList const* bc_params = has_dbc_params ? &problemParams->sublist("Dirichlet BCs") : nullptr;
 
+  // Skip elimination for problems with SDBC or time-dependent DBCs: those
+  // enforce BCs through different mechanisms (strong enforcement or value
+  // that varies at runtime) that are incompatible with static elimination.
+  if (bc_params != nullptr) {
+    for (auto it = bc_params->begin(); it != bc_params->end(); ++it) {
+      std::string const& name = bc_params->name(it);
+      if (name.find("SDBC") != std::string::npos) return;
+      if (name.find("Time Dependent") != std::string::npos) return;
+    }
+  }
+
   // Step 1: Build a local map of constrained DOF GID → prescribed value
   // from locally-owned node sets.  Iterate the BC parameter list directly
   // to get the correct value for each (node_set, equation_offset) pair.
@@ -491,32 +503,18 @@ Application::eliminateConstrainedDOFs()
     auto const& node_gids = it->second;
 
     for (int eq : offsets[i]) {
-      // Look up the prescribed value: scan BC param entries for the one
-      // matching this node set AND this equation offset.  The entry name
-      // format is "DBC on NS <ns> for DOF <dof>" or "SDBC on NS ...".
-      // We match by node set name (exact substring bounded by spaces) and
-      // verify the equation offset agrees.
+      // offsets[i][k] = j = index into bc_names, so bc_names[eq] is the DOF
+      // name (e.g. "X", "Y", "Z", "T").  Build the expected parameter name
+      // and look it up directly; fall back to SDBC variant.
       double prescribed_value = 0.0;
-      if (bc_params != nullptr) {
-        // Build the expected prefix for this node set.
-        std::string const ns_token = " NS " + node_set_ids[i] + " ";
-        for (auto pl_it = bc_params->begin(); pl_it != bc_params->end(); ++pl_it) {
-          std::string const& name = bc_params->name(pl_it);
-          if (name.find(ns_token) == std::string::npos) continue;
-          if (!bc_params->isType<double>(name)) continue;
-          // This entry matches our node set.  Check if its equation offset
-          // (position in offsets[i]) matches `eq`.  Since offsets[i] is built
-          // by scanning bcNames in order, the k-th entry in offsets[i]
-          // corresponds to the k-th DOF constrained on this node set.
-          // Rather than reconstruct that mapping, we just associate this
-          // value with eq — for the common case of one DBC per (ns, dof),
-          // this is correct.  For multiple DOFs on the same node set, we
-          // count how many entries we've seen for this node set.
-          prescribed_value = bc_params->get<double>(name);
-          // We found a matching entry.  If offsets[i] has only one element,
-          // this is unambiguous.  For multi-DOF, we rely on the ordering.
-          break;
-        }
+      if (bc_params != nullptr && eq < static_cast<int>(bc_names.size())) {
+        std::string const& dof      = bc_names[eq];
+        std::string const  dbc_key  = "DBC on NS " + node_set_ids[i] + " for DOF " + dof;
+        std::string const  sdbc_key = "SDBC on NS " + node_set_ids[i] + " for DOF " + dof;
+        if (bc_params->isType<double>(dbc_key))
+          prescribed_value = bc_params->get<double>(dbc_key);
+        else if (bc_params->isType<double>(sdbc_key))
+          prescribed_value = bc_params->get<double>(sdbc_key);
       }
       for (auto node_gid : node_gids) {
         GO const dof_gid             = stk_disc->getGlobalDOF(node_gid, eq);
@@ -567,6 +565,9 @@ Application::eliminateConstrainedDOFs()
 
   if (global_gid_value_map.empty()) return;
 
+  // Capture the full (pre-elimination) owned vector space before disc reduces it.
+  full_owned_vs_ = disc->getVectorSpace();
+
   // Step 3: Build the constrained GID set for the discretization and
   // the overlap injection map.
   std::set<GO> constrained_gids;
@@ -596,6 +597,24 @@ Application::injectConstrainedDOFValues() const
   for (auto const& [lid, value] : prescribed_dbc_values_) {
     x_data[lid] = value;
   }
+}
+
+Teuchos::RCP<Thyra_Vector const>
+Application::expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x) const
+{
+  if (prescribed_dbc_values_.empty() || full_owned_vs_.is_null()) return x;
+
+  // For serial: scatter reduced x to overlap (which equals the full owned space),
+  // then inject prescribed BC values into constrained slots.
+  auto full_x  = Thyra::createMember(disc->getOverlapVectorSpace());
+  auto cas     = Albany::createCombineAndScatterManager(disc->getVectorSpace(), disc->getOverlapVectorSpace());
+  cas->scatter(*x, *full_x, Albany::CombineMode::INSERT);
+
+  auto x_data = Albany::getNonconstLocalData(full_x);
+  for (auto const& [lid, value] : prescribed_dbc_values_) {
+    x_data[lid] = value;
+  }
+  return full_x;
 }
 
 void
@@ -1750,7 +1769,8 @@ Application::evaluateResponse(
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response");
   double const this_time = fixTime(current_time);
-  responses[response_index]->evaluateResponse(this_time, x, xdot, xdotdot, p, g);
+  auto const   x_full    = expandToFullSolution(x);
+  responses[response_index]->evaluateResponse(this_time, x_full, xdot, xdotdot, p, g);
 }
 
 void

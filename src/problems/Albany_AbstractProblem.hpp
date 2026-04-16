@@ -134,6 +134,12 @@ class AbstractProblem
     return nodeSetIDs_;
   }
 
+  std::vector<std::string>
+  getDirichletBCNames()
+  {
+    return bcNames_;
+  }
+
   //! Return the Null space object used to communicate with MP
   const Teuchos::RCP<Albany::RigidBodyModes>&
   getNullSpace()
@@ -177,6 +183,7 @@ class AbstractProblem
  protected:
   Teuchos::Array<Teuchos::Array<int>> offsets_;
   std::vector<std::string>            nodeSetIDs_;
+  std::vector<std::string>            bcNames_;
   //! List of valid problem params common to all problems, as
   //! a starting point for the specific  getValidProblemParameters
   Teuchos::RCP<Teuchos::ParameterList>

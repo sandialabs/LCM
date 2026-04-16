@@ -467,7 +467,6 @@ Application::eliminateConstrainedDOFs()
   auto const& node_set_ids = problem->getNodeSetIDs();
   auto const& offsets      = problem->getOffsets();
   auto const& ns_gids_map  = disc->getNodeSetGIDs();
-  auto const& node_sets    = disc->getNodeSets();
 
   if (node_set_ids.empty()) return;
   if (offsets.size() != static_cast<int>(node_set_ids.size())) return;
@@ -479,80 +478,87 @@ Application::eliminateConstrainedDOFs()
   bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
   Teuchos::ParameterList const* bc_params = has_dbc_params ? &problemParams->sublist("Dirichlet BCs") : nullptr;
 
-  // Collect global DOF GIDs for all Dirichlet-constrained DOFs, and
-  // build the prescribed-value injection map for the overlap space.
-  std::set<GO> constrained_gids;
-  auto const   overlap_vs         = disc->getOverlapVectorSpace();
-  auto const   overlap_vs_indexer = Albany::createGlobalLocalIndexer(overlap_vs);
-
+  // Step 1: Build a local map of constrained DOF GID → prescribed value
+  // from locally-owned node sets.
+  std::map<GO, double> local_gid_value_map;
   for (std::size_t i = 0; i < node_set_ids.size(); ++i) {
     auto it = ns_gids_map.find(node_set_ids[i]);
     if (it == ns_gids_map.end()) continue;
     auto const& node_gids = it->second;
 
     for (int eq : offsets[i]) {
-      // Try to look up the prescribed value from the DBC parameter list.
-      // For Phase 1, support constant DBCs ("DBC on NS ... for DOF ...").
       double prescribed_value = 0.0;
       if (bc_params != nullptr) {
-        auto const& ns_node_sets = node_sets.find(node_set_ids[i]);
-        if (ns_node_sets != node_sets.end() && !ns_node_sets->second.empty()) {
-          // Reconstruct the BC parameter name to look up the value.
-          // The dirichlet names for each equation offset are set by the
-          // problem; for now scan the parameter list for a matching entry.
-          for (auto pl_it = bc_params->begin(); pl_it != bc_params->end(); ++pl_it) {
-            std::string const& name = bc_params->name(pl_it);
-            if (name.find(node_set_ids[i]) != std::string::npos && bc_params->isType<double>(name)) {
-              // Check that the equation offset matches by using the offset
-              // stored in the evaluator's offsets array.
-              prescribed_value = bc_params->get<double>(name);
-              break;
-            }
+        for (auto pl_it = bc_params->begin(); pl_it != bc_params->end(); ++pl_it) {
+          std::string const& name = bc_params->name(pl_it);
+          if (name.find(node_set_ids[i]) != std::string::npos && bc_params->isType<double>(name)) {
+            prescribed_value = bc_params->get<double>(name);
+            break;
           }
         }
       }
-
       for (auto node_gid : node_gids) {
-        GO const dof_gid = stk_disc->getGlobalDOF(node_gid, eq);
-        constrained_gids.insert(dof_gid);
-
-        LO const overlap_lid = overlap_vs_indexer->getLocalElement(dof_gid);
-        if (overlap_lid >= 0) {
-          prescribed_dbc_values_.push_back({overlap_lid, prescribed_value});
-        }
+        GO const dof_gid             = stk_disc->getGlobalDOF(node_gid, eq);
+        local_gid_value_map[dof_gid] = prescribed_value;
       }
     }
   }
 
-  // All-gather the constrained GID set so that every process knows the
-  // full global set.  This is needed for graph column filtering: a free-DOF
-  // row on process A may reference a constrained GID owned by process B.
-  {
-    std::vector<GO> local_vec(constrained_gids.begin(), constrained_gids.end());
-    int const       local_count = static_cast<int>(local_vec.size());
-    int const       num_procs   = comm->getSize();
+  // Step 2: All-gather GIDs and values so every process knows the full
+  // global set.  Needed for graph column filtering and overlap injection.
+  std::map<GO, double> global_gid_value_map = local_gid_value_map;
+  int const            num_procs            = comm->getSize();
+  if (num_procs > 1) {
+    int const local_count = static_cast<int>(local_gid_value_map.size());
 
-    // Gather counts from all processes.
+    std::vector<GO>     local_gids;
+    std::vector<double> local_vals;
+    local_gids.reserve(local_count);
+    local_vals.reserve(local_count);
+    for (auto const& [gid, val] : local_gid_value_map) {
+      local_gids.push_back(gid);
+      local_vals.push_back(val);
+    }
+
     std::vector<int> counts(num_procs);
     Teuchos::gatherAll(*comm, 1, &local_count, num_procs, counts.data());
 
-    if (num_procs > 1) {
-      // Use MPI_Allgatherv for variable-length gather.
-      std::vector<int> displs(num_procs, 0);
-      for (int i = 1; i < num_procs; ++i) displs[i] = displs[i - 1] + counts[i - 1];
-      int const total = displs[num_procs - 1] + counts[num_procs - 1];
+    std::vector<int> displs(num_procs, 0);
+    for (int i = 1; i < num_procs; ++i) displs[i] = displs[i - 1] + counts[i - 1];
+    int const total = displs[num_procs - 1] + counts[num_procs - 1];
 
-      std::vector<GO> all_gids(total);
-      auto const*     mpi_comm = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
-      MPI_Allgatherv(
-          local_vec.data(), local_count, MPI_LONG_LONG,
-          all_gids.data(), counts.data(), displs.data(), MPI_LONG_LONG,
-          *mpi_comm->getRawMpiComm());
-      constrained_gids.insert(all_gids.begin(), all_gids.end());
+    std::vector<GO>     all_gids(total);
+    std::vector<double> all_vals(total);
+    auto const*         mpi_comm = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
+    MPI_Allgatherv(
+        local_gids.data(), local_count, MPI_LONG_LONG,
+        all_gids.data(), counts.data(), displs.data(), MPI_LONG_LONG,
+        *mpi_comm->getRawMpiComm());
+    MPI_Allgatherv(
+        local_vals.data(), local_count, MPI_DOUBLE,
+        all_vals.data(), counts.data(), displs.data(), MPI_DOUBLE,
+        *mpi_comm->getRawMpiComm());
+
+    for (int i = 0; i < total; ++i) {
+      global_gid_value_map[all_gids[i]] = all_vals[i];
     }
   }
 
-  if (constrained_gids.empty()) return;
+  if (global_gid_value_map.empty()) return;
+
+  // Step 3: Build the constrained GID set for the discretization and
+  // the overlap injection map.
+  std::set<GO> constrained_gids;
+  auto const   overlap_vs         = disc->getOverlapVectorSpace();
+  auto const   overlap_vs_indexer = Albany::createGlobalLocalIndexer(overlap_vs);
+
+  for (auto const& [gid, val] : global_gid_value_map) {
+    constrained_gids.insert(gid);
+    LO const overlap_lid = overlap_vs_indexer->getLocalElement(gid);
+    if (overlap_lid >= 0) {
+      prescribed_dbc_values_.push_back({overlap_lid, val});
+    }
+  }
 
   disc->setConstrainedDOFs(constrained_gids);
 }

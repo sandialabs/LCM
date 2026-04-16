@@ -9,6 +9,7 @@
 #include <limits>
 
 #include "Albany_BucketArray.hpp"
+#include "Albany_CombineAndScatterManager.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_NodalGraphUtils.hpp"
@@ -1201,6 +1202,24 @@ STKDiscretization::setField(Thyra_Vector const& result, std::string const& name,
 void
 STKDiscretization::setSolutionField(Thyra_Vector const& soln, bool const overlapped)
 {
+  if (!constrained_dof_gids_.empty() && !overlapped) {
+    // The owned solution is in the reduced space (missing constrained DOFs).
+    // Expand to the overlap space, inject BC values, then write from overlap.
+    auto overlap_soln = Thyra::createMember(m_overlap_vs);
+    overlap_soln->assign(0.0);
+    auto cas = Albany::createCombineAndScatterManager(m_vs, m_overlap_vs);
+    cas->scatter(soln, *overlap_soln, Albany::CombineMode::INSERT);
+    // Inject prescribed BC values at constrained DOF positions.
+    auto ov_data    = Albany::getNonconstLocalData(overlap_soln);
+    auto ov_indexer = createGlobalLocalIndexer(m_overlap_vs);
+    for (auto const& [gid, val] : constrained_dof_values_) {
+      LO const lid = ov_indexer->getLocalElement(gid);
+      if (lid >= 0) ov_data[lid] = val;
+    }
+    setSolutionField(*overlap_soln, /*overlapped=*/true);
+    return;
+  }
+
   Teuchos::RCP<AbstractSTKFieldContainer> container = stkMeshStruct->getFieldContainer();
 
   // Select the proper mesh part and node vector space
@@ -1596,11 +1615,12 @@ STKDiscretization::fillCompleteGraphs()
 }
 
 void
-STKDiscretization::setConstrainedDOFs(std::set<GO> const& constrained_dof_gids)
+STKDiscretization::setConstrainedDOFs(std::set<GO> const& constrained_dof_gids, std::map<GO, double> const& constrained_dof_values)
 {
   if (constrained_dof_gids.empty()) return;
 
-  constrained_dof_gids_ = constrained_dof_gids;
+  constrained_dof_gids_   = constrained_dof_gids;
+  constrained_dof_values_ = constrained_dof_values;
 
   // Rebuild the owned DOF vector space, excluding constrained GIDs.
   auto const full_vs_indexer = createGlobalLocalIndexer(m_vs);

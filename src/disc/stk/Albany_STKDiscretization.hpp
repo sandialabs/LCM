@@ -152,7 +152,7 @@ class STKDiscretization : public AbstractDiscretization
   }
 
   void
-  setConstrainedDOFs(std::set<GO> const& constrained_dof_gids) override;
+  setConstrainedDOFs(std::set<GO> const& constrained_dof_gids, std::map<GO, double> const& constrained_dof_values = {}) override;
 
   //! Get Node set lists (typedef in Albany_AbstractDiscretization.hpp)
   NodeSetList const&
@@ -655,8 +655,10 @@ class STKDiscretization : public AbstractDiscretization
   //! Teuchos communicator
   Teuchos::RCP<Teuchos_Comm const> comm;
 
-  //! DOF GIDs eliminated from the owned space via Dirichlet BC elimination
-  std::set<GO> constrained_dof_gids_;
+  //! DOF GIDs eliminated from the owned space via Dirichlet BC elimination,
+  //! and their prescribed values (for solution output reconstruction).
+  std::set<GO>         constrained_dof_gids_;
+  std::map<GO, double> constrained_dof_values_;
 
   //! Unknown map and node map
   Teuchos::RCP<Thyra_VectorSpace const> m_vs;

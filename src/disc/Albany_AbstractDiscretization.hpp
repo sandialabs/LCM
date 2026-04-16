@@ -5,6 +5,7 @@
 #ifndef ALBANY_ABSTRACT_DISCRETIZATION_HPP
 #define ALBANY_ABSTRACT_DISCRETIZATION_HPP
 
+#include <map>
 #include <set>
 
 #include "Albany_AbstractMeshStruct.hpp"
@@ -75,7 +76,7 @@ class AbstractDiscretization
   //! the given global DOF IDs, and createJacobianOp() produces a
   //! correspondingly smaller matrix. The overlap spaces are unchanged.
   virtual void
-  setConstrainedDOFs(std::set<GO> const& /*constrained_dof_gids*/)
+  setConstrainedDOFs(std::set<GO> const& /*constrained_dof_gids*/, std::map<GO, double> const& /*constrained_dof_values*/ = {})
   {
   }
 

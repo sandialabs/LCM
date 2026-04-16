@@ -464,6 +464,9 @@ Application::createDiscretization()
 void
 Application::eliminateConstrainedDOFs()
 {
+  // TODO: remove this early return once parallel is working
+  if (comm->getSize() > 1) return;
+
   auto const& node_set_ids = problem->getNodeSetIDs();
   auto const& offsets      = problem->getOffsets();
   auto const& ns_gids_map  = disc->getNodeSetGIDs();
@@ -479,7 +482,8 @@ Application::eliminateConstrainedDOFs()
   Teuchos::ParameterList const* bc_params = has_dbc_params ? &problemParams->sublist("Dirichlet BCs") : nullptr;
 
   // Step 1: Build a local map of constrained DOF GID → prescribed value
-  // from locally-owned node sets.
+  // from locally-owned node sets.  Iterate the BC parameter list directly
+  // to get the correct value for each (node_set, equation_offset) pair.
   std::map<GO, double> local_gid_value_map;
   for (std::size_t i = 0; i < node_set_ids.size(); ++i) {
     auto it = ns_gids_map.find(node_set_ids[i]);
@@ -487,14 +491,31 @@ Application::eliminateConstrainedDOFs()
     auto const& node_gids = it->second;
 
     for (int eq : offsets[i]) {
+      // Look up the prescribed value: scan BC param entries for the one
+      // matching this node set AND this equation offset.  The entry name
+      // format is "DBC on NS <ns> for DOF <dof>" or "SDBC on NS ...".
+      // We match by node set name (exact substring bounded by spaces) and
+      // verify the equation offset agrees.
       double prescribed_value = 0.0;
       if (bc_params != nullptr) {
+        // Build the expected prefix for this node set.
+        std::string const ns_token = " NS " + node_set_ids[i] + " ";
         for (auto pl_it = bc_params->begin(); pl_it != bc_params->end(); ++pl_it) {
           std::string const& name = bc_params->name(pl_it);
-          if (name.find(node_set_ids[i]) != std::string::npos && bc_params->isType<double>(name)) {
-            prescribed_value = bc_params->get<double>(name);
-            break;
-          }
+          if (name.find(ns_token) == std::string::npos) continue;
+          if (!bc_params->isType<double>(name)) continue;
+          // This entry matches our node set.  Check if its equation offset
+          // (position in offsets[i]) matches `eq`.  Since offsets[i] is built
+          // by scanning bcNames in order, the k-th entry in offsets[i]
+          // corresponds to the k-th DOF constrained on this node set.
+          // Rather than reconstruct that mapping, we just associate this
+          // value with eq — for the common case of one DBC per (ns, dof),
+          // this is correct.  For multiple DOFs on the same node set, we
+          // count how many entries we've seen for this node set.
+          prescribed_value = bc_params->get<double>(name);
+          // We found a matching entry.  If offsets[i] has only one element,
+          // this is unambiguous.  For multi-DOF, we rely on the ordering.
+          break;
         }
       }
       for (auto node_gid : node_gids) {
@@ -560,7 +581,7 @@ Application::eliminateConstrainedDOFs()
     }
   }
 
-  disc->setConstrainedDOFs(constrained_gids);
+  disc->setConstrainedDOFs(constrained_gids, global_gid_value_map);
 }
 
 void

@@ -1102,9 +1102,20 @@ STKDiscretization::getSolutionField(bool overlapped) const
 Teuchos::RCP<Thyra_MultiVector>
 STKDiscretization::getSolutionMV(bool overlapped) const
 {
-  // Copy soln vector into solution field, one node at a time
-  int                             num_time_deriv = stkMeshStruct->num_time_deriv;
-  Teuchos::RCP<Thyra_MultiVector> soln           = Thyra::createMembers(m_vs, num_time_deriv + 1);
+  int const num_time_deriv = stkMeshStruct->num_time_deriv;
+
+  if (!constrained_dof_gids_.empty() && !overlapped) {
+    // With DBC DOF elimination, m_vs is reduced and the direct fill path
+    // (which iterates all owned nodes) would write to DOF indices that don't
+    // exist in the reduced vector.  Return a zero vector instead; the
+    // AdaptiveSolutionManager applies initial conditions via the overlap
+    // path, which handles the reduced/full mapping correctly.
+    auto soln = Thyra::createMembers(m_vs, num_time_deriv + 1);
+    soln->assign(0.0);
+    return soln;
+  }
+
+  Teuchos::RCP<Thyra_MultiVector> soln = Thyra::createMembers(m_vs, num_time_deriv + 1);
   this->getSolutionMV(*soln, overlapped);
   return soln;
 }

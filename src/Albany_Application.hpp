@@ -567,6 +567,13 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   }
 
  protected:
+  //! Prescribed DBC values for DOF elimination: (overlap LID, value) pairs.
+  //! Applied after each owned→overlap scatter to fill constrained DOF slots.
+  std::vector<std::pair<LO, double>> prescribed_dbc_values_;
+
+  void
+  injectConstrainedDOFValues() const;
+
   bool is_schwarz_{false};
   bool no_dir_bcs_{false};
   bool requires_sdbcs_{false};

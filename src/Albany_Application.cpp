@@ -464,6 +464,7 @@ Application::eliminateConstrainedDOFs()
   auto const& node_set_ids = problem->getNodeSetIDs();
   auto const& offsets      = problem->getOffsets();
   auto const& ns_gids_map  = disc->getNodeSetGIDs();
+  auto const& node_sets    = disc->getNodeSets();
 
   if (node_set_ids.empty()) return;
   if (offsets.size() != static_cast<int>(node_set_ids.size())) return;
@@ -471,23 +472,71 @@ Application::eliminateConstrainedDOFs()
   auto* stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
   if (stk_disc == nullptr) return;
 
-  // Collect global DOF GIDs for all Dirichlet-constrained DOFs.
-  // offsets[i] lists equation components constrained on nodeSetIDs[i].
+  // Get the DBC parameter list for prescribed values.
+  bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
+  Teuchos::ParameterList const* bc_params = has_dbc_params ? &problemParams->sublist("Dirichlet BCs") : nullptr;
+
+  // Collect global DOF GIDs for all Dirichlet-constrained DOFs, and
+  // build the prescribed-value injection map for the overlap space.
   std::set<GO> constrained_gids;
+  auto const   overlap_vs         = disc->getOverlapVectorSpace();
+  auto const   overlap_vs_indexer = createGlobalLocalIndexer(overlap_vs);
+
   for (std::size_t i = 0; i < node_set_ids.size(); ++i) {
     auto it = ns_gids_map.find(node_set_ids[i]);
     if (it == ns_gids_map.end()) continue;
     auto const& node_gids = it->second;
+
     for (int eq : offsets[i]) {
+      // Try to look up the prescribed value from the DBC parameter list.
+      // For Phase 1, support constant DBCs ("DBC on NS ... for DOF ...").
+      double prescribed_value = 0.0;
+      if (bc_params != nullptr) {
+        auto const& ns_node_sets = node_sets.find(node_set_ids[i]);
+        if (ns_node_sets != node_sets.end() && !ns_node_sets->second.empty()) {
+          // Reconstruct the BC parameter name to look up the value.
+          // The dirichlet names for each equation offset are set by the
+          // problem; for now scan the parameter list for a matching entry.
+          for (auto pl_it = bc_params->begin(); pl_it != bc_params->end(); ++pl_it) {
+            std::string const& name = bc_params->name(pl_it);
+            if (name.find(node_set_ids[i]) != std::string::npos && bc_params->isType<double>(name)) {
+              // Check that the equation offset matches by using the offset
+              // stored in the evaluator's offsets array.
+              prescribed_value = bc_params->get<double>(name);
+              break;
+            }
+          }
+        }
+      }
+
       for (auto node_gid : node_gids) {
         GO const dof_gid = stk_disc->getGlobalDOF(node_gid, eq);
         constrained_gids.insert(dof_gid);
+
+        LO const overlap_lid = overlap_vs_indexer->getLocalElement(dof_gid);
+        if (overlap_lid >= 0) {
+          prescribed_dbc_values_.push_back({overlap_lid, prescribed_value});
+        }
       }
     }
   }
 
   if (!constrained_gids.empty()) {
     disc->setConstrainedDOFs(constrained_gids);
+  }
+}
+
+void
+Application::injectConstrainedDOFValues() const
+{
+  if (prescribed_dbc_values_.empty()) return;
+
+  auto overlapped_MV = solMgr->getOverlappedSolution();
+  auto x_overlap     = overlapped_MV->col(0);
+  auto x_data        = Albany::getNonconstLocalData(x_overlap);
+
+  for (auto const& [lid, value] : prescribed_dbc_values_) {
+    x_data[lid] = value;
   }
 }
 
@@ -1212,6 +1261,7 @@ Application::computeGlobalResidualImpl(
 
   // Scatter x and xdot to the overlapped distrbution
   solMgr->scatterX(*x, x_dot.ptr(), x_dotdot.ptr());
+  injectConstrainedDOFValues();
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -1417,6 +1467,7 @@ Application::computeGlobalJacobianImpl(
 
   // Scatter x and xdot to the overlapped distribution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
+  injectConstrainedDOFValues();
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -1694,6 +1745,7 @@ Application::evaluateStateFieldManager(
 
   // Scatter to the overlapped distrbution
   solMgr->scatterX(x, xdot, xdotdot);
+  injectConstrainedDOFValues();
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -1822,6 +1874,14 @@ Application::loadBasicWorksetInfoSDBCs(PHAL::Workset& workset, Teuchos::RCP<Thyr
   auto overlapped_sol = Thyra::createMember(overlapped_MV->range());
   overlapped_sol->assign(0.0);
   solMgr->get_cas_manager()->scatter(owned_sol, overlapped_sol, CombineMode::INSERT);
+
+  // Inject prescribed DBC values into constrained overlap DOF slots.
+  if (!prescribed_dbc_values_.empty()) {
+    auto x_data = Albany::getNonconstLocalData(overlapped_sol);
+    for (auto const& [lid, value] : prescribed_dbc_values_) {
+      x_data[lid] = value;
+    }
+  }
 
   auto numVectors = overlapped_MV->domain()->dim();
   workset.x       = overlapped_sol;
@@ -1973,6 +2033,7 @@ Application::setupBasicWorksetInfo(
 
   // Scatter xT and xdotT to the overlapped distrbution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
+  injectConstrainedDOFValues();
 
   // Scatter distributed parameters
   distParamLib->scatter();

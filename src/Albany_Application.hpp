@@ -80,6 +80,8 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   void
   createDiscretization();
   void
+  eliminateConstrainedDOFs();
+  void
   finalSetUp(const Teuchos::RCP<Teuchos::ParameterList>& params, Teuchos::RCP<Thyra_Vector const> const& initial_guess = Teuchos::null);
 
   //! Get underlying abstract discretization

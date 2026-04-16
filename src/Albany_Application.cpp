@@ -4,6 +4,7 @@
 
 #include "Albany_Application.hpp"
 
+#include <set>
 #include <string>
 
 #include "AAdapt_Erosion.hpp"
@@ -453,6 +454,41 @@ Application::createDiscretization()
       problem->getFieldRequirements(),
       problem->getSideSetFieldRequirements(),
       problem->getNullSpace());
+
+  eliminateConstrainedDOFs();
+}
+
+void
+Application::eliminateConstrainedDOFs()
+{
+  auto const& node_set_ids = problem->getNodeSetIDs();
+  auto const& offsets      = problem->getOffsets();
+  auto const& ns_gids_map  = disc->getNodeSetGIDs();
+
+  if (node_set_ids.empty()) return;
+  if (offsets.size() != static_cast<int>(node_set_ids.size())) return;
+
+  auto* stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
+  if (stk_disc == nullptr) return;
+
+  // Collect global DOF GIDs for all Dirichlet-constrained DOFs.
+  // offsets[i] lists equation components constrained on nodeSetIDs[i].
+  std::set<GO> constrained_gids;
+  for (std::size_t i = 0; i < node_set_ids.size(); ++i) {
+    auto it = ns_gids_map.find(node_set_ids[i]);
+    if (it == ns_gids_map.end()) continue;
+    auto const& node_gids = it->second;
+    for (int eq : offsets[i]) {
+      for (auto node_gid : node_gids) {
+        GO const dof_gid = stk_disc->getGlobalDOF(node_gid, eq);
+        constrained_gids.insert(dof_gid);
+      }
+    }
+  }
+
+  if (!constrained_gids.empty()) {
+    disc->setConstrainedDOFs(constrained_gids);
+  }
 }
 
 void

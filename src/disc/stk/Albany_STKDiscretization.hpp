@@ -151,6 +151,9 @@ class STKDiscretization : public AbstractDiscretization
     return m_overlap_jac_factory->createOp();
   }
 
+  void
+  setConstrainedDOFs(std::set<GO> const& constrained_dof_gids) override;
+
   //! Get Node set lists (typedef in Albany_AbstractDiscretization.hpp)
   NodeSetList const&
   getNodeSets() const
@@ -651,6 +654,9 @@ class STKDiscretization : public AbstractDiscretization
 
   //! Teuchos communicator
   Teuchos::RCP<Teuchos_Comm const> comm;
+
+  //! DOF GIDs eliminated from the owned space via Dirichlet BC elimination
+  std::set<GO> constrained_dof_gids_;
 
   //! Unknown map and node map
   Teuchos::RCP<Thyra_VectorSpace const> m_vs;

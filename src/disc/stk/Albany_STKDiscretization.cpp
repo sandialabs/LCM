@@ -1585,6 +1585,36 @@ STKDiscretization::fillCompleteGraphs()
 }
 
 void
+STKDiscretization::setConstrainedDOFs(std::set<GO> const& constrained_dof_gids)
+{
+  if (constrained_dof_gids.empty()) return;
+
+  constrained_dof_gids_ = constrained_dof_gids;
+
+  // Rebuild the owned DOF vector space, excluding constrained GIDs.
+  auto const full_vs_indexer = createGlobalLocalIndexer(m_vs);
+  auto const num_owned       = getSpmdVectorSpace(m_vs)->localSubDim();
+
+  Teuchos::Array<GO> free_gids;
+  free_gids.reserve(num_owned);
+  for (LO lid = 0; lid < num_owned; ++lid) {
+    GO const gid = full_vs_indexer->getGlobalElement(lid);
+    if (constrained_dof_gids_.count(gid) == 0) {
+      free_gids.push_back(gid);
+    }
+  }
+
+  *out << "DBC elimination: " << constrained_dof_gids_.size() << " constrained DOFs, "
+       << free_gids.size() << " free DOFs (was " << num_owned << " total)\n";
+
+  m_vs = createVectorSpace(comm, free_gids());
+
+  // Rebuild the owned Jacobian graph from the (unchanged) overlap graph
+  // projected onto the reduced owned space.
+  m_jac_factory = Teuchos::rcp(new ThyraCrsMatrixFactory(m_vs, m_vs, m_overlap_jac_factory));
+}
+
+void
 STKDiscretization::computeWorksetInfoBoundaryIndicators()
 {
   auto local_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());

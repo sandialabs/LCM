@@ -5,6 +5,8 @@
 #ifndef ALBANY_ABSTRACT_DISCRETIZATION_HPP
 #define ALBANY_ABSTRACT_DISCRETIZATION_HPP
 
+#include <set>
+
 #include "Albany_AbstractMeshStruct.hpp"
 #include "Albany_DiscretizationUtils.hpp"
 #include "Albany_NodalDOFManager.hpp"
@@ -67,6 +69,15 @@ class AbstractDiscretization
   createJacobianOp() const = 0;
   virtual Teuchos::RCP<Thyra_LinearOp>
   createOverlapJacobianOp() const = 0;
+
+  //! Eliminate Dirichlet-constrained DOFs from the owned vector space.
+  //! After this call, getVectorSpace() returns a reduced space excluding
+  //! the given global DOF IDs, and createJacobianOp() produces a
+  //! correspondingly smaller matrix. The overlap spaces are unchanged.
+  virtual void
+  setConstrainedDOFs(std::set<GO> const& /*constrained_dof_gids*/)
+  {
+  }
 
   //! Get Node set lists
   virtual NodeSetList const&

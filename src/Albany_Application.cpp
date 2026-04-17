@@ -526,11 +526,6 @@ Application::eliminateConstrainedDOFs()
   // DOFs from the owned space breaks the history bookkeeping.
   if (num_time_deriv >= 2) return;
 
-  // Skip for Schwarz alternating coupling: the StrongSchwarz BC values are
-  // updated each Schwarz iteration from the neighboring domain's solution and
-  // cannot be statically eliminated.
-  if (getSchwarzAlternating()) return;
-
   auto const& ns_gids_map   = disc->getNodeSetGIDs();
   auto const& ns_coords_map = stk_disc->getNodeSetCoords();
 
@@ -550,13 +545,6 @@ Application::eliminateConstrainedDOFs()
   bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
   if (!has_dbc_params) return;
   auto& bc_params = problemParams->sublist("Dirichlet BCs");
-
-  // Skip if any BC is a Schwarz coupling condition: its value is updated each
-  // Schwarz iteration from the neighboring domain and cannot be statically
-  // eliminated (setSchwarzAlternating is not yet called at construction time).
-  for (auto it = bc_params.begin(); it != bc_params.end(); ++it) {
-    if (it->first.find("Schwarz") != std::string::npos) return;
-  }
 
   // Step 1: Build per-(node_set, eq) descriptors for every constrained DOF.
   // Supported BC key forms (in order of precedence):
@@ -683,6 +671,25 @@ Application::eliminateConstrainedDOFs()
   }
 
   disc->setConstrainedDOFs(constrained_gids, gid_value_map);
+
+  // Retranslate nodeSets LIDs to the new (post-elimination) owned vector space.
+  // Eliminated DOFs get LID = -1; free DOFs get their new contiguous LID.
+  // This keeps workset.nodeSets consistent for all BC evaluators.
+  {
+    auto const new_vs          = disc->getVectorSpace();
+    auto const new_vs_indexer  = Albany::createGlobalLocalIndexer(new_vs);
+    auto const full_vs_indexer = Albany::createGlobalLocalIndexer(full_owned_vs_);
+    auto&      ns_map          = disc->getNodeSets();
+    for (auto& [ns_id, ns_nodes] : ns_map) {
+      for (auto& dofs : ns_nodes) {
+        for (auto& lid : dofs) {
+          GO const gid     = full_vs_indexer->getGlobalElement(lid);
+          LO const new_lid = new_vs_indexer->getLocalElement(gid);
+          lid = (new_lid >= 0) ? static_cast<int>(new_lid) : -1;
+        }
+      }
+    }
+  }
 }
 
 void
@@ -1548,10 +1555,8 @@ Application::computeGlobalResidualImpl(
   // be written to the output file
   disc->setResidualField(*overlapped_f);
 
-  // Apply Dirichlet conditions using dfm (Dirchelt Field Manager).
-  // Skip when DBC DOF elimination is active — constrained DOFs are not
-  // in the owned system, so there are no rows to modify.
-  if (dfm != Teuchos::null && dbc_descriptors_.empty()) {
+  // Apply Dirichlet conditions using dfm (Dirichlet Field Manager).
+  if (dfm != Teuchos::null) {
     PHAL::Workset workset = set_dfm_workset(current_time, x, x_dot, x_dotdot, f);
 
     // FillType template argument used to specialize Sacado
@@ -1755,10 +1760,8 @@ Application::computeGlobalJacobianImpl(
     countScale++;
   }
 
-  // Apply Dirichlet conditions using dfm (Dirchelt Field Manager).
-  // Skip when DBC DOF elimination is active — constrained DOFs are not
-  // in the owned system, so there are no rows to modify.
-  if (Teuchos::nonnull(dfm) && dbc_descriptors_.empty()) {
+  // Apply Dirichlet conditions using dfm (Dirichlet Field Manager).
+  if (Teuchos::nonnull(dfm)) {
     PHAL::Workset workset;
 
     workset.f       = f;

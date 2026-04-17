@@ -48,7 +48,13 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, 
 
   Albany::Application const& coupled_app = getApplication(coupled_app_index);
 
-  Teuchos::RCP<Thyra_Vector const> coupled_solution = coupled_app.getX();
+  // Use the overlap solution: computeBCs indexes by overlap node LID
+  // (coupled_dimension * local_node_id + component), which is only valid
+  // for the full-size overlap vector.  getX() returns the owned vector
+  // which is reduced after DBC elimination and would cause out-of-bounds.
+  auto const coupled_sol_MV = coupled_app.getAdaptSolMgr()->getOverlappedSolution();
+  Teuchos::RCP<Thyra_Vector const> coupled_solution =
+      (coupled_sol_MV != Teuchos::null) ? coupled_sol_MV->col(0) : Teuchos::null;
 
   if (coupled_solution == Teuchos::null) {
     x_val = 0.0;

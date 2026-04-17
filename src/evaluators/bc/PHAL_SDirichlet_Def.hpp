@@ -82,6 +82,7 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits::E
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
+    if (dof < 0) continue;  // eliminated DOF
     x_view[dof]    = this->value;
   }
 }
@@ -110,6 +111,7 @@ SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
+    if (dof < 0) continue;  // eliminated DOF
     f_view[dof]    = 0.0;
     // Record DOFs to avoid setting Schwarz BCs on them.
     workset.fixed_dofs_.insert(dof);
@@ -155,7 +157,8 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(typenam
         if (is_erodible == true && nbi != 2.0) continue;
         if (nbi == 0.0) continue;
       }
-      auto const dof       = ns_nodes[ns_node][this->offset];
+      auto const dof = ns_nodes[ns_node][this->offset];
+      if (dof < 0) continue;  // eliminated DOF
       row_is_dbc_data[dof] = 1;
     }
   } else {  // special case for Schwarz SDBC
@@ -164,6 +167,7 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(typenam
     for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
       for (int offset = 0; offset < spatial_dimension; ++offset) {
         auto dof = ns_nodes[ns_node][offset];
+        if (dof < 0) continue;  // eliminated DOF
         // If this DOF already has a DBC, skip it.
         if (fixed_dofs.find(dof) != fixed_dofs.end()) continue;
         row_is_dbc_data[dof] = 1;

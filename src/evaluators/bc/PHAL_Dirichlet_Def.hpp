@@ -88,6 +88,7 @@ Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits:
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
+    if (dof < 0) continue;  // eliminated DOF
     f_view[dof]    = x_view[dof] - this->value;
     // Record DOFs to avoid setting Schwarz BCs on them.
     workset.fixed_dofs_.insert(dof);

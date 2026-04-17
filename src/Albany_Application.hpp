@@ -132,6 +132,12 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     return solMgr;
   }
 
+  Teuchos::RCP<AAdapt::AdaptiveSolutionManager const>
+  getAdaptSolMgr() const
+  {
+    return solMgr;
+  }
+
   //! Get parameter library
   Teuchos::RCP<ParamLib>
   getParamLib() const;

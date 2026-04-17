@@ -90,6 +90,7 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits:
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
+    if (dof < 0) continue;  // eliminated DOF
     if (dim > 0) expr_eval.bindVariable("x", ns_coords[ns_node][0]);
     if (dim > 1) expr_eval.bindVariable("y", ns_coords[ns_node][1]);
     if (dim > 2) expr_eval.bindVariable("z", ns_coords[ns_node][2]);
@@ -121,6 +122,7 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Trai
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
+    if (dof < 0) continue;  // eliminated DOF
     f_view[dof]    = 0.0;
     // Record DOFs to avoid setting Schwarz BCs on them.
     workset.fixed_dofs_.insert(dof);
@@ -167,7 +169,8 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(typen
         if (is_erodible == true && nbi != 2.0) continue;
         if (nbi == 0.0) continue;
       }
-      auto dof             = ns_nodes[ns_node][this->offset];
+      auto dof = ns_nodes[ns_node][this->offset];
+      if (dof < 0) continue;  // eliminated DOF
       row_is_dbc_data[dof] = 1;
     }
   } else {  // special case for Schwarz SDBC
@@ -176,6 +179,7 @@ ExprEvalSDBC<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(typen
     for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
       for (int offset = 0; offset < spatial_dimension; ++offset) {
         auto dof = ns_nodes[ns_node][offset];
+        if (dof < 0) continue;  // eliminated DOF
         // If this DOF already has a DBC, skip it.
         if (fixed_dofs.find(dof) != fixed_dofs.end()) continue;
         row_is_dbc_data[dof] = 1;

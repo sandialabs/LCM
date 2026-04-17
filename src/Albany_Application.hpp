@@ -567,20 +567,43 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   }
 
  protected:
-  //! Prescribed DBC values for DOF elimination: (overlap LID, value) pairs.
-  //! Applied after each owned→overlap scatter to fill constrained DOF slots.
-  std::vector<std::pair<LO, double>> prescribed_dbc_values_;
+  //! Descriptor for a single constrained DOF: knows how to compute its
+  //! prescribed value given the current time (and, for expressions, node coords).
+  struct DBCDescriptor
+  {
+    enum class Kind { Constant, TimeArray, Expression };
+    Kind              kind        = Kind::Constant;
+    LO                overlap_lid = -1;
+    // Constant
+    double constant = 0.0;
+    // TimeArray (piecewise-linear interpolation)
+    std::vector<double> times;
+    std::vector<double> values;
+    // Expression (STK expreval string, node coordinates)
+    std::string expr_str;
+    double      x = 0, y = 0, z = 0;
+
+    double
+    eval(double time) const;
+  };
+
+  std::vector<DBCDescriptor> dbc_descriptors_;
 
   //! Full (pre-elimination) owned vector space; null when no elimination active.
   Teuchos::RCP<Thyra_VectorSpace const> full_owned_vs_;
 
+  //! Last time at which a residual/Jacobian was computed; used as fallback in
+  //! response evaluation when the model evaluator sees is_dynamic==false (e.g.
+  //! Piro's post-integration response pass where x_dot is null).
+  double last_transient_time_ = 0.0;
+
   void
-  injectConstrainedDOFValues() const;
+  injectConstrainedDOFValues(double time);
 
   //! Expand reduced owned x to full owned space with BC values injected.
   //! Returns x unchanged if no DOF elimination is active.
   Teuchos::RCP<Thyra_Vector const>
-  expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x) const;
+  expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, double time);
 
   bool is_schwarz_{false};
   bool no_dir_bcs_{false};

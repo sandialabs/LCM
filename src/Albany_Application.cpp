@@ -28,6 +28,7 @@
 #include "Thyra_MultiVectorStdOps.hpp"
 #include "Thyra_VectorBase.hpp"
 #include "Thyra_VectorStdOps.hpp"
+#include "stk_expreval/Evaluator.hpp"
 
 using Teuchos::ArrayRCP;
 using Teuchos::getFancyOStream;
@@ -461,6 +462,38 @@ Application::createDiscretization()
   eliminateConstrainedDOFs();
 }
 
+double
+Application::DBCDescriptor::eval(double time) const
+{
+  switch (kind) {
+    case Kind::Constant: return constant;
+
+    case Kind::TimeArray: {
+      auto const n = times.size();
+      if (time <= times[0]) return values[0];
+      if (time >= times[n - 1]) return values[n - 1];
+      for (std::size_t i = 1; i < n; ++i) {
+        if (time < times[i]) {
+          double const slope = (values[i] - values[i - 1]) / (times[i] - times[i - 1]);
+          return values[i - 1] + slope * (time - times[i - 1]);
+        }
+      }
+      return values[n - 1];
+    }
+
+    case Kind::Expression: {
+      stk::expreval::Eval ev(expr_str);
+      ev.parse();
+      ev.bindVariable("t", time);
+      ev.bindVariable("x", x);
+      ev.bindVariable("y", y);
+      ev.bindVariable("z", z);
+      return ev.evaluate();
+    }
+  }
+  return 0.0;
+}
+
 void
 Application::eliminateConstrainedDOFs()
 {
@@ -470,7 +503,6 @@ Application::eliminateConstrainedDOFs()
   auto const& node_set_ids = problem->getNodeSetIDs();
   auto const& offsets      = problem->getOffsets();
   auto const& bc_names     = problem->getDirichletBCNames();
-  auto const& ns_gids_map  = disc->getNodeSetGIDs();
 
   if (node_set_ids.empty()) return;
   if (offsets.size() != static_cast<int>(node_set_ids.size())) return;
@@ -478,20 +510,32 @@ Application::eliminateConstrainedDOFs()
   auto* stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
   if (stk_disc == nullptr) return;
 
-  // Get the DBC parameter list for prescribed values.
-  bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
-  Teuchos::ParameterList const* bc_params = has_dbc_params ? &problemParams->sublist("Dirichlet BCs") : nullptr;
+  // Skip for LOCA continuation: LOCA's ExtendedGroup sizes vectors from the
+  // owned space at construction time; a reduced owned space would mismatch
+  // its internal bookkeeping.  LOCA support is deferred to a future phase.
+  if (params_->isSublist("Piro") && params_->sublist("Piro").isSublist("LOCA")) return;
 
-  // Skip elimination for problems with SDBC, time-dependent DBCs, or DBCs
-  // used as continuation/sensitivity parameters — those enforce BCs through
-  // different mechanisms or have values that vary at runtime.
-  if (bc_params != nullptr) {
-    for (auto it = bc_params->begin(); it != bc_params->end(); ++it) {
-      std::string const& name = bc_params->name(it);
-      if (name.find("SDBC") != std::string::npos) return;
-      if (name.find("Time Dependent") != std::string::npos) return;
-    }
-  }
+  // Skip for ACE Sequential Thermo-Mechanical problems: element death
+  // dynamically changes nodeset membership after initialization, so a
+  // statically-computed elimination set would become stale.
+  if (problemParams->isParameter("ACE Sequential Thermomechanical") &&
+      problemParams->get<bool>("ACE Sequential Thermomechanical")) return;
+
+  // Skip for 2nd-order dynamics (Newmark, HHT, etc.): the Newmark history
+  // tracks velocity and acceleration for every DOF; eliminating displacement
+  // DOFs from the owned space breaks the history bookkeeping.
+  if (num_time_deriv >= 2) return;
+
+  // Skip for Schwarz alternating coupling: the StrongSchwarz BC values are
+  // updated each Schwarz iteration from the neighboring domain's solution and
+  // cannot be statically eliminated.
+  if (getSchwarzAlternating()) return;
+
+  auto const& ns_gids_map   = disc->getNodeSetGIDs();
+  auto const& ns_coords_map = stk_disc->getNodeSetCoords();
+
+  // Skip if any DBC is used as a continuation/sensitivity parameter (value
+  // changes dynamically via the Piro driver — static elimination won't do).
   if (problemParams->isSublist("Parameters")) {
     auto& plist   = problemParams->sublist("Parameters");
     int const n   = plist.get<int>("Number", 0);
@@ -503,116 +547,164 @@ Application::eliminateConstrainedDOFs()
     }
   }
 
-  // Step 1: Build a local map of constrained DOF GID → prescribed value
-  // from locally-owned node sets.  Iterate the BC parameter list directly
-  // to get the correct value for each (node_set, equation_offset) pair.
-  std::map<GO, double> local_gid_value_map;
+  bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
+  if (!has_dbc_params) return;
+  auto& bc_params = problemParams->sublist("Dirichlet BCs");
+
+  // Skip if any BC is a Schwarz coupling condition: its value is updated each
+  // Schwarz iteration from the neighboring domain and cannot be statically
+  // eliminated (setSchwarzAlternating is not yet called at construction time).
+  for (auto it = bc_params.begin(); it != bc_params.end(); ++it) {
+    if (it->first.find("Schwarz") != std::string::npos) return;
+  }
+
+  // Step 1: Build per-(node_set, eq) descriptors for every constrained DOF.
+  // Supported BC key forms (in order of precedence):
+  //   "DBC on NS <ns> for DOF <dof>"                 → double          → Constant
+  //   "SDBC on NS <ns> for DOF <dof>"                → double          → Constant
+  //   "Time Dependent DBC on NS <ns> for DOF <dof>"  → sublist         → TimeArray
+  //   "ExpressionEvaluated SDBC on NS <ns> for DOF <dof>" → string     → Expression
+  std::map<GO, DBCDescriptor> local_gid_desc_map;
+
   for (std::size_t i = 0; i < node_set_ids.size(); ++i) {
-    auto it = ns_gids_map.find(node_set_ids[i]);
-    if (it == ns_gids_map.end()) continue;
-    auto const& node_gids = it->second;
+    auto gid_it = ns_gids_map.find(node_set_ids[i]);
+    if (gid_it == ns_gids_map.end()) continue;
+    auto const& node_gids = gid_it->second;
+
+    // Node-set coordinates parallel to node_gids (may be absent for this ns).
+    std::vector<double*> const* ns_coords = nullptr;
+    auto coord_it = ns_coords_map.find(node_set_ids[i]);
+    if (coord_it != ns_coords_map.end()) ns_coords = &coord_it->second;
 
     for (int eq : offsets[i]) {
-      // offsets[i][k] = j = index into bc_names, so bc_names[eq] is the DOF
-      // name (e.g. "X", "Y", "Z", "T").  Build the expected parameter name
-      // and look it up directly; fall back to SDBC variant.
-      double prescribed_value = 0.0;
-      if (bc_params != nullptr && eq < static_cast<int>(bc_names.size())) {
-        std::string const& dof      = bc_names[eq];
-        std::string const  dbc_key  = "DBC on NS " + node_set_ids[i] + " for DOF " + dof;
-        std::string const  sdbc_key = "SDBC on NS " + node_set_ids[i] + " for DOF " + dof;
-        if (bc_params->isType<double>(dbc_key))
-          prescribed_value = bc_params->get<double>(dbc_key);
-        else if (bc_params->isType<double>(sdbc_key))
-          prescribed_value = bc_params->get<double>(sdbc_key);
+      if (eq >= static_cast<int>(bc_names.size())) continue;
+      std::string const& dof = bc_names[eq];
+      std::string const& ns  = node_set_ids[i];
+
+      // Build a descriptor prototype for this (ns, dof) pair.
+      DBCDescriptor proto;
+
+      std::string const dbc_key   = "DBC on NS " + ns + " for DOF " + dof;
+      std::string const sdbc_key  = "SDBC on NS " + ns + " for DOF " + dof;
+      std::string const tdep_key  = "Time Dependent DBC on NS " + ns + " for DOF " + dof;
+      std::string const expr_key  = "ExpressionEvaluated SDBC on NS " + ns + " for DOF " + dof;
+
+      if (bc_params.isType<double>(dbc_key)) {
+        proto.kind     = DBCDescriptor::Kind::Constant;
+        proto.constant = bc_params.get<double>(dbc_key);
+      } else if (bc_params.isType<double>(sdbc_key)) {
+        proto.kind     = DBCDescriptor::Kind::Constant;
+        proto.constant = bc_params.get<double>(sdbc_key);
+      } else if (bc_params.isSublist(tdep_key)) {
+        auto& tlist    = bc_params.sublist(tdep_key);
+        proto.kind     = DBCDescriptor::Kind::TimeArray;
+        auto tv        = tlist.get<Teuchos::Array<double>>("Time Values");
+        auto bv        = tlist.get<Teuchos::Array<double>>("BC Values");
+        proto.times    = tv.toVector();
+        proto.values   = bv.toVector();
+      } else if (bc_params.isType<std::string>(expr_key)) {
+        proto.kind     = DBCDescriptor::Kind::Expression;
+        proto.expr_str = bc_params.get<std::string>(expr_key);
+        // Coordinates are per-node and filled in the loop below.
+      } else {
+        // No matching BC entry — this node set / DOF has no DBC.
+        continue;
       }
-      for (auto node_gid : node_gids) {
-        GO const dof_gid             = stk_disc->getGlobalDOF(node_gid, eq);
-        local_gid_value_map[dof_gid] = prescribed_value;
+
+      for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
+        GO const dof_gid = stk_disc->getGlobalDOF(node_gids[ni], eq);
+        DBCDescriptor desc = proto;
+        if (proto.kind == DBCDescriptor::Kind::Expression && ns_coords != nullptr) {
+          double* c = (*ns_coords)[ni];
+          desc.x = c[0];
+          desc.y = c[1];
+          desc.z = (spatial_dimension > 2) ? c[2] : 0.0;
+        }
+        local_gid_desc_map[dof_gid] = desc;
       }
     }
   }
 
-  // Step 2: All-gather GIDs and values so every process knows the full
-  // global set.  Needed for graph column filtering and overlap injection.
-  std::map<GO, double> global_gid_value_map = local_gid_value_map;
-  int const            num_procs            = comm->getSize();
-  if (num_procs > 1) {
-    int const local_count = static_cast<int>(local_gid_value_map.size());
+  if (local_gid_desc_map.empty()) return;
 
-    std::vector<GO>     local_gids;
-    std::vector<double> local_vals;
+  // Step 2: All-gather GIDs (and a sentinel initial value) so every process
+  // knows the full constrained set for graph filtering.
+  // Descriptor data stays local — each rank owns its overlap slice.
+  std::map<GO, DBCDescriptor> global_gid_desc_map = local_gid_desc_map;
+  int const num_procs = comm->getSize();
+  if (num_procs > 1) {
+    // Gather just the GIDs; each rank will fill its own descriptors from the
+    // local map for overlap LIDs it owns.
+    int const local_count = static_cast<int>(local_gid_desc_map.size());
+    std::vector<GO> local_gids;
     local_gids.reserve(local_count);
-    local_vals.reserve(local_count);
-    for (auto const& [gid, val] : local_gid_value_map) {
-      local_gids.push_back(gid);
-      local_vals.push_back(val);
-    }
+    for (auto const& [gid, desc] : local_gid_desc_map) local_gids.push_back(gid);
 
     std::vector<int> counts(num_procs);
     Teuchos::gatherAll(*comm, 1, &local_count, num_procs, counts.data());
-
     std::vector<int> displs(num_procs, 0);
     for (int i = 1; i < num_procs; ++i) displs[i] = displs[i - 1] + counts[i - 1];
     int const total = displs[num_procs - 1] + counts[num_procs - 1];
 
-    std::vector<GO>     all_gids(total);
-    std::vector<double> all_vals(total);
-    auto const*         mpi_comm = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
+    std::vector<GO> all_gids(total);
+    auto const*     mpi_comm = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
     MPI_Allgatherv(
         local_gids.data(), local_count, MPI_LONG_LONG,
         all_gids.data(), counts.data(), displs.data(), MPI_LONG_LONG,
         *mpi_comm->getRawMpiComm());
-    MPI_Allgatherv(
-        local_vals.data(), local_count, MPI_DOUBLE,
-        all_vals.data(), counts.data(), displs.data(), MPI_DOUBLE,
-        *mpi_comm->getRawMpiComm());
 
-    for (int i = 0; i < total; ++i) {
-      global_gid_value_map[all_gids[i]] = all_vals[i];
+    for (GO gid : all_gids) {
+      if (global_gid_desc_map.find(gid) == global_gid_desc_map.end())
+        global_gid_desc_map[gid] = DBCDescriptor{};  // placeholder — not on this rank
     }
   }
-
-  if (global_gid_value_map.empty()) return;
 
   // Capture the full (pre-elimination) owned vector space before disc reduces it.
   full_owned_vs_ = disc->getVectorSpace();
 
   // Step 3: Build the constrained GID set for the discretization and
-  // the overlap injection map.
+  // populate dbc_descriptors_ for overlap-slot injection.
   std::set<GO> constrained_gids;
+  // For setConstrainedDOFs we still need a GID→initial_value map (used to
+  // initialize the reduced solution on first scatter); use t=0 evaluation.
+  std::map<GO, double> gid_value_map;
   auto const   overlap_vs         = disc->getOverlapVectorSpace();
   auto const   overlap_vs_indexer = Albany::createGlobalLocalIndexer(overlap_vs);
 
-  for (auto const& [gid, val] : global_gid_value_map) {
+  for (auto const& [gid, desc] : global_gid_desc_map) {
     constrained_gids.insert(gid);
+    gid_value_map[gid] = desc.eval(0.0);
     LO const overlap_lid = overlap_vs_indexer->getLocalElement(gid);
-    if (overlap_lid >= 0) {
-      prescribed_dbc_values_.push_back({overlap_lid, val});
+    if (overlap_lid >= 0 && local_gid_desc_map.count(gid)) {
+      DBCDescriptor d   = local_gid_desc_map.at(gid);
+      d.overlap_lid     = overlap_lid;
+      dbc_descriptors_.push_back(d);
     }
   }
 
-  disc->setConstrainedDOFs(constrained_gids, global_gid_value_map);
+  disc->setConstrainedDOFs(constrained_gids, gid_value_map);
 }
 
 void
-Application::injectConstrainedDOFValues() const
+Application::injectConstrainedDOFValues(double time)
 {
-  if (prescribed_dbc_values_.empty()) return;
+  if (dbc_descriptors_.empty()) return;
+
+  last_transient_time_ = time;
 
   auto overlapped_MV = solMgr->getOverlappedSolution();
   auto x_overlap     = overlapped_MV->col(0);
   auto x_data        = Albany::getNonconstLocalData(x_overlap);
 
-  for (auto const& [lid, value] : prescribed_dbc_values_) {
-    x_data[lid] = value;
+  for (auto const& desc : dbc_descriptors_) {
+    x_data[desc.overlap_lid] = desc.eval(time);
   }
 }
 
 Teuchos::RCP<Thyra_Vector const>
-Application::expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x) const
+Application::expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, double time)
 {
-  if (prescribed_dbc_values_.empty() || full_owned_vs_.is_null()) return x;
+  if (dbc_descriptors_.empty() || full_owned_vs_.is_null()) return x;
 
   // For serial: scatter reduced x to overlap (which equals the full owned space),
   // then inject prescribed BC values into constrained slots.
@@ -621,8 +713,8 @@ Application::expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x) con
   cas->scatter(*x, *full_x, Albany::CombineMode::INSERT);
 
   auto x_data = Albany::getNonconstLocalData(full_x);
-  for (auto const& [lid, value] : prescribed_dbc_values_) {
-    x_data[lid] = value;
+  for (auto const& desc : dbc_descriptors_) {
+    x_data[desc.overlap_lid] = desc.eval(time);
   }
   return full_x;
 }
@@ -1348,7 +1440,7 @@ Application::computeGlobalResidualImpl(
 
   // Scatter x and xdot to the overlapped distrbution
   solMgr->scatterX(*x, x_dot.ptr(), x_dotdot.ptr());
-  injectConstrainedDOFValues();
+  injectConstrainedDOFValues(current_time);
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -1459,7 +1551,7 @@ Application::computeGlobalResidualImpl(
   // Apply Dirichlet conditions using dfm (Dirchelt Field Manager).
   // Skip when DBC DOF elimination is active — constrained DOFs are not
   // in the owned system, so there are no rows to modify.
-  if (dfm != Teuchos::null && prescribed_dbc_values_.empty()) {
+  if (dfm != Teuchos::null && dbc_descriptors_.empty()) {
     PHAL::Workset workset = set_dfm_workset(current_time, x, x_dot, x_dotdot, f);
 
     // FillType template argument used to specialize Sacado
@@ -1555,7 +1647,7 @@ Application::computeGlobalJacobianImpl(
 
   // Scatter x and xdot to the overlapped distribution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
-  injectConstrainedDOFValues();
+  injectConstrainedDOFValues(current_time);
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -1666,7 +1758,7 @@ Application::computeGlobalJacobianImpl(
   // Apply Dirichlet conditions using dfm (Dirchelt Field Manager).
   // Skip when DBC DOF elimination is active — constrained DOFs are not
   // in the owned system, so there are no rows to modify.
-  if (Teuchos::nonnull(dfm) && prescribed_dbc_values_.empty()) {
+  if (Teuchos::nonnull(dfm) && dbc_descriptors_.empty()) {
     PHAL::Workset workset;
 
     workset.f       = f;
@@ -1779,7 +1871,11 @@ Application::evaluateResponse(
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Response");
   double const this_time = fixTime(current_time);
-  auto const   x_full    = expandToFullSolution(x);
+  // For DBC elimination, the expansion needs the correct transient time.
+  // During the post-integration response pass, x_dot is null so is_dynamic=false
+  // and curr_time=getCurrentTime()=0; use last_transient_time_ as fallback.
+  double const expand_time = (dbc_descriptors_.empty() || this_time != 0.0) ? this_time : last_transient_time_;
+  auto const   x_full      = expandToFullSolution(x, expand_time);
   responses[response_index]->evaluateResponse(this_time, x_full, xdot, xdotdot, p, g);
 }
 
@@ -1836,7 +1932,7 @@ Application::evaluateStateFieldManager(
 
   // Scatter to the overlapped distrbution
   solMgr->scatterX(x, xdot, xdotdot);
-  injectConstrainedDOFValues();
+  injectConstrainedDOFValues(current_time);
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -1967,10 +2063,10 @@ Application::loadBasicWorksetInfoSDBCs(PHAL::Workset& workset, Teuchos::RCP<Thyr
   solMgr->get_cas_manager()->scatter(owned_sol, overlapped_sol, CombineMode::INSERT);
 
   // Inject prescribed DBC values into constrained overlap DOF slots.
-  if (!prescribed_dbc_values_.empty()) {
+  if (!dbc_descriptors_.empty()) {
     auto x_data = Albany::getNonconstLocalData(overlapped_sol);
-    for (auto const& [lid, value] : prescribed_dbc_values_) {
-      x_data[lid] = value;
+    for (auto const& desc : dbc_descriptors_) {
+      x_data[desc.overlap_lid] = desc.eval(current_time);
     }
   }
 
@@ -2124,7 +2220,7 @@ Application::setupBasicWorksetInfo(
 
   // Scatter xT and xdotT to the overlapped distrbution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
-  injectConstrainedDOFValues();
+  injectConstrainedDOFValues(current_time);
 
   // Scatter distributed parameters
   distParamLib->scatter();

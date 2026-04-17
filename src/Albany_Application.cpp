@@ -482,14 +482,24 @@ Application::eliminateConstrainedDOFs()
   bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
   Teuchos::ParameterList const* bc_params = has_dbc_params ? &problemParams->sublist("Dirichlet BCs") : nullptr;
 
-  // Skip elimination for problems with SDBC or time-dependent DBCs: those
-  // enforce BCs through different mechanisms (strong enforcement or value
-  // that varies at runtime) that are incompatible with static elimination.
+  // Skip elimination for problems with SDBC, time-dependent DBCs, or DBCs
+  // used as continuation/sensitivity parameters — those enforce BCs through
+  // different mechanisms or have values that vary at runtime.
   if (bc_params != nullptr) {
     for (auto it = bc_params->begin(); it != bc_params->end(); ++it) {
       std::string const& name = bc_params->name(it);
       if (name.find("SDBC") != std::string::npos) return;
       if (name.find("Time Dependent") != std::string::npos) return;
+    }
+  }
+  if (problemParams->isSublist("Parameters")) {
+    auto& plist   = problemParams->sublist("Parameters");
+    int const n   = plist.get<int>("Number", 0);
+    for (int k = 0; k < n; ++k) {
+      std::string const key = "Parameter " + std::to_string(k);
+      if (!plist.isType<std::string>(key)) continue;
+      std::string const pname = Teuchos::getValue<std::string>(plist.getEntry(key));
+      if (pname.find("DBC") != std::string::npos) return;
     }
   }
 

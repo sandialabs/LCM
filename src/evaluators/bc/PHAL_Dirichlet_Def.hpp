@@ -140,6 +140,7 @@ Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits:
       if (nbi == 0.0) continue;
     }
     auto const dof = ns_nodes[ns_node][this->offset];
+    if (dof < 0) continue;  // eliminated DOF
     index[0]       = dof;
 
     // Extract the row, zero it out, then put j_coeff on diagonal

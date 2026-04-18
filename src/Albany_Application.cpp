@@ -512,9 +512,9 @@ Application::eliminateConstrainedDOFs()
   auto* stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
   if (stk_disc == nullptr) return;
 
-  // Skip for LOCA continuation: LOCA's ExtendedGroup sizes vectors from the
-  // owned space at construction time; a reduced owned space would mismatch
-  // its internal bookkeeping.  LOCA support is deferred to a future phase.
+  // Skip for any LOCA continuation problem: elimination changes the Newton
+  // iteration path which alters path-dependent material state compared to
+  // the row-zeroing reference solutions baked into the gold files.
   if (params_->isSublist("Piro") && params_->sublist("Piro").isSublist("LOCA")) return;
 
   // Skip for ACE Sequential Thermo-Mechanical problems: element death

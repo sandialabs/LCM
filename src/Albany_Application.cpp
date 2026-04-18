@@ -490,6 +490,8 @@ Application::DBCDescriptor::eval(double time) const
       ev.bindVariable("z", z);
       return ev.evaluate();
     }
+
+    case Kind::Schwarz: return schwarz_cached_value;
   }
   return 0.0;
 }
@@ -611,6 +613,26 @@ Application::eliminateConstrainedDOFs()
         local_gid_desc_map[dof_gid] = desc;
       }
     }
+
+    // Check for StrongSchwarz SDBC (one sublist entry covers all equations).
+    std::string const& schwarz_ns  = node_set_ids[i];
+    std::string const  schwarz_key = "SDBC on NS " + schwarz_ns + " for DOF StrongSchwarz";
+    if (bc_params.isSublist(schwarz_key)) {
+      auto const& schwarz_sub        = bc_params.sublist(schwarz_key);
+      std::string const coupled_name = schwarz_sub.get<std::string>("Coupled Application");
+      for (int eq : offsets[i]) {
+        for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
+          GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], eq);
+          DBCDescriptor desc;
+          desc.kind                     = DBCDescriptor::Kind::Schwarz;
+          desc.schwarz_coupled_app_name = coupled_name;
+          desc.schwarz_nodeset_id       = schwarz_ns;
+          desc.schwarz_ns_node_idx      = static_cast<int>(ni);
+          desc.schwarz_eq               = eq;
+          local_gid_desc_map[dof_gid]   = desc;
+        }
+      }
+    }
   }
 
   if (local_gid_desc_map.empty()) return;
@@ -698,6 +720,61 @@ Application::injectConstrainedDOFValues(double time)
   if (dbc_descriptors_.empty()) return;
 
   last_transient_time_ = time;
+
+  // Lazy-init Schwarz descriptors: resolve coupled app name to index and find
+  // the coupled app's overlap node whose coordinates match this interface node.
+  if (!apps_.is_null() && !app_name_index_map_.is_null()) {
+    auto* this_stk = dynamic_cast<Albany::STKDiscretization*>(disc.get());
+    for (auto& desc : dbc_descriptors_) {
+      if (desc.kind != DBCDescriptor::Kind::Schwarz || desc.schwarz_initialized) continue;
+
+      auto const name_it = app_name_index_map_->find(desc.schwarz_coupled_app_name);
+      if (name_it == app_name_index_map_->end()) continue;
+      int const coupled_idx = name_it->second;
+      if (apps_[coupled_idx] == Teuchos::null) continue;
+
+      auto const& coupled_app  = *apps_[coupled_idx];
+      auto*       coupled_stk  = dynamic_cast<Albany::STKDiscretization*>(coupled_app.getDiscretization().get());
+      if (coupled_stk == nullptr) continue;
+
+      // Coordinate of this interface node in this app's nodeset
+      auto const& ns_coords_map = this_stk->getNodeSetCoords();
+      auto const  ns_coord_it   = ns_coords_map.find(desc.schwarz_nodeset_id);
+      if (ns_coord_it == ns_coords_map.end()) continue;
+      double* const coord = ns_coord_it->second[desc.schwarz_ns_node_idx];
+
+      // Find the coupled app's overlap node with matching coordinates
+      auto const& coupled_coords = coupled_stk->getCoordinates();
+      int const   dim            = static_cast<int>(spatial_dimension);
+      LO const    n_ov_nodes     = static_cast<LO>(coupled_coords.size()) / dim;
+      double const tol2          = 1.0e-12;
+
+      for (LO n = 0; n < n_ov_nodes; ++n) {
+        double d2 = 0.0;
+        for (int d = 0; d < dim; ++d) {
+          double const diff = coupled_coords[dim * n + d] - coord[d];
+          d2 += diff * diff;
+        }
+        if (d2 < tol2) {
+          desc.schwarz_coupled_app_idx     = coupled_idx;
+          desc.schwarz_coupled_overlap_lid = n;
+          desc.schwarz_initialized         = true;
+          break;
+        }
+      }
+    }
+  }
+
+  // Update cached Schwarz values from the current coupled app overlap solution.
+  for (auto& desc : dbc_descriptors_) {
+    if (desc.kind != DBCDescriptor::Kind::Schwarz || !desc.schwarz_initialized) continue;
+    auto const& coupled_app    = *apps_[desc.schwarz_coupled_app_idx];
+    auto const  coupled_sol_MV = coupled_app.getAdaptSolMgr()->getOverlappedSolution();
+    if (coupled_sol_MV == Teuchos::null) continue;
+    auto const coupled_view             = Albany::getLocalData(coupled_sol_MV->col(0));
+    int const  coupled_neq              = coupled_app.getNumEquations();
+    desc.schwarz_cached_value = coupled_view[coupled_neq * desc.schwarz_coupled_overlap_lid + desc.schwarz_eq];
+  }
 
   auto overlapped_MV = solMgr->getOverlappedSolution();
   auto x_overlap     = overlapped_MV->col(0);

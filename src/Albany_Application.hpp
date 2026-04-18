@@ -577,7 +577,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   //! prescribed value given the current time (and, for expressions, node coords).
   struct DBCDescriptor
   {
-    enum class Kind { Constant, TimeArray, Expression };
+    enum class Kind { Constant, TimeArray, Expression, Schwarz };
     Kind              kind        = Kind::Constant;
     LO                overlap_lid = -1;
     // Constant
@@ -588,6 +588,15 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     // Expression (STK expreval string, node coordinates)
     std::string expr_str;
     double      x = 0, y = 0, z = 0;
+    // Schwarz (value interpolated from coupled app; lazy-initialized on first inject)
+    std::string schwarz_coupled_app_name;
+    std::string schwarz_nodeset_id;
+    int         schwarz_ns_node_idx         = -1;
+    int         schwarz_eq                  = 0;
+    bool        schwarz_initialized         = false;
+    int         schwarz_coupled_app_idx     = -1;  // cached on init
+    LO          schwarz_coupled_overlap_lid = -1;  // cached on init
+    mutable double schwarz_cached_value     = 0.0; // updated each inject
 
     double
     eval(double time) const;

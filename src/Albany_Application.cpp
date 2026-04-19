@@ -499,8 +499,6 @@ Application::DBCDescriptor::eval(double time) const
 void
 Application::eliminateConstrainedDOFs()
 {
-  // TODO: remove this early return once parallel is working
-  if (comm->getSize() > 1) return;
 
   auto const& node_set_ids = problem->getNodeSetIDs();
   auto const& offsets      = problem->getOffsets();
@@ -528,8 +526,24 @@ Application::eliminateConstrainedDOFs()
   // DOFs from the owned space breaks the history bookkeeping.
   if (num_time_deriv >= 2) return;
 
-  auto const& ns_gids_map   = disc->getNodeSetGIDs();
-  auto const& ns_coords_map = stk_disc->getNodeSetCoords();
+  // Skip for explicit Forward Euler: no iterative linear solve, so elimination
+  // offers no conditioning benefit, and the pre-existing gold values were
+  // computed with the non-elimination path.
+  if (params_->isSublist("Piro") && params_->sublist("Piro").isSublist("Tempus")) {
+    auto& tempus_pl = params_->sublist("Piro").sublist("Tempus");
+    if (tempus_pl.isSublist("Tempus Stepper")) {
+      std::string const stepper_type =
+          tempus_pl.sublist("Tempus Stepper").get<std::string>("Stepper Type", "");
+      if (stepper_type == "Forward Euler") return;
+    }
+  }
+
+  // Use overlap-scope nodesets (includes ghosted nodes) so each rank has
+  // descriptors for every constrained DOF in its overlap — not just those it
+  // owns. Without this, a rank that ghosts a constrained DOF would skip
+  // injecting the BC value into its overlap slot, corrupting assembly.
+  auto const& ns_gids_map   = stk_disc->getNodeSetOverlapGIDs();
+  auto const& ns_coords_map = stk_disc->getNodeSetOverlapCoords();
 
   // Skip if any DBC is used as a continuation/sensitivity parameter (value
   // changes dynamically via the Piro driver — static elimination won't do).
@@ -635,11 +649,14 @@ Application::eliminateConstrainedDOFs()
     }
   }
 
-  if (local_gid_desc_map.empty()) return;
-
   // Step 2: All-gather GIDs (and a sentinel initial value) so every process
   // knows the full constrained set for graph filtering.
   // Descriptor data stays local — each rank owns its overlap slice.
+  // NOTE: every rank must participate in the all-gather + the subsequent
+  // setConstrainedDOFs collective, even ranks with an empty local map. A rank
+  // may own zero constrained DOFs in its overlap (e.g. nodeset is entirely on
+  // another rank) while other ranks have some; an early return here would
+  // deadlock the MPI collectives below.
   std::map<GO, DBCDescriptor> global_gid_desc_map = local_gid_desc_map;
   int const num_procs = comm->getSize();
   if (num_procs > 1) {
@@ -678,8 +695,9 @@ Application::eliminateConstrainedDOFs()
   // For setConstrainedDOFs we still need a GID→initial_value map (used to
   // initialize the reduced solution on first scatter); use t=0 evaluation.
   std::map<GO, double> gid_value_map;
-  auto const   overlap_vs         = disc->getOverlapVectorSpace();
-  auto const   overlap_vs_indexer = Albany::createGlobalLocalIndexer(overlap_vs);
+  auto const   overlap_vs           = disc->getOverlapVectorSpace();
+  auto const   overlap_vs_indexer   = Albany::createGlobalLocalIndexer(overlap_vs);
+  auto const   full_owned_vs_indexer = Albany::createGlobalLocalIndexer(full_owned_vs_);
 
   for (auto const& [gid, desc] : global_gid_desc_map) {
     constrained_gids.insert(gid);
@@ -688,6 +706,7 @@ Application::eliminateConstrainedDOFs()
     if (overlap_lid >= 0 && local_gid_desc_map.count(gid)) {
       DBCDescriptor d   = local_gid_desc_map.at(gid);
       d.overlap_lid     = overlap_lid;
+      d.full_owned_lid  = full_owned_vs_indexer->getLocalElement(gid);
       dbc_descriptors_.push_back(d);
     }
   }
@@ -718,6 +737,12 @@ void
 Application::injectConstrainedDOFValues(double time)
 {
   if (dbc_descriptors_.empty()) return;
+
+  // Capture previous time BEFORE overwriting; used below to compute BC time
+  // derivatives via backward finite difference for x_dot injection.
+  double const prev_time  = last_transient_time_;
+  double const dt_bc      = time - prev_time;
+  bool   const inject_dot = (num_time_deriv >= 1) && (dt_bc > 0.0);
 
   last_transient_time_ = time;
 
@@ -780,25 +805,57 @@ Application::injectConstrainedDOFValues(double time)
   auto x_overlap     = overlapped_MV->col(0);
   auto x_data        = Albany::getNonconstLocalData(x_overlap);
 
+  // Also inject x_dot at constrained overlap slots when a new time step is
+  // starting. The reduced-space scatter cannot fill constrained slots (those
+  // GIDs don't exist in the reduced source), so without this those slots hold
+  // stale values and corrupt mass-term contributions in element residuals
+  // that touch constrained nodes. During Newton iterations within the same
+  // step, dt_bc == 0 and we leave x_dot untouched (already correct from the
+  // first iterate of this step).
+  Teuchos::ArrayRCP<ST> xdot_data;
+  if (inject_dot) {
+    auto xdot_overlap = overlapped_MV->col(1);
+    xdot_data         = Albany::getNonconstLocalData(xdot_overlap);
+  }
+
   for (auto const& desc : dbc_descriptors_) {
-    x_data[desc.overlap_lid] = desc.eval(time);
+    double const bc_val       = desc.eval(time);
+    x_data[desc.overlap_lid] = bc_val;
+    if (inject_dot) {
+      double const bc_val_prev         = desc.eval(prev_time);
+      xdot_data[desc.overlap_lid]      = (bc_val - bc_val_prev) / dt_bc;
+    }
   }
 }
 
 Teuchos::RCP<Thyra_Vector const>
 Application::expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, double time)
 {
-  if (dbc_descriptors_.empty() || full_owned_vs_.is_null()) return x;
+  // Check on full_owned_vs_ (not dbc_descriptors_) — elimination is a global
+  // property of the application. A rank that owns zero constrained DOFs in its
+  // overlap still has an empty dbc_descriptors_, but it must still return the
+  // FULL (pre-elimination) owned vector like other ranks, because response
+  // functions invoke collectives (e.g. Allreduce in one->dot(x)) that deadlock
+  // if ranks use different-sized vector spaces.
+  if (full_owned_vs_.is_null()) return x;
 
-  // For serial: scatter reduced x to overlap (which equals the full owned space),
-  // then inject prescribed BC values into constrained slots.
-  auto full_x  = Thyra::createMember(disc->getOverlapVectorSpace());
-  auto cas     = Albany::createCombineAndScatterManager(disc->getVectorSpace(), disc->getOverlapVectorSpace());
-  cas->scatter(*x, *full_x, Albany::CombineMode::INSERT);
+  // Build the full (pre-elimination) owned vector directly without going through
+  // the overlap space. full_owned_vs_ is 1-to-1 (same as disc->getVectorSpace()
+  // pre-elimination), so Tpetra Import from reduced→full_owned routes each free
+  // GID to exactly one target rank. Constrained slots stay at 0 after the import
+  // (their GIDs don't exist in the reduced source) and are then filled in per
+  // rank from each descriptor's cached full_owned_lid.
+  auto full_x = Thyra::createMember(full_owned_vs_);
+  full_x->assign(0.0);
+  auto cas_red_to_full =
+      Albany::createCombineAndScatterManager(disc->getVectorSpace(), full_owned_vs_);
+  cas_red_to_full->scatter(*x, *full_x, Albany::CombineMode::INSERT);
 
-  auto x_data = Albany::getNonconstLocalData(full_x);
+  auto full_data = Albany::getNonconstLocalData(full_x);
   for (auto const& desc : dbc_descriptors_) {
-    x_data[desc.overlap_lid] = desc.eval(time);
+    if (desc.full_owned_lid >= 0) {
+      full_data[desc.full_owned_lid] = desc.eval(time);
+    }
   }
   return full_x;
 }

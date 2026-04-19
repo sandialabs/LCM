@@ -170,6 +170,16 @@ class STKDiscretization : public AbstractDiscretization
   {
     return nodeSetCoords;
   }
+  NodeSetGIDsList const&
+  getNodeSetOverlapGIDs() const
+  {
+    return nodeSetOverlapGIDs;
+  }
+  NodeSetCoordList const&
+  getNodeSetOverlapCoords() const
+  {
+    return nodeSetOverlapCoords;
+  }
   NodeGID2LIDMap const&
   getNodeGID2LIDMap() const
   {
@@ -690,6 +700,11 @@ class STKDiscretization : public AbstractDiscretization
   NodeSetList      nodeSets;
   NodeSetGIDsList  nodeSetGIDs;
   NodeSetCoordList nodeSetCoords;
+  //! Overlap-scope nodeset GIDs and coords (includes ghosted nodes). Used by
+  //! DBC DOF elimination so every rank knows which of its overlap DOFs are
+  //! constrained, even if the constraint's owner is a different rank.
+  NodeSetGIDsList  nodeSetOverlapGIDs;
+  NodeSetCoordList nodeSetOverlapCoords;
   NodeGID2LIDMap   node_GID_2_LID_map;
 
   //! side sets stored as std::map(string ID, SideArray classes) per workset

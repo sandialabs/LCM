@@ -578,8 +578,9 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   struct DBCDescriptor
   {
     enum class Kind { Constant, TimeArray, Expression, Schwarz };
-    Kind              kind        = Kind::Constant;
-    LO                overlap_lid = -1;
+    Kind              kind           = Kind::Constant;
+    LO                overlap_lid    = -1;
+    LO                full_owned_lid = -1;  // LID in full (pre-elimination) owned VS; -1 if this rank does not own this DOF
     // Constant
     double constant = 0.0;
     // TimeArray (piecewise-linear interpolation)

@@ -1642,29 +1642,28 @@ STKDiscretization::setConstrainedDOFs(std::set<GO> const& constrained_dof_gids, 
   m_vs = createVectorSpace(comm, free_gids());
   *out << "DBC elimination: reduced vector space created.\n";
 
-  // Rebuild the owned Jacobian graph.  We cannot use the Tpetra Export path
-  // (ThyraCrsMatrixFactory's overlap-projection constructor) because the
-  // overlap graph's column entries reference constrained GIDs that no process
-  // owns in the reduced domain map, causing fillComplete to fail.  Instead,
-  // iterate the overlap graph directly, keep only free-DOF rows that this
-  // process owns, and filter out constrained column entries.
-  auto const overlap_graph = m_overlap_jac_factory->getTpetraGraph();
-  auto const overlap_map   = overlap_graph->getRowMap();
-  auto const owned_map     = getTpetraMap(m_vs);
+  // Rebuild the owned Jacobian graph. Two-step approach for parallel correctness:
+  //   1. Build a filtered OVERLAP graph: same structure as m_overlap_jac_factory
+  //      but with constrained columns removed. Each rank filters its own
+  //      overlap graph locally.
+  //   2. Export the filtered overlap graph to a REDUCED-OWNED graph. Tpetra
+  //      Export combines cross-rank contributions so shared owned rows pick up
+  //      non-zero entries contributed by elements on other ranks. Direct manual
+  //      iteration over this rank's overlap graph would miss those.
+  // Step-1 filtering of constrained columns is what lets step-2 fillComplete
+  // succeed against the reduced domain map — without that, column GIDs that no
+  // rank owns would cause the export to fail.
+  auto const overlap_graph   = m_overlap_jac_factory->getTpetraGraph();
+  auto const overlap_row_map = overlap_graph->getRowMap();
 
-  m_jac_factory = Teuchos::rcp(new ThyraCrsMatrixFactory(m_vs, m_vs));
+  auto filtered_overlap_factory = Teuchos::rcp(new ThyraCrsMatrixFactory(m_overlap_vs, m_overlap_vs));
 
-  for (LO ov_lid = 0; ov_lid < static_cast<LO>(overlap_map->getLocalNumElements()); ++ov_lid) {
-    GO const row_gid = overlap_map->getGlobalElement(ov_lid);
+  for (LO ov_lid = 0; ov_lid < static_cast<LO>(overlap_row_map->getLocalNumElements()); ++ov_lid) {
+    GO const row_gid = overlap_row_map->getGlobalElement(ov_lid);
 
-    // Skip rows not in the reduced owned map.
-    if (owned_map->getLocalElement(row_gid) == Teuchos::OrdinalTraits<LO>::invalid()) continue;
-
-    // Get column indices for this row.
     typename Tpetra_CrsGraph::local_inds_host_view_type col_lids;
     overlap_graph->getLocalRowView(ov_lid, col_lids);
 
-    // Filter: keep only columns that are free DOFs.
     Teuchos::Array<GO> free_cols;
     free_cols.reserve(col_lids.size());
     for (size_t j = 0; j < col_lids.size(); ++j) {
@@ -1675,12 +1674,14 @@ STKDiscretization::setConstrainedDOFs(std::set<GO> const& constrained_dof_gids, 
     }
 
     if (!free_cols.empty()) {
-      m_jac_factory->insertGlobalIndices(row_gid, free_cols());
+      filtered_overlap_factory->insertGlobalIndices(row_gid, free_cols());
     }
   }
 
-  *out << "DBC elimination: calling fillComplete on reduced graph...\n";
-  m_jac_factory->fillComplete();
+  *out << "DBC elimination: calling fillComplete on filtered overlap graph...\n";
+  filtered_overlap_factory->fillComplete();
+  *out << "DBC elimination: exporting to reduced owned graph...\n";
+  m_jac_factory = Teuchos::rcp(new ThyraCrsMatrixFactory(m_vs, m_vs, filtered_overlap_factory));
   *out << "DBC elimination: graph rebuild complete.\n";
 }
 
@@ -2362,6 +2363,21 @@ STKDiscretization::computeNodeSets()
         nodeSets[ns->first][i][eq] = getOwnedDOF(node_lid, eq);
       }
       nodeSetCoords[ns->first][i] = stk::mesh::field_data(*coordinates_field, nodes[i]);
+    }
+
+    // Overlap-scope nodeset (includes ghosted nodes): used by DBC DOF
+    // elimination so every rank has descriptors for constrained DOFs it
+    // ghosts.
+    stk::mesh::Selector select_overlap_in_nspart =
+        stk::mesh::Selector(*(ns->second)) &
+        (stk::mesh::Selector(metaData.locally_owned_part()) | stk::mesh::Selector(metaData.globally_shared_part()));
+    std::vector<stk::mesh::Entity> overlap_nodes;
+    stk::mesh::get_selected_entities(select_overlap_in_nspart, bulkData.buckets(stk::topology::NODE_RANK), overlap_nodes);
+    nodeSetOverlapGIDs[ns->first].resize(overlap_nodes.size());
+    nodeSetOverlapCoords[ns->first].resize(overlap_nodes.size());
+    for (std::size_t i = 0; i < overlap_nodes.size(); ++i) {
+      nodeSetOverlapGIDs[ns->first][i]   = gid(overlap_nodes[i]);
+      nodeSetOverlapCoords[ns->first][i] = stk::mesh::field_data(*coordinates_field, overlap_nodes[i]);
     }
     ns++;
   }

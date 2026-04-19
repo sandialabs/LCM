@@ -245,9 +245,6 @@ set(SOURCES
     evaluators/bc/PHAL_TimeDepDBC.cpp
     evaluators/bc/PHAL_TimeDepSDBC.cpp
     evaluators/bc/PHAL_SDirichlet.cpp
-    evaluators/bc/PHAL_DirichletCoordinateFunction.cpp
-    evaluators/bc/PHAL_DirichletField.cpp
-    evaluators/bc/PHAL_IdentityCoordinateFunctionTraits.cpp
     evaluators/bc/PHAL_Neumann.cpp
     evaluators/gather/PHAL_GatherAuxData.cpp
     evaluators/gather/PHAL_GatherCoordinateVector.cpp
@@ -343,17 +340,11 @@ set(HEADERS
     evaluators/bc/PHAL_TimeDepDBC.hpp
     evaluators/bc/PHAL_TimeDepSDBC.hpp
     evaluators/bc/PHAL_SDirichlet.hpp
-    evaluators/bc/PHAL_DirichletCoordinateFunction.hpp
-    evaluators/bc/PHAL_DirichletCoordinateFunction_Def.hpp
-    evaluators/bc/PHAL_DirichletField.hpp
-    evaluators/bc/PHAL_DirichletField_Def.hpp
     evaluators/bc/PHAL_Dirichlet_Def.hpp
     evaluators/bc/PHAL_ExprEvalSDBC_Def.hpp
     evaluators/bc/PHAL_TimeDepDBC_Def.hpp
     evaluators/bc/PHAL_TimeDepSDBC_Def.hpp
     evaluators/bc/PHAL_SDirichlet_Def.hpp
-    evaluators/bc/PHAL_IdentityCoordinateFunctionTraits.hpp
-    evaluators/bc/PHAL_IdentityCoordinateFunctionTraits_Def.hpp
     evaluators/bc/PHAL_Neumann.hpp
     evaluators/bc/PHAL_Neumann_Def.hpp
     evaluators/gather/PHAL_GatherAuxData.hpp

@@ -70,14 +70,6 @@ struct DirichletTraits
   {
     typeDa = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_dirichlet_aggregator
   };
-  enum
-  {
-    typeFb = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_dirichlet_coordinate_function
-  };
-  enum
-  {
-    typeF = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_dirichlet_field
-  };
   static std::string const bcParamsPl;
 
   typedef PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits> factory_type;
@@ -96,18 +88,6 @@ struct DirichletTraits
 
   static std::string
   constructScaledSDBCName(std::string const& ns, std::string const& dof);
-
-  static std::string
-  constructBCNameField(std::string const& ns, std::string const& dof);
-
-  static std::string
-  constructSDBCNameField(std::string const& ns, std::string const& dof);
-
-  static std::string
-  constructExprEvalSDBCNameField(std::string const& ns, std::string const& dof);
-
-  static std::string
-  constructScaledSDBCNameField(std::string const& ns, std::string const& dof);
 
   static std::string
   constructTimeDepBCName(std::string const& ns, std::string const& dof);

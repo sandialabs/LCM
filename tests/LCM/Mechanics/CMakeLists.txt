@@ -26,8 +26,6 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 # test for 2D with blocked ordering
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputBlocked.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/inputBlocked.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputBlocked_dir_field.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/inputBlocked_dir_field.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
 
@@ -35,10 +33,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
 add_test(${testName}2D_Blocked ${Albany.exe} inputBlocked.yaml)
 set_tests_properties(${testName}2D_Blocked PROPERTIES LABELS
                                                       "LCM;Tpetra;Forward")
-add_test(${testName}2D_Blocked_dir_field ${Albany.exe}
-         inputBlocked_dir_field.yaml)
-set_tests_properties(${testName}2D_Blocked_dir_field
-                     PROPERTIES LABELS "LCM;Tpetra;Forward")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputJ2Plast2DTraction.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/inputJ2Plast2DTraction.yaml COPYONLY)

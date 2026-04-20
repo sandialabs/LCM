@@ -46,6 +46,7 @@ LCM:
       Predictor:
         Method: Constant
       Stepper:
+        Continuation Method: Natural
         Initial Value: 0.00000000e+00
         Continuation Parameter: Time
         Max Steps: 1000
@@ -110,23 +111,20 @@ LCM:
       Status Tests:
         Test Type: Combo
         Combo Type: OR
-        Number of Tests: 4
+        Number of Tests: 3
         Test 0:
-          Test Type: RelativeNormF
-          Tolerance: 1.00000000e-12
-        Test 1:
           Test Type: MaxIters
           Maximum Iterations: 15
-        Test 2:
+        Test 1:
           Test Type: Combo
-          Combo Type: OR
+          Combo Type: AND
           Number of Tests: 2
           Test 0:
             Test Type: NStep
-            Number of Nonlinear Iterations: 5
+            Number of Nonlinear Iterations: 1
           Test 1:
             Test Type: NormF
-            Tolerance: 1.00000000e-12
-        Test 3:
+            Tolerance: 1.00000000e-8
+        Test 2:
           Test Type: FiniteValue
 ...

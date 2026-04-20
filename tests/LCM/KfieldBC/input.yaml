@@ -47,6 +47,7 @@ LCM:
       Predictor:
         Method: Tangent
       Stepper:
+        Continuation Method: Natural
         Initial Value: 0.00000000e+00
         Continuation Parameter: Time
         Max Steps: 4
@@ -68,10 +69,17 @@ LCM:
         Combo Type: OR
         Number of Tests: 2
         Test 0:
-          Test Type: NormF
-          Tolerance: 1.0e-8
-          Norm Type: Two Norm
-          Scale Type: Unscaled
+          Test Type: Combo
+          Combo Type: AND
+          Number of Tests: 2
+          Test 0:
+            Test Type: NormF
+            Tolerance: 1.0e-8
+            Norm Type: Two Norm
+            Scale Type: Unscaled
+          Test 1:
+            Test Type: NStep
+            Number of Nonlinear Iterations: 1
         Test 1:
           Test Type: MaxIters
           Maximum Iterations: 10

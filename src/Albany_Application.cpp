@@ -510,10 +510,12 @@ Application::eliminateConstrainedDOFs()
   auto* stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
   if (stk_disc == nullptr) return;
 
-  // Skip for any LOCA continuation problem: elimination changes the Newton
-  // iteration path which alters path-dependent material state compared to
-  // the row-zeroing reference solutions baked into the gold files.
-  if (params_->isSublist("Piro") && params_->sublist("Piro").isSublist("LOCA")) return;
+  // Explicit opt-out: some problem types have coupled residual structure
+  // (e.g. poromechanics backward-Euler pressure updates) that the strong-DBC
+  // reduced-space assembly does not reproduce bit-for-bit against the weak
+  // row-zeroing path. Such problems set this flag to stay on the weak path.
+  if (problemParams->isParameter("Skip DOF Elimination") &&
+      problemParams->get<bool>("Skip DOF Elimination")) return;
 
   // Skip for ACE Sequential Thermo-Mechanical problems: element death
   // dynamically changes nodeset membership after initialization, so a
@@ -688,6 +690,19 @@ Application::eliminateConstrainedDOFs()
 
   // Capture the full (pre-elimination) owned vector space before disc reduces it.
   full_owned_vs_ = disc->getVectorSpace();
+
+  // Skip elimination if it would remove every DOF (fully-constrained mesh).
+  // A 0-dimensional reduced owned space makes the linear solver (Belos)
+  // throw on empty block size; weak Dirichlet enforcement handles these
+  // degenerate cases correctly without elimination.
+  {
+    GO const n_constrained_global = static_cast<GO>(global_gid_desc_map.size());
+    GO const n_owned_global       = full_owned_vs_->dim();
+    if (n_constrained_global >= n_owned_global) {
+      dbc_descriptors_.clear();
+      return;
+    }
+  }
 
   // Step 3: Build the constrained GID set for the discretization and
   // populate dbc_descriptors_ for overlap-slot injection.
@@ -1581,7 +1596,7 @@ Application::computeGlobalResidualImpl(
 
   // Scatter x and xdot to the overlapped distrbution
   solMgr->scatterX(*x, x_dot.ptr(), x_dotdot.ptr());
-  injectConstrainedDOFValues(current_time);
+  injectConstrainedDOFValues(fixTime(current_time));
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -1786,7 +1801,7 @@ Application::computeGlobalJacobianImpl(
 
   // Scatter x and xdot to the overlapped distribution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
-  injectConstrainedDOFValues(current_time);
+  injectConstrainedDOFValues(fixTime(current_time));
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -2069,7 +2084,7 @@ Application::evaluateStateFieldManager(
 
   // Scatter to the overlapped distrbution
   solMgr->scatterX(x, xdot, xdotdot);
-  injectConstrainedDOFValues(current_time);
+  injectConstrainedDOFValues(fixTime(current_time));
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -2357,7 +2372,7 @@ Application::setupBasicWorksetInfo(
 
   // Scatter xT and xdotT to the overlapped distrbution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
-  injectConstrainedDOFValues(current_time);
+  injectConstrainedDOFValues(fixTime(current_time));
 
   // Scatter distributed parameters
   distParamLib->scatter();

@@ -38,6 +38,7 @@ ALBANY:
     LOCA: 
       Step Size: { }
       Stepper: 
+        Continuation Method: Natural
         Eigensolver: { }
     NOX: 
       Direction: 

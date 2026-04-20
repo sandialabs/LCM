@@ -39,6 +39,7 @@ LCM:
         Last Step Predictor: { }
       Step Size: { }
       Stepper:
+        Continuation Method: Natural
         Eigensolver: { }
     NOX:
       Direction:

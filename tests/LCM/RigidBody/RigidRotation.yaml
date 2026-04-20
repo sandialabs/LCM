@@ -142,14 +142,11 @@ LCM:
       Status Tests:
         Test Type: Combo
         Combo Type: OR
-        Number of Tests: 5
+        Number of Tests: 3
         Test 0:
-          Test Type: RelativeNormF
-          Tolerance: 9.99999999999999945e-21
-        Test 1:
           Test Type: MaxIters
           Maximum Iterations: 2000
-        Test 2:
+        Test 1:
           Test Type: Combo
           Combo Type: AND
           Number of Tests: 2
@@ -159,9 +156,6 @@ LCM:
           Test 1:
             Test Type: NormF
             Tolerance: 9.99999999999999980e-13
-        Test 3:
+        Test 2:
           Test Type: FiniteValue
-        Test 4:
-          Test Type: NormF
-          Tolerance: 1.00000000000000001e-35
 ...

@@ -1700,6 +1700,21 @@ Application::computeGlobalResidualImpl(
 
   // Push the assembled residual values back into the overlap vector
   cas_manager->scatter(f, overlapped_f, CombineMode::INSERT);
+
+  // Under DBC elimination, constrained-DOF rows are not in the reduced owned
+  // map, so the combine above never cross-rank-sums their overlap values. Each
+  // rank's overlap slot holds only its local element assembly, so serial and
+  // parallel diverge at shared constrained nodes (parallel shows a fraction of
+  // the full reaction). Zero those slots to restore the pre-elimination
+  // behavior (residual ≈ 0 at constrained DOFs after BC enforcement) and
+  // preserve serial/parallel reproducibility in exodus output.
+  if (!dbc_descriptors_.empty()) {
+    auto overlap_data = Albany::getNonconstLocalData(overlapped_f);
+    for (auto const& desc : dbc_descriptors_) {
+      overlap_data[desc.overlap_lid] = 0.0;
+    }
+  }
+
   // Write the residual to the discretization, which will later (optionally)
   // be written to the output file
   disc->setResidualField(*overlapped_f);

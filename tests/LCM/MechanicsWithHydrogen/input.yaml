@@ -48,8 +48,9 @@ LCM:
       Bifurcation: { }
       Constraints: { }
       Predictor:
-        Method: Tangent
+        Method: Constant
       Stepper:
+        Continuation Method: Natural
         Initial Value: 0.00000000e+00
         Continuation Parameter: Time
         Max Steps: 10
@@ -116,22 +117,22 @@ LCM:
       Status Tests:
         Test Type: Combo
         Combo Type: OR
-        Number of Tests: 4
+        Number of Tests: 3
         Test 0:
-          Test Type: NormF
-          Norm Type: Two Norm
-          Scale Type: Scaled
-          Tolerance: 1.00000000e-12
-        Test 1:
           Test Type: MaxIters
           Maximum Iterations: 15
+        Test 1:
+          Test Type: Combo
+          Combo Type: AND
+          Number of Tests: 2
+          Test 0:
+            Test Type: NStep
+            Number of Nonlinear Iterations: 1
+          Test 1:
+            Test Type: NormF
+            Tolerance: 1.00000000e-08
         Test 2:
-          Test Type: Stagnation
-          Consecutive Iterations: 5
-          Tolerance: 0.99000000
-        Test 3:
-          Test Type: NormUpdate
-          Tolerance: 4.95000000e-08
+          Test Type: FiniteValue
       Solver Options:
         Status Test Check Type: Complete
 ...

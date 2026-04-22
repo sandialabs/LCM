@@ -87,7 +87,7 @@ ALBANY:
           Norm Type: Two Norm
           Scale Type: Scaled
           Tolerance: 1.00000000000000002e-08
-        Test 1: 
+        Test 1:
           Test Type: MaxIters
-          Maximum Iterations: 1
+          Maximum Iterations: 20
 ...

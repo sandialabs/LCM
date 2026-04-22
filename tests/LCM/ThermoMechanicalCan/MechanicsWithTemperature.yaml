@@ -52,7 +52,7 @@ LCM:
     Use Serial Mesh: false
   Regression Results:
     Number of Comparisons: 1
-    Test Values: [79.54519701]
+    Test Values: [78.33582203]
     Relative Tolerance: 0.01000000
     Absolute Tolerance: 0.01000000
   Piro:
@@ -99,6 +99,20 @@ LCM:
                       Num Blocks: 200
                       Flexible Gmres: false
               Preconditioner Type: MueLu
+              Preconditioner Types:
+                MueLu:
+                  verbosity: none
+                  max levels: 10
+                  'repartition: enable': true
+                  'repartition: min rows per proc': 1000
+                  'sa: damping factor': 0.50000000
+                  'smoother: pre or post': both
+                  'coarse: max size': 500
+                  'coarse: type': KLU
+                  'aggregation: type': uncoupled
+                  'smoother: type': RELAXATION
+                  'smoother: params':
+                    'relaxation: type': 'Symmetric Gauss-Seidel'
       Line Search:
         Full Step:
           Full Step: 1.00000000
@@ -122,23 +136,20 @@ LCM:
       Status Tests:
         Test Type: Combo
         Combo Type: OR
-        Number of Tests: 5
+        Number of Tests: 3
         Test 0:
-          Test Type: NormF
-          Norm Type: Two Norm
-          Scale Type: Scaled
-          Tolerance: 1.00000000e-06
-        Test 1:
           Test Type: MaxIters
           Maximum Iterations: 100
+        Test 1:
+          Test Type: Combo
+          Combo Type: AND
+          Number of Tests: 2
+          Test 0:
+            Test Type: NStep
+            Number of Nonlinear Iterations: 1
+          Test 1:
+            Test Type: NormF
+            Tolerance: 1.00000000e-06
         Test 2:
-          Test Type: NormF
-          Scale Type: Unscaled
-          Tolerance: 1.00000000e-06
-        Test 3:
-          Test Type: NormUpdate
-          Scale Type: Unscaled
-          Tolerance: 1.00000000e-06
-        Test 4:
           Test Type: FiniteValue
 ...

@@ -134,23 +134,20 @@ LCM:
       Status Tests:
         Test Type: Combo
         Combo Type: OR
-        Number of Tests: 5
+        Number of Tests: 3
         Test 0:
-          Test Type: NormF
-          Norm Type: Two Norm
-          Scale Type: Scaled
-          Tolerance: 1.00000000e-10
-        Test 1:
           Test Type: MaxIters
           Maximum Iterations: 100
+        Test 1:
+          Test Type: Combo
+          Combo Type: AND
+          Number of Tests: 2
+          Test 0:
+            Test Type: NStep
+            Number of Nonlinear Iterations: 1
+          Test 1:
+            Test Type: NormF
+            Tolerance: 1.00000000e-08
         Test 2:
-          Test Type: NormF
-          Scale Type: Unscaled
-          Tolerance: 1.00000000e-07
-        Test 3:
-          Test Type: NormUpdate
-          Scale Type: Unscaled
-          Tolerance: 1.00000000e-07
-        Test 4:
           Test Type: FiniteValue
 ...

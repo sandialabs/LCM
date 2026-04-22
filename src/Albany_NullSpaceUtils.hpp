@@ -25,6 +25,23 @@ class RigidBodyModes
     numPDEs = numPDEs_;
   }
 
+  //! Read the number of PDEs. Used by the discretization to check whether
+  //! a reduced row map preserves uniform nodal block structure.
+  int
+  getNumPDEs() const
+  {
+    return numPDEs;
+  }
+
+  //! Drop coordinate/nullspace/block-size information from the preconditioner
+  //! parameter list. Called when DBC DOF elimination produces a reduced row
+  //! map whose per-rank local size is not a multiple of numPDEs — in that
+  //! case MueLu's node-uniform block assumption is violated and
+  //! Hierarchy::ReplaceCoordinateMap throws. Without coordinates/nullspace,
+  //! MueLu falls back to algebraic aggregation and the solve proceeds.
+  void
+  clearCoordinatesAndNullspace();
+
   //! Set sizes of nullspace etc.
   void
   setParameters(int const numPDEs, int const numElasticityDim, int const numScalar, int const nullSpaceDim, bool const setNonElastRBM = false);

@@ -1683,6 +1683,18 @@ STKDiscretization::setConstrainedDOFs(std::set<GO> const& constrained_dof_gids, 
   *out << "DBC elimination: exporting to reduced owned graph...\n";
   m_jac_factory = Teuchos::rcp(new ThyraCrsMatrixFactory(m_vs, m_vs, filtered_overlap_factory));
   *out << "DBC elimination: graph rebuild complete.\n";
+
+  // setupMLCoords() populated MueLu/FROSch with coordinates and a nullspace
+  // sized to the full (pre-elimination) vector space. After elimination the
+  // matrix row map has fewer rows, and partial-component DBCs can also break
+  // MueLu's uniform nodal block structure (numLocalRows % numPDEs == 0).
+  // Either mismatch makes MueLu throw during Hierarchy::ReplaceCoordinateMap
+  // or later in the rebalance path. Drop the stale coordinates/nullspace so
+  // MueLu falls back to algebraic aggregation — safe for any DBC pattern.
+  if (!rigidBodyModes.is_null() && (rigidBodyModes->isMueLuUsed() || rigidBodyModes->isFROSchUsed())) {
+    *out << "DBC elimination: clearing MueLu/FROSch coordinates+nullspace (pre-elimination data is stale under the reduced row map).\n";
+    rigidBodyModes->clearCoordinatesAndNullspace();
+  }
 }
 
 void

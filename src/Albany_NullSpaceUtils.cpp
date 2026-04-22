@@ -383,4 +383,23 @@ RigidBodyModes::setCoordinatesAndNullspace(
   }
 }
 
+void
+RigidBodyModes::clearCoordinatesAndNullspace()
+{
+  if (plist.is_null()) return;
+
+  plist->remove("Coordinates", false);
+  plist->remove("Nullspace", false);
+  plist->remove("number of equations", false);
+  // MueLu's repartition path runs CoordinatesTransferFactory, which throws
+  // when "Coordinates" is absent. Disable repartition when falling back to
+  // coordinate-free aggregation.
+  plist->set("repartition: enable", false);
+  if (plist->isSublist("Matrix")) {
+    plist->sublist("Matrix").remove("PDE equations", false);
+  }
+  coordMV = Teuchos::null;
+  traits  = Teuchos::null;
+}
+
 }  // namespace Albany

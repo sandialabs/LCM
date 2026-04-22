@@ -4,7 +4,9 @@
 
 #include "Albany_Application.hpp"
 
+#include <fstream>
 #include <set>
+#include <sstream>
 #include <string>
 
 #include "Teuchos_DefaultMpiComm.hpp"
@@ -604,8 +606,25 @@ Application::eliminateConstrainedDOFs()
       } else if (bc_params.isSublist(tdep_key)) {
         auto& tlist    = bc_params.sublist(tdep_key);
         proto.kind     = DBCDescriptor::Kind::TimeArray;
-        auto tv        = tlist.get<Teuchos::Array<double>>("Time Values");
-        auto bv        = tlist.get<Teuchos::Array<double>>("BC Values");
+        // Accept either inline "Time Values"/"BC Values" arrays or file-backed
+        // "Time File"/"BC File" (whitespace-separated array text, as parsed by
+        // Albany_BCUtils_Def's weak-path reader).
+        auto read_array = [](Teuchos::ParameterList& list, char const* values_key, char const* file_key) {
+          if (list.isParameter(file_key)) {
+            auto const filename = list.get<std::string>(file_key);
+            std::ifstream file(filename);
+            ALBANY_ASSERT(file.good(), "Error opening " + std::string(file_key) + ": " + filename);
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            std::istringstream iss(buffer.str());
+            Teuchos::Array<double> a;
+            iss >> a;
+            return a;
+          }
+          return list.get<Teuchos::Array<double>>(values_key);
+        };
+        auto tv        = read_array(tlist, "Time Values", "Time File");
+        auto bv        = read_array(tlist, "BC Values",   "BC File");
         proto.times    = tv.toVector();
         proto.values   = bv.toVector();
       } else if (bc_params.isType<std::string>(expr_key)) {

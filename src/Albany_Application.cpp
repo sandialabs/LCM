@@ -530,18 +530,6 @@ Application::eliminateConstrainedDOFs()
   // DOFs from the owned space breaks the history bookkeeping.
   if (num_time_deriv >= 2) return;
 
-  // Skip for explicit Forward Euler: no iterative linear solve, so elimination
-  // offers no conditioning benefit, and the pre-existing gold values were
-  // computed with the non-elimination path.
-  if (params_->isSublist("Piro") && params_->sublist("Piro").isSublist("Tempus")) {
-    auto& tempus_pl = params_->sublist("Piro").sublist("Tempus");
-    if (tempus_pl.isSublist("Tempus Stepper")) {
-      std::string const stepper_type =
-          tempus_pl.sublist("Tempus Stepper").get<std::string>("Stepper Type", "");
-      if (stepper_type == "Forward Euler") return;
-    }
-  }
-
   // Use overlap-scope nodesets (includes ghosted nodes) so each rank has
   // descriptors for every constrained DOF in its overlap — not just those it
   // owns. Without this, a rank that ghosts a constrained DOF would skip

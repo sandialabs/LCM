@@ -537,6 +537,25 @@ Application::eliminateConstrainedDOFs()
   auto const& ns_gids_map   = stk_disc->getNodeSetOverlapGIDs();
   auto const& ns_coords_map = stk_disc->getNodeSetOverlapCoords();
 
+  // Skip when any DBC key is registered as a continuation/sensitivity parameter.
+  // LOCA's natural-continuation predictor needs df/d(bc) propagated through the
+  // residual via Sacado AD. The weak-enforcement path gets this "for free" from
+  // f[i] = x[i] - bc_value with bc_value registered as a Sacado parameter.
+  // Elimination injects bc_value as a plain double in the overlap, so the
+  // Tangent residual sees df/dp = 0 at constrained DOFs and the predictor is
+  // wrong — the first continuation step diverges (see Mechanics2D_Blocked).
+  // Re-enable once the injection path is specialized for Tangent/DistParamDeriv.
+  if (problemParams->isSublist("Parameters")) {
+    auto&     plist = problemParams->sublist("Parameters");
+    int const n     = plist.get<int>("Number", 0);
+    for (int k = 0; k < n; ++k) {
+      std::string const key = "Parameter " + std::to_string(k);
+      if (!plist.isType<std::string>(key)) continue;
+      std::string const pname = Teuchos::getValue<std::string>(plist.getEntry(key));
+      if (pname.find("DBC") != std::string::npos) return;
+    }
+  }
+
   bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
   if (!has_dbc_params) return;
   auto& bc_params = problemParams->sublist("Dirichlet BCs");

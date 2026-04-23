@@ -100,6 +100,19 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   Teuchos::RCP<Thyra_VectorSpace const>
   getVectorSpace() const;
 
+  //! Get the full (pre-elimination) owned vector space. When DBC DOF
+  //! elimination is inactive, this equals getVectorSpace().
+  Teuchos::RCP<Thyra_VectorSpace const>
+  getFullVectorSpace() const;
+
+  //! Expand a reduced owned x to the full owned space with constrained-DOF
+  //! values injected at `time`. Returns `x` unchanged when elimination is
+  //! inactive. Callers outside Application (e.g. response functions whose
+  //! culling targets include constrained GIDs) use this to see the full
+  //! solution.
+  Teuchos::RCP<Thyra_Vector const>
+  expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, double time);
+
   //! Create Jacobian operator
   Teuchos::RCP<Thyra_LinearOp>
   createJacobianOp() const;
@@ -581,6 +594,9 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     Kind              kind           = Kind::Constant;
     LO                overlap_lid    = -1;
     LO                full_owned_lid = -1;  // LID in full (pre-elimination) owned VS; -1 if this rank does not own this DOF
+    // Full BC key ("DBC on NS <ns> for DOF <dof>", etc.). Used to look up
+    // LOCA-driven parameter updates in paramLib at eval time.
+    std::string bc_key;
     // Constant
     double constant = 0.0;
     // TimeArray (piecewise-linear interpolation)
@@ -616,10 +632,11 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   void
   injectConstrainedDOFValues(double time);
 
-  //! Expand reduced owned x to full owned space with BC values injected.
-  //! Returns x unchanged if no DOF elimination is active.
-  Teuchos::RCP<Thyra_Vector const>
-  expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, double time);
+  //! If a constrained DOF's BC key is registered as a Sacado parameter,
+  //! refresh the descriptor's constant value from paramLib so LOCA/analysis
+  //! parameter updates propagate into the injected overlap values.
+  void
+  refreshDBCValuesFromParamLib();
 
   bool is_schwarz_{false};
   bool no_dir_bcs_{false};

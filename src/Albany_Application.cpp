@@ -537,19 +537,6 @@ Application::eliminateConstrainedDOFs()
   auto const& ns_gids_map   = stk_disc->getNodeSetOverlapGIDs();
   auto const& ns_coords_map = stk_disc->getNodeSetOverlapCoords();
 
-  // Skip if any DBC is used as a continuation/sensitivity parameter (value
-  // changes dynamically via the Piro driver — static elimination won't do).
-  if (problemParams->isSublist("Parameters")) {
-    auto& plist   = problemParams->sublist("Parameters");
-    int const n   = plist.get<int>("Number", 0);
-    for (int k = 0; k < n; ++k) {
-      std::string const key = "Parameter " + std::to_string(k);
-      if (!plist.isType<std::string>(key)) continue;
-      std::string const pname = Teuchos::getValue<std::string>(plist.getEntry(key));
-      if (pname.find("DBC") != std::string::npos) return;
-    }
-  }
-
   bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
   if (!has_dbc_params) return;
   auto& bc_params = problemParams->sublist("Dirichlet BCs");
@@ -588,9 +575,11 @@ Application::eliminateConstrainedDOFs()
       if (bc_params.isType<double>(dbc_key)) {
         proto.kind     = DBCDescriptor::Kind::Constant;
         proto.constant = bc_params.get<double>(dbc_key);
+        proto.bc_key   = dbc_key;
       } else if (bc_params.isType<double>(sdbc_key)) {
         proto.kind     = DBCDescriptor::Kind::Constant;
         proto.constant = bc_params.get<double>(sdbc_key);
+        proto.bc_key   = sdbc_key;
       } else if (bc_params.isSublist(tdep_key)) {
         auto& tlist    = bc_params.sublist(tdep_key);
         proto.kind     = DBCDescriptor::Kind::TimeArray;
@@ -756,9 +745,24 @@ Application::eliminateConstrainedDOFs()
 }
 
 void
+Application::refreshDBCValuesFromParamLib()
+{
+  if (dbc_descriptors_.empty()) return;
+  if (paramLib.is_null()) return;
+  for (auto& desc : dbc_descriptors_) {
+    if (desc.kind != DBCDescriptor::Kind::Constant) continue;
+    if (desc.bc_key.empty()) continue;
+    if (!paramLib->isParameter(desc.bc_key)) continue;
+    desc.constant = paramLib->getRealValue<PHAL::AlbanyTraits::Residual>(desc.bc_key);
+  }
+}
+
+void
 Application::injectConstrainedDOFValues(double time)
 {
   if (dbc_descriptors_.empty()) return;
+
+  refreshDBCValuesFromParamLib();
 
   // Capture previous time BEFORE overwriting; used below to compute BC time
   // derivatives via backward finite difference for x_dot injection.
@@ -872,6 +876,8 @@ Application::expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, dou
   auto cas_red_to_full =
       Albany::createCombineAndScatterManager(disc->getVectorSpace(), full_owned_vs_);
   cas_red_to_full->scatter(*x, *full_x, Albany::CombineMode::INSERT);
+
+  refreshDBCValuesFromParamLib();
 
   auto full_data = Albany::getNonconstLocalData(full_x);
   for (auto const& desc : dbc_descriptors_) {
@@ -1065,6 +1071,12 @@ Teuchos::RCP<Thyra_VectorSpace const>
 Application::getVectorSpace() const
 {
   return disc->getVectorSpace();
+}
+
+Teuchos::RCP<Thyra_VectorSpace const>
+Application::getFullVectorSpace() const
+{
+  return full_owned_vs_.is_null() ? disc->getVectorSpace() : full_owned_vs_;
 }
 
 RCP<Thyra_LinearOp>

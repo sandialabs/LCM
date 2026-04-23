@@ -148,11 +148,13 @@ SolutionValuesResponseFunction::evaluateResponse(
     Teuchos::RCP<Thyra_Vector> const& g)
 {
   this->updateCASManager();
-  // Import the selected gids
+  // x is already in the full (pre-elimination) owned VS: Application::evaluateResponse
+  // calls expandToFullSolution before dispatching. The CAS manager is built on that
+  // full VS so Node-GID culling can reference constrained DOFs.
   cas_manager->scatter(*x, *culledVec, CombineMode::INSERT);
   getNonconstLocalData(g).deepCopy(getLocalData(culledVec.getConst())());
   if (Teuchos::nonnull(sol_printer_)) {
-    sol_printer_->print(g, cullingStrategy_->selectedGIDs(app_->getVectorSpace()));
+    sol_printer_->print(g, cullingStrategy_->selectedGIDs(app_->getFullVectorSpace()));
   }
 }
 
@@ -173,10 +175,9 @@ SolutionValuesResponseFunction::evaluateGradient(
   this->updateCASManager();
 
   if (!g.is_null()) {
-    // Import the selected gids
     cas_manager->scatter(*x, *culledVec, CombineMode::INSERT);
     getNonconstLocalData(g).deepCopy(getLocalData(culledVec.getConst())());
-    if (Teuchos::nonnull(sol_printer_)) sol_printer_->print(g, cullingStrategy_->selectedGIDs(app_->getVectorSpace()));
+    if (Teuchos::nonnull(sol_printer_)) sol_printer_->print(g, cullingStrategy_->selectedGIDs(app_->getFullVectorSpace()));
   }
 
   if (!dg_dx.is_null()) {
@@ -210,7 +211,9 @@ SolutionValuesResponseFunction::evaluateGradient(
 void
 SolutionValuesResponseFunction::updateCASManager()
 {
-  Teuchos::RCP<Thyra_VectorSpace const> const solutionVS = app_->getVectorSpace();
+  // Use the full (pre-elimination) owned VS so Node GID culling can see
+  // constrained DOFs; evaluateResponse/Gradient feed in an expanded x.
+  Teuchos::RCP<Thyra_VectorSpace const> const solutionVS = app_->getFullVectorSpace();
   if (cas_manager.is_null() || !sameAs(solutionVS, cas_manager->getOwnedVectorSpace())) {
     const Teuchos::Array<GO>              selectedGIDs = cullingStrategy_->selectedGIDs(solutionVS);
     Teuchos::RCP<Thyra_VectorSpace const> targetVS     = createVectorSpace(app_->getComm(), selectedGIDs);

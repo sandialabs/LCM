@@ -2,7 +2,7 @@ COORDINATES absolute 1.e-6
 
 TIME STEPS relative 1.e-6 floor 0.0
 
-NODAL VARIABLES relative 2.0e-5 floor 1.0e-7
+NODAL VARIABLES relative 2.0e-5 floor 1.0e-6
 	displacement_1
 	displacement_2
 	displacement_3

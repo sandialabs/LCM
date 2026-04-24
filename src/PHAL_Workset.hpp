@@ -5,9 +5,11 @@
 #ifndef PHAL_WORKSET_HPP
 #define PHAL_WORKSET_HPP
 
+#include <cstdint>
 #include <list>
 #include <set>
 #include <string>
+#include <vector>
 
 #include "Albany_DiscretizationUtils.hpp"
 #include "Albany_SacadoTypes.hpp"
@@ -136,6 +138,17 @@ struct Workset
   // Set by the IM solver from the previous step's failure_state values.
   // Read by the scatter evaluator to skip dead elements.
   Teuchos::RCP<std::vector<double>> death_status_vec{Teuchos::null};
+
+  // Per-(cell, pt) failure-mode bitmask for erosion models. Bits:
+  //   bit 0 = tension, bit 1 = strain, bit 2 = yield,
+  //   bit 3 = angle,   bit 4 = displacement.
+  // Once a bit is set at a (cell, pt) it stays set for the life of the run —
+  // OR-semantics give failure accumulation across fills and time steps while
+  // preventing a criterion that keeps tripping at the same point from being
+  // counted more than once. Indexed [cell][pt]. Owned and attached by the
+  // Application (see Albany::Application::failure_mode_vecs_); sized lazily
+  // on first use by the kernel that knows num_pts for its model.
+  Teuchos::RCP<std::vector<std::vector<uint8_t>>> failure_mode_vec{Teuchos::null};
   Teuchos::RCP<Tpetra_MultiVector> auxDataPtrT;
 
   bool transientTerms{false};

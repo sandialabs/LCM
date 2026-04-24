@@ -226,17 +226,40 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
 
   current_time_ = workset.current_time;
 
-  // Seed failed_ from the shared death_status_vec_, which is set by the
-  // IM solver at the start of the step from the prior converged state and
-  // is updated live by this evaluator when new failures occur during a
-  // Newton iteration.  This makes failure monotonic across time steps
-  // (previously-dead cells stay dead) without introducing any noise from
-  // Phalanx state-rotation of the Fad-typed failure_state field.
+  // Seed failed_ from the persistent per-(cell, pt) failure bitmask.
+  // Each bit (tension, strain, yield, angle, displacement) contributes its
+  // decimal magnitude (1, 10, 100, 1000, 10000) once it is set at a
+  // given (cell, pt), and stays set for the life of the run.  This seeds
+  // failed_(cell, 0) to the cumulative cell-level decimal encoding so
+  // BulkFailureCriterion reads a monotonic count of (pt, mode) trips.
+  //
+  // Lazy sizing: the kernel is the only place that knows num_pts_ for this
+  // model, so size the [cell][pt] grid here on first contact.  The
+  // Application-owned shell (RCP) was attached in loadWorksetBucketInfo.
   auto const num_cells = workset.numCells;
+  failure_mode_vec_    = workset.failure_mode_vec;
+  if (failure_mode_vec_ != Teuchos::null) {
+    if (static_cast<int>(failure_mode_vec_->size()) < num_cells) {
+      failure_mode_vec_->resize(num_cells);
+    }
+    for (auto cell = 0; cell < num_cells; ++cell) {
+      if (static_cast<int>((*failure_mode_vec_)[cell].size()) < num_pts_) {
+        (*failure_mode_vec_)[cell].resize(num_pts_, 0);
+      }
+    }
+  }
   for (auto cell = 0; cell < num_cells; ++cell) {
     double seed = 0.0;
-    if (has_failed_old_) {
-      seed = (*death_status_vec_)[cell];
+    if (failure_mode_vec_ != Teuchos::null) {
+      auto const& mask_row = (*failure_mode_vec_)[cell];
+      for (auto pt = 0; pt < num_pts_; ++pt) {
+        uint8_t const m = mask_row[pt];
+        if (m & 0x01) seed += 1.0;
+        if (m & 0x02) seed += 10.0;
+        if (m & 0x04) seed += 100.0;
+        if (m & 0x08) seed += 1000.0;
+        if (m & 0x10) seed += 10000.0;
+      }
     }
     failed_(cell, 0) = seed;
   }
@@ -639,6 +662,25 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
   }
 
+  // Per-(cell, pt) OR-accumulation: add each mode's decimal magnitude to
+  // `failed` exactly the first time that mode trips at this integration
+  // point. `failure_mode_vec_` is persistent across fills and time steps
+  // (owned by the Application), so a criterion that keeps tripping at the
+  // same point contributes its magnitude once and only once.
+  auto trip = [&](bool fired, uint8_t bit, double magnitude) {
+    if (fired == false) return;
+    if (failure_mode_vec_ == Teuchos::null) {
+      // No bitmask storage attached (non-standard workset path). Fall back
+      // to the pre-bitmask behavior so we don't silently lose failures.
+      failed += magnitude;
+      return;
+    }
+    auto& mask = (*failure_mode_vec_)[cell][pt];
+    if ((mask & bit) != 0u) return;
+    mask = static_cast<uint8_t>(mask | bit);
+    failed += magnitude;
+  };
+
   // Hack for tensile strength
   if (tensile_strength > 0) {
     auto          sig = Sacado::Value<decltype(sigma)>::eval(sigma);
@@ -648,10 +690,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     auto const Smax              = std::max(S(0, 0), std::max(S(1, 1), S(2, 2)));
     bool const tension_failure   = Smax >= tensile_strength;
     tensile_indicator_(cell, pt) = safe_quotient(Smax, tensile_strength);
-    if (tension_failure == true) {
-      // ALBANY_ABORT("Tensile failure!\n");
-      failed += 1.0;
-    }
+    trip(tension_failure, 0x01, 1.0);
   }
 
   // Hack for strain limit
@@ -663,16 +702,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     auto const     distortion     = minitensor::norm(Cdevval) / std::sqrt(3.0);
     bool const     strain_failure = distortion >= strain_limit;
     strain_indicator_(cell, pt)   = safe_quotient(distortion, strain_limit);
-    if (strain_failure == true) {
-      // ALBANY_ABORT("Strain failure!\n");
-      failed += 10.0;
-    }
+    trip(strain_failure, 0x02, 10.0);
   }
 
   // Determine if critical stress is exceeded
-  if (yielded == true) {
-    failed += 100.0;
-  }
+  trip(yielded, 0x04, 100.0);
 
   // Determine if kinematic failure occurred
   auto critical_angle = critical_angle_;
@@ -681,23 +715,20 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   if (critical_angle > 0.0) {
     auto const theta_abs = std::abs(theta);
-    if (theta_abs >= critical_angle) {
-      // ALBANY_ABORT("Critical angle failure!\n");
-      failed += 1000.0;
-    }
+    trip(theta_abs >= critical_angle, 0x08, 1000.0);
     angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
   }
   auto const disp_val               = Sacado::Value<decltype(displacement)>::eval(displacement);
   auto const displacement_norm      = minitensor::norm(disp_val);
   displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement_);
-  if ((maximum_displacement_ > 0.0) && (displacement_norm > maximum_displacement_)) {
-    // std::cout << "displacement_norm, maximum_displacement = " << displacement_norm << ", " << maximum_displacement_ << "\n";
-    // ALBANY_ABORT("Kinematic failure!\n");
-    failed += 10000.0;
-    // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
-  }
+  bool const disp_failure =
+      (maximum_displacement_ > 0.0) && (displacement_norm > maximum_displacement_);
+  trip(disp_failure, 0x10, 10000.0);
   if (disable_erosion_) {
     failed = 0.0;
+    if (failure_mode_vec_ != Teuchos::null) {
+      (*failure_mode_vec_)[cell][pt] = 0u;
+    }
   }
 
   // Live death propagation: if this cell just tripped a failure criterion

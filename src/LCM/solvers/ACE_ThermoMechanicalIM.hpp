@@ -8,6 +8,7 @@
 
 #include <functional>
 
+#include "ACE_AdaptiveState.hpp"
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_Application.hpp"
@@ -16,12 +17,9 @@
 #include "Albany_SolverFactory.hpp"
 #include "Piro_NOXSolver.hpp"
 #include "StateVarUtils.hpp"
-#include "Thyra_AdaptiveSolutionManager.hpp"
 #include "Thyra_DefaultProductVector.hpp"
 #include "Thyra_DefaultProductVectorSpace.hpp"
-#include "Thyra_ModelEvaluatorDelegatorBase.hpp"
 #include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
-#include "ACE_ThermoMechanical.hpp"  // for ACEAdaptiveState, ACEModelEvaluatorDelegator
 
 namespace LCM {
 

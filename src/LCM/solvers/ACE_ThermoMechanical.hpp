@@ -8,6 +8,7 @@
 
 #include <functional>
 
+#include "ACE_AdaptiveState.hpp"
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_Application.hpp"
@@ -16,49 +17,11 @@
 #include "Albany_SolverFactory.hpp"
 #include "Piro_NOXSolver.hpp"
 #include "StateVarUtils.hpp"
-#include "Thyra_AdaptiveSolutionManager.hpp"
 #include "Thyra_DefaultProductVector.hpp"
 #include "Thyra_DefaultProductVectorSpace.hpp"
-#include "Thyra_ModelEvaluatorDelegatorBase.hpp"
 #include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
 
 namespace LCM {
-
-class ACEAdaptiveState : public Thyra::AdaptiveStateBase
-{
- public:
-  ACEAdaptiveState(Teuchos::RCP<Thyra::ModelEvaluator<ST>> const& model) : AdaptiveStateBase(model) {}
-  ~ACEAdaptiveState() {}
-  void
-  buildSolutionGroup()
-  {
-  }
-};
-
-class ACEModelEvaluatorDelegator : public Thyra::ModelEvaluatorDelegatorBase<ST>
-{
- public:
-  ACEModelEvaluatorDelegator(Teuchos::RCP<Thyra::ModelEvaluator<ST>> const& model_rcp) : model_rcp_(model_rcp) {}
-  Teuchos::RCP<Thyra::ModelEvaluator<ST>>
-  getNonconstUnderlyingModel()
-  {
-    return model_rcp_;
-  }
-
-  ModelEvaluatorBase::OutArgs<ST>
-  createOutArgsImpl() const
-  {
-    return ModelEvaluatorBase::OutArgs<ST>();
-  }
-
-  void
-  evalModelImpl(ModelEvaluatorBase::InArgs<ST> const&, ModelEvaluatorBase::OutArgs<ST> const&) const
-  {
-  }
-
- private:
-  Teuchos::RCP<Thyra::ModelEvaluator<ST>> model_rcp_;
-};
 
 ///
 /// ACEThermoMechanical coupling class

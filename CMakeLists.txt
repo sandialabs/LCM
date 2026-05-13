@@ -680,18 +680,6 @@ endif()
 # Other Miscellaneous Albany Options here:
 message("\nMiscellaneous Albany Options:")
 
-# set optional dependency on the BGL, defaults to Enabled This option is added due to issued with compiling BGL with the
-# intel compilers see Trilinos bugzilla bug #6343
-#
-option(ENABLE_BGL "Flag to turn on the Phalanx graphviz capabilities (dependent on BGL)" ON)
-if(ENABLE_BGL)
-  message("-- BGL                       is Enabled")
-  set(ALBANY_BGL TRUE)
-else()
-  message("-- BGL                       is NOT Enabled. Graph visualization in Phalanx will not be available!")
-  set(ALBANY_BGL FALSE)
-endif()
-
 # Add option to check for hardware floating point exceptions using SSE, defaults to disabled
 option(ENABLE_CHECK_FPE "Flag to turn on floating point exception (NAN) checking" OFF)
 

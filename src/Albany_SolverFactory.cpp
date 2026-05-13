@@ -4,7 +4,6 @@
 
 #include "Albany_SolverFactory.hpp"
 
-#include "ACE_ThermoMechanical.hpp"
 #include "LCM/solvers/ACE_ThermoMechanicalIM.hpp"
 #include "Albany_Application.hpp"
 #include "Albany_Macros.hpp"
@@ -133,8 +132,6 @@ SolverFactory::createAndGetAlbanyApp(
 
   bool const is_schwarz = solutionMethod == "Schwarz Alternating";
 
-  bool const is_ace_thermo_mech = solutionMethod == "ACE Sequential Thermo-Mechanical";
-
   if (is_schwarz == true) {
 #if !defined(ALBANY_DTK)
     ALBANY_ASSERT(appComm->getSize() == 1, "Parallel Schwarz requires DTK");
@@ -143,10 +140,6 @@ SolverFactory::createAndGetAlbanyApp(
 
   if (solutionMethod == "Schwarz Alternating") {
     return Teuchos::rcp(new LCM::SchwarzAlternating(appParams, solverComm));
-  }
-
-  if (solutionMethod == "ACE Sequential Thermo-Mechanical") {
-    return Teuchos::rcp(new LCM::ACEThermoMechanical(appParams, solverComm));
   }
 
   if (solutionMethod == "ACE Sequential Thermo-Mechanical IM") {

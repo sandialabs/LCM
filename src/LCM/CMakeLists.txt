@@ -62,12 +62,11 @@ set(evaluator-headers
 set(model-eval-sources
     "${LCM_DIR}/solvers/Schwarz_Alternating.cpp"
     "${LCM_DIR}/solvers/Schwarz_ObserverImpl.cpp"
-    "${LCM_DIR}/solvers/ACE_ThermoMechanical.cpp"
     "${LCM_DIR}/solvers/ACE_ThermoMechanicalIM.cpp"
     "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.cpp")
 set(model-eval-headers
     "${LCM_DIR}/solvers/Schwarz_Alternating.hpp"
-    "${LCM_DIR}/solvers/ACE_ThermoMechanical.hpp"
+    "${LCM_DIR}/solvers/ACE_AdaptiveState.hpp"
     "${LCM_DIR}/solvers/ACE_ThermoMechanicalIM.hpp"
     "${LCM_DIR}/solvers/Schwarz_ObserverImpl.hpp"
     "${LCM_DIR}/solvers/Schwarz_StatelessObserverImpl.hpp")

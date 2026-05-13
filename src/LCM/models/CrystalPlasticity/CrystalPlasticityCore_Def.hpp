@@ -2,7 +2,7 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#include <boost/math/special_functions/fpclassify.hpp>
+#include <cmath>
 
 #include "Albany_Utils.hpp"
 
@@ -39,7 +39,7 @@ CP::expectFiniteTensor(minitensor::Tensor<T, N> const& A, std::string const& msg
   minitensor::Index const num_components = dim * dim;
 
   for (minitensor::Index i = 0; i < num_components; ++i) {
-    ALBANY_EXPECT(boost::math::isfinite(Sacado::ScalarValue<T>::eval(A[i])) == true);
+    ALBANY_EXPECT(std::isfinite(Sacado::ScalarValue<T>::eval(A[i])) == true);
   }
 }
 

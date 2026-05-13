@@ -20,7 +20,6 @@ cd "$LCM_DIR"
 
 TRILINOS_URL="https://github.com/trilinos/Trilinos.git"
 LCM_URL="https://github.com/sandialabs/LCM.git"
-DTK_URL="https://github.com/ikalash/DataTransferKit.git"
 
 if [ ! -d "$LCM_DIR/Trilinos" ]; then
     echo "--- Cloning Trilinos (develop) ---"
@@ -37,23 +36,6 @@ else
     echo "--- LCM already exists, pulling latest ---"
     cd "$LCM_DIR/LCM" && git pull && cd "$LCM_DIR"
 fi
-
-if [ ! -d "$LCM_DIR/DataTransferKit" ]; then
-    echo "--- Cloning DTK (dtk-2.0-tpetra-static-graph) ---"
-    git clone -b dtk-2.0-tpetra-static-graph "$DTK_URL" DataTransferKit
-else
-    echo "--- DTK already exists, pulling latest ---"
-    cd "$LCM_DIR/DataTransferKit" && git pull && cd "$LCM_DIR"
-fi
-
-#---------------------------------------------------------------------------
-# Copy DTK into Trilinos
-#---------------------------------------------------------------------------
-echo "--- Copying DTK into Trilinos/DataTransferKit ---"
-if [ -d "$LCM_DIR/Trilinos/DataTransferKit" ]; then
-    rm -rf "$LCM_DIR/Trilinos/DataTransferKit"
-fi
-cp -a "$LCM_DIR/DataTransferKit" "$LCM_DIR/Trilinos/DataTransferKit"
 
 #---------------------------------------------------------------------------
 # Build and test with each compiler

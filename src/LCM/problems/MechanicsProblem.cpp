@@ -114,12 +114,10 @@ MechanicsProblem::MechanicsProblem(
   rigidBodyModes->setParameters(num_PDEs, num_eq_mech, num_eq_aux, null_space_dim);
 
   have_adaptation_ = params->isSublist("Adaptation");
-  bool have_erosion{false};
   if (have_adaptation_) {
     Teuchos::ParameterList const& adapt_params         = params->sublist("Adaptation");
     std::string const&            adaptation_method    = adapt_params.get<std::string>("Method");
     have_sizefield_adaptation_                         = (adaptation_method == "RPI Albany Size");
-    have_erosion                                       = (adaptation_method == "Erosion");
   }
 
   // User-defined NOX status test that can be passed to the ModelEvaluators.
@@ -138,11 +136,6 @@ MechanicsProblem::MechanicsProblem(
   }
   if (require_lattice_orientation_on_mesh) {
     requirements.push_back("Lattice_Orientation");
-  }
-  if (have_erosion && num_dims_ == 3) {
-    requirements.push_back("cell_boundary_indicator");
-    // TODO: Layout for edge does not exist yet
-    requirements.push_back("node_boundary_indicator");
   }
 }
 

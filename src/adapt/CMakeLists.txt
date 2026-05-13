@@ -34,13 +34,6 @@ set(HEADERS
 set(SOURCES ${SOURCES} AAdapt_CopyRemesh.cpp)
 set(HEADERS ${HEADERS} AAdapt_CopyRemesh.hpp)
 
-# Erosion adapter depends on LCM and STK
-if(ALBANY_BGL)
-  set(SOURCES ${SOURCES} AAdapt_Erosion.cpp)
-
-  set(HEADERS ${HEADERS} AAdapt_Erosion.hpp)
-endif()
-
 if(ALBANY_STK_PERCEPT)
   set(SOURCES ${SOURCES} AAdapt_STKAdapt.cpp AAdapt_STKConstantSizeField.cpp)
 

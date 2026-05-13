@@ -30,11 +30,6 @@ class DistributedParameterLibrary;
 class Application;
 }  // namespace Albany
 
-namespace LCM {
-// Needed for ACE erosion
-class Topology;
-}  // namespace LCM
-
 namespace PHAL {
 
 struct Workset
@@ -126,9 +121,6 @@ struct Workset
   std::map<GO, double*>                                node_boundary_indicator;
   std::set<int>                                        fixed_dofs_;
   bool                                                 is_schwarz_bc_{false};
-
-  // Needed for ACE erosion
-  Teuchos::RCP<LCM::Topology> topology{Teuchos::null};
 
   int spatial_dimension_{0};
 

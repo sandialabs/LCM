@@ -55,19 +55,6 @@ Albany::ACEThermalProblem::ACEThermalProblem(
   }
   // Check whether we are doing mesh adaptation
   have_adaptation_ = params->isSublist("Adaptation");
-  bool have_erosion{false};
-
-  if (have_adaptation_ == true) {
-    Teuchos::ParameterList const& adapt_params           = params->sublist("Adaptation");
-    std::string const&            adaptation_method_name = adapt_params.get<std::string>("Method");
-    have_erosion                                         = adaptation_method_name == "Erosion";
-  }
-  // Only add cell/node boundary indicator in 3D, as the erosion machinery
-  // does not work in 2D.
-  if ((have_erosion == true) && (num_dim_ == 3)) {
-    requirements.push_back("cell_boundary_indicator");
-    requirements.push_back("node_boundary_indicator");
-  }
 }
 
 Albany::ACEThermalProblem::~ACEThermalProblem() {}

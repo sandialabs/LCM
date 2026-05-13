@@ -497,18 +497,6 @@ set(utils-headers
     "${LCM_DIR}/utils/MiniNonlinearSolver_Def.hpp"
     "${LCM_DIR}/utils/MiniSolvers.hpp")
 
-# LCM utils / topology
-set(topology-sources
-    "${LCM_DIR}/utils/topology/Subgraph.cpp"
-    "${LCM_DIR}/utils/topology/Topology.cpp"
-    "${LCM_DIR}/utils/topology/Topology_FailureCriterion.cpp"
-    "${LCM_DIR}/utils/topology/Topology_Utils.cpp")
-set(topology-headers
-    "${LCM_DIR}/utils/topology/Subgraph.hpp"
-    "${LCM_DIR}/utils/topology/Topology_FailureCriterion.hpp"
-    "${LCM_DIR}/utils/topology/Topology.hpp"
-    "${LCM_DIR}/utils/topology/Topology_Types.hpp"
-    "${LCM_DIR}/utils/topology/Topology_Utils.hpp")
 
 # DTK (DataTransferKit) - absorbed into LCM
 set(dtk-sources
@@ -564,7 +552,6 @@ set(SOURCES
     ${bc-sources}
     ${models-sources}
     ${utils-sources}
-    ${topology-sources}
     ${dtk-sources}
     ${residual-sources}
     ${lin-sources}
@@ -586,7 +573,6 @@ set(HEADERS
     ${bc-headers}
     ${models-headers}
     ${utils-headers}
-    ${topology-headers}
     ${residual-headers}
     ${lin-headers}
     ${proj-headers}
@@ -639,7 +625,6 @@ set(INCLUDE_DIRS
     ${LCM_DIR}/evaluators/HMC
     ${LCM_DIR}/models
     ${LCM_DIR}/utils
-    ${LCM_DIR}/utils/topology
     ${LCM_DIR}/utils/dtk_interp_and_error
     ${Trilinos_TPL_INCLUDE_DIRS})
 

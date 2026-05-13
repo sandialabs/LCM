@@ -26,8 +26,6 @@
 #include "Piro_ObserverToLOCASaveDataStrategyAdapter.hpp"
 #include "Piro_TempusSolver.hpp"
 #include "Piro_TrapezoidRuleSolver.hpp"
-#include "Topology.hpp"
-#include "Topology_FailureCriterion.hpp"
 
 namespace {
 

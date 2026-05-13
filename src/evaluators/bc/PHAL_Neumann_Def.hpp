@@ -14,7 +14,6 @@
 #include "PHAL_Neumann.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Topology.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
 // #define ACE_WAVE_PRESS_DEBUG_OUTPUT

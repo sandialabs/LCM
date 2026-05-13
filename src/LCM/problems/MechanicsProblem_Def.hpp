@@ -1094,14 +1094,6 @@ MechanicsProblem::constructEvaluators(
       // outputs
       p->set<std::string>("Surface Vector Residual Name", "Displacement Residual");
 
-      if (have_topmod_adaptation_) {
-        // Input
-        p->set<std::string>("Jacobian Name", J);
-        p->set<bool>("Use Adaptive Insertion", true);
-        // Output
-        p->set<std::string>("Cauchy Stress Name", cauchy);
-      }
-
       ev = Teuchos::rcp(new LCM::SurfaceVectorResidual<EvalT, PHAL::AlbanyTraits>(*p, dl_));
       fm0.template registerEvaluator<EvalT>(ev);
     }  // end of coehesive/surface element block

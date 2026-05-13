@@ -200,9 +200,6 @@ class MechanicsProblem : public AbstractProblem
   /// Have a Peridynamics block
   bool have_peridynamics_{false};
 
-  /// Topology adaptation (adaptive insertion)
-  bool have_topmod_adaptation_{false};
-
   /// Is a coupled sequential ACE thermo-mechanical problem
   bool is_ace_sequential_thermomechanical_{false};
 

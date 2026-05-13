@@ -119,7 +119,6 @@ MechanicsProblem::MechanicsProblem(
     Teuchos::ParameterList const& adapt_params         = params->sublist("Adaptation");
     std::string const&            adaptation_method    = adapt_params.get<std::string>("Method");
     have_sizefield_adaptation_                         = (adaptation_method == "RPI Albany Size");
-    have_topmod_adaptation_                            = (adaptation_method == "Topmod");
     have_erosion                                       = (adaptation_method == "Erosion");
   }
 

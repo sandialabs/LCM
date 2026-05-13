@@ -31,9 +31,7 @@ SurfaceVectorResidual<EvalT, Traits>::SurfaceVectorResidual(Teuchos::ParameterLi
 
       use_cohesive_traction_(p.get<bool>("Use Cohesive Traction", false)),
 
-      compute_membrane_forces_(p.get<bool>("Compute Membrane Forces", false)),
-
-      have_topmod_adaptation_(p.get<bool>("Use Adaptive Insertion", false))
+      compute_membrane_forces_(p.get<bool>("Compute Membrane Forces", false))
 {
   this->addDependentField(current_basis_);
   this->addDependentField(ref_dual_basis_);
@@ -51,16 +49,6 @@ SurfaceVectorResidual<EvalT, Traits>::SurfaceVectorResidual(Teuchos::ParameterLi
     this->addDependentField(traction_);
   } else {
     this->addDependentField(stress_);
-  }
-
-  if (have_topmod_adaptation_ == true) {
-    detF_ = decltype(detF_)(p.get<std::string>("Jacobian Name"), dl->qp_scalar);
-
-    this->addDependentField(detF_);
-
-    cauchy_stress_ = decltype(cauchy_stress_)(p.get<std::string>("Cauchy Stress Name"), dl->qp_tensor);
-
-    this->addEvaluatedField(cauchy_stress_);
   }
 
   std::vector<PHX::DataLayout::size_type> dims;
@@ -91,8 +79,6 @@ SurfaceVectorResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::Set
   } else {
     this->utils.setFieldData(stress_, fm);
   }
-
-  if (have_topmod_adaptation_) this->utils.setFieldData(cauchy_stress_, fm);
 
   // Allocate Temporary Views
   ref_values_  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", num_surf_nodes_, num_qps_);
@@ -204,22 +190,5 @@ SurfaceVectorResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
       }  // end of pt
     }  // end of numPlaneNodes
   }  // end of cell
-
-  // This is here just to satisfy projection operators from QPs to nodes
-  if (have_topmod_adaptation_ == true) {
-    for (std::size_t cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t pt = 0; pt < num_qps_; ++pt) {
-        for (int i = 0; i < num_dims_; ++i) {
-          for (int j = 0; j < num_dims_; ++j) {
-            if (use_cohesive_traction_) {
-              cauchy_stress_(cell, pt, i, j) = traction_(cell, pt, i) * ref_normal_(cell, pt, j);
-            } else {
-              cauchy_stress_(cell, pt, i, j) = stress_(cell, pt, i, j);
-            }
-          }
-        }
-      }
-    }
-  }
 }
 }  // namespace LCM

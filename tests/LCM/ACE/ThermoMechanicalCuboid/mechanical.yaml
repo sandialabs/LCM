@@ -16,12 +16,6 @@ LCM:
       SDBC on NS y+ for DOF Y: 0.0
       SDBC on NS z- for DOF Z: 0.0
 
-    Adaptation:
-      Method: Erosion
-      Rebalance: true
-      Equilibrate: false
-      Rename Exodus Output: false
-
     Response Functions:
       Number: 1
       Response 0: Project IP to Nodal Field

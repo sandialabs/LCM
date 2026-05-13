@@ -42,12 +42,6 @@ ALBANY:
       Function: Constant
       Function Data: [270.0]
 
-    Adaptation:
-      Method: Erosion
-      Rebalance: true
-      Equilibrate: false
-      Rename Exodus Output: false
-    
     Response Functions:
       Number: 2
       Response 0: Project IP to Nodal Field

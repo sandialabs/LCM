@@ -14,7 +14,6 @@
 #include <fstream>
 #include <set>
 
-#include "AAdapt_Erosion.hpp"
 #include "ACEcommon.hpp"
 #include "Albany_PiroObserver.hpp"
 #include "Teuchos_TimeMonitor.hpp"

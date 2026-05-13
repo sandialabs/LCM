@@ -392,10 +392,8 @@ AAdapt::ConstantFunctionGaussianPerturbed::ConstantFunctionGaussianPerturbed(
       neq(neq_),
       data(data_),
       pert_mag(pert_mag_),
-      //      rng(boost::random::random_device()()), // seed the rng
       rng(seedgen(worksetID)),  // seed the rng
-      nd(neq_),
-      var_nor(neq_)
+      nd(neq_)
 {
   ALBANY_PANIC(
       (data.size() != neq || pert_mag.size() != neq),
@@ -406,8 +404,7 @@ AAdapt::ConstantFunctionGaussianPerturbed::ConstantFunctionGaussianPerturbed(
   if (data.size() > 0 && pert_mag.size() > 0)
     for (int i = 0; i < neq; i++)
       if (pert_mag[i] > std::numeric_limits<double>::epsilon()) {
-        nd[i]      = Teuchos::rcp(new boost::normal_distribution<double>(data[i], pert_mag[i]));
-        var_nor[i] = Teuchos::rcp(new boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>(rng, *nd[i]));
+        nd[i] = Teuchos::rcp(new std::normal_distribution<double>(data[i], pert_mag[i]));
       }
 }
 
@@ -415,8 +412,8 @@ void
 AAdapt::ConstantFunctionGaussianPerturbed::compute(double* x, double const* X)
 {
   for (int i = 0; i < neq; i++)
-    if (var_nor[i] != Teuchos::null)
-      x[i] = (*var_nor[i])();
+    if (nd[i] != Teuchos::null)
+      x[i] = (*nd[i])(rng);
 
     else
       x[i] = data[i];

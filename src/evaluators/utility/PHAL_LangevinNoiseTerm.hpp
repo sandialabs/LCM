@@ -5,17 +5,13 @@
 #ifndef PHAL_LANGEVINNOISETERM_HPP
 #define PHAL_LANGEVINNOISETERM_HPP
 
+#include <random>
+
 #include "Albany_Types.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"
 #include "Phalanx_MDField.hpp"
 #include "Phalanx_config.hpp"
-
-// Random and Gaussian number distribution
-#include <boost/random.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
 
 /** \brief Finite Element Interpolation Evaluator
 
@@ -55,12 +51,8 @@ class LangevinNoiseTerm : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   ScalarT             sd;
   Teuchos::Array<int> duration;
 
-  boost::mt19937                                                                              rng;
-  Teuchos::RCP<boost::normal_distribution<double>>                                            nd;
-  Teuchos::RCP<boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>> var_nor;
-  //  Teuchos::RCP<boost::normal_distribution<ScalarT> > nd;
-  //  Teuchos::RCP<boost::variate_generator<boost::mt19937&,
-  //  boost::normal_distribution<ScalarT> > > var_nor;
+  std::mt19937                                     rng;
+  Teuchos::RCP<std::normal_distribution<double>>   nd;
 
   // generate seed convenience function
   long

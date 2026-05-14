@@ -5,117 +5,17 @@
 #
 
 add_subdirectory(bcs)
-#add_subdirectory(bcs-orig)
 add_subdirectory(grid)
 add_subdirectory(external_files)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_new_wave_press_nbc.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/coupled_new_wave_press_nbc.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_hs_wave_press_nbc.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/coupled_hs_wave_press_nbc.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation_tempus_noerosion.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation_tempus_noerosion.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation_piro_noerosion.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation_piro_noerosion.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation_tempus_noerosion_all_implicit.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation_tempus_noerosion_all_implicit.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_new_wave_press_nbc.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/thermal_new_wave_press_nbc.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_hs_wave_press_nbc.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/thermal_hs_wave_press_nbc.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_new_wave_press_nbc_implicit.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/thermal_new_wave_press_nbc_implicit.yaml COPYONLY)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_piro_noerosion.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_piro_noerosion.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_implicit.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_implicit.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_new_wave_press_nbc.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_new_wave_press_nbc.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_hs_wave_press_nbc.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_hs_wave_press_nbc.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_new_wave_press_nbc_implicit.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_new_wave_press_nbc_implicit.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_piro_noerosion.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_piro_noerosion.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion_implicit.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion_implicit.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal_new_wave_press_nbc.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/materials_thermal_new_wave_press_nbc.yaml COPYONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal_denudation.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/materials_thermal_denudation.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_thermal_denudation.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/materials_thermal_denudation.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_mechanical_new_wave_press_nbc.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/materials_mechanical_new_wave_press_nbc.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_mechanical_denudation.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/materials_mechanical_denudation.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_mechanical_denudation_piro_noerosion.yaml
-        	${CMAKE_CURRENT_BINARY_DIR}/materials_mechanical_denudation_piro_noerosion.yaml COPYONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/materials_thermal_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest_serial.cmake COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_new_wave_press_nbc_gold.e-s.6
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_new_wave_press_nbc_gold.e-s.6 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_new_wave_press_nbc_gold.e-s.6
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_new_wave_press_nbc_gold.e-s.6 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_hs_wave_press_nbc_gold.e-s.6
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_hs_wave_press_nbc_gold.e-s.6 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_hs_wave_press_nbc_gold.e-s.6
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_hs_wave_press_nbc_gold.e-s.6 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_piro_noerosion_gold.e-s.71
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_piro_noerosion_gold.e-s.71 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143.4.0
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143.4.0 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143.4.1
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143.4.1 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143.4.2
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143.4.2 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_gold.e-s.143.4.3
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_gold.e-s.143.4.3 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.0
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.0 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.1
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.1 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.2
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.2 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.3
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_denudation_tempus_noerosion_gold.e-s.71.4.3 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_piro_noerosion_gold.e-s.71
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_piro_noerosion_gold.e-s.71 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143.4.0
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143.4.0 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143.4.1
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143.4.1 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143.4.2
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143.4.2 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_gold.e-s.143.4.3
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_gold.e-s.143.4.3 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.0
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.0 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.1
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.1 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.2
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.2 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.3
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_denudation_tempus_noerosion_gold.e-s.71.4.3 COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical.exodiff
-               ${CMAKE_CURRENT_BINARY_DIR}/mechanical.exodiff COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.exodiff
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal.exodiff COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_implicit.exodiff
-               ${CMAKE_CURRENT_BINARY_DIR}/thermal_implicit.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation_im.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation_im.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation_im.yaml
@@ -133,25 +33,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_denudation_im_gold.e
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-# Add the tests
 
-# The following IO-coupled tests are pending conversion to the IM
-# coupling driver. They were registered previously against the now-
-# removed "ACE Sequential Thermo-Mechanical" IO solver:
-#   * NewWavePressNBC_Serial       (coupled_new_wave_press_nbc.yaml)
-#   * HydrostaticWavePressNBC_Serial (coupled_hs_wave_press_nbc.yaml)
-#   * Denudation_Piro_NoErosion_Serial / _NoErosion duplicate
-#                                  (coupled_denudation_piro_noerosion.yaml)
-#   * Denudation_Tempus_NoErosion_ExplicitThermal_Parallel
-#                                  (coupled_denudation_tempus_noerosion.yaml)
-#   * Denudation_Tempus_NoErosion_ImplicitThermal_Parallel
-#                                  (coupled_denudation_tempus_noerosion_all_implicit.yaml)
-# To re-enable: fix the outstanding IM-solver bugs, edit each YAML to set
-# "Solution Method: ACE Sequential Thermo-Mechanical IM", rerun and capture
-# fresh gold files, then restore the add_test() / set_tests_properties()
-# blocks. Source YAMLs and gold files are preserved in this directory.
-
-#Serial test - IM denudation with element death (short run: 20 steps)
+# Serial test - denudation with element death (short run: 20 steps)
 set(OUTFILE1 "thermal_denudation.e")
 set(REF_FILE1 "thermal_denudation_im_gold.e")
 set(OUTFILE2 "mechanical_denudation.e")

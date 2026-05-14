@@ -11,6 +11,6 @@ LCM:
     Amplification Factor: 1.1
     Exodus Write Interval: 1
   Problem:
-    Solution Method: ACE Sequential Thermo-Mechanical IM
+    Solution Method: ACE Sequential Thermo-Mechanical
     Phalanx Graph Visualization Detail: 0
 ...

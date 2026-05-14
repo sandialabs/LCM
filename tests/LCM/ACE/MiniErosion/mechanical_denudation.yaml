@@ -3,7 +3,7 @@ LCM:
     Name: Mechanics 3D
     Solution Method: Transient
     Phalanx Graph Visualization Detail: 0
-    MaterialDB Filename: 'materials_mechanical_denudation_im.yaml'
+    MaterialDB Filename: 'materials_mechanical_denudation.yaml'
     Second Order: Trapezoid Rule
     
     Initial Condition:

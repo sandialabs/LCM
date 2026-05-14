@@ -1,10 +1,10 @@
-# ThermoMechanicalCuboid: in-memory ACE coupling smoke test on a
-# permafrost cuboid with Neumann BCs (geothermal heat flux), Dirichlet
-# BCs, and TrapezoidRule mechanical solver. No erosion.
+# ThermoMechanicalCuboid: ACE coupling smoke test on a permafrost
+# cuboid with Neumann BCs (geothermal heat flux), Dirichlet BCs, and
+# TrapezoidRule mechanical solver. No erosion.
 
 # Copy input files
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_im.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/coupled_im.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/coupled.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/thermal.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical.yaml
@@ -20,5 +20,5 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/depth.txt
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-add_test(ACE_${testName}_IM ${SerialAlbany.exe} coupled_im.yaml)
-set_tests_properties(ACE_${testName}_IM PROPERTIES LABELS "LCM;Tpetra;Forward")
+add_test(ACE_${testName} ${SerialAlbany.exe} coupled.yaml)
+set_tests_properties(ACE_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")

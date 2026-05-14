@@ -1,9 +1,9 @@
-# Short IM denudation test: runs 20 steps (9000s) instead of the
+# Short denudation test: runs 20 steps (9000s) instead of the
 # full 144 steps (64800s) to verify element death triggers while
 # keeping test run time practical.
 LCM:
   Alternating System:
-    Model Input Files: ['thermal_denudation.yaml', 'mechanical_denudation_im.yaml']
+    Model Input Files: ['thermal_denudation.yaml', 'mechanical_denudation.yaml']
     Initial Time: 0.0 #   [sec]
     Final Time: 9000.0 #  [sec] (full run: 64800.0)
     Initial Time Step: 450.0 # [sec]
@@ -15,6 +15,6 @@ LCM:
     Exodus Write Interval: 1
     Exodus ACE Output File Initial Index: 0
   Problem:
-    Solution Method: ACE Sequential Thermo-Mechanical IM
+    Solution Method: ACE Sequential Thermo-Mechanical
     Phalanx Graph Visualization Detail: 0
 ...

@@ -696,32 +696,23 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Transfer Thermal->Mechanical"));
             transferThermalToMechanical(thermal_sub, subdomain);
           }
-          // Set death status on the Application for scatter skip and orphan fix.
-          // Extract per-cell death indicators from the PREVIOUS step's
-          // cached failure_state values: index (cell, 0) in the flat array.
+          // Set death status on the Application for scatter skip and orphan
+          // fix. Read the per-cell `cell_death` state variable, which J2Erosion
+          // sets to 1.0 once every integration point in the cell has failed
+          // (in any mode) and 0.0 otherwise. cell_death is a cell-scalar so
+          // there is no qp dimension to skip past.
           {
             auto& app = *apps_[subdomain];
             auto& esa = internal_states_[subdomain].element_state_arrays;
             app.death_status_vecs_.resize(esa.size());
             for (size_t ws = 0; ws < esa.size(); ++ws) {
-              auto it = esa[ws].find("failure_state");
+              auto it = esa[ws].find("cell_death");
               if (it != esa[ws].end()) {
-                auto& flat = it->second;
-                // failure_state layout is (cell, qp).  Determine num_qps
-                // from the Albany state array dimensions.
-                auto& sa    = state_mgr.getStateArray(Albany::StateManager::ELEM, ws);
-                auto  sa_it = sa.find("failure_state");
-                int   num_qps   = 1;
-                int   num_cells = flat.size();
-                if (sa_it != sa.end()) {
-                  Albany::StateStruct::FieldDims dims;
-                  sa_it->second.dimensions(dims);
-                  num_cells = dims[0];
-                  if (dims.size() > 1) num_qps = dims[1];
-                }
-                auto ds = Teuchos::rcp(new std::vector<double>(num_cells, 0.0));
+                auto&     flat      = it->second;
+                int const num_cells = flat.size();
+                auto      ds        = Teuchos::rcp(new std::vector<double>(num_cells, 0.0));
                 for (int c = 0; c < num_cells; ++c) {
-                  (*ds)[c] = flat[c * num_qps];
+                  (*ds)[c] = flat[c];
                 }
                 app.death_status_vecs_[ws] = ds;
               }

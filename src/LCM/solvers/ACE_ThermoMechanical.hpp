@@ -106,13 +106,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
     OR
   };
 
-  // Public counters for failed elements
-  mutable int count_displacement{0};
-  mutable int count_angle{0};
-  mutable int count_yield{0};
-  mutable int count_strain{0};
-  mutable int count_tension{0};
-
  private:
   /// Create operator form of dg/dx for distributed responses
   Teuchos::RCP<Thyra::LinearOpBase<ST>>

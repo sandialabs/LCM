@@ -8,7 +8,7 @@
 // This requires future work to detect new boundary faces after element death
 // and apply the appropriate Neumann conditions to them.
 
-#include "ACE_ThermoMechanicalIM.hpp"
+#include "ACE_ThermoMechanical.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -103,7 +103,7 @@ is_within_interval(std::vector<ST> const& initial_times, std::vector<ST> const& 
 
 namespace LCM {
 
-ACEThermoMechanicalIM::ACEThermoMechanicalIM(Teuchos::RCP<Teuchos::ParameterList> const& app_params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
+ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> const& app_params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm)
     : fos_(Teuchos::VerboseObjectBase::getDefaultOStream()), comm_(comm)
 {
   alt_system_params_ = Teuchos::sublist(app_params, "Alternating System");
@@ -158,7 +158,7 @@ ACEThermoMechanicalIM::ACEThermoMechanicalIM(Teuchos::RCP<Teuchos::ParameterList
   num_subdomains_ = model_filenames_.size();
 
   // throw error if number of model filenames provided is > 2
-  ALBANY_ASSERT(num_subdomains_ <= 2, "ACEThermoMechanicalIM solver requires no more than 2 models!");
+  ALBANY_ASSERT(num_subdomains_ <= 2, "ACEThermoMechanical solver requires no more than 2 models!");
 
   // Arrays to cache useful info for each subdomain for later use
   apps_.resize(num_subdomains_);
@@ -305,95 +305,95 @@ ACEThermoMechanicalIM::ACEThermoMechanicalIM(Teuchos::RCP<Teuchos::ParameterList
   return;
 }
 
-ACEThermoMechanicalIM::~ACEThermoMechanicalIM() { return; }
+ACEThermoMechanical::~ACEThermoMechanical() { return; }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-ACEThermoMechanicalIM::get_x_space() const
+ACEThermoMechanical::get_x_space() const
 {
   return Teuchos::null;
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-ACEThermoMechanicalIM::get_f_space() const
+ACEThermoMechanical::get_f_space() const
 {
   return Teuchos::null;
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-ACEThermoMechanicalIM::get_p_space(int) const
+ACEThermoMechanical::get_p_space(int) const
 {
   return Teuchos::null;
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>
-ACEThermoMechanicalIM::get_g_space(int) const
+ACEThermoMechanical::get_g_space(int) const
 {
   return Teuchos::null;
 }
 
 Teuchos::RCP<const Teuchos::Array<std::string>>
-ACEThermoMechanicalIM::get_p_names(int) const
+ACEThermoMechanical::get_p_names(int) const
 {
   return Teuchos::null;
 }
 
 Teuchos::ArrayView<std::string const>
-ACEThermoMechanicalIM::get_g_names(int) const
+ACEThermoMechanical::get_g_names(int) const
 {
   ALBANY_ABORT("not implemented");
   return Teuchos::ArrayView<std::string const>(Teuchos::null);
 }
 
 Thyra_ModelEvaluator::InArgs<ST>
-ACEThermoMechanicalIM::getNominalValues() const
+ACEThermoMechanical::getNominalValues() const
 {
   return this->createInArgsImpl();
 }
 
 Thyra_ModelEvaluator::InArgs<ST>
-ACEThermoMechanicalIM::getLowerBounds() const
+ACEThermoMechanical::getLowerBounds() const
 {
   return Thyra_ModelEvaluator::InArgs<ST>();  // Default value
 }
 
 Thyra_ModelEvaluator::InArgs<ST>
-ACEThermoMechanicalIM::getUpperBounds() const
+ACEThermoMechanical::getUpperBounds() const
 {
   return Thyra_ModelEvaluator::InArgs<ST>();  // Default value
 }
 
 Teuchos::RCP<Thyra::LinearOpBase<ST>>
-ACEThermoMechanicalIM::create_W_op() const
+ACEThermoMechanical::create_W_op() const
 {
   return Teuchos::null;
 }
 
 Teuchos::RCP<Thyra::PreconditionerBase<ST>>
-ACEThermoMechanicalIM::create_W_prec() const
+ACEThermoMechanical::create_W_prec() const
 {
   return Teuchos::null;
 }
 
 Teuchos::RCP<const Thyra::LinearOpWithSolveFactoryBase<ST>>
-ACEThermoMechanicalIM::get_W_factory() const
+ACEThermoMechanical::get_W_factory() const
 {
   return Teuchos::null;
 }
 
 Thyra_ModelEvaluator::InArgs<ST>
-ACEThermoMechanicalIM::createInArgs() const
+ACEThermoMechanical::createInArgs() const
 {
   return this->createInArgsImpl();
 }
 
 Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>
-ACEThermoMechanicalIM::getApps() const
+ACEThermoMechanical::getApps() const
 {
   return apps_;
 }
 
 void
-ACEThermoMechanicalIM::set_failed(char const* msg)
+ACEThermoMechanical::set_failed(char const* msg)
 {
   failed_          = true;
   failure_message_ = msg;
@@ -401,35 +401,35 @@ ACEThermoMechanicalIM::set_failed(char const* msg)
 }
 
 void
-ACEThermoMechanicalIM::clear_failed()
+ACEThermoMechanical::clear_failed()
 {
   failed_ = false;
   return;
 }
 
 bool
-ACEThermoMechanicalIM::get_failed() const
+ACEThermoMechanical::get_failed() const
 {
   return failed_;
 }
 
 // Create operator form of dg/dx for distributed responses
 Teuchos::RCP<Thyra::LinearOpBase<ST>>
-ACEThermoMechanicalIM::create_DgDx_op_impl(int /* j */) const
+ACEThermoMechanical::create_DgDx_op_impl(int /* j */) const
 {
   return Teuchos::null;
 }
 
 // Create operator form of dg/dx_dot for distributed responses
 Teuchos::RCP<Thyra::LinearOpBase<ST>>
-ACEThermoMechanicalIM::create_DgDx_dot_op_impl(int /* j */) const
+ACEThermoMechanical::create_DgDx_dot_op_impl(int /* j */) const
 {
   return Teuchos::null;
 }
 
 // Create InArgs
 Thyra_InArgs
-ACEThermoMechanicalIM::createInArgsImpl() const
+ACEThermoMechanical::createInArgsImpl() const
 {
   Thyra::ModelEvaluatorBase::InArgsSetup<ST> ias;
 
@@ -448,7 +448,7 @@ ACEThermoMechanicalIM::createInArgsImpl() const
 
 // Create OutArgs
 Thyra_OutArgs
-ACEThermoMechanicalIM::createOutArgsImpl() const
+ACEThermoMechanical::createOutArgsImpl() const
 {
   Thyra::ModelEvaluatorBase::OutArgsSetup<ST> oas;
 
@@ -465,7 +465,7 @@ ACEThermoMechanicalIM::createOutArgsImpl() const
 
 // Evaluate model on InArgs
 void
-ACEThermoMechanicalIM::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&) const
+ACEThermoMechanical::evalModelImpl(Thyra_ModelEvaluator::InArgs<ST> const&, Thyra_ModelEvaluator::OutArgs<ST> const&) const
 {
   ThermoMechanicalLoopDynamics();
 }
@@ -487,9 +487,9 @@ centered(std::string const& str, int width)
 }  // anonymous namespace
 
 void
-ACEThermoMechanicalIM::createPersistentApps()
+ACEThermoMechanical::createPersistentApps()
 {
-  Teuchos::TimeMonitor timer(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Create Persistent Apps"));
+  Teuchos::TimeMonitor timer(*Teuchos::TimeMonitor::getNewTimer("ACE: Create Persistent Apps"));
   for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     auto& app_params = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
@@ -545,7 +545,7 @@ ACEThermoMechanicalIM::createPersistentApps()
 }
 
 void
-ACEThermoMechanicalIM::transferThermalToMechanical(int thermal_sub, int mech_sub) const
+ACEThermoMechanical::transferThermalToMechanical(int thermal_sub, int mech_sub) const
 {
   auto& thermal_state_mgr = apps_[thermal_sub]->getStateMgr();
   auto& mech_state_mgr = apps_[mech_sub]->getStateMgr();
@@ -577,7 +577,7 @@ ACEThermoMechanicalIM::transferThermalToMechanical(int thermal_sub, int mech_sub
 }
 
 void
-ACEThermoMechanicalIM::transferMechanicalToThermal(int mech_sub, int thermal_sub) const
+ACEThermoMechanical::transferMechanicalToThermal(int mech_sub, int thermal_sub) const
 {
   // Mesh topology changes (element deactivation) are automatically
   // visible to the thermal app since both apps share the same
@@ -586,7 +586,7 @@ ACEThermoMechanicalIM::transferMechanicalToThermal(int mech_sub, int thermal_sub
 }
 
 bool
-ACEThermoMechanicalIM::continueSolve() const
+ACEThermoMechanical::continueSolve() const
 {
   ++num_iter_;
   // IKT 6/5/2020: right now, we want to do just 1 coupling iteration.
@@ -600,9 +600,9 @@ ACEThermoMechanicalIM::continueSolve() const
     return true;
 }
 
-// Sequential ThermoMechanical coupling loop, dynamic (in-memory version)
+// Sequential ThermoMechanical coupling loop, dynamic
 void
-ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
+ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 {
   std::string const delim(72, '=');
 
@@ -664,20 +664,20 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
           {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Restore Thermal States"));
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Restore Thermal States"));
             fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
           }
           {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Thermal Solve"));
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Solve"));
             AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
           if (failed_ == false) {
             {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Save Thermal States"));
+              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Save Thermal States"));
               fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
             }
             {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Thermal Output"));
+              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Output"));
               doDynamicInitialOutput(next_time, subdomain);
             }
           }
@@ -687,13 +687,13 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
           auto& app       = *apps_[subdomain];
           auto& state_mgr = app.getStateMgr();
           {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Restore Mechanical States"));
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Restore Mechanical States"));
             fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
           }
           // Transfer thermal results AFTER restoring mechanical states,
           // so the thermal-to-mechanical transfer is not overwritten.
           if (thermal_sub >= 0) {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Transfer Thermal->Mechanical"));
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Transfer Thermal->Mechanical"));
             transferThermalToMechanical(thermal_sub, subdomain);
           }
           // Set death status on the Application for scatter skip and orphan fix.
@@ -728,16 +728,16 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
             }
           }
           {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Mechanical Solve"));
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Solve"));
             AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
           if (failed_ == false) {
             {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Save Mechanical States"));
+              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Save Mechanical States"));
               fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
             }
             {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE IM: Mechanical Output"));
+              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Output"));
               doDynamicInitialOutput(next_time, subdomain);
             }
           }
@@ -818,7 +818,7 @@ ACEThermoMechanicalIM::ThermoMechanicalLoopDynamics() const
 }
 
 void
-ACEThermoMechanicalIM::AdvanceThermalDynamics(
+ACEThermoMechanical::AdvanceThermalDynamics(
     int const    subdomain,
     bool const   is_initial_state,
     double const current_time,
@@ -890,7 +890,7 @@ ACEThermoMechanicalIM::AdvanceThermalDynamics(
 }
 
 void
-ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
+ACEThermoMechanical::AdvanceMechanicalDynamics(
     int const    subdomain,
     bool const   is_initial_state,
     double const current_time,
@@ -1027,7 +1027,7 @@ ACEThermoMechanicalIM::AdvanceMechanicalDynamics(
 }
 
 void
-ACEThermoMechanicalIM::setExplicitUpdateInitialGuessForCoupling(ST const current_time, ST const time_step) const
+ACEThermoMechanical::setExplicitUpdateInitialGuessForCoupling(ST const current_time, ST const time_step) const
 {
   // do an explicit update to form the initial guess for the schwarz
   // iteration
@@ -1069,7 +1069,7 @@ ACEThermoMechanicalIM::setExplicitUpdateInitialGuessForCoupling(ST const current
 }
 
 void
-ACEThermoMechanicalIM::setICVecs(ST const time, int const subdomain) const
+ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
 {
   auto const prob_type       = prob_types_[subdomain];
   auto const is_initial_time = time <= initial_time_ + initial_time_step_;
@@ -1114,7 +1114,7 @@ ACEThermoMechanicalIM::setICVecs(ST const time, int const subdomain) const
 }
 
 void
-ACEThermoMechanicalIM::doQuasistaticOutput(ST const time) const
+ACEThermoMechanical::doQuasistaticOutput(ST const time) const
 {
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     if (do_outputs_[subdomain] == true) {
@@ -1135,7 +1135,7 @@ ACEThermoMechanicalIM::doQuasistaticOutput(ST const time) const
 }
 
 void
-ACEThermoMechanicalIM::doDynamicInitialOutput(ST const time, int const subdomain) const
+ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain) const
 {
   if (do_outputs_[subdomain] == false) return;
 
@@ -1152,7 +1152,7 @@ ACEThermoMechanicalIM::doDynamicInitialOutput(ST const time, int const subdomain
 
 // Sequential ThermoMechanical coupling loop, quasistatic
 void
-ACEThermoMechanicalIM::ThermoMechanicalLoopQuasistatics() const
+ACEThermoMechanical::ThermoMechanicalLoopQuasistatics() const
 {
   // IKT 6/5/2020: not implemented for now.
 }

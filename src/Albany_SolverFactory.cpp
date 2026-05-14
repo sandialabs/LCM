@@ -4,7 +4,7 @@
 
 #include "Albany_SolverFactory.hpp"
 
-#include "LCM/solvers/ACE_ThermoMechanicalIM.hpp"
+#include "LCM/solvers/ACE_ThermoMechanical.hpp"
 #include "Albany_Application.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ModelEvaluator.hpp"
@@ -142,8 +142,8 @@ SolverFactory::createAndGetAlbanyApp(
     return Teuchos::rcp(new LCM::SchwarzAlternating(appParams, solverComm));
   }
 
-  if (solutionMethod == "ACE Sequential Thermo-Mechanical IM") {
-    return Teuchos::rcp(new LCM::ACEThermoMechanicalIM(appParams, solverComm));
+  if (solutionMethod == "ACE Sequential Thermo-Mechanical") {
+    return Teuchos::rcp(new LCM::ACEThermoMechanical(appParams, solverComm));
   }
 
   model_ = createAlbanyAppAndModel(albanyApp, appComm, initial_guess, createAlbanyApp);

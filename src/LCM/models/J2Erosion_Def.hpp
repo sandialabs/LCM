@@ -202,7 +202,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // get State Variables
   Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
-  // Read death status from the workset.  The IM solver populates this
+  // Read death status from the workset.  The ACE solver populates this
   // at the start of each step from the prior converged state, and
   // J2Erosion's operator() writes into it live when new failures occur
   // during a Newton iteration.  The scatter evaluator reads it to skip

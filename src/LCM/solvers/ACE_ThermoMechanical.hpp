@@ -3,8 +3,9 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#if !defined(LCM_ACEThermoMechanicalIM_hpp)
-#define LCM_ACEThermoMechanicalIM_hpp
+#if !defined(LCM_ACEThermoMechanical_hpp)
+#define LCM_ACEThermoMechanical_hpp
+
 
 #include <functional>
 
@@ -24,16 +25,16 @@
 namespace LCM {
 
 ///
-/// ACEThermoMechanicalIM coupling class (in-memory coupled version)
+/// ACEThermoMechanical coupling class
 ///
-class ACEThermoMechanicalIM : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
+class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 {
  public:
   /// Constructor
-  ACEThermoMechanicalIM(Teuchos::RCP<Teuchos::ParameterList> const& app_params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
+  ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> const& app_params, Teuchos::RCP<Teuchos::Comm<int> const> const& comm);
 
   /// Destructor
-  ~ACEThermoMechanicalIM();
+  ~ACEThermoMechanical();
 
   /// Return solution vector map
   Teuchos::RCP<Thyra::VectorSpaceBase<ST> const>
@@ -252,4 +253,4 @@ class ACEThermoMechanicalIM : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
 }  // namespace LCM
 
-#endif  // LCM_ACEThermoMechanicalIM_hpp
+#endif  // LCM_ACEThermoMechanical_hpp

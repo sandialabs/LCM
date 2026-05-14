@@ -99,6 +99,22 @@ who owns it is the key to modifying the algorithm.
   see *how* a region is failing.
 - Output to Exodus when the material YAML sets `Output Failure State: true`.
 
+> **Limitation — elements with 10 or more integration points.**
+> Each decimal "digit" of `failure_state` is really a column sum over all
+> the integration points of the cell: the tension digit is the count of
+> points whose tension bit is set, the strain digit is the count whose
+> strain bit is set, and so on. The decode in the example above is only
+> valid while each per-mode count stays ≤ 9. If a cell has 10 or more
+> integration points **and** 10 or more of them fail in the same mode,
+> that column carries into the next mode's digit and the decode is
+> silently corrupted (e.g. 10 tension trips read as "1 strain, 0
+> tension"). Standard 8-point hexes are safe; higher-order or composite
+> elements with ≥10 quadrature points are not. This affects **only** the
+> `failure_state` diagnostic — the death predicate reads the bitmask
+> directly (§3.1, §4), so it is unaffected. If you need `failure_state` to
+> be correct for such elements, replace the packed encoding with five
+> separate per-cell count fields, one per mode.
+
 ### 3.3 `cell_death` — the per-cell binary death flag
 
 - An Albany cell-scalar state variable, one value per element: `1.0` if

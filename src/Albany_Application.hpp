@@ -745,8 +745,8 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
   }
 
   // Erosion failure-mode bitmask: persistent per-workset storage. Allocated
-  // here as an empty shell on first access so every solver path (IO, IM, …)
-  // sees a non-null RCP; the kernel sizes the [cell][pt] grid on first use.
+  // here as an empty shell on first access so every solver path sees a
+  // non-null RCP; the kernel sizes the [cell][pt] grid on first use.
   if (ws >= static_cast<int>(failure_mode_vecs_.size())) {
     failure_mode_vecs_.resize(ws + 1);
   }

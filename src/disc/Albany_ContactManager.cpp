@@ -130,8 +130,6 @@ Albany::ContactManager::ContactManager(
 
   //   if (printlevel) cout << *manager;
   std::cout << *moertelManager;
-
-  // GAH here
 }
 
 // Process all the contact surfaces and insert the data into a Moertel Interface

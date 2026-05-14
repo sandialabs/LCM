@@ -464,8 +464,6 @@ addToLocalRowValues(
   auto tmat = getTpetraMatrix(lop, false);
   if (!tmat.is_null()) {
     auto returned_val = tmat->sumIntoLocalValues(lrow, indices, values);
-    // std::cout << "IKT returned_val, indices size = " << returned_val << ", "
-    // << indices.size() << std::endl;
     ALBANY_ASSERT(
         returned_val != -1,
         "Error: addToLocalRowValues returned -1, meaning linear op is not "
@@ -535,8 +533,6 @@ addToGlobalRowValues(
     const Tpetra_GO                     tgrow = grow;
     Teuchos::ArrayView<const Tpetra_GO> tindices(reinterpret_cast<const Tpetra_GO*>(indices.getRawPtr()), indices.size());
     auto                                returned_val = tmat->sumIntoGlobalValues(tgrow, tindices, values);
-    // std::cout << "IKT returned_val, indices size = " << returned_val << ", "
-    // << indices.size() << std::endl;
     ALBANY_ASSERT(
         returned_val != -1,
         "Error: addToGlobalRowValues returned -1, meaning linear op is not "

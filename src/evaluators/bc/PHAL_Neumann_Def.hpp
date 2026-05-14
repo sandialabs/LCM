@@ -892,7 +892,6 @@ NeumannBase<EvalT, Traits>::calc_ace_press_hydrostatic(
     const double                                         current_time) const
 {
   Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
-  //*out << "IKT in calc_ace_press_hydrostatic!\n";
   int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
   int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
 

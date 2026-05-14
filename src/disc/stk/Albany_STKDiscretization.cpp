@@ -590,7 +590,6 @@ STKDiscretization::transformMesh()
       }
     }
   } else if (transformType == "Tanh Boundary Layer") {
-    //*out << "IKT Tanh Boundary Layer!\n";
 
     /* The way this transform type works is it takes a uniform STK mesh of [0,L]
    generated within Albany and applies the following transformation to it:

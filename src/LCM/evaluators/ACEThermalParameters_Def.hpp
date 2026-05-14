@@ -238,7 +238,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
         snow_depth = interpolateVectors(time_eb, snow_depth_eb, current_time);
         snow_given = true;
       }
-      // std::cout << "IKT snow_depth = " << snow_depth << "\n";
 
       // Calculate the salinity of the grid cell
       if ((is_erodible == true) && (height <= sea_level)) {

@@ -127,7 +127,7 @@ struct Workset
   Albany::StateArray*              stateArrayPtr{nullptr};
 
   // Element death status: maps cell index → death indicator (> 0 means dead).
-  // Set by the IM solver from the previous step's failure_state values.
+  // Set by the ACE solver from the previous step's cell_death values.
   // Read by the scatter evaluator to skip dead elements.
   Teuchos::RCP<std::vector<double>> death_status_vec{Teuchos::null};
 

@@ -233,7 +233,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       Teuchos::RCP<Thyra_Vector>   f,
       Teuchos::RCP<Thyra_LinearOp> jac);
 
-  // Element death status per workset, set by the IM solver.
+  // Element death status per workset, set by the ACE solver.
   // death_status_vecs_[ws] is a vector of per-cell death indicators.
   std::vector<Teuchos::RCP<std::vector<double>>> death_status_vecs_;
 

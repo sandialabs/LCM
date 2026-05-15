@@ -155,7 +155,7 @@ Commands (can be chained):
   help, --help, -h         Show this help
 
 Packages:
-  trilinos                 Trilinos (including DTK)
+  trilinos                 Trilinos
   lcm                      LCM/Albany
 
 Options:

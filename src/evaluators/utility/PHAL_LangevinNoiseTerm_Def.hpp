@@ -28,8 +28,7 @@ LangevinNoiseTerm<EvalT, Traits>::LangevinNoiseTerm(Teuchos::ParameterList const
   numQPs  = dims[1];
   numDims = dims[2];
 
-  nd      = Teuchos::rcp(new boost::normal_distribution<double>(0.0, sd_val));
-  var_nor = Teuchos::rcp(new boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>(rng, *nd));
+  nd = Teuchos::rcp(new std::normal_distribution<double>(0.0, sd_val));
   this->addDependentField(rho.fieldTag());
   this->addEvaluatedField(noiseTerm);
   this->setName("LangevinNoiseTerm");
@@ -55,7 +54,7 @@ LangevinNoiseTerm<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
     // by this.
 
     for (std::size_t cell = 0; cell < workset.numCells; ++cell)
-      for (std::size_t qp = 0; qp < numQPs; ++qp) noiseTerm(cell, qp) = rho(cell, qp) + (*var_nor)();
+      for (std::size_t qp = 0; qp < numQPs; ++qp) noiseTerm(cell, qp) = rho(cell, qp) + (*nd)(rng);
     //        noiseTerm(cell, qp) = rho(cell, qp) + 0.1;
     //        noiseTerm(cell, qp) = 0.0;
   }

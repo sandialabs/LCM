@@ -6,8 +6,7 @@
 
 # This test is not currently appropriate for the BGQ
 if(NOT ALBANY_PARALLEL_ONLY
-   AND LCM_TEST_EXES
-   AND ALBANY_BGL)
+   AND LCM_TEST_EXES)
 
   set(runtest.py ${CMAKE_CURRENT_SOURCE_DIR}/runtest.py)
   set(MPS.cmake ${CMAKE_CURRENT_SOURCE_DIR}/MPS.cmake)

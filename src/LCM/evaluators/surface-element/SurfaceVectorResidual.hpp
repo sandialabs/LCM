@@ -60,9 +60,6 @@ class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public 
   /// Reference configuration area
   PHX::MDField<const MeshScalarT, Cell, QuadPoint> ref_area_;
 
-  /// Determinant of deformation gradient
-  PHX::MDField<ScalarT const, Cell, QuadPoint, Dim> detF_;
-
   /// Reference Cell Views
   Kokkos::DynRankView<RealType, PHX::Device> ref_values_;
 
@@ -78,9 +75,6 @@ class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public 
   // Output:
   /// Force
   PHX::MDField<ScalarT, Cell, Node, Dim> force_;
-
-  /// Cauchy Stress
-  PHX::MDField<ScalarT, Cell, QuadPoint, Dim, Dim> cauchy_stress_;
 
   unsigned int workset_size_;
 
@@ -99,9 +93,6 @@ class SurfaceVectorResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public 
 
   /// Membrane Forces Flag
   bool compute_membrane_forces_;
-
-  /// Topology modification for adaptive insertion flag.
-  bool have_topmod_adaptation_;
 };
 }  // namespace LCM
 

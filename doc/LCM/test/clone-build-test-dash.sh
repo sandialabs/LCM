@@ -19,12 +19,6 @@ for PACKAGE in $PACKAGES; do
             BRANCH="main"
             SHA="head"
 	    ;;
-	dtk)
-	    PACKAGE_NAME="DataTransferKit"
-	    REPO="git@github.com:ikalash/DataTransferKit"
-            BRANCH="dtk-2.0-tpetra-static-graph"
-            SHA="head"
-	    ;;
 	*)
 	    echo "Unrecognized package option"
 	    exit 1
@@ -40,13 +34,6 @@ for PACKAGE in $PACKAGES; do
         git reset --hard "$SHA"
     fi
 done
-
-# For now assume that if there is a DTK directory in the main LCM
-# directory, it contains a DTK version that we can use for
-# Trilinos.
-if [ -e DataTransferKit ]; then
-    cp -p -r DataTransferKit Trilinos
-fi
 
 ./clean-config-build-test-dash-all.sh
 

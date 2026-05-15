@@ -11,7 +11,6 @@
 
 #include "Teuchos_DefaultMpiComm.hpp"
 
-#include "AAdapt_Erosion.hpp"
 #include "AAdapt_RC_Manager.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_DataTypes.hpp"
@@ -2396,15 +2395,6 @@ void
 Application::loadWorksetSidesetInfo(PHAL::Workset& workset, int const ws)
 {
   workset.sideSets = Teuchos::rcpFromRef(disc->getSideSets(ws));
-
-  // Needed for ACE erosion
-  auto const is_erosion = solMgr->isAdaptive() == true && solMgr->getMethod() == "Erosion";
-  if (is_erosion == true) {
-    auto erosion_rcp = Teuchos::rcp_dynamic_cast<AAdapt::Erosion>(solMgr->getAdapter());
-    workset.topology = erosion_rcp->getTopology();
-  } else {
-    workset.topology = Teuchos::null;
-  }
 }
 
 void

@@ -167,8 +167,8 @@ ScatterResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename T
   f_kokkos = Albany::getNonconstDeviceData(f);
 
   // Element death: extract death status into a device-compatible view.
-  // The death_status_vec is set by the IM solver from the previous
-  // step's converged failure_state values.  It is not modified during
+  // The death_status_vec is set by the ACE solver from the previous
+  // step's converged cell_death values.  It is not modified during
   // evaluation, so it's safe to read here.
   this->have_death_status_ = false;
   if (workset.death_status_vec != Teuchos::null) {

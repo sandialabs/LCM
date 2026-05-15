@@ -14,7 +14,6 @@
 #include "PHAL_Neumann.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
-#include "Topology.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen
 // #define ACE_WAVE_PRESS_DEBUG_OUTPUT
@@ -320,54 +319,7 @@ NeumannBase<EvalT, Traits>::evaluateNeumannContribution(typename Traits::EvalDat
 
   auto& side_set = it->second;
 
-  // If this is an ACE erodible side set, discard any information in it and
-  // rebuild it by querying the topology structure for erodible faces.
-  // This is because there is mesh adaptation, material may be removed, and
-  // the boundary changes, and so the NBC needs to propagate with the moving
-  // boundary.
   auto const is_erodible = ss_id.find("erodible") != std::string::npos;
-#if 0
-  {
-    if (is_erodible == true) {
-      side_set.clear();
-      auto               topo_rcp            = workset.topology;
-      auto&              bulk_data           = topo_rcp->get_bulk_data();
-      auto               erodible_cells      = topo_rcp->getErodibleCells();
-      auto               erodible_cell_gids  = topo_rcp->getEntityGIDs(erodible_cells);
-      auto&              stk_disc            = topo_rcp->get_stk_discretization();
-      auto               elem_gid_to_wslid   = stk_disc.getElemGIDws();
-      auto               stk_mesh_struct_rcp = stk_disc.getSTKMeshStruct();
-      auto               stk_mesh_specs_rcp  = stk_mesh_struct_rcp->getMeshSpecs()[0];
-      auto               ws_eb_names         = stk_disc.getWsEBNames();
-      auto const         elem_rank           = stk::topology::ELEM_RANK;
-      auto const         face_rank           = stk::topology::FACE_RANK;
-      Albany::SideStruct entry;
-      for (auto cell : erodible_cells) {
-        auto const* relations     = bulk_data.begin(cell, face_rank);
-        auto const  num_relations = bulk_data.num_connectivity(cell, face_rank);
-        ALBANY_ASSERT(num_relations > 0);
-        for (auto i = 0; i < num_relations; ++i) {
-          auto face = relations[i];
-          if (topo_rcp->is_erodible_face(face) == true) {
-            auto const elem_gid      = topo_rcp->get_gid(cell) - 1;
-            auto const wslid         = elem_gid_to_wslid[elem_gid];
-            auto const ws            = wslid.ws;
-            auto const elem_lid      = wslid.LID;
-            auto const elem_eb_index = stk_mesh_specs_rcp->ebNameToIndex[ws_eb_names[ws]];
-            auto const side_local_id = stk_disc.determine_local_side_id(cell, face);
-            auto const side_gid      = topo_rcp->get_gid(face) - 1;
-            entry.side_GID           = side_gid;
-            entry.elem_GID           = elem_gid;
-            entry.elem_LID           = elem_lid;
-            entry.elem_ebIndex       = elem_eb_index;
-            entry.side_local_id      = side_local_id;
-            side_set.emplace_back(entry);
-          }
-        }
-      }
-    }
-  }
-#endif
 
 // #define DEBUG
 #if defined(DEBUG)
@@ -940,7 +892,6 @@ NeumannBase<EvalT, Traits>::calc_ace_press_hydrostatic(
     const double                                         current_time) const
 {
   Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
-  //*out << "IKT in calc_ace_press_hydrostatic!\n";
   int numCells_ = qp_data_returned.extent(0);  // How many cell's worth of data is being computed?
   int numPoints = qp_data_returned.extent(1);  // How many QPs per cell?
 

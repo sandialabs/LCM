@@ -151,8 +151,6 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalDa
   // Compute pore fluid flux
   if (haveMech) {
     // Put back the permeability tensor to the reference configuration
-    // std::cout << "AGS: commenting out necessary line to get code to compile.
-    // states need to be Kokkos, or copied to Kokkos" << std::endl;
     RST::inverse(F_inv, defGrad.get_view());
     RST::transpose(F_invT, F_inv);
     FST::scalarMultiplyDataData(JF_invT, J.get_view(), F_invT);

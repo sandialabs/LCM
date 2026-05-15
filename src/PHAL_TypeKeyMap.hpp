@@ -5,16 +5,11 @@
 #ifndef PHAL_TYPE_KEY_MAP_HPP
 #define PHAL_TYPE_KEY_MAP_HPP
 
+#include <type_traits>
+
 #include "Sacado_mpl_placeholders.hpp"
 #include "Teuchos_Array.hpp"
 #include "Teuchos_any.hpp"
-#include "boost/mpl/back_inserter.hpp"
-#include "boost/mpl/find_if.hpp"
-#include "boost/mpl/pair.hpp"
-#include "boost/mpl/size.hpp"
-#include "boost/mpl/transform.hpp"
-#include "boost/mpl/vector.hpp"
-#include "boost/type_traits.hpp"
 
 namespace PHAL {
 
@@ -36,7 +31,7 @@ class TypeKeyMap
   template <typename T>
   struct GetObjectTypeAndPos
   {
-    typedef typename Sacado::mpl::find_if<TypeMap, boost::is_same<Sacado::mpl::first<Sacado::mpl::placeholders::_1>, T>>::type Iter;
+    typedef typename Sacado::mpl::find_if<TypeMap, std::is_same<Sacado::mpl::first<Sacado::mpl::placeholders::_1>, T>>::type Iter;
     typedef typename Sacado::mpl::deref<Iter>::type                                                                            Pair;
     typedef typename Sacado::mpl::second<Pair>::type                                                                           type;
     typedef typename Iter::pos                                                                                                 pos;
@@ -47,17 +42,17 @@ class TypeKeyMap
   template <typename T>
   struct GetObjectRefType
   {
-    typedef typename GetObjectTypeAndPos<T>::type            object_type;
-    typedef typename boost::add_reference<object_type>::type type;
+    typedef typename GetObjectTypeAndPos<T>::type                  object_type;
+    typedef typename std::add_lvalue_reference<object_type>::type  type;
   };
 
   //! Meta-function for getting the object const-reference type indexed by T
   template <typename T>
   struct GetObjectConstRefType
   {
-    typedef typename GetObjectTypeAndPos<T>::type           object_type;
-    typedef typename boost::add_const<object_type>::type    const_type;
-    typedef typename boost::add_reference<const_type>::type type;
+    typedef typename GetObjectTypeAndPos<T>::type                 object_type;
+    typedef typename std::add_const<object_type>::type            const_type;
+    typedef typename std::add_lvalue_reference<const_type>::type  type;
   };
 
   //! Typedef of container used

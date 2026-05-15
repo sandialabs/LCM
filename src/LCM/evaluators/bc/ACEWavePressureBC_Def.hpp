@@ -59,7 +59,6 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeVal(RealType time)
     this->s_val           = sValues[Index - 1] + slope * (time - timeValues[Index - 1]);
     slope                 = (wValues[Index] - wValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->w_val           = wValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    // std::cout << "IKT computeVal water_height_val = " << this->water_height_val << "\n";
     ALBANY_PANIC(this->wave_length_val <= 0, "Wave length is non-positive!");
     ALBANY_PANIC(this->wave_number_val <= 0, "Wave number is non-positive!");
   }
@@ -83,7 +82,6 @@ ACEWavePressureBC_Base<EvalT, Traits>::computeValHydrostatic(RealType time)
   } else {
     slope            = (waterHValues[Index] - waterHValues[Index - 1]) / (timeValues[Index] - timeValues[Index - 1]);
     this->waterH_val = waterHValues[Index - 1] + slope * (time - timeValues[Index - 1]);
-    // std::cout << "IKT computeVal waterH_val = " << this->waterH_val << "\n";
     // ALBANY_PANIC(this->waterH_val <= 0, "waterH is non-positive!");
 
     if (this->waterH_val < 0.) {

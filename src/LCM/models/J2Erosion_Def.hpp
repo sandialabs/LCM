@@ -112,6 +112,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
 
   // define the evaluated fields
   setEvaluatedField("failure_state", dl->cell_scalar2);
+  setEvaluatedField("cell_death", dl->cell_scalar2);
   setEvaluatedField(cauchy_str, dl->qp_tensor);
   setEvaluatedField(Fp_str, dl->qp_tensor);
   setEvaluatedField(eqps_str, dl->qp_scalar);
@@ -142,6 +143,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(angle_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
   addStateVariable(displacement_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
+  addStateVariable("cell_death", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Cell Death", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
@@ -193,6 +195,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   angle_indicator_        = *eval_fields[angle_indicator_str];
   displacement_indicator_ = *eval_fields[displacement_indicator_str];
   failed_                 = *eval_fields["failure_state"];
+  dead_                   = *eval_fields["cell_death"];
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_str];
@@ -202,7 +205,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // get State Variables
   Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
-  // Read death status from the workset.  The IM solver populates this
+  // Read death status from the workset.  The ACE solver populates this
   // at the start of each step from the prior converged state, and
   // J2Erosion's operator() writes into it live when new failures occur
   // during a Newton iteration.  The scatter evaluator reads it to skip
@@ -226,19 +229,55 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
 
   current_time_ = workset.current_time;
 
-  // Seed failed_ from the shared death_status_vec_, which is set by the
-  // IM solver at the start of the step from the prior converged state and
-  // is updated live by this evaluator when new failures occur during a
-  // Newton iteration.  This makes failure monotonic across time steps
-  // (previously-dead cells stay dead) without introducing any noise from
-  // Phalanx state-rotation of the Fad-typed failure_state field.
+  // Seed failed_ (diagnostic, decimal-encoded per-mode counts) and
+  // dead_ (binary cell-death flag) from the persistent per-(cell, pt)
+  // failure bitmask. failure_mode_vec_ is owned by Albany::Application
+  // and persists across fills and time steps; once a bit is set at
+  // (cell, pt) it stays set.
+  //
+  // Each set bit at (cell, pt) contributes a decimal magnitude (1, 10,
+  // 100, 1000, 10000) to failed_(cell, 0) so the encoded value decodes
+  // back to per-mode trip counts across all pts of the cell.
+  //
+  // dead_(cell, 0) is 1.0 iff every pt in the cell has at least one bit
+  // set in the bitmask, i.e. every integration point has failed in some
+  // way.  This is the predicate consumed by the ACE solver to populate
+  // death_status_vec.
+  //
+  // Lazy sizing: the kernel is the only place that knows num_pts_ for
+  // this model, so size the [cell][pt] grid here on first contact.  The
+  // Application-owned shell (RCP) was attached in loadWorksetBucketInfo.
   auto const num_cells = workset.numCells;
+  failure_mode_vec_    = workset.failure_mode_vec;
+  if (failure_mode_vec_ != Teuchos::null) {
+    if (static_cast<int>(failure_mode_vec_->size()) < num_cells) {
+      failure_mode_vec_->resize(num_cells);
+    }
+    for (auto cell = 0; cell < num_cells; ++cell) {
+      if (static_cast<int>((*failure_mode_vec_)[cell].size()) < num_pts_) {
+        (*failure_mode_vec_)[cell].resize(num_pts_, 0);
+      }
+    }
+  }
   for (auto cell = 0; cell < num_cells; ++cell) {
-    double seed = 0.0;
-    if (has_failed_old_) {
-      seed = (*death_status_vec_)[cell];
+    double seed     = 0.0;
+    bool   all_failed = true;
+    if (failure_mode_vec_ != Teuchos::null) {
+      auto const& mask_row = (*failure_mode_vec_)[cell];
+      for (auto pt = 0; pt < num_pts_; ++pt) {
+        uint8_t const m = mask_row[pt];
+        if (m & 0x01) seed += 1.0;
+        if (m & 0x02) seed += 10.0;
+        if (m & 0x04) seed += 100.0;
+        if (m & 0x08) seed += 1000.0;
+        if (m & 0x10) seed += 10000.0;
+        if (m == 0u) all_failed = false;
+      }
+    } else {
+      all_failed = false;
     }
     failed_(cell, 0) = seed;
+    dead_(cell, 0)   = all_failed ? 1.0 : 0.0;
   }
 }
 
@@ -639,6 +678,30 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
   }
 
+  // Per-(cell, pt) OR-accumulation: add each mode's decimal magnitude to
+  // `failed` exactly the first time that mode trips at this integration
+  // point. `failure_mode_vec_` is persistent across fills and time steps
+  // (owned by the Application), so a criterion that keeps tripping at the
+  // same point contributes its magnitude once and only once.
+  //
+  // When disable_erosion_ is true the cell cannot die regardless of how
+  // criteria trip, so skip both the bitmask update and the failed
+  // accumulator. Indicators above are still computed for diagnostics.
+  auto trip = [&](bool fired, uint8_t bit, double magnitude) {
+    if (fired == false) return;
+    if (disable_erosion_) return;
+    if (failure_mode_vec_ == Teuchos::null) {
+      // No bitmask storage attached (non-standard workset path). Fall back
+      // to the pre-bitmask behavior so we don't silently lose failures.
+      failed += magnitude;
+      return;
+    }
+    auto& mask = (*failure_mode_vec_)[cell][pt];
+    if ((mask & bit) != 0u) return;
+    mask = static_cast<uint8_t>(mask | bit);
+    failed += magnitude;
+  };
+
   // Hack for tensile strength
   if (tensile_strength > 0) {
     auto          sig = Sacado::Value<decltype(sigma)>::eval(sigma);
@@ -648,10 +711,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     auto const Smax              = std::max(S(0, 0), std::max(S(1, 1), S(2, 2)));
     bool const tension_failure   = Smax >= tensile_strength;
     tensile_indicator_(cell, pt) = safe_quotient(Smax, tensile_strength);
-    if (tension_failure == true) {
-      // ALBANY_ABORT("Tensile failure!\n");
-      failed += 1.0;
-    }
+    trip(tension_failure, 0x01, 1.0);
   }
 
   // Hack for strain limit
@@ -663,16 +723,11 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     auto const     distortion     = minitensor::norm(Cdevval) / std::sqrt(3.0);
     bool const     strain_failure = distortion >= strain_limit;
     strain_indicator_(cell, pt)   = safe_quotient(distortion, strain_limit);
-    if (strain_failure == true) {
-      // ALBANY_ABORT("Strain failure!\n");
-      failed += 10.0;
-    }
+    trip(strain_failure, 0x02, 10.0);
   }
 
   // Determine if critical stress is exceeded
-  if (yielded == true) {
-    failed += 100.0;
-  }
+  trip(yielded, 0x04, 100.0);
 
   // Determine if kinematic failure occurred
   auto critical_angle = critical_angle_;
@@ -681,41 +736,39 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
   if (critical_angle > 0.0) {
     auto const theta_abs = std::abs(theta);
-    if (theta_abs >= critical_angle) {
-      // ALBANY_ABORT("Critical angle failure!\n");
-      failed += 1000.0;
-    }
+    trip(theta_abs >= critical_angle, 0x08, 1000.0);
     angle_indicator_(cell, pt) = safe_quotient(theta_abs, critical_angle);
   }
   auto const disp_val               = Sacado::Value<decltype(displacement)>::eval(displacement);
   auto const displacement_norm      = minitensor::norm(disp_val);
   displacement_indicator_(cell, pt) = safe_quotient(displacement_norm, maximum_displacement_);
-  if ((maximum_displacement_ > 0.0) && (displacement_norm > maximum_displacement_)) {
-    // std::cout << "displacement_norm, maximum_displacement = " << displacement_norm << ", " << maximum_displacement_ << "\n";
-    // ALBANY_ABORT("Kinematic failure!\n");
-    failed += 10000.0;
-    // std::cout << "Cell " << cell << " pt " << pt << " :: max displacement \n";
-  }
-  if (disable_erosion_) {
-    failed = 0.0;
-  }
+  bool const disp_failure =
+      (maximum_displacement_ > 0.0) && (displacement_norm > maximum_displacement_);
+  trip(disp_failure, 0x10, 10000.0);
 
-  // Live death propagation: if this cell just tripped a failure criterion
-  // within the current Newton iteration but was alive in death_status_vec
-  // at the start of the fill, update the shared death_status_vec so the
-  // scatter evaluator (which has not yet run this fill) and
-  // fixOrphanNodesForElementDeath see the cell as dead in this same fill.
-  // Without this, Newton can push alive cells into regimes where they
-  // would fail, while scatter keeps assembling their (now nonphysical)
-  // stress contributions — breaking convergence after a death cascade.
-  // Failure criteria add integer magnitudes (1=tension, 10=strain,
-  // 100=yield, 1000=angle, 10000=displacement) so any genuine failure
-  // pushes `failed` to at least 1.  Use a 0.5 threshold to reject any
-  // sub-integer numerical noise from AD tracking.
-  if (pt == num_pts_ - 1 && has_failed_old_) {
-    auto const failed_val = Sacado::ScalarValue<ScalarT>::eval(failed);
-    if (failed_val >= 0.5 && (*death_status_vec_)[cell] == 0.0) {
-      (*death_status_vec_)[cell] = failed_val;
+  // Live death propagation: when the last pt of a cell is processed,
+  // check whether every pt in this cell has at least one failure bit
+  // set in failure_mode_vec_. If so, mark the cell dead so the scatter
+  // evaluator and fixOrphanNodesForElementDeath see it as dead in this
+  // same fill. Without this, Newton can push partially-failed cells
+  // (now condemned by the last-pt trip) into regimes where they would
+  // fail more, while scatter keeps assembling their nonphysical stress
+  // contributions — breaking convergence after a death cascade.
+  //
+  // When disable_erosion_ is true, trips above are no-ops, so no pt
+  // ever has a bit set and the predicate cannot trigger.
+  if (pt == num_pts_ - 1 && has_failed_old_ && failure_mode_vec_ != Teuchos::null) {
+    auto const& mask_row   = (*failure_mode_vec_)[cell];
+    bool        all_failed = true;
+    for (auto p = 0; p < num_pts_; ++p) {
+      if (mask_row[p] == 0u) {
+        all_failed = false;
+        break;
+      }
+    }
+    if (all_failed && (*death_status_vec_)[cell] == 0.0) {
+      (*death_status_vec_)[cell] = 1.0;
+      dead_(cell, 0)             = 1.0;
     }
   }
 }

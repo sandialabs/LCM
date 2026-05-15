@@ -74,6 +74,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField j2_stress_;
   ScalarField tilt_angle_;
   ScalarField failed_;
+  ScalarField dead_;
 
   // Failure indicators
   ScalarField yield_indicator_;
@@ -87,6 +88,14 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray eqps_old_;
   Teuchos::RCP<std::vector<double>> death_status_vec_;
   bool            has_failed_old_{false};
+
+  // Per-(cell, pt) failure-mode bitmask. Bits encode:
+  //   1 = tension, 2 = strain, 4 = yield, 8 = angle, 16 = displacement.
+  // Owned by Albany::Application; persistent across fills and time steps.
+  // Once a bit is set at (cell, pt) it stays set. Used both for diagnostic
+  // bookkeeping (encoded into failure_state) and as the source of truth
+  // for the cell-death predicate (cell dies iff every pt has any bit set).
+  Teuchos::RCP<std::vector<std::vector<uint8_t>>> failure_mode_vec_;
 
   bool                       have_cell_boundary_indicator_{false};
   Teuchos::ArrayRCP<double*> cell_boundary_indicator_;

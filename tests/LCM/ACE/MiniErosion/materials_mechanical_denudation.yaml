@@ -9,6 +9,8 @@ LCM:
   Materials:
     Permafrost:
       Disable Erosion: false
+      Output Failure State: true
+      Output Cell Death: true
       Material Model:
         Model Name: J2 Erosion
       Elastic Modulus:

@@ -43,11 +43,9 @@ function(lcm_do_package)
     lcm_do_trilinos(${PASS_ARGS})
   elseif ("${ARG_PACKAGE}" STREQUAL "lcm")
     lcm_do_albany(${PASS_ARGS})
-  elseif ("${ARG_PACKAGE}" STREQUAL "dtk")
-    message(STATUS, "DTK is built together with Trilinos")
   else()
-    message(FATAL_ERROR 
-      "PACKAGE was \"${ARG_PACKAGE}\", should be \"trilinos\" or \"lcm\" or \"dtk\"")
+    message(FATAL_ERROR
+      "PACKAGE was \"${ARG_PACKAGE}\", should be \"trilinos\" or \"lcm\"")
   endif()
   if (ARG_RESULT_VARIABLE)
     set(${ARG_RESULT_VARIABLE} ${PACKAGE_ERR} PARENT_SCOPE)

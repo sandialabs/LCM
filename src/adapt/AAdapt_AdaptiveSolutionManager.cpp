@@ -5,10 +5,6 @@
 #include "AAdapt_AdaptiveSolutionManager.hpp"
 
 #include "AAdapt_CopyRemesh.hpp"
-#if defined(ALBANY_BGL)
-#include "AAdapt_Erosion.hpp"
-#include "AAdapt_TopologyModification.hpp"
-#endif
 #if defined(ALBANY_STK_PERCEPT)
 #include "AAdapt_STKAdaptT.hpp"
 #endif
@@ -117,14 +113,6 @@ AdaptiveSolutionManager::buildAdapter(const Teuchos::RCP<rc::Manager>& rc_mgr)
   if (method == "Copy Remesh") {
     adapter_ = Teuchos::rcp(new CopyRemesh(adaptParams_, paramLib_, stateMgr_, comm_));
   } else
-#if defined(ALBANY_BGL)
-      if (method == "Topmod") {
-    adapter_ = Teuchos::rcp(new TopologyMod(adaptParams_, paramLib_, stateMgr_, comm_));
-  } else if (method == "Erosion") {
-    adapter_ = Teuchos::rcp(new Erosion(adaptParams_, paramLib_, stateMgr_, comm_));
-  } else
-#endif
-
 #if defined(ALBANY_STK_PERCEPT)
       if (method == "Unif Size") {
     adapter_ = Teuchos::rcp(new STKAdaptT<STKUnifRefineField>(adaptParams_, paramLib_, stateMgr_, comm_));

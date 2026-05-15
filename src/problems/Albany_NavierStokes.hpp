@@ -138,7 +138,7 @@ class NavierStokes : public AbstractProblem
 
 }  // namespace Albany
 
-#include <boost/type_traits/is_same.hpp>
+#include <type_traits>
 
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_ProblemUtils.hpp"
@@ -195,7 +195,7 @@ Albany::NavierStokes::constructEvaluators(
 
   // Print only for the residual specialization
 
-  if (boost::is_same<EvalT, PHAL::AlbanyTraits::Residual>::value)
+  if (std::is_same<EvalT, PHAL::AlbanyTraits::Residual>::value)
 
     *out << "Field Dimensions: Workset=" << worksetSize << ", Vertices= " << numVertices << ", Nodes= " << numNodes << ", QuadPts= " << numQPts
          << ", Dim= " << numDim << std::endl;

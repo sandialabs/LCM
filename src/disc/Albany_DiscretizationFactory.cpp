@@ -14,7 +14,6 @@
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SideSetSTKMeshStruct.hpp"
 #include "Albany_TmplSTKMeshStruct.hpp"
-#include "Topology_Utils.hpp"
 
 Albany::DiscretizationFactory::DiscretizationFactory(const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams, const Teuchos::RCP<Teuchos_Comm const>& commT_)
     : commT(commT_)
@@ -37,104 +36,10 @@ Albany::DiscretizationFactory::DiscretizationFactory(const Teuchos::RCP<Teuchos:
   }
 }
 
-namespace {
-
-void
-createInterfaceParts(Teuchos::RCP<Teuchos::ParameterList> const& adapt_params, Teuchos::RCP<Albany::AbstractMeshStruct>& mesh_struct)
-{
-  // Top mod uses BGL
-  bool const do_adaptation = adapt_params.is_null() == false;
-
-  if (do_adaptation == false) return;
-
-  std::string const& adaptation_method_name = adapt_params->get<std::string>("Method");
-
-  bool const is_topology_modification = adaptation_method_name == "Topmod";
-
-  if (is_topology_modification == false) return;
-
-  std::string const& bulk_part_name = adapt_params->get<std::string>("Bulk Block Name");
-
-  Albany::AbstractSTKMeshStruct& stk_mesh_struct = dynamic_cast<Albany::AbstractSTKMeshStruct&>(*mesh_struct);
-
-  stk::mesh::MetaData& meta_data = *(stk_mesh_struct.metaData);
-
-  stk::mesh::Part& bulk_part = *(meta_data.get_part(bulk_part_name));
-
-  stk::topology               stk_topo_data      = meta_data.get_topology(bulk_part);
-  shards::CellTopology const& bulk_cell_topology = stk::mesh::get_cell_topology(stk_topo_data);
-
-  std::string const& interface_part_name(adapt_params->get<std::string>("Interface Block Name"));
-
-  shards::CellTopology const interface_cell_topology = LCM::interfaceCellTopogyFromBulkCellTopogy(bulk_cell_topology);
-
-  stk::mesh::EntityRank const interface_dimension = static_cast<stk::mesh::EntityRank>(interface_cell_topology.getDimension());
-
-  stk::mesh::Part& interface_part = meta_data.declare_part(interface_part_name, interface_dimension);
-
-  stk::topology stk_interface_topo = stk::mesh::get_topology(interface_cell_topology);
-  stk::mesh::set_topology(interface_part, stk_interface_topo);
-
-  stk::io::put_io_part_attribute(interface_part);
-
-  // Augment the MeshSpecsStruct array with one additional entry for
-  // the interface block. Essentially copy the last entry from the array
-  // and modify some of its fields as needed.
-  Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>& mesh_specs_struct = stk_mesh_struct.getMeshSpecs();
-
-  Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>::size_type number_blocks = mesh_specs_struct.size();
-
-  Albany::MeshSpecsStruct& last_mesh_specs_struct = *(mesh_specs_struct[number_blocks - 1]);
-
-  CellTopologyData const& interface_cell_topology_data = *(interface_cell_topology.getCellTopologyData());
-
-  int const dimension = interface_cell_topology.getDimension();
-
-  int const cubature_degree = last_mesh_specs_struct.cubatureDegree;
-
-  std::vector<std::string> node_sets, side_sets;
-
-  int const workset_size = last_mesh_specs_struct.worksetSize;
-
-  std::string const& element_block_name = interface_part_name;
-
-  std::map<std::string, int>& eb_name_to_index_map = last_mesh_specs_struct.ebNameToIndex;
-
-  // Add entry to the map for this block
-  eb_name_to_index_map.insert(std::make_pair(element_block_name, number_blocks));
-
-  bool const is_interleaved = last_mesh_specs_struct.interleavedOrdering;
-
-  Intrepid2::EPolyType const cubature_rule = last_mesh_specs_struct.cubatureRule;
-
-  mesh_specs_struct.resize(number_blocks + 1);
-
-  mesh_specs_struct[number_blocks] = Teuchos::rcp(new Albany::MeshSpecsStruct(
-      interface_cell_topology_data,
-      dimension,
-      cubature_degree,
-      node_sets,
-      side_sets,
-      workset_size,
-      element_block_name,
-      eb_name_to_index_map,
-      is_interleaved,
-      number_blocks > 1,
-      cubature_rule));
-  return;
-}
-
-}  // anonymous namespace
-
 Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>
 Albany::DiscretizationFactory::createMeshSpecs()
 {
-  // First, create the mesh struct
   meshStruct = createMeshStruct(discParams, adaptParams, commT);
-
-  // Add an interface block. For now relies on STK, so we force a cast that
-  // will fail if the underlying meshStruct is not based on STK.
-  createInterfaceParts(adaptParams, meshStruct);
   return meshStruct->getMeshSpecs();
 }
 

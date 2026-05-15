@@ -254,9 +254,15 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       Teuchos::RCP<Thyra_Vector>   f,
       Teuchos::RCP<Thyra_LinearOp> jac);
 
-  // Element death status per workset, set by the IM solver.
+  // Element death status per workset, set by the ACE solver.
   // death_status_vecs_[ws] is a vector of per-cell death indicators.
   std::vector<Teuchos::RCP<std::vector<double>>> death_status_vecs_;
+
+  // Per-(cell, pt) failure-mode bitmask per workset. Persists across
+  // Phalanx fills and across time steps; OR-accumulated by erosion kernels.
+  // Shells are allocated here in loadWorksetBucketInfo; the [cell][pt] grid
+  // is sized lazily by the kernel (which knows num_pts for its model).
+  std::vector<Teuchos::RCP<std::vector<std::vector<uint8_t>>>> failure_mode_vecs_;
 
  private:
   void
@@ -810,6 +816,17 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
   } else {
     workset.death_status_vec = Teuchos::null;
   }
+
+  // Erosion failure-mode bitmask: persistent per-workset storage. Allocated
+  // here as an empty shell on first access so every solver path sees a
+  // non-null RCP; the kernel sizes the [cell][pt] grid on first use.
+  if (ws >= static_cast<int>(failure_mode_vecs_.size())) {
+    failure_mode_vecs_.resize(ws + 1);
+  }
+  if (failure_mode_vecs_[ws].is_null()) {
+    failure_mode_vecs_[ws] = Teuchos::rcp(new std::vector<std::vector<uint8_t>>{});
+  }
+  workset.failure_mode_vec = failure_mode_vecs_[ws];
 }
 
 }  // namespace Albany

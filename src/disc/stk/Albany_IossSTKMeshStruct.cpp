@@ -8,7 +8,8 @@
 
 #include <Shards_BasicTopologies.hpp>
 #include <Teuchos_RCPStdSharedPtrConversions.hpp>
-#include <boost/algorithm/string/predicate.hpp>
+#include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>
@@ -20,6 +21,14 @@
 #include "Teuchos_VerboseObject.hpp"
 
 namespace {
+
+bool
+iequals(std::string const& a, std::string const& b)
+{
+  return a.size() == b.size() &&
+         std::equal(a.begin(), a.end(), b.begin(),
+                    [](unsigned char x, unsigned char y) { return std::tolower(x) == std::tolower(y); });
+}
 
 void
 get_element_block_sizes(stk::io::StkMeshIoBroker& mesh_data, std::vector<int>& el_blocks)
@@ -420,7 +429,7 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
 
         for (std::size_t j = 0; j < restart_fields.size(); j++)
 
-          if (boost::iequals(st.name, restart_fields[j])) {
+          if (iequals(st.name, restart_fields[j])) {
             *out << "Restarting from field \"" << st.name << "\" found in exodus file." << std::endl;
             st.restartDataAvailable = true;
             break;

@@ -1,8 +1,11 @@
+# Short denudation test: runs 20 steps (9000s) instead of the
+# full 144 steps (64800s) to verify element death triggers while
+# keeping test run time practical.
 LCM:
   Alternating System:
     Model Input Files: ['thermal_denudation.yaml', 'mechanical_denudation.yaml']
     Initial Time: 0.0 #   [sec]
-    Final Time: 64800.0 #  [sec]
+    Final Time: 9000.0 #  [sec] (full run: 64800.0)
     Initial Time Step: 450.0 # [sec]
     Maximum Steps: 10000
     Minimum Time Step: 1.0e-04 # [sec]
@@ -10,8 +13,6 @@ LCM:
     Reduction Factor: 0.5
     Amplification Factor: 1.1
     Exodus Write Interval: 1
-    #Change the following if you want your output Exo files to start with 
-    #an index other than 0.  This is useful when doing restarts.
     Exodus ACE Output File Initial Index: 0
   Problem:
     Solution Method: ACE Sequential Thermo-Mechanical

@@ -18,8 +18,6 @@
 
 #define ST_LLI "%" PRId64
 
-#include <boost/algorithm/string/predicate.hpp>
-
 #include "Albany_Utils.hpp"
 
 // uncomment the following line if you want debug output to be printed to screen

@@ -6,8 +6,10 @@
 #if !defined(LCM_ACEThermoMechanical_hpp)
 #define LCM_ACEThermoMechanical_hpp
 
+
 #include <functional>
 
+#include "ACE_AdaptiveState.hpp"
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_Application.hpp"
@@ -16,49 +18,11 @@
 #include "Albany_SolverFactory.hpp"
 #include "Piro_NOXSolver.hpp"
 #include "StateVarUtils.hpp"
-#include "Thyra_AdaptiveSolutionManager.hpp"
 #include "Thyra_DefaultProductVector.hpp"
 #include "Thyra_DefaultProductVectorSpace.hpp"
-#include "Thyra_ModelEvaluatorDelegatorBase.hpp"
 #include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
 
 namespace LCM {
-
-class ACEAdaptiveState : public Thyra::AdaptiveStateBase
-{
- public:
-  ACEAdaptiveState(Teuchos::RCP<Thyra::ModelEvaluator<ST>> const& model) : AdaptiveStateBase(model) {}
-  ~ACEAdaptiveState() {}
-  void
-  buildSolutionGroup()
-  {
-  }
-};
-
-class ACEModelEvaluatorDelegator : public Thyra::ModelEvaluatorDelegatorBase<ST>
-{
- public:
-  ACEModelEvaluatorDelegator(Teuchos::RCP<Thyra::ModelEvaluator<ST>> const& model_rcp) : model_rcp_(model_rcp) {}
-  Teuchos::RCP<Thyra::ModelEvaluator<ST>>
-  getNonconstUnderlyingModel()
-  {
-    return model_rcp_;
-  }
-
-  ModelEvaluatorBase::OutArgs<ST>
-  createOutArgsImpl() const
-  {
-    return ModelEvaluatorBase::OutArgs<ST>();
-  }
-
-  void
-  evalModelImpl(ModelEvaluatorBase::InArgs<ST> const&, ModelEvaluatorBase::OutArgs<ST> const&) const
-  {
-  }
-
- private:
-  Teuchos::RCP<Thyra::ModelEvaluator<ST>> model_rcp_;
-};
 
 ///
 /// ACEThermoMechanical coupling class
@@ -142,13 +106,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
     OR
   };
 
-  // Public counters for failed elements
-  mutable int count_displacement{0};
-  mutable int count_angle{0};
-  mutable int count_yield{0};
-  mutable int count_strain{0};
-  mutable int count_tension{0};
-
  private:
   /// Create operator form of dg/dx for distributed responses
   Teuchos::RCP<Thyra::LinearOpBase<ST>>
@@ -186,19 +143,19 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   continueSolve() const;
 
   void
-  createThermalSolverAppDiscME(int const file_index, double const current_time) const;
+  createPersistentApps();
 
   void
-  createMechanicalSolverAppDiscME(int const file_index, double const current_time, double const next_time, double const time_step) const;
+  transferThermalToMechanical(int thermal_subdomain, int mechanical_subdomain) const;
+
+  void
+  transferMechanicalToThermal(int mechanical_subdomain, int thermal_subdomain) const;
 
   void
   doQuasistaticOutput(ST const time) const;
 
   void
   doDynamicInitialOutput(ST const time, int const subdomain) const;
-
-  void
-  renamePrevWrittenExoFiles(const int subdomain, const int file_index) const;
 
   void
   setExplicitUpdateInitialGuessForCoupling(ST const current_time, ST const time_step) const;
@@ -247,11 +204,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdot_;
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdotdot_;
 
-  // variable with previous thermal Exodus output file, for mechanical restarts
-  mutable std::string prev_thermal_exo_outfile_name_{""};
-  // variable with previous mechanical Exodus output file, for thermal restarts
-  mutable std::string prev_mechanical_exo_outfile_name_{""};
-
   mutable std::vector<LCM::StateArrays> internal_states_;
   mutable std::vector<bool>             do_outputs_;
   mutable std::vector<bool>             do_outputs_init_;
@@ -283,7 +235,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   Teuchos::Array<std::string>            model_filenames_;
   // Min value of z-coordinate in initial mesh - needed for wave pressure NBC
   mutable double zmin_{0.0};
-  mutable int    init_file_index_;
 
   // Storage for defining time intervals where the time step will be prescribed.
   // This is needed for time stepping through user-defined events such as

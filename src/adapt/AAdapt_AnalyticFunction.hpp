@@ -5,15 +5,10 @@
 #ifndef AADAPT_ANALYTICFUNCTION_HPP
 #define AADAPT_ANALYTICFUNCTION_HPP
 
+#include <random>
 #include <string>
 
 #include "Albany_config.h"
-
-// Random and Gaussian number distribution
-#include <boost/random.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
 
 #include "Teuchos_Array.hpp"
 #if defined(ALBANY_PAMGEN)
@@ -150,9 +145,8 @@ class ConstantFunctionGaussianPerturbed : public AnalyticFunction
   Teuchos::Array<double> data;
   Teuchos::Array<double> pert_mag;
 
-  boost::mt19937                                                                                              rng;
-  Teuchos::Array<Teuchos::RCP<boost::normal_distribution<double>>>                                            nd;
-  Teuchos::Array<Teuchos::RCP<boost::variate_generator<boost::mt19937&, boost::normal_distribution<double>>>> var_nor;
+  std::mt19937                                                       rng;
+  Teuchos::Array<Teuchos::RCP<std::normal_distribution<double>>>     nd;
 };
 
 class GaussSin : public AnalyticFunction

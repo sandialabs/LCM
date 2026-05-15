@@ -568,8 +568,7 @@ include_directories(
   ./LCM/parallel_models
   ./LCM/solvers
   ./LCM/utils
-  ./LCM/utils/dtk
-  ./LCM/utils/topology)
+  ./LCM/utils/dtk)
 
 link_directories(${Trilinos_LIBRARY_DIRS} ${Trilinos_TPL_LIBRARY_DIRS})
 

@@ -6,7 +6,6 @@
 
 #include <Albany_STKNodeSharing.hpp>
 #include <Shards_BasicTopologies.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 #include <iostream>
 #include <stk_io/IossBridge.hpp>
 #include <stk_mesh/base/Entity.hpp>

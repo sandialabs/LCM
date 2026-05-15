@@ -69,7 +69,6 @@
 
 #cmakedefine ALBANY_CONTACT
 #cmakedefine ALBANY_OMEGA_H
-#cmakedefine ALBANY_BGL
 
 // ================ Package-specific macros ================= //
 

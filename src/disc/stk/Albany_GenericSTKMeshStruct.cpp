@@ -250,6 +250,15 @@ GenericSTKMeshStruct::SetupFieldData(
     metaData->declare_part_subset(*activePart, *it.second);
   }
 
+  // Declare the dead-cells part. Initially empty; populated at step
+  // boundaries by Application::applyDeathToActivePart when cells die.
+  // process_killed_elements paints newly exposed active/dead interface
+  // faces here, and we also add the dead cells themselves so visualization
+  // filters and future BC inheritance (Phase 4) can find them via a pure
+  // STK part query.
+  deadCellsPart = &metaData->declare_part("dead_cells");
+  stk::io::put_io_part_attribute(*deadCellsPart);
+
 #if defined(ALBANY_STK_PERCEPT)
   // Build the eMesh if needed
   if (buildEMesh) eMesh = Teuchos::rcp(new stk::percept::PerceptMesh(metaData, bulkData, false));

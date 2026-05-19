@@ -6,7 +6,13 @@
 
 #include <string>
 
+#include "stk_mesh/base/BulkData.hpp"
+#include "stk_mesh/base/Part.hpp"
+#include "stk_mesh/baseImpl/elementGraph/GraphTypes.hpp"
+#include "stk_mesh/baseImpl/elementGraph/ProcessKilledElements.hpp"
+
 #include "AAdapt_RC_Manager.hpp"
+#include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_DataTypes.hpp"
 #include "Albany_DiscretizationFactory.hpp"
@@ -1148,6 +1154,88 @@ Application::fixOrphanNodesForElementDeath(
       }
     }
   }
+}
+
+bool
+Application::applyDeathToActivePart()
+{
+  // Phase 1 of the activePart-based element-death port.
+  //
+  // Pre: death_status_vecs_ has been populated by the material model
+  //   (J2Erosion writes (*death_status_vec_)[cell] = 1.0 at the last-pt
+  //   propagation point in J2Erosion_Def.hpp:770). Called once per
+  //   accepted time step from the observer hooks.
+  //
+  // Within the step that a cell dies, the existing scatter-skip in
+  // PHAL_ScatterResidual_Def.hpp still gates its assembly contribution.
+  // This routine handles the BETWEEN-steps housekeeping: the dead cell
+  // physically leaves activePart and the workset buckets, so subsequent
+  // steps never see it again.
+
+  if (death_status_vecs_.empty()) return false;
+
+  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
+  if (stk_disc == nullptr) return false;
+
+  auto& stk_mesh = *stk_disc->getSTKMeshStruct();
+  auto* activePart    = stk_mesh.getActivePart();
+  auto* deadCellsPart = stk_mesh.getDeadCellsPart();
+  if (activePart == nullptr || deadCellsPart == nullptr) return false;
+
+  auto& bulkData = *stk_mesh.bulkData;
+  auto& elemGIDws = stk_disc->getElemGIDws();
+
+  // Gather killed cells: those flagged dead in death_status_vecs_ that
+  // are still members of activePart. Mirrors the workset/cell scan in
+  // fixOrphanNodesForElementDeath.
+  stk::mesh::EntityVector killed;
+  int const num_worksets = static_cast<int>(death_status_vecs_.size());
+  for (auto const& [gid, lid] : elemGIDws) {
+    if (lid.ws >= num_worksets) continue;
+    if (death_status_vecs_[lid.ws] == Teuchos::null) continue;
+    auto const& ds = *death_status_vecs_[lid.ws];
+    if (lid.LID >= static_cast<int>(ds.size())) continue;
+    if (ds[lid.LID] <= 0.0) continue;
+
+    stk::mesh::Entity cell = bulkData.get_entity(stk::topology::ELEMENT_RANK, gid);
+    if (!bulkData.is_valid(cell)) continue;
+    if (!bulkData.bucket(cell).member(*activePart)) continue;  // already killed in a prior step
+
+    killed.push_back(cell);
+  }
+
+  if (killed.empty()) return false;
+
+  // Step B1: STK's process_killed_elements removes killed cells from
+  // activePart, walks the active/inactive interface, and creates new
+  // exposed-face entities painted into side_parts. We pass
+  // {activePart, deadCellsPart} so the new faces are IO-visible and
+  // tagged as on-the-dead-boundary. boundary_mesh_parts is nullptr in
+  // Phase 1; Phase 4 will populate it for BC inheritance.
+  stk::mesh::PartVector const side_parts{activePart, deadCellsPart};
+  stk::mesh::impl::ParallelSelectedInfo remoteActiveSelector;  // empty: serial OK
+  stk::mesh::process_killed_elements(
+      bulkData, killed, *activePart, remoteActiveSelector,
+      side_parts, /*boundary_mesh_parts=*/nullptr,
+      stk::mesh::impl::MeshModification::modification_optimization::MOD_END_SORT);
+
+  // Step B2: put the dead cells themselves into deadCellsPart so
+  // visualization filters and future BC inheritance can locate them via
+  // STK part queries instead of scanning death_status_vec.
+  bulkData.modification_begin();
+  for (stk::mesh::Entity cell : killed) {
+    bulkData.change_entity_parts(
+        cell,
+        stk::mesh::PartVector{deadCellsPart},
+        stk::mesh::PartVector{});
+  }
+  bulkData.modification_end();
+
+  // Step B3: rebuild worksets so dead cells drop out of the bucket
+  // selectors. Subsequent steps' fills never see them.
+  stk_disc->rebuildWorksets();
+
+  return true;
 }
 
 void

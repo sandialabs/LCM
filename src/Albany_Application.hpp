@@ -233,6 +233,14 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       Teuchos::RCP<Thyra_Vector>   f,
       Teuchos::RCP<Thyra_LinearOp> jac);
 
+  //! Phase 1 of the activePart-based element-death port: at step
+  //! boundaries, remove cells flagged dead in death_status_vecs_ from
+  //! STK's activePart and rebuild worksets so they no longer appear in
+  //! assembly. Returns true if any cells were removed (caller can use
+  //! this to drive preconditioner reset later).
+  bool
+  applyDeathToActivePart();
+
   // Element death status per workset, set by the ACE solver.
   // death_status_vecs_[ws] is a vector of per-cell death indicators.
   std::vector<Teuchos::RCP<std::vector<double>>> death_status_vecs_;

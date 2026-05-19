@@ -23,6 +23,18 @@ rebuildWorksetsEnabled()
   }();
   return enabled;
 }
+
+// Phase 1 gate (mirrors Albany_ObserverImpl.cpp): remove dead cells
+// from activePart per subdomain at step boundaries.
+bool
+phase1ActivePartDeathEnabled()
+{
+  static bool const enabled = [] {
+    char const* v = std::getenv("ALBANY_PHASE1_ACTIVE_PART_DEATH");
+    return (v != nullptr) && (std::string(v) == "1");
+  }();
+  return enabled;
+}
 }  // namespace
 
 ObserverImpl::ObserverImpl(Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps) : StatelessObserverImpl(apps) { return; }
@@ -43,7 +55,12 @@ ObserverImpl::observeSolution(
 
   StatelessObserverImpl::observeSolution(stamp, non_overlapped_solution, non_overlapped_solution_dot);
 
-  if (rebuildWorksetsEnabled()) {
+  if (phase1ActivePartDeathEnabled()) {
+    // applyDeathToActivePart rebuilds worksets internally when cells died.
+    for (int m = 0; m < this->n_models_; m++) {
+      this->apps_[m]->applyDeathToActivePart();
+    }
+  } else if (rebuildWorksetsEnabled()) {
     for (int m = 0; m < this->n_models_; m++) {
       this->apps_[m]->getDiscretization()->rebuildWorksets();
     }

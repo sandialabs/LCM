@@ -58,10 +58,22 @@ struct AbstractSTKMeshStruct : public AbstractMeshStruct
   //! Part containing all active (non-eroded) elements
   stk::mesh::Part* activePart{nullptr};
 
+  //! Part containing cells that have died via element death and the faces
+  //! newly exposed at the active/dead interface. Populated at step
+  //! boundaries by Application::applyDeathToActivePart. Phase 4 will use
+  //! this for BC inheritance onto exposed faces.
+  stk::mesh::Part* deadCellsPart{nullptr};
+
   stk::mesh::Part*
   getActivePart() const
   {
     return activePart;
+  }
+
+  stk::mesh::Part*
+  getDeadCellsPart() const
+  {
+    return deadCellsPart;
   }
 
   Teuchos::RCP<AbstractSTKFieldContainer>

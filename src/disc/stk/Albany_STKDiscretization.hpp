@@ -429,6 +429,11 @@ class STKDiscretization : public AbstractDiscretization
   void
   updateMesh();
 
+  //! Phase 0: workset-only subset of updateMesh(), for testing the
+  //! mid-run rebuild path before any element-death semantics are layered on.
+  void
+  rebuildWorksets() override;
+
   //! Function that transforms an STK mesh of a unit cube (for LandIce problems)
   void
   transformMesh();

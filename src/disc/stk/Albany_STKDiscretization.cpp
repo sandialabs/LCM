@@ -2578,4 +2578,17 @@ STKDiscretization::updateMesh()
   }
 }
 
+void
+STKDiscretization::rebuildWorksets()
+{
+  // Phase 0 of the activePart-based element-death port: re-run only the
+  // workset-related subset of updateMesh(). Safe to call mid-run only when
+  // the global DOF map and Jacobian graph are unchanged (true when no cells
+  // have been removed from activePart, as in Phase 0). Per-cell state
+  // survives because computeWorksetInfo() re-reads from STK fields.
+  computeWorksetInfo();
+  computeNodeSets();
+  computeSideSets();
+}
+
 }  // namespace Albany

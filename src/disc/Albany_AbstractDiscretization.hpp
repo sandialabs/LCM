@@ -307,6 +307,14 @@ class AbstractDiscretization
   // Routine that disables writing out of initial condition to Exodus file
   virtual void
   outputExodusSolutionInitialTime(const bool output_initial_soln_to_exo_file_) = 0;
+
+  // Phase 0 of the activePart-based element-death port: exercise the
+  // workset-rebuild path without changing semantics. Default is a no-op;
+  // STKDiscretization overrides.
+  virtual void
+  rebuildWorksets()
+  {
+  }
 };
 
 }  // namespace Albany

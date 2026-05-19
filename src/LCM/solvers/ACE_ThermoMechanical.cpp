@@ -504,10 +504,15 @@ ACEThermoMechanical::createPersistentApps()
       disc_params.set<std::string>("Exodus Solution Name", "displacement");
       disc_params.set<std::string>("Exodus SolutionDot Name", "velocity");
       disc_params.set<std::string>("Exodus SolutionDotDot Name", "acceleration");
+      // Distinct residual name: with shared mesh, both apps declare a
+      // residual field on the same metaData; defaulting both to "residual"
+      // produces a dim-mismatch conflict (mech: 3, thermal: 1).
+      disc_params.set<std::string>("Exodus Residual Name", "displacement_residual");
     }
     if (prob_types_[subdomain] == THERMAL) {
       disc_params.set<std::string>("Exodus Solution Name", "temperature");
       disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
+      disc_params.set<std::string>("Exodus Residual Name", "temperature_residual");
     }
 
     // Force matching workset sizes so state arrays line up cell-for-cell
@@ -526,6 +531,23 @@ ACEThermoMechanical::createPersistentApps()
   if (first_problem_params->isSublist("Adaptation")) {
     first_adapt_params = Teuchos::sublist(first_problem_params, "Adaptation", true);
   }
+
+  // In the normal single-app path, Application::initialSetUp seeds
+  // "Number Of Time Derivatives" on the Discretization sublist by
+  // reading from the Problem sublist (which AbstractProblem's ctor
+  // populates). We're constructing the mesh BEFORE any Application
+  // exists, so AbstractProblem hasn't run and neither sublist has the
+  // value yet. Derive it directly from prob_types_: MECHANICAL needs 2
+  // (displacement/velocity/acceleration), THERMAL needs 1. Use the max
+  // across subdomains so the shared mesh has enough headroom for side-set
+  // inheritance.
+  int shared_num_time_deriv = 0;
+  for (int s = 0; s < num_subdomains_; ++s) {
+    int const ntd = (prob_types_[s] == MECHANICAL) ? 2 : 1;
+    if (ntd > shared_num_time_deriv) shared_num_time_deriv = ntd;
+  }
+  first_disc_params->set<int>("Number Of Time Derivatives", shared_num_time_deriv);
+
   auto shared_mesh_abs = Albany::DiscretizationFactory::createMeshStruct(
       first_disc_params, first_adapt_params, comm_);
   auto shared_mesh = Teuchos::rcp_dynamic_cast<Albany::IossSTKMeshStruct>(shared_mesh_abs);

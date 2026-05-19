@@ -113,6 +113,12 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
   std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>              cached_side_set_sis_;
   std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> cached_side_set_req_;
   unsigned int                                                              cached_worksetSize_{0};
+
+  //! For a borrowed instance, a pointer to the donor so that we can
+  //! refresh bulkData from the donor right before SetupFieldData runs
+  //! (the donor only allocates bulkData inside its own setFieldAndBulkData,
+  //! so it may be null at the time the borrowing ctor copies it).
+  Teuchos::RCP<IossSTKMeshStruct> donor_for_borrowed_;
 };
 
 }  // Namespace Albany

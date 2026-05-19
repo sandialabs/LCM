@@ -68,6 +68,7 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   // for both.
   this->borrowedSharedResources = true;
   this->deferCommit             = true;
+  this->donor_for_borrowed_     = donor;
 
   metaData    = donor->metaData;
   bulkData    = donor->bulkData;
@@ -335,6 +336,15 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
     std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
     std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
+  // Borrowed instance: refresh bulkData from the donor right before
+  // SetupFieldData. The donor allocates bulkData inside its own
+  // setFieldAndBulkData (the first one to run); by the time we get
+  // here, the donor's bulkData is populated and we need to share it,
+  // not allocate a fresh one on the already-bulkData'd metaData.
+  if (borrowedSharedResources && Teuchos::nonnull(donor_for_borrowed_)) {
+    bulkData = donor_for_borrowed_->bulkData;
+  }
+
   this->SetupFieldData(commT, neq_, req, sis, worksetSize);
 
   // Cache for a possible deferred commitAndPopulate. These are read by

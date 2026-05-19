@@ -508,11 +508,38 @@ ACEThermoMechanical::createPersistentApps()
       // residual field on the same metaData; defaulting both to "residual"
       // produces a dim-mismatch conflict (mech: 3, thermal: 1).
       disc_params.set<std::string>("Exodus Residual Name", "displacement_residual");
+
+      // M4: single coupled output file. The mechanical subdomain solves
+      // last in the coupling loop, so its Exodus file captures the fully
+      // updated coupled state on the shared mesh; designate it the sole
+      // writer. Strip the thermal_/mechanical_ prefix from its filename
+      // so the coupled output has a physics-neutral name. This only
+      // mutates ACE's in-memory copy of the params (init_pls_); the YAML
+      // file is untouched, so a standalone mechanical run still produces
+      // mechanical_denudation.e.
+      if (disc_params.isType<std::string>("Exodus Output File Name")) {
+        std::string fname = disc_params.get<std::string>("Exodus Output File Name");
+        for (std::string const& pfx : {std::string("mechanical_"), std::string("thermal_")}) {
+          auto const pos = fname.find(pfx);
+          if (pos != std::string::npos) {
+            fname.erase(pos, pfx.size());
+            break;
+          }
+        }
+        disc_params.set<std::string>("Exodus Output File Name", fname);
+      }
     }
     if (prob_types_[subdomain] == THERMAL) {
       disc_params.set<std::string>("Exodus Solution Name", "temperature");
       disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
       disc_params.set<std::string>("Exodus Residual Name", "temperature_residual");
+
+      // M4: non-writer subdomain. Drop its output file param so no
+      // output broker is created (setupExodusOutput is gated on
+      // exoOutput, which derives from this param). Again only ACE's
+      // in-memory copy is changed; standalone thermal runs are
+      // unaffected.
+      disc_params.remove("Exodus Output File Name", /*throwIfNotExists=*/false);
     }
 
     // Force matching workset sizes so state arrays line up cell-for-cell
@@ -1195,6 +1222,13 @@ void
 ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain) const
 {
   if (do_outputs_[subdomain] == false) return;
+
+  // M4: single coupled output. Only the mechanical subdomain writes the
+  // Exodus file (it solves last, so its snapshot has the fully updated
+  // coupled state). The thermal subdomain has no output broker anyway
+  // (createPersistentApps removed its "Exodus Output File Name"); this
+  // early return also guards against do_outputs_ being forced true.
+  if (prob_types_[subdomain] != MECHANICAL) return;
 
   auto const xMV_rcp         = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
   auto&      abs_disc        = *discs_[subdomain];

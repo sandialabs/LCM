@@ -15,6 +15,8 @@
 #include <set>
 
 #include "ACEcommon.hpp"
+#include "Albany_DiscretizationFactory.hpp"
+#include "Albany_IossSTKMeshStruct.hpp"
 #include "Albany_PiroObserver.hpp"
 #include "Teuchos_TimeMonitor.hpp"
 #include "Albany_STKDiscretization.hpp"
@@ -490,50 +492,108 @@ void
 ACEThermoMechanical::createPersistentApps()
 {
   Teuchos::TimeMonitor timer(*Teuchos::TimeMonitor::getNewTimer("ACE: Create Persistent Apps"));
+
+  // ----- Per-subdomain param setup (Exodus field names, workset size) -----
+  // Done up front so all subdomains' discretization params are settled
+  // before we build the shared mesh.
   for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    auto& app_params = *init_pls_[subdomain];
+    auto& app_params  = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
 
-    // Name mechanical solution fields
     if (prob_types_[subdomain] == MECHANICAL) {
       disc_params.set<std::string>("Exodus Solution Name", "displacement");
       disc_params.set<std::string>("Exodus SolutionDot Name", "velocity");
       disc_params.set<std::string>("Exodus SolutionDotDot Name", "acceleration");
     }
-
-    // Name thermal fields
     if (prob_types_[subdomain] == THERMAL) {
       disc_params.set<std::string>("Exodus Solution Name", "temperature");
       disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
     }
 
-    // Force all subdomains to use the same workset size (-1 = one workset
-    // per element block) so that in-memory state transfer between apps
-    // operates on arrays with matching sizes.
+    // Force matching workset sizes so state arrays line up cell-for-cell
+    // between subdomains. -1 = one workset per element block.
     disc_params.set("Workset Size", -1);
+  }
 
-    solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(init_pls_[subdomain], comm_));
+  // ----- Build the shared STK mesh once, deferring commit -----
+  // ACE thermo-mechanical always uses the same mesh for both physics,
+  // so we open the Exodus file once via the first subdomain's params,
+  // then both Applications declare their fields on the shared metaData
+  // before a single commit fires.
+  auto first_disc_params    = Teuchos::sublist(init_pls_[0], "Discretization", true);
+  auto first_problem_params = Teuchos::sublist(init_pls_[0], "Problem", true);
+  Teuchos::RCP<Teuchos::ParameterList> first_adapt_params;
+  if (first_problem_params->isSublist("Adaptation")) {
+    first_adapt_params = Teuchos::sublist(first_problem_params, "Adaptation", true);
+  }
+  auto shared_mesh_abs = Albany::DiscretizationFactory::createMeshStruct(
+      first_disc_params, first_adapt_params, comm_);
+  auto shared_mesh = Teuchos::rcp_dynamic_cast<Albany::IossSTKMeshStruct>(shared_mesh_abs);
+  ALBANY_PANIC(
+      shared_mesh.is_null(),
+      "ACE_ThermoMechanical shared-mesh path requires IossSTKMeshStruct "
+      "(Discretization Method: Ioss/Exodus/Pamgen).\n");
+  shared_mesh->deferCommit = true;
 
-    Teuchos::RCP<Albany::Application> app;
-    solvers_[subdomain] = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
-    apps_[subdomain] = app;
+  // ----- Construct per-subdomain mesh struct: donor for 0, borrowing for the rest -----
+  std::vector<Teuchos::RCP<Albany::AbstractMeshStruct>> per_app_mesh(num_subdomains_);
+  per_app_mesh[0] = shared_mesh;
+  for (int s = 1; s < num_subdomains_; ++s) {
+    auto s_disc_params    = Teuchos::sublist(init_pls_[s], "Discretization", true);
+    auto s_problem_params = Teuchos::sublist(init_pls_[s], "Problem", true);
+    Teuchos::RCP<Teuchos::ParameterList> s_adapt_params;
+    if (s_problem_params->isSublist("Adaptation")) {
+      s_adapt_params = Teuchos::sublist(s_problem_params, "Adaptation", true);
+    }
+    per_app_mesh[s] = Teuchos::rcp(new Albany::IossSTKMeshStruct(
+        shared_mesh, s_disc_params, s_adapt_params, comm_));
+  }
 
-    auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(app->getDiscretization());
-    discs_[subdomain] = stk_disc;
-    stk_mesh_structs_[subdomain] = stk_disc->getSTKMeshStruct();
+  // ----- Construct each Application with its mesh, deferring post-commit -----
+  // Each app's createDiscretization runs setFieldAndBulkData on its mesh
+  // struct, which (because deferCommit is set) declares the app's field
+  // container on the shared metaData and stops before commit.
+  for (int s = 0; s < num_subdomains_; ++s) {
+    apps_[s] = Teuchos::rcp(new Albany::Application(
+        comm_, init_pls_[s], per_app_mesh[s], /*deferPostCommit=*/true));
+  }
 
-    do_outputs_[subdomain]      = stk_mesh_structs_[subdomain]->exoOutput;
-    do_outputs_init_[subdomain] = stk_mesh_structs_[subdomain]->exoOutput;
+  // ----- Single commit + populate on the shared mesh -----
+  // After this, both apps' fields are alive on the committed metaData
+  // and the bulk data is populated from the Exodus file. We pass the
+  // donor's params + the first app's StateInfoStruct; per-app state
+  // marking happens through each app's StateManager anyway.
+  shared_mesh->commitAndPopulate(
+      comm_, first_disc_params, apps_[0]->getStateMgr().getStateInfoStruct());
 
-    model_evaluators_[subdomain] = solver_factories_[subdomain]->returnModel();
+  // ----- Finalize each app: runs disc->updateMesh() + finalSetUp -----
+  for (int s = 0; s < num_subdomains_; ++s) {
+    apps_[s]->finalizePostCommit();
+  }
 
-    curr_x_[subdomain] = Teuchos::null;
+  // ----- Build SolverFactory + Piro per app, reusing the existing Application -----
+  for (int s = 0; s < num_subdomains_; ++s) {
+    solver_factories_[s] = Teuchos::rcp(new Albany::SolverFactory(init_pls_[s], comm_));
 
-    // Calculate and store the min value of the z-coordinate for wave pressure NBC
-    if (prob_types_[subdomain] == THERMAL) {
+    Teuchos::RCP<Albany::Application> app_ref = apps_[s];
+    solvers_[s] = solver_factories_[s]->createAndGetAlbanyApp(
+        app_ref, comm_, comm_, Teuchos::null, /*createAlbanyApp=*/false);
+
+    auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(apps_[s]->getDiscretization());
+    discs_[s]            = stk_disc;
+    stk_mesh_structs_[s] = stk_disc->getSTKMeshStruct();
+
+    do_outputs_[s]      = stk_mesh_structs_[s]->exoOutput;
+    do_outputs_init_[s] = stk_mesh_structs_[s]->exoOutput;
+
+    model_evaluators_[s] = solver_factories_[s]->returnModel();
+
+    curr_x_[s] = Teuchos::null;
+
+    if (prob_types_[s] == THERMAL) {
       Teuchos::RCP<const Thyra_MultiVector> coord_mv = stk_disc->getCoordMV();
-      Teuchos::RCP<const Thyra_Vector> z_coord = coord_mv->col(2);
-      zmin_ = Thyra::min(*z_coord);
+      Teuchos::RCP<const Thyra_Vector>      z_coord  = coord_mv->col(2);
+      zmin_                                          = Thyra::min(*z_coord);
     }
   }
 

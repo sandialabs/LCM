@@ -169,8 +169,10 @@ Application::finalizePostCommit(RCP<Thyra_Vector const> const& initial_guess)
 
   // The shared mesh has been committed and populated by the orchestrator.
   // Run the discretization update + finalSetUp that the shared-mesh ctor
-  // deferred.
-  disc->updateMesh();
+  // deferred. updateMesh lives on STKDiscretization specifically; for
+  // shared-mesh ACE coupling we always have STK.
+  auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(disc, true);
+  stk_disc->updateMesh();
   finalSetUp(deferred_params_, initial_guess);
 
   deferred_post_commit_pending_ = false;

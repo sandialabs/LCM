@@ -24,17 +24,6 @@ rebuildWorksetsEnabled()
   return enabled;
 }
 
-// Phase 1 gate (mirrors Albany_ObserverImpl.cpp): remove dead cells
-// from activePart per subdomain at step boundaries.
-bool
-phase1ActivePartDeathEnabled()
-{
-  static bool const enabled = [] {
-    char const* v = std::getenv("ALBANY_PHASE1_ACTIVE_PART_DEATH");
-    return (v != nullptr) && (std::string(v) == "1");
-  }();
-  return enabled;
-}
 }  // namespace
 
 ObserverImpl::ObserverImpl(Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>& apps) : StatelessObserverImpl(apps) { return; }
@@ -55,12 +44,18 @@ ObserverImpl::observeSolution(
 
   StatelessObserverImpl::observeSolution(stamp, non_overlapped_solution, non_overlapped_solution_dot);
 
-  if (phase1ActivePartDeathEnabled()) {
-    // applyDeathToActivePart rebuilds worksets internally when cells died.
-    for (int m = 0; m < this->n_models_; m++) {
-      this->apps_[m]->applyDeathToActivePart();
-    }
-  } else if (rebuildWorksetsEnabled()) {
+  // M3a: activePart-based element death is on by default for each
+  // subdomain. The function returns immediately if no cells died this
+  // step. With M1's shared STKMeshStruct, all subdomains see the same
+  // bulkData/activePart, so killing on one app naturally affects the
+  // others; calling per-app is still correct because death_status_vecs_
+  // is populated only by the app whose material model fires the death
+  // predicate (typically the mechanical subdomain in ACE).
+  bool any_killed = false;
+  for (int m = 0; m < this->n_models_; m++) {
+    if (this->apps_[m]->applyDeathToActivePart()) any_killed = true;
+  }
+  if (!any_killed && rebuildWorksetsEnabled()) {
     for (int m = 0; m < this->n_models_; m++) {
       this->apps_[m]->getDiscretization()->rebuildWorksets();
     }

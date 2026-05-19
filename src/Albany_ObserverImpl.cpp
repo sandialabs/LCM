@@ -32,27 +32,6 @@ rebuildWorksetsEnabled()
   return enabled;
 }
 
-// Phase 1 gate: set ALBANY_PHASE1_ACTIVE_PART_DEATH=1 to remove dead
-// cells from STK's activePart at step boundaries (Adagio idiom).
-// Default off keeps existing behavior. When both Phase 0 and Phase 1
-// gates are on, only Phase 1 runs: applyDeathToActivePart() already
-// rebuilds worksets when cells died, so the Phase 0 rebuild would be
-// redundant; we skip it to avoid a double rebuild per step.
-bool
-phase1ActivePartDeathEnabled()
-{
-  static bool const enabled = [] {
-    char const* v  = std::getenv("ALBANY_PHASE1_ACTIVE_PART_DEATH");
-    bool const  on = (v != nullptr) && (std::string(v) == "1");
-    if (on) {
-      *Teuchos::VerboseObjectBase::getDefaultOStream()
-          << "[Phase 1] ALBANY_PHASE1_ACTIVE_PART_DEATH=1: "
-             "dead cells leave activePart at step boundaries.\n";
-    }
-    return on;
-  }();
-  return enabled;
-}
 }  // namespace
 
 ObserverImpl::ObserverImpl(const Teuchos::RCP<Application>& app) : StatelessObserverImpl(app) {}
@@ -81,11 +60,12 @@ ObserverImpl::observeSolution(
 
   StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
 
-  if (phase1ActivePartDeathEnabled()) {
-    // applyDeathToActivePart rebuilds worksets internally when cells died,
-    // so skip the Phase 0 redundant rebuild.
-    app_->applyDeathToActivePart();
-  } else if (rebuildWorksetsEnabled()) {
+  // M3a: activePart-based element death is on by default. The function
+  // returns immediately if no cells died this step. It rebuilds worksets
+  // internally when it does kill cells, so the Phase 0 test-only rebuild
+  // is skipped in that case to avoid double work.
+  bool const killed = app_->applyDeathToActivePart();
+  if (!killed && rebuildWorksetsEnabled()) {
     app_->getDiscretization()->rebuildWorksets();
   }
 }
@@ -97,11 +77,12 @@ ObserverImpl::observeSolution(double stamp, const Thyra_MultiVector& nonOverlapp
   app_->getStateMgr().updateStates();
   StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution);
 
-  if (phase1ActivePartDeathEnabled()) {
-    // applyDeathToActivePart rebuilds worksets internally when cells died,
-    // so skip the Phase 0 redundant rebuild.
-    app_->applyDeathToActivePart();
-  } else if (rebuildWorksetsEnabled()) {
+  // M3a: activePart-based element death is on by default. The function
+  // returns immediately if no cells died this step. It rebuilds worksets
+  // internally when it does kill cells, so the Phase 0 test-only rebuild
+  // is skipped in that case to avoid double work.
+  bool const killed = app_->applyDeathToActivePart();
+  if (!killed && rebuildWorksetsEnabled()) {
     app_->getDiscretization()->rebuildWorksets();
   }
 }

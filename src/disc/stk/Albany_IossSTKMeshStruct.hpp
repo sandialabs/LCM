@@ -23,6 +23,21 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
       const Teuchos::RCP<Teuchos::ParameterList>& adaptParams,
       const Teuchos::RCP<Teuchos_Comm const>&     commT);
 
+  //! Borrowing constructor: builds an IossSTKMeshStruct that shares
+  //! metaData/bulkData/mesh_data with `donor` instead of opening the
+  //! Exodus file a second time. partVec/nsPartVec/ssPartVec/meshSpecs
+  //! are copied from the donor (the underlying parts live on the shared
+  //! metaData, so the copies are alias maps). The borrowed instance's
+  //! setFieldAndBulkData will declare its own field container on the
+  //! shared metaData but skip bulk-data setup/commit. Used by
+  //! ACE_ThermoMechanical to share one mesh across thermal+mechanical
+  //! Applications.
+  IossSTKMeshStruct(
+      const Teuchos::RCP<IossSTKMeshStruct>&      donor,
+      const Teuchos::RCP<Teuchos::ParameterList>& params,
+      const Teuchos::RCP<Teuchos::ParameterList>& adaptParams,
+      const Teuchos::RCP<Teuchos_Comm const>&     commT);
+
   ~IossSTKMeshStruct();
 
   void
@@ -35,6 +50,18 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
       const unsigned int                                                               worksetSize,
       std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis = {},
       const std::map<std::string, AbstractFieldContainer::FieldContainerRequirements>& side_set_req = {});
+
+  //! Run the deferred post-declaration work on the donor instance:
+  //! mesh_data->set_bulk_data, add_all_mesh_fields_as_input_fields,
+  //! metaData->commit(), populate bulk data, and read restart. Called by
+  //! the orchestrator once all participating apps have declared their
+  //! fields. Borrowed instances must NOT call this (they share state
+  //! with the donor).
+  void
+  commitAndPopulate(
+      const Teuchos::RCP<Teuchos_Comm const>&      commT,
+      const Teuchos::RCP<Teuchos::ParameterList>&  params,
+      const Teuchos::RCP<Albany::StateInfoStruct>& sis) override;
 
   int
   getSolutionFieldHistoryDepth() const
@@ -78,6 +105,14 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
   bool   m_hasRestartSolution;
   double m_restartDataTime;
   int    m_solutionFieldHistoryDepth;
+
+  //! Parameters cached by setFieldAndBulkData for use by a deferred
+  //! commitAndPopulate. Only meaningful when deferCommit is true and the
+  //! orchestrator will invoke commitAndPopulate later.
+  AbstractFieldContainer::FieldContainerRequirements                        cached_req_;
+  std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>>              cached_side_set_sis_;
+  std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> cached_side_set_req_;
+  unsigned int                                                              cached_worksetSize_{0};
 };
 
 }  // Namespace Albany

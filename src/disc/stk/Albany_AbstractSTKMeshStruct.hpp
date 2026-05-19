@@ -76,6 +76,34 @@ struct AbstractSTKMeshStruct : public AbstractMeshStruct
     return deadCellsPart;
   }
 
+  //! When true, setFieldAndBulkData declares fields on metaData but stops
+  //! before metaData->commit() and the post-commit bulk-data population.
+  //! The orchestrator (e.g. ACE_ThermoMechanical sharing one mesh across
+  //! thermal+mechanical apps) is then responsible for calling
+  //! commitAndPopulate() once all participating apps have declared their
+  //! fields. Default false preserves existing single-app behavior.
+  bool deferCommit{false};
+
+  //! Marks an instance as "borrowing" metaData/bulkData/mesh_data from
+  //! another (donor) STKMeshStruct. A borrowed instance's
+  //! setFieldAndBulkData declares its own fields on the shared metaData
+  //! but skips bulk-data setup and commit (the donor's commitAndPopulate
+  //! handles those once for both).
+  bool borrowedSharedResources{false};
+
+  //! Run the deferred post-declaration work (commit metaData + populate
+  //! bulk data + read restart, as applicable). Called exactly once by the
+  //! orchestrator, on the donor instance, after every participating app
+  //! has finished declaring its fields. Default is a no-op; concrete
+  //! mesh struct types that need it (e.g. IossSTKMeshStruct) override.
+  virtual void
+  commitAndPopulate(
+      const Teuchos::RCP<Teuchos_Comm const>&     /*commT*/,
+      const Teuchos::RCP<Teuchos::ParameterList>& /*params*/,
+      const Teuchos::RCP<Albany::StateInfoStruct>& /*sis*/)
+  {
+  }
+
   Teuchos::RCP<AbstractSTKFieldContainer>
   getFieldContainer()
   {

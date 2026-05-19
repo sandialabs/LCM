@@ -1278,15 +1278,30 @@ Application::applyDeathToActivePart()
 
   // Step B1: STK's process_killed_elements removes killed cells from
   // activePart, walks the active/inactive interface, and creates new
-  // exposed-face entities painted into side_parts. We pass
-  // {activePart, deadCellsPart} so the new faces are IO-visible and
-  // tagged as on-the-dead-boundary. boundary_mesh_parts is nullptr in
-  // Phase 1; Phase 4 will populate it for BC inheritance.
+  // exposed-face entities painted into side_parts ({activePart,
+  // deadCellsPart} so the new faces are IO-visible and tagged as
+  // on-the-dead-boundary).
+  //
+  // M3b: boundary_mesh_parts populated with every declared side-set
+  // part. STK inherits old-boundary membership onto newly exposed
+  // faces, so any user-declared Neumann-style BC on a side-set
+  // automatically extends onto the new interface faces when the cell
+  // that previously bore the BC dies. With shared mesh, both thermal
+  // and mechanical apps' side-set BCs live on the same metaData; each
+  // app's BC evaluator iterates only its own declared parts so the
+  // union pass-through is harmless. Dirichlet BCs on nodesets are not
+  // affected by this mechanism (faces, not nodes, are propagated).
   stk::mesh::PartVector const side_parts{activePart, deadCellsPart};
+  stk::mesh::PartVector       bc_mesh_parts;
+  bc_mesh_parts.reserve(stk_mesh.ssPartVec.size());
+  for (auto& kv : stk_mesh.ssPartVec) {
+    if (kv.second != nullptr) bc_mesh_parts.push_back(kv.second);
+  }
   stk::mesh::impl::ParallelSelectedInfo remoteActiveSelector;  // empty: serial OK
   stk::mesh::process_killed_elements(
       bulkData, killed, *activePart, remoteActiveSelector,
-      side_parts, /*boundary_mesh_parts=*/nullptr,
+      side_parts,
+      bc_mesh_parts.empty() ? nullptr : &bc_mesh_parts,
       stk::mesh::impl::MeshModification::modification_optimization::MOD_END_SORT);
 
   // Step B2: put the dead cells themselves into deadCellsPart so

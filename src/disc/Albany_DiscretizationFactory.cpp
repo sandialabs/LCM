@@ -169,7 +169,9 @@ Albany::DiscretizationFactory::createDiscretizationFromInternalMeshStruct(
   }
   auto ms   = Teuchos::rcp_dynamic_cast<Albany::AbstractSTKMeshStruct>(meshStruct);
   auto disc = Teuchos::rcp(new Albany::STKDiscretization(discParams, ms, commT, rigidBodyModes, sideSetEquations));
-  disc->updateMesh();
+  if (!deferUpdateMesh) {
+    disc->updateMesh();
+  }
   return disc;
 }
 

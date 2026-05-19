@@ -57,7 +57,28 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       Teuchos::RCP<Thyra_Vector const> const&     initial_guess = Teuchos::null,
       bool const                                  schwarz       = false);
 
+  //! Ctor for orchestrated shared-mesh construction: caller (e.g.
+  //! ACE_ThermoMechanical) supplies a pre-built STKMeshStruct that is
+  //! shared with other Applications, and sets deferPostCommit=true so
+  //! that this ctor stops after createDiscretization (without running
+  //! disc->updateMesh or finalSetUp). The orchestrator then calls
+  //! sharedMesh->commitAndPopulate exactly once, followed by
+  //! finalizePostCommit() on each Application.
+  Application(
+      const Teuchos::RCP<Teuchos_Comm const>&            comm,
+      const Teuchos::RCP<Teuchos::ParameterList>&        params,
+      const Teuchos::RCP<Albany::AbstractMeshStruct>&    sharedMesh,
+      bool const                                         deferPostCommit,
+      Teuchos::RCP<Thyra_Vector const> const&            initial_guess = Teuchos::null,
+      bool const                                         schwarz       = false);
+
   Application(const Teuchos::RCP<Teuchos_Comm const>& comm);
+
+  //! Run the post-commit portion of construction: disc->updateMesh() +
+  //! finalSetUp. Called by the orchestrator after the shared mesh's
+  //! commitAndPopulate has fired. No-op if the ordinary ctor was used.
+  void
+  finalizePostCommit(Teuchos::RCP<Thyra_Vector const> const& initial_guess = Teuchos::null);
 
   Application(const Application&) = delete;
 
@@ -580,6 +601,12 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
  protected:
   bool is_schwarz_{false};
+
+  //! Set by the shared-mesh ctor; tells finalizePostCommit which
+  //! params to re-use for the deferred finalSetUp call.
+  bool                                            deferred_post_commit_pending_{false};
+  Teuchos::RCP<Teuchos::ParameterList>            deferred_params_;
+  Teuchos::RCP<Albany::AbstractMeshStruct>        deferred_shared_mesh_;
   bool no_dir_bcs_{false};
   bool requires_sdbcs_{false};
   bool requires_orig_dbcs_{false};

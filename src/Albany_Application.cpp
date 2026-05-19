@@ -110,6 +110,74 @@ Application::Application(const RCP<Teuchos_Comm const>& comm_)
   // Nothing to be done here
 }
 
+Application::Application(
+    const RCP<Teuchos_Comm const>&                     comm_,
+    const RCP<Teuchos::ParameterList>&                 params,
+    const Teuchos::RCP<Albany::AbstractMeshStruct>&    sharedMesh,
+    bool const                                         deferPostCommit,
+    RCP<Thyra_Vector const> const&                     initial_guess,
+    bool const                                         schwarz)
+    : is_schwarz_{schwarz},
+      no_dir_bcs_(false),
+      requires_sdbcs_(false),
+      requires_orig_dbcs_(false),
+      comm(comm_),
+      out(Teuchos::VerboseObjectBase::getDefaultOStream()),
+      params_(params),
+      physicsBasedPreconditioner(false),
+      shapeParamsHaveBeenReset(false),
+      phxGraphVisDetail(0),
+      stateGraphVisDetail(0),
+      morphFromInit(true),
+      perturbBetaForDirichlets(0.0)
+{
+  initialSetUp(params);
+
+  // Shared-mesh path: inject the pre-built mesh struct so the
+  // DiscretizationFactory uses it instead of constructing its own from
+  // YAML. createMeshSpecs(mesh) registers the shared mesh on the factory.
+  ALBANY_PANIC(sharedMesh.is_null(), "Application shared-mesh ctor requires non-null sharedMesh.\n");
+  createMeshSpecs(sharedMesh);
+  buildProblem();
+
+  if (deferPostCommit) {
+    // Defer disc->updateMesh() so the orchestrator can call
+    // sharedMesh->commitAndPopulate() first. createDiscretization
+    // still runs setFieldAndBulkData (which declares this app's fields
+    // on the shared metaData but skips commit when deferCommit is set
+    // on the mesh).
+    discFactory->deferUpdateMesh = true;
+    createDiscretization();
+    discFactory->deferUpdateMesh = false;  // restore for any later calls
+
+    // Stash state finalizePostCommit needs.
+    deferred_post_commit_pending_ = true;
+    deferred_params_              = params;
+    deferred_shared_mesh_         = sharedMesh;
+    // initial_guess is captured by finalizePostCommit's parameter.
+    (void)initial_guess;
+  } else {
+    createDiscretization();
+    finalSetUp(params, initial_guess);
+  }
+}
+
+void
+Application::finalizePostCommit(RCP<Thyra_Vector const> const& initial_guess)
+{
+  if (!deferred_post_commit_pending_) return;
+
+  // The shared mesh has been committed and populated by the orchestrator.
+  // Run the discretization update + finalSetUp that the shared-mesh ctor
+  // deferred.
+  disc->updateMesh();
+  finalSetUp(deferred_params_, initial_guess);
+
+  deferred_post_commit_pending_ = false;
+  deferred_params_              = Teuchos::null;
+  deferred_shared_mesh_         = Teuchos::null;
+}
+
 void
 Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
 {

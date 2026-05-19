@@ -627,44 +627,28 @@ ACEThermoMechanical::createPersistentApps()
 }
 
 void
-ACEThermoMechanical::transferThermalToMechanical(int thermal_sub, int mech_sub) const
+ACEThermoMechanical::transferThermalToMechanical(int /*thermal_sub*/, int /*mech_sub*/) const
 {
-  auto& thermal_state_mgr = apps_[thermal_sub]->getStateMgr();
-  auto& mech_state_mgr = apps_[mech_sub]->getStateMgr();
-
-  auto& thermal_states = thermal_state_mgr.getStateArrays().elemStateArrays;
-  auto& mech_states = mech_state_mgr.getStateArrays().elemStateArrays;
-
-  // Transfer ACE_Ice_Saturation (and any other shared QP state fields).
-  // Both apps must use the same workset configuration (enforced in
-  // createPersistentApps) so that state arrays have matching sizes.
-  std::vector<std::string> shared_fields = {"ACE_Ice_Saturation"};
-  for (auto const& field_name : shared_fields) {
-    for (size_t ws = 0; ws < thermal_states.size() && ws < mech_states.size(); ++ws) {
-      auto it_thermal = thermal_states[ws].find(field_name);
-      auto it_mech = mech_states[ws].find(field_name);
-      if (it_thermal != thermal_states[ws].end() && it_mech != mech_states[ws].end()) {
-        auto const& src = it_thermal->second;
-        auto&       dst = it_mech->second;
-        ALBANY_ASSERT(src.size() == dst.size(),
-            "ACE_Ice_Saturation size mismatch at ws=" << ws
-            << ": thermal=" << src.size() << " mechanical=" << dst.size()
-            << ". Both apps must use the same Workset Size.");
-        for (size_t i = 0; i < src.size(); ++i) {
-          dst[i] = src[i];
-        }
-      }
-    }
-  }
+  // M2: no-op since M1.
+  // Both apps now share one STKMeshStruct (one MetaData, one BulkData),
+  // so element state fields like ACE_Ice_Saturation live on the shared
+  // mesh. Each Application's StateManager reads from the same STK fields
+  // at workset-fill time, so values are automatically consistent across
+  // apps. The pre-M1 path explicitly copied thermal_states[ws][name]
+  // into mech_states[ws][name] cell-by-cell; that copy is now an
+  // identity (same underlying STK field on both sides) and is omitted.
+  //
+  // Call sites are left in place to preserve the existing coupling
+  // sequence structure; a later pass can remove them entirely.
 }
 
 void
-ACEThermoMechanical::transferMechanicalToThermal(int mech_sub, int thermal_sub) const
+ACEThermoMechanical::transferMechanicalToThermal(int /*mech_sub*/, int /*thermal_sub*/) const
 {
-  // Mesh topology changes (element deactivation) are automatically
-  // visible to the thermal app since both apps share the same
-  // STK BulkData when using the active_part mechanism.
-  // No explicit field transfer needed.
+  // M2: no-op. Same reasoning as transferThermalToMechanical above.
+  // Mesh topology changes (element death, when Phase 1 is active) and
+  // shared element state are automatically visible to the thermal app
+  // via the shared STK BulkData.
 }
 
 bool

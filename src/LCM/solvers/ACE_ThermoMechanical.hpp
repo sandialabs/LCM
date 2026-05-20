@@ -17,7 +17,6 @@
 #include "Albany_ModelEvaluator.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Piro_NOXSolver.hpp"
-#include "StateVarUtils.hpp"
 #include "Thyra_DefaultProductVector.hpp"
 #include "Thyra_DefaultProductVectorSpace.hpp"
 #include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
@@ -146,12 +145,6 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   createPersistentApps();
 
   void
-  transferThermalToMechanical(int thermal_subdomain, int mechanical_subdomain) const;
-
-  void
-  transferMechanicalToThermal(int mechanical_subdomain, int thermal_subdomain) const;
-
-  void
   doQuasistaticOutput(ST const time) const;
 
   void
@@ -204,9 +197,8 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdot_;
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdotdot_;
 
-  mutable std::vector<LCM::StateArrays> internal_states_;
-  mutable std::vector<bool>             do_outputs_;
-  mutable std::vector<bool>             do_outputs_init_;
+  mutable std::vector<bool> do_outputs_;
+  mutable std::vector<bool> do_outputs_init_;
 
   bool std_init_guess_{false};
 

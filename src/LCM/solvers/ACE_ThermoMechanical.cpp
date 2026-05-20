@@ -173,7 +173,6 @@ ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> co
   sub_outargs_.resize(num_subdomains_);
   curr_x_.resize(num_subdomains_);
   prev_step_x_.resize(num_subdomains_);
-  internal_states_.resize(num_subdomains_);
 
   // IKT NOTE 6/4/2020:the xdotdot arrays are
   // not relevant for thermal problems,
@@ -646,68 +645,6 @@ ACEThermoMechanical::createPersistentApps()
     }
   }
 
-  // Cache initial internal states
-  for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    auto& state_mgr = apps_[subdomain]->getStateMgr();
-    fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-  }
-}
-
-void
-ACEThermoMechanical::transferThermalToMechanical(int thermal_sub, int mech_sub) const
-{
-  // Make the mechanical solve see the ice saturation the thermal solve
-  // just computed.
-  //
-  // Root cause this works around (task #62): with M1's shared STK mesh,
-  // the thermal and mechanical apps' element-state arrays for shared
-  // fields like ACE_Ice_Saturation ALIAS THE SAME underlying STK-field
-  // storage (verified: identical data buffer addresses). The mechanical
-  // phase begins with fromTo(internal_states_[mech], getStateArrays()),
-  // restoring the mechanical app's cached states -- and because the
-  // buffer is shared, that restore overwrites the ACE_Ice_Saturation the
-  // thermal solve produced moments earlier with the mechanical app's
-  // stale (initial-condition) ice. The mechanical solve would then run
-  // on frozen ice, the material never weakens, and nothing erodes.
-  //
-  // The fix: re-install the thermal result here, AFTER the mechanical
-  // restore has run. internal_states_[thermal_sub] is a deep copy
-  // (LCM::StateArrays -- plain std::vector storage, decoupled from the
-  // shared STK buffer; see StateVarUtils.hpp) saved at the end of the
-  // thermal phase, so it still holds the freshly computed ice. Copy it
-  // into the live (shared) mechanical state. The mechanical solve then
-  // reads current ice.
-  auto const& thermal_saved = internal_states_[thermal_sub].element_state_arrays;
-  auto&       mech_live     = apps_[mech_sub]->getStateMgr().getStateArrays().elemStateArrays;
-
-  std::vector<std::string> const shared_fields = {"ACE_Ice_Saturation"};
-  for (auto const& field_name : shared_fields) {
-    for (size_t ws = 0; ws < thermal_saved.size() && ws < mech_live.size(); ++ws) {
-      auto it_thermal = thermal_saved[ws].find(field_name);
-      auto it_mech    = mech_live[ws].find(field_name);
-      if (it_thermal != thermal_saved[ws].end() && it_mech != mech_live[ws].end()) {
-        auto const& src = it_thermal->second;  // std::vector<ST> (deep copy)
-        auto&       dst = it_mech->second;     // Albany::MDArray (live, shared)
-        ALBANY_ASSERT(
-            src.size() == dst.size(),
-            "ACE_Ice_Saturation size mismatch at ws=" << ws << ": thermal-saved=" << src.size() << " mechanical=" << dst.size());
-        for (size_t i = 0; i < src.size(); ++i) {
-          dst[i] = src[i];
-        }
-      }
-    }
-  }
-}
-
-void
-ACEThermoMechanical::transferMechanicalToThermal(int /*mech_sub*/, int /*thermal_sub*/) const
-{
-  // No element-state copy needed mechanical->thermal. Element death is
-  // the only mechanical-side change the thermal app must see, and that
-  // propagates automatically: with M1's shared mesh, dead cells leave
-  // the shared activePart, so the thermal app's worksets (rebuilt from
-  // the shared BulkData) exclude them too. This direction was already
-  // a no-op before M2.
 }
 
 bool
@@ -742,14 +679,6 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   }
   int stop{0};
   ST  current_time{initial_time_};
-
-  // Identify thermal and mechanical subdomain indices
-  int thermal_sub = -1;
-  int mech_sub = -1;
-  for (int s = 0; s < num_subdomains_; ++s) {
-    if (prob_types_[s] == THERMAL) thermal_sub = s;
-    if (prob_types_[s] == MECHANICAL) mech_sub = s;
-  }
 
   // Time-stepping loop
   while (stop < maximum_steps_ && current_time < final_time_) {
@@ -786,49 +715,28 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == THERMAL) {
           *fos_ << "Problem            :Thermal\n";
-          auto& app       = *apps_[subdomain];
-          auto& state_mgr = app.getStateMgr();
-          {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Restore Thermal States"));
-            fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-          }
           {
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Solve"));
             AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
           if (failed_ == false) {
-            {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Save Thermal States"));
-              fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-            }
-            {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Output"));
-              doDynamicInitialOutput(next_time, subdomain);
-            }
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Output"));
+            doDynamicInitialOutput(next_time, subdomain);
           }
         }
         if (prob_type == MECHANICAL && failed_ == false) {
           *fos_ << "Problem            :Mechanical\n";
-          auto& app       = *apps_[subdomain];
-          auto& state_mgr = app.getStateMgr();
-          {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Restore Mechanical States"));
-            fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-          }
-          // Transfer thermal results AFTER restoring mechanical states,
-          // so the thermal-to-mechanical transfer is not overwritten.
-          if (thermal_sub >= 0) {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Transfer Thermal->Mechanical"));
-            transferThermalToMechanical(thermal_sub, subdomain);
-          }
           // Set death status on the Application for scatter skip and orphan
-          // fix. Read the per-cell `cell_death` state variable, which J2Erosion
-          // sets to 1.0 once every integration point in the cell has failed
-          // (in any mode) and 0.0 otherwise. cell_death is a cell-scalar so
-          // there is no qp dimension to skip past.
+          // fix. Read the per-cell `cell_death` state variable, which
+          // J2Erosion sets to 1.0 once every integration point in the cell
+          // has failed (in any mode) and 0.0 otherwise. cell_death is a
+          // cell-scalar so there is no qp dimension to skip past. The
+          // mechanical app's live element-state arrays are read directly:
+          // states persist in the shared STK mesh between steps, so no
+          // snapshot restore is needed.
           {
             auto& app = *apps_[subdomain];
-            auto& esa = internal_states_[subdomain].element_state_arrays;
+            auto& esa = app.getStateMgr().getStateArrays().elemStateArrays;
             app.death_status_vecs_.resize(esa.size());
             for (size_t ws = 0; ws < esa.size(); ++ws) {
               auto it = esa[ws].find("cell_death");
@@ -848,14 +756,8 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
           if (failed_ == false) {
-            {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Save Mechanical States"));
-              fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-            }
-            {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Output"));
-              doDynamicInitialOutput(next_time, subdomain);
-            }
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Output"));
+            doDynamicInitialOutput(next_time, subdomain);
           }
         }
         if (failed_ == true) {
@@ -942,6 +844,18 @@ ACEThermoMechanical::AdvanceThermalDynamics(
     double const time_step) const
 {
   failed_ = false;
+
+  // Re-sync this subdomain's discretization to the shared STK mesh.
+  // The mechanical phase erodes cells, mutating the shared BulkData:
+  // process_killed_elements + modification_end reallocate STK bucket
+  // storage. Only the eroding app's own discretization is rebuilt at
+  // that point (Application::applyDeathToActivePart); the thermal
+  // discretization still holds worksets whose cached coordinate
+  // pointers now dangle. Rebuilding here re-reads geometry and
+  // connectivity from the current shared mesh -- and drops eroded
+  // cells from the thermal worksets -- before the thermal solve runs.
+  discs_[subdomain]->rebuildWorksets();
+
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 

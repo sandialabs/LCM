@@ -1103,126 +1103,76 @@ Application::writePhalanxGraph(Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits
 }
 
 // Element death: fix orphan nodes after global assembly.
-// Orphan nodes are connected only to dead elements and receive no
-// stiffness contributions (dead elements are skipped in scatter).
-// Set their Jacobian diagonal to 1.0 and residual to 0.0.
+// Element death leaves orphan nodes -- nodes connected only to dead
+// (deactivated) elements. No active element contributes to an orphan
+// DOF, so its row in any assembled operator is entirely zero. A zero
+// row makes the operator singular, which breaks the linear solves and,
+// for the mass matrix that Piro::InvertMassMatrixDecorator lumps for
+// the explicit thermal solve, causes a divide-by-zero.
+//
+// This regularizes every zero-diagonal row: it zeroes the row and sets
+// the diagonal to a representative magnitude, decoupling the orphan DOF
+// (and giving a finite 1/m for a lumped mass matrix). Detecting orphans
+// straight from the assembled operator -- rather than from a per-app
+// cell-death snapshot -- keeps the fix correct no matter how erosion
+// has rebuilt the worksets, and needs no death bookkeeping that could
+// go stale across a mid-solve workset rebuild.
+//
+// The residual needs no companion fix: an orphan node belongs to no
+// active-element workset, so nothing scatters into its residual entry
+// and it is already zero.
 void
-Application::fixOrphanNodesForElementDeath(
-    Teuchos::RCP<Thyra_Vector>   f,
-    Teuchos::RCP<Thyra_LinearOp> jac)
+Application::fixOrphanNodesForElementDeath(Teuchos::RCP<Thyra_LinearOp> jac)
 {
-  auto& state_mgr = getStateMgr();
-  auto const& ws_el_node_id = disc->getWsElNodeID();
-  int  const  num_worksets  = ws_el_node_id.size();
-  auto        neq_per_node  = disc->getNumEq();
+  if (Teuchos::is_null(jac)) return;
 
-  if (death_status_vecs_.empty()) return;
+  // The operator arrives fill-complete (just assembled and combined).
+  // Read the diagonal and the orphan rows' column layouts in that
+  // state -- getDiagonalCopy / getLocalRowValues are only valid on a
+  // fill-complete matrix -- then re-open it for value modification.
+  // The caller fill-completes the operator afterward, so this routine
+  // leaves it fill-active, matching the Dirichlet-BC code path.
+  Teuchos::RCP<Thyra_Vector> diag;
+  Albany::getDiagonalCopy(jac, diag);
+  Teuchos::ArrayRCP<const ST> const diag_data = Albany::getLocalData(diag.getConst());
+  LO const                          num_rows  = static_cast<LO>(diag_data.size());
 
-  bool any_dead_overall = false;
-  for (int ws = 0; ws < num_worksets; ++ws) {
-    if (ws >= static_cast<int>(death_status_vecs_.size())) break;
-    if (death_status_vecs_[ws] == Teuchos::null) continue;
-    for (auto v : *death_status_vecs_[ws]) {
-      if (v > 0.0) { any_dead_overall = true; break; }
-    }
-    if (any_dead_overall) break;
-  }
-  if (!any_dead_overall) return;
-
-  // For each node, track whether it appears in any alive element.
-  std::map<GO, bool> node_has_alive;
-
-  for (int ws = 0; ws < num_worksets; ++ws) {
-    if (ws >= static_cast<int>(death_status_vecs_.size())) break;
-    if (death_status_vecs_[ws] == Teuchos::null) continue;
-    auto& ds        = *death_status_vecs_[ws];
-    int   num_cells = ds.size();
-
-    for (int cell = 0; cell < num_cells; ++cell) {
-      bool is_dead = ds[cell] > 0.0;
-      int  nn      = ws_el_node_id[ws][cell].size();
-      for (int n = 0; n < nn; ++n) {
-        GO node_gid = ws_el_node_id[ws][cell][n];
-        if (!is_dead) {
-          node_has_alive[node_gid] = true;
-        } else if (node_has_alive.find(node_gid) == node_has_alive.end()) {
-          node_has_alive[node_gid] = false;
-        }
-      }
+  // Representative diagonal magnitude from the non-orphan rows.
+  ST rep_sum   = 0.0;
+  LO rep_count = 0;
+  for (LO i = 0; i < num_rows; ++i) {
+    ST const d = std::abs(diag_data[i]);
+    if (d > 0.0) {
+      rep_sum += d;
+      ++rep_count;
     }
   }
+  ST const diag_scale = (rep_count > 0) ? rep_sum / rep_count : 1.0;
 
-  // Collect orphan node GIDs
-  std::vector<GO> orphan_node_gids;
-  for (auto& [gid, has_alive] : node_has_alive) {
-    if (!has_alive) {
-      orphan_node_gids.push_back(gid);
-    }
+  // Collect orphan rows (exact-zero diagonal) and their column layout
+  // while the operator is still fill-complete.
+  std::vector<LO>                 orphan_rows;
+  std::vector<Teuchos::Array<LO>> orphan_cols;
+  for (LO i = 0; i < num_rows; ++i) {
+    if (diag_data[i] != 0.0) continue;  // not an orphan DOF
+    Teuchos::Array<LO> indices;
+    Teuchos::Array<ST> values;
+    Albany::getLocalRowValues(jac, i, indices, values);
+    if (indices.size() == 0) continue;
+    orphan_rows.push_back(i);
+    orphan_cols.push_back(indices);
   }
 
-  if (orphan_node_gids.empty()) return;
-
-  auto stk_disc_ptr = dynamic_cast<Albany::STKDiscretization*>(disc.get());
-  if (stk_disc_ptr == nullptr) return;
-
-  // Fix Jacobian: zero row, set diagonal to a representative scale.
-  // Use the average alive diagonal magnitude so the preconditioner
-  // sees uniform scaling across alive and orphan DOFs.
-  if (Teuchos::nonnull(jac)) {
-    auto jac_tpetra = Albany::getTpetraMatrix(jac);
-    resumeFill(jac);
-
-    // Compute average diagonal magnitude from alive DOFs
-    Tpetra_Vector diag_vec(jac_tpetra->getRowMap());
-    jac_tpetra->getLocalDiagCopy(diag_vec);
-    auto diag_data = diag_vec.getLocalViewHost(Tpetra::Access::ReadOnly);
-    ST diag_sum = 0.0;
-    LO diag_count = 0;
-    for (LO i = 0; i < static_cast<LO>(diag_data.extent(0)); ++i) {
-      ST d = std::abs(diag_data(i, 0));
-      if (d > 1.0) {  // skip orphan/dead DOFs (they have diagonal ~1 or 0)
-        diag_sum += d;
-        ++diag_count;
-      }
+  // Re-open for value modification; the caller fill-completes later.
+  resumeFill(jac);
+  for (size_t r = 0; r < orphan_rows.size(); ++r) {
+    LO const                  row     = orphan_rows[r];
+    Teuchos::Array<LO> const& indices = orphan_cols[r];
+    Teuchos::Array<ST>        values(indices.size(), 0.0);
+    for (int k = 0; k < indices.size(); ++k) {
+      if (indices[k] == row) values[k] = diag_scale;
     }
-    ST const diag_scale = (diag_count > 0) ? diag_sum / diag_count : 1.0;
-
-    for (GO node_gid : orphan_node_gids) {
-      for (int eq = 0; eq < neq_per_node; ++eq) {
-        GO dof_gid = stk_disc_ptr->getGlobalDOF(node_gid, eq);
-        LO dof_lid = jac_tpetra->getRowMap()->getLocalElement(dof_gid);
-        if (dof_lid == Teuchos::OrdinalTraits<LO>::invalid()) continue;
-        auto num_entries = jac_tpetra->getNumEntriesInLocalRow(dof_lid);
-        if (num_entries > 0) {
-          typename Tpetra_CrsMatrix::local_inds_host_view_type col_inds;
-          typename Tpetra_CrsMatrix::values_host_view_type     vals;
-          jac_tpetra->getLocalRowView(dof_lid, col_inds, vals);
-          std::vector<LO> cols_vec(col_inds.extent(0));
-          std::vector<ST> vals_vec(col_inds.extent(0), 0.0);
-          for (size_t k = 0; k < col_inds.extent(0); ++k) {
-            cols_vec[k] = col_inds(k);
-            if (col_inds(k) == dof_lid) vals_vec[k] = diag_scale;
-          }
-          jac_tpetra->replaceLocalValues(dof_lid, cols_vec, vals_vec);
-        }
-      }
-    }
-  }
-
-  // Fix residual: zero entries for orphan nodes
-  if (Teuchos::nonnull(f)) {
-    auto f_data    = Albany::getNonconstLocalData(f);
-    auto f_tpetra  = Albany::getTpetraVector(f);
-    auto f_row_map = f_tpetra->getMap();
-    for (GO node_gid : orphan_node_gids) {
-      for (int eq = 0; eq < neq_per_node; ++eq) {
-        GO dof_gid = stk_disc_ptr->getGlobalDOF(node_gid, eq);
-        LO dof_lid = f_row_map->getLocalElement(dof_gid);
-        if (dof_lid != Teuchos::OrdinalTraits<LO>::invalid()) {
-          f_data[dof_lid] = 0.0;
-        }
-      }
-    }
+    Albany::setLocalRowValues(jac, row, indices(), values());
   }
 }
 
@@ -1426,9 +1376,6 @@ Application::computeGlobalResidualImpl(
     TEUCHOS_FUNC_TIME_MONITOR("Albany Residual Fill: Export");
     cas_manager->combine(overlapped_f, f, CombineMode::ADD);
   }
-
-  // Element death: fix orphan nodes
-  fixOrphanNodesForElementDeath(f, Teuchos::null);
 
   // Allocate scaleVec_
   if (scale != 1.0) {
@@ -1642,8 +1589,8 @@ Application::computeGlobalJacobianImpl(
     cas_manager->combine(overlapped_jac, jac, CombineMode::ADD);
   }
 
-  // Element death: fix orphan nodes
-  fixOrphanNodesForElementDeath(f, jac);
+  // Element death: regularize zero-diagonal (orphan) rows
+  fixOrphanNodesForElementDeath(jac);
 
   // scale Jacobian
   if (scaleBCdofs == false && scale != 1.0) {

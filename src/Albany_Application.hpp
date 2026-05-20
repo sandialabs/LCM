@@ -250,9 +250,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       double const                            dt = 0.0);
 
   void
-  fixOrphanNodesForElementDeath(
-      Teuchos::RCP<Thyra_Vector>   f,
-      Teuchos::RCP<Thyra_LinearOp> jac);
+  fixOrphanNodesForElementDeath(Teuchos::RCP<Thyra_LinearOp> jac);
 
   //! Phase 1 of the activePart-based element-death port: at step
   //! boundaries, remove cells flagged dead in death_status_vecs_ from
@@ -772,9 +770,22 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
 
   workset.stateArrayPtr = &stateMgr.getStateArray(Albany::StateManager::ELEM, ws);
 
-  // Element death: pass per-workset death status to the scatter evaluator
+  // Element death: pass per-workset death status to the scatter and
+  // material evaluators. Erosion can rebuild the worksets mid-solve
+  // (Application::applyDeathToActivePart), which re-buckets the mesh and
+  // changes per-workset cell counts. The death-flag buffer is a cached
+  // member, so it can fall out of sync; resize it here to the workset's
+  // current cell count so the evaluators never index out of bounds. A
+  // size change means a rebuild just happened -- every surviving cell is
+  // alive (the dead ones were removed), so the flags reset to zero. When
+  // the size is unchanged the buffer is left intact, preserving flags
+  // the material model wrote earlier in this solve.
   if (ws < static_cast<int>(death_status_vecs_.size())) {
-    workset.death_status_vec = death_status_vecs_[ws];
+    auto& dsv = death_status_vecs_[ws];
+    if (Teuchos::nonnull(dsv) && static_cast<int>(dsv->size()) != workset.numCells) {
+      dsv->assign(workset.numCells, 0.0);
+    }
+    workset.death_status_vec = dsv;
   } else {
     workset.death_status_vec = Teuchos::null;
   }

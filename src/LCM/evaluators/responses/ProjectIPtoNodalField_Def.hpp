@@ -721,6 +721,60 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(t
     // think we need it because createOp() calls fillComplete.
     // mm->fillComplete();
 
+    // Element death can leave orphan nodes -- nodes whose surrounding
+    // elements have all been removed. Such a node gets no contribution
+    // to the projection mass matrix, so its row is entirely zero and A
+    // becomes singular, which makes the (Block CG) projection solve
+    // fail with "non-positive p^H*A*p". Give each orphan row a
+    // representative diagonal so A stays SPD. The matching RHS entry is
+    // also zero (no active element contributes the projected field
+    // there), so the projected nodal value at an orphan node is 0.
+    {
+      Teuchos::RCP<Thyra_Vector> mm_diag;
+      Albany::getDiagonalCopy(mm, mm_diag);
+      Teuchos::ArrayRCP<const ST> const diag_data = Albany::getLocalData(mm_diag.getConst());
+      LO const                          num_rows  = static_cast<LO>(diag_data.size());
+
+      // Representative diagonal magnitude from the non-orphan rows.
+      ST diag_sum   = 0.0;
+      LO diag_count = 0;
+      for (LO i = 0; i < num_rows; ++i) {
+        if (diag_data[i] > 0.0) {
+          diag_sum += diag_data[i];
+          ++diag_count;
+        }
+      }
+      ST const diag_scale = (diag_count > 0) ? diag_sum / diag_count : 1.0;
+
+      // Read the column layout of each orphan row while the matrix is
+      // fill-complete, then patch the diagonals under resumeFill.
+      std::vector<LO>                 orphan_rows;
+      std::vector<Teuchos::Array<LO>> orphan_cols;
+      for (LO i = 0; i < num_rows; ++i) {
+        if (diag_data[i] != 0.0) continue;
+        Teuchos::Array<LO> indices;
+        Teuchos::Array<ST> values;
+        Albany::getLocalRowValues(mm, i, indices, values);
+        if (indices.size() == 0) continue;
+        orphan_rows.push_back(i);
+        orphan_cols.push_back(indices);
+      }
+
+      if (!orphan_rows.empty()) {
+        Albany::resumeFill(mm);
+        for (size_t r = 0; r < orphan_rows.size(); ++r) {
+          LO const                  row     = orphan_rows[r];
+          Teuchos::Array<LO> const& indices = orphan_cols[r];
+          Teuchos::Array<ST>        values(indices.size(), 0.0);
+          for (int k = 0; k < indices.size(); ++k) {
+            if (indices[k] == row) values[k] = diag_scale;
+          }
+          Albany::setLocalRowValues(mm, row, indices(), values());
+        }
+        Albany::fillComplete(mm);
+      }
+    }
+
     // Now export ip_field.
     // IKT, note to self: ipf has owned layout, since it is that of mm.
     Teuchos::RCP<Thyra_MultiVector> ipf = Thyra::createMembers(mm->range(), Albany::getNumVectors(mgr_->ip_field));

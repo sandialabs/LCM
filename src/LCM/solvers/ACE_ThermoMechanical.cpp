@@ -656,41 +656,41 @@ ACEThermoMechanical::createPersistentApps()
 void
 ACEThermoMechanical::transferThermalToMechanical(int thermal_sub, int mech_sub) const
 {
-  // Restored after the M2 no-op was found to break the coupling.
+  // Make the mechanical solve see the ice saturation the thermal solve
+  // just computed.
   //
-  // M2 assumed that, because both apps share one STKMeshStruct, they
-  // also share element-state fields like ACE_Ice_Saturation, making
-  // this copy an identity. That is false: the shared mesh provides
-  // shared topology, but each Application has its OWN Discretization
-  // with its OWN StateManager element-state arrays
-  // (Discretization::stateArrays). Those arrays are Albany scratch,
-  // populated by each app's evaluators; they do NOT round-trip through
-  // a shared STK field during the solve. So the thermal app's computed
-  // ACE_Ice_Saturation must be copied explicitly into the mechanical
-  // app's element-state arrays, or the mechanical app reads stale /
-  // initial-condition values (ice never thaws, no erosion).
+  // Root cause this works around (task #62): with M1's shared STK mesh,
+  // the thermal and mechanical apps' element-state arrays for shared
+  // fields like ACE_Ice_Saturation ALIAS THE SAME underlying STK-field
+  // storage (verified: identical data buffer addresses). The mechanical
+  // phase begins with fromTo(internal_states_[mech], getStateArrays()),
+  // restoring the mechanical app's cached states -- and because the
+  // buffer is shared, that restore overwrites the ACE_Ice_Saturation the
+  // thermal solve produced moments earlier with the mechanical app's
+  // stale (initial-condition) ice. The mechanical solve would then run
+  // on frozen ice, the material never weakens, and nothing erodes.
   //
-  // With M1's shared mesh, both apps' Discretizations build worksets
-  // from the same BulkData, so the workset/cell layout matches and the
-  // size assertion below holds.
-  auto& thermal_state_mgr = apps_[thermal_sub]->getStateMgr();
-  auto& mech_state_mgr    = apps_[mech_sub]->getStateMgr();
+  // The fix: re-install the thermal result here, AFTER the mechanical
+  // restore has run. internal_states_[thermal_sub] is a deep copy
+  // (LCM::StateArrays -- plain std::vector storage, decoupled from the
+  // shared STK buffer; see StateVarUtils.hpp) saved at the end of the
+  // thermal phase, so it still holds the freshly computed ice. Copy it
+  // into the live (shared) mechanical state. The mechanical solve then
+  // reads current ice.
+  auto const& thermal_saved = internal_states_[thermal_sub].element_state_arrays;
+  auto&       mech_live     = apps_[mech_sub]->getStateMgr().getStateArrays().elemStateArrays;
 
-  auto& thermal_states = thermal_state_mgr.getStateArrays().elemStateArrays;
-  auto& mech_states    = mech_state_mgr.getStateArrays().elemStateArrays;
-
-  std::vector<std::string> shared_fields = {"ACE_Ice_Saturation"};
+  std::vector<std::string> const shared_fields = {"ACE_Ice_Saturation"};
   for (auto const& field_name : shared_fields) {
-    for (size_t ws = 0; ws < thermal_states.size() && ws < mech_states.size(); ++ws) {
-      auto it_thermal = thermal_states[ws].find(field_name);
-      auto it_mech    = mech_states[ws].find(field_name);
-      if (it_thermal != thermal_states[ws].end() && it_mech != mech_states[ws].end()) {
-        auto const& src = it_thermal->second;
-        auto&       dst = it_mech->second;
+    for (size_t ws = 0; ws < thermal_saved.size() && ws < mech_live.size(); ++ws) {
+      auto it_thermal = thermal_saved[ws].find(field_name);
+      auto it_mech    = mech_live[ws].find(field_name);
+      if (it_thermal != thermal_saved[ws].end() && it_mech != mech_live[ws].end()) {
+        auto const& src = it_thermal->second;  // std::vector<ST> (deep copy)
+        auto&       dst = it_mech->second;     // Albany::MDArray (live, shared)
         ALBANY_ASSERT(
             src.size() == dst.size(),
-            "ACE_Ice_Saturation size mismatch at ws=" << ws << ": thermal=" << src.size() << " mechanical=" << dst.size()
-                                                      << ". Both apps must build worksets from the shared mesh.");
+            "ACE_Ice_Saturation size mismatch at ws=" << ws << ": thermal-saved=" << src.size() << " mechanical=" << dst.size());
         for (size_t i = 0; i < src.size(); ++i) {
           dst[i] = src[i];
         }

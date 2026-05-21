@@ -56,9 +56,10 @@ nodeset 6 name "z+"
 
 sideset 1 surface with (z_coord < {0 + eps})
 sideset 1 name "bottom"
-#sideset 2 surface with (x_coord <= {0 + eps})
-#sideset 2 name "bluff_face-erodible"
-sideset 2 face with (x_coord <= {0 + eps}) and (y_coord > {-L/2 - eps}) and (y_coord < {L/2 + eps}) and (z_coord > {0 - eps}) and (z_coord < {2*L + eps})
+# bluff_face-erodible: the faces ON the x=0 bluff face. The domain is
+# x in [-L,0], so the test must be (x_coord >= 0-eps); the earlier
+# (x_coord <= 0+eps) form selected every face in the mesh.
+sideset 2 face with (x_coord >= {0 - eps}) and (y_coord > {-L/2 - eps}) and (y_coord < {L/2 + eps}) and (z_coord > {0 - eps}) and (z_coord < {2*L + eps})
 sideset 2 name "bluff_face-erodible"
 
 nodeset 7 node with (z_coord >= {0 - eps}) and (z_coord < {0 + 2*h + eps}) and (x_coord <= {0 + eps})

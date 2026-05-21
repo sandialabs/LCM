@@ -2239,10 +2239,35 @@ STKDiscretization::computeNodeSets()
   std::map<std::string, stk::mesh::Part*>::iterator ns                = stkMeshStruct->nsPartVec.begin();
   AbstractSTKFieldContainer::VectorFieldType*       coordinates_field = stkMeshStruct->getCoordinatesField();
 
+  // Element-death Dirichlet-BC propagation. A node set whose name
+  // contains "erodible" carries a Dirichlet BC on an eroding surface,
+  // but the node set itself is a full-depth slab (it spans the bluff
+  // interior and back face, not just the exposed face). Restrict it to
+  // the nodes of the "-erodible" side-set(s): those side-sets track the
+  // receding surface because process_killed_elements paints every
+  // newly-exposed face into them (see Application::applyDeathToActivePart),
+  // and STK induces face -> node membership. Rebuilt on every
+  // rebuildWorksets(), this intersection follows the surface as it
+  // erodes -- and keeps the BC off interior/back nodes from step 0.
+  stk::mesh::Selector erodible_surface;
+  bool                have_erodible_surface = false;
+  for (auto& kv : stkMeshStruct->ssPartVec) {
+    if (kv.second == nullptr) continue;
+    if (kv.first.find("erodible") == std::string::npos) continue;
+    erodible_surface      = have_erodible_surface ? (erodible_surface | stk::mesh::Selector(*kv.second)) :
+                                                    stk::mesh::Selector(*kv.second);
+    have_erodible_surface = true;
+  }
+
   auto node_indexer = createGlobalLocalIndexer(m_node_vs);
   while (ns != stkMeshStruct->nsPartVec.end()) {  // Iterate over Node Sets
     // Get all owned nodes in this node set
     stk::mesh::Selector select_owned_in_nspart = stk::mesh::Selector(*(ns->second)) & stk::mesh::Selector(metaData.locally_owned_part());
+
+    // Erodible node sets are clipped to the live eroding surface.
+    if (have_erodible_surface && ns->first.find("erodible") != std::string::npos) {
+      select_owned_in_nspart &= erodible_surface;
+    }
 
     std::vector<stk::mesh::Entity> nodes;
     stk::mesh::get_selected_entities(select_owned_in_nspart, bulkData.buckets(stk::topology::NODE_RANK), nodes);

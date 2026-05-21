@@ -1239,13 +1239,24 @@ Application::applyDeathToActivePart()
   // that previously bore the BC dies. With shared mesh, both thermal
   // and mechanical apps' side-set BCs live on the same metaData; each
   // app's BC evaluator iterates only its own declared parts so the
-  // union pass-through is harmless. Dirichlet BCs on nodesets are not
-  // affected by this mechanism (faces, not nodes, are propagated).
-  stk::mesh::PartVector const side_parts{activePart, deadCellsPart};
-  stk::mesh::PartVector       bc_mesh_parts;
+  // union pass-through is harmless.
+  //
+  // Dirichlet-BC propagation: side_parts also gets every "-erodible"
+  // side-set, so process_killed_elements paints all newly-exposed
+  // faces into it -- the eroding surface tracks the receding bluff.
+  // STKDiscretization::computeNodeSets restricts an "-erodible" node
+  // set (a full-depth z-band slab) to the nodes of that side-set, so
+  // the Dirichlet BC follows the exposed surface and never lands on
+  // interior or back-face nodes.
+  stk::mesh::PartVector side_parts{activePart, deadCellsPart};
+  stk::mesh::PartVector bc_mesh_parts;
   bc_mesh_parts.reserve(stk_mesh.ssPartVec.size());
   for (auto& kv : stk_mesh.ssPartVec) {
-    if (kv.second != nullptr) bc_mesh_parts.push_back(kv.second);
+    if (kv.second == nullptr) continue;
+    bc_mesh_parts.push_back(kv.second);
+    if (kv.first.find("erodible") != std::string::npos) {
+      side_parts.push_back(kv.second);
+    }
   }
   stk::mesh::impl::ParallelSelectedInfo remoteActiveSelector;  // empty: serial OK
   stk::mesh::process_killed_elements(

@@ -89,13 +89,17 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   Teuchos::RCP<std::vector<double>> death_status_vec_;
   bool            has_failed_old_{false};
 
-  // Per-(cell, pt) failure-mode bitmask. Bits encode:
+  // Per-(cell, pt) failure-mode bitmask, carried as an STK-backed element
+  // state so it follows each cell correctly when the discretization
+  // rebuilds its worksets (erosion re-buckets the mesh). Bits encode:
   //   1 = tension, 2 = strain, 4 = yield, 8 = angle, 16 = displacement.
-  // Owned by Albany::Application; persistent across fills and time steps.
-  // Once a bit is set at (cell, pt) it stays set. Used both for diagnostic
-  // bookkeeping (encoded into failure_state) and as the source of truth
-  // for the cell-death predicate (cell dies iff every pt has any bit set).
-  Teuchos::RCP<std::vector<std::vector<uint8_t>>> failure_mode_vec_;
+  // Once a bit is set at (cell, pt) it stays set. failure_modes_old_ holds
+  // the value converged at the previous step; failure_modes_ is this
+  // fill's updated value (old | newly tripped bits), saved back to the
+  // state. The mask is the source of truth for failure_state and the
+  // cell-death predicate (cell dies iff every pt has any bit set).
+  Albany::MDArray failure_modes_old_;
+  ScalarField     failure_modes_;
 
   bool                       have_cell_boundary_indicator_{false};
   Teuchos::ArrayRCP<double*> cell_boundary_indicator_;

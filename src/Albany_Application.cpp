@@ -8,8 +8,11 @@
 
 #include "stk_mesh/base/BulkData.hpp"
 #include "stk_mesh/base/Part.hpp"
+#include "stk_mesh/baseImpl/elementGraph/ElemElemGraph.hpp"
 #include "stk_mesh/baseImpl/elementGraph/GraphTypes.hpp"
+#include "stk_mesh/baseImpl/elementGraph/ParallelInfoForGraph.hpp"
 #include "stk_mesh/baseImpl/elementGraph/ProcessKilledElements.hpp"
+#include "stk_util/parallel/ParallelReduceBool.hpp"
 
 #include "AAdapt_RC_Manager.hpp"
 #include "Albany_AbstractSTKMeshStruct.hpp"
@@ -1224,30 +1227,46 @@ Application::applyDeathToActivePart()
     killed.push_back(cell);
   }
 
-  if (killed.empty()) return false;
+  // process_killed_elements -- and the collective calls preceding it
+  // (modification cycles, the element-graph build, the remote-active
+  // exchange, rebuildWorksets) -- must be entered by *every* rank, even
+  // ranks with no locally killed cells: they pass an empty list. Make
+  // the early-out a global decision so the ranks never diverge and
+  // deadlock.
+  if (!stk::is_true_on_any_proc(bulkData.parallel(), !killed.empty())) {
+    return false;
+  }
 
-  // Step B1: STK's process_killed_elements removes killed cells from
-  // activePart, walks the active/inactive interface, and creates new
-  // exposed-face entities painted into side_parts ({activePart,
-  // deadCellsPart} so the new faces are IO-visible and tagged as
-  // on-the-dead-boundary).
+  // Step B1: add the killed cells to deadCellsPart. They remain in
+  // activePart -- their assembly contribution is gated by the scatter
+  // skip via death_status_vec, not by part membership. deadCellsPart is
+  // what lets the remote-active query below and visualization filters
+  // tell dead cells from live ones.
+  bulkData.modification_begin();
+  for (stk::mesh::Entity cell : killed) {
+    bulkData.change_entity_parts(
+        cell,
+        stk::mesh::PartVector{deadCellsPart},  // add
+        stk::mesh::PartVector{});              // remove nothing
+  }
+  bulkData.modification_end();
+
+  // Step B2: let STK walk the active/dead interface and create the
+  // newly-exposed face entities.
   //
-  // M3b: boundary_mesh_parts populated with every declared side-set
-  // part. STK inherits old-boundary membership onto newly exposed
-  // faces, so any user-declared Neumann-style BC on a side-set
-  // automatically extends onto the new interface faces when the cell
-  // that previously bore the BC dies. With shared mesh, both thermal
-  // and mechanical apps' side-set BCs live on the same metaData; each
-  // app's BC evaluator iterates only its own declared parts so the
-  // union pass-through is harmless.
+  // side_parts: new faces are painted into {activePart, deadCellsPart}
+  // (so they are IO-visible and tagged on-the-dead-boundary) plus every
+  // "-erodible" side-set, so the eroding surface tracks the receding
+  // bluff -- STKDiscretization::computeNodeSets clips an "-erodible"
+  // node set to that side-set's nodes, keeping a Dirichlet BC on the
+  // live exposed surface (see doc/element_death.md section 8).
   //
-  // Dirichlet-BC propagation: side_parts also gets every "-erodible"
-  // side-set, so process_killed_elements paints all newly-exposed
-  // faces into it -- the eroding surface tracks the receding bluff.
-  // STKDiscretization::computeNodeSets restricts an "-erodible" node
-  // set (a full-depth z-band slab) to the nodes of that side-set, so
-  // the Dirichlet BC follows the exposed surface and never lands on
-  // interior or back-face nodes.
+  // bc_mesh_parts (boundary_mesh_parts): every declared side-set. STK
+  // inherits a dying cell's side-set membership onto the newly-exposed
+  // faces, so a Neumann-style BC extends onto the new interface. With
+  // the shared mesh both apps' side-sets live on one metaData; each
+  // app's BC evaluator iterates only its own parts, so the union is
+  // harmless.
   stk::mesh::PartVector side_parts{activePart, deadCellsPart};
   stk::mesh::PartVector bc_mesh_parts;
   bc_mesh_parts.reserve(stk_mesh.ssPartVec.size());
@@ -1258,27 +1277,34 @@ Application::applyDeathToActivePart()
       side_parts.push_back(kv.second);
     }
   }
-  stk::mesh::impl::ParallelSelectedInfo remoteActiveSelector;  // empty: serial OK
+
+  // process_killed_elements walks the death boundary through the
+  // face-adjacent element graph, which spans rank boundaries in
+  // parallel. remoteActiveSelector tells each rank, for every graph
+  // edge crossing to another rank, whether the off-rank element is
+  // still live; without it the ranks build inconsistent interfaces and
+  // deadlock in the parallel modification-end exchange. Killed cells
+  // stay in activePart, so "live" is activePart minus deadCellsPart;
+  // populate_selected_value_for_remote_elements fills the map from that
+  // selector. In serial there are no cross-rank edges and it stays
+  // empty, leaving the serial result unchanged.
+  bulkData.initialize_face_adjacent_element_graph();
+  auto& elem_graph = bulkData.get_face_adjacent_element_graph();
+  stk::mesh::impl::ParallelSelectedInfo remoteActiveSelector;
+  stk::mesh::impl::populate_selected_value_for_remote_elements(
+      bulkData, elem_graph,
+      stk::mesh::Selector(*activePart) & !stk::mesh::Selector(*deadCellsPart),
+      remoteActiveSelector);
+
   stk::mesh::process_killed_elements(
       bulkData, killed, *activePart, remoteActiveSelector,
       side_parts,
       bc_mesh_parts.empty() ? nullptr : &bc_mesh_parts,
       stk::mesh::impl::MeshModification::modification_optimization::MOD_END_SORT);
 
-  // Step B2: put the dead cells themselves into deadCellsPart so
-  // visualization filters and future BC inheritance can locate them via
-  // STK part queries instead of scanning death_status_vec.
-  bulkData.modification_begin();
-  for (stk::mesh::Entity cell : killed) {
-    bulkData.change_entity_parts(
-        cell,
-        stk::mesh::PartVector{deadCellsPart},
-        stk::mesh::PartVector{});
-  }
-  bulkData.modification_end();
-
-  // Step B3: rebuild worksets so dead cells drop out of the bucket
-  // selectors. Subsequent steps' fills never see them.
+  // Step B3: rebuild worksets so the discretization picks up the new
+  // faces and computeNodeSets re-clips the "-erodible" node sets to the
+  // grown side-set.
   stk_disc->rebuildWorksets();
 
   return true;

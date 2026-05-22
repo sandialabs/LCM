@@ -3,15 +3,15 @@
 This document describes how the ACE sequential thermo-mechanical solver
 decides that an element has "died" (failed and should no longer carry
 load), how that decision propagates through assembly, and how the mesh and
-boundary conditions follow the receding surface. It is written for power
-users who want to understand or modify the algorithm.
+boundary conditions follow the receding surface. It is written for
+developers who want to understand or modify the algorithm.
 
 It describes the **current** algorithm. It is not a design rationale or a
 history of past approaches.
 
 ---
 
-## 1. Mental model
+## 1. Overview
 
 Element death in the ACE solver is **non-destructive in the sense that no
 element is ever deleted**. A dead element is moved between STK *parts*; it
@@ -22,11 +22,11 @@ scales:
 - **Within a step** — a cell that fails is *skipped* during residual and
   Jacobian assembly, so it contributes nothing to the global system. The
   cell is still a member of `activePart` and still in the worksets.
-- **Between steps** — once per accepted step, the structural housekeeping
-  runs (`Application::applyDeathToActivePart`, §7): the dead cells are
-  moved out of `activePart` into `deadCellsPart`, STK creates the
-  newly-exposed boundary faces, and the worksets are rebuilt so dead cells
-  drop out for good.
+- **Between steps** — once per accepted step, the structural update runs
+  (`Application::applyDeathToActivePart`, §7): the dead cells are moved out
+  of `activePart` into `deadCellsPart`, STK creates the newly-exposed
+  boundary faces, and the worksets are rebuilt so dead cells are excluded
+  permanently.
 
 So the mesh *topology* is preserved (no entity is destroyed), but the mesh
 *is* modified between steps: cells change part membership and new face
@@ -37,12 +37,12 @@ structurally removed by the step-N observer.
 The death decision is made by the `J2Erosion` constitutive model, which
 runs per integration point. The ACE coupling solver
 (`LCM::ACEThermoMechanical`) reads the result at the start of each
-mechanical step and broadcasts it to the assembly evaluators.
+mechanical step and passes it to the assembly evaluators.
 
 Two ideas are kept deliberately separate:
 
 - **Bookkeeping** — *how* each integration point failed (which of the five
-  criteria tripped). Recorded for diagnostics and never thrown away.
+  criteria tripped). Recorded for diagnostics and never discarded.
 - **The death predicate** — *whether* the element is dead. This is a single
   rule: **an element dies when every one of its integration points has
   failed in at least one way.** It does not matter which criteria tripped
@@ -101,23 +101,23 @@ who owns it is the key to modifying the algorithm.
   (which erosion does constantly, §7). A bitmask held in an
   Application-side, workset-position-indexed cache would silently mis-map
   on a rebuild and corrupt the recorded death history.
-- **This is the source of truth for the death predicate.**
+- **This is the authoritative record for the death predicate.**
 - Output to Exodus when the material YAML sets `Output Failure Modes: true`.
 
 ### 3.2 `failure_state` — the per-cell diagnostic encoding
 
 - An Albany cell-scalar state variable (`dl->cell_scalar2`), one value per
   element.
-- At the top of every `J2Erosion` evaluation it is recomputed from
+- At the start of every `J2Erosion` evaluation it is recomputed from
   `failure_modes_old`: each set bit at each point of the cell adds a
   decimal magnitude — `1` (tension), `10` (strain), `100` (yield),
-  `1000` (angle), `10000` (displacement) — and the current fill's fresh
-  trips are added on top.
+  `1000` (angle), `10000` (displacement) — and the current fill's new
+  trips are then added.
 - The result is a decimal-encoded histogram. Example: a value of `30201`
   decodes as 3 displacement trips, 0 angle, 2 yield, 0 strain, 1 tension,
   summed over all the points of that cell.
-- **Purely diagnostic.** It does not gate death. It is what you inspect to
-  see *how* a region is failing.
+- **Purely diagnostic.** It does not determine death. It is what you
+  inspect to see *how* a region is failing.
 - Output to Exodus when the material YAML sets `Output Failure State: true`.
 
 > **Limitation — elements with 10 or more integration points.**
@@ -138,7 +138,7 @@ who owns it is the key to modifying the algorithm.
   encodes the death predicate, and it is what the ACE solver reads.
 - Output to Exodus when the material YAML sets `Output Cell Death: true`.
 
-### 3.4 `death_status_vec` — the per-workset assembly-time death view
+### 3.4 `death_status_vec` — the per-workset assembly-time death status
 
 - Type: `std::vector<double>`, indexed by cell within a workset; `> 0`
   means dead.
@@ -154,7 +154,7 @@ who owns it is the key to modifying the algorithm.
 
 - `activePart` — elements that participate in assembly.
   `computeWorksetInfo` builds the worksets from `& activePart`, so dead
-  cells drop out of the worksets once they leave this part.
+  cells are excluded from the worksets once they leave this part.
 - `deadCellsPart` — elements that have been structurally killed; kept so
   visualization and BC queries can find them.
 - Both are obtained from the STK mesh struct (`getActivePart()`,
@@ -167,10 +167,10 @@ who owns it is the key to modifying the algorithm.
 
 All of this happens in `J2ErosionKernel`, in `src/LCM/models/J2Erosion_Def.hpp`.
 
-### 4.1 Seeding at the top of a fill (`init`)
+### 4.1 Seeding at the start of a fill (`init`)
 
-Before the per-point kernel runs, `init()` walks every cell and, from
-`failure_modes_old`:
+Before the per-point kernel runs, `init()` iterates over every cell and,
+from `failure_modes_old`:
 
 - recomputes `failure_state(cell, 0)` (the decimal encoding of §3.2), and
 - sets `cell_death(cell, 0) = 1.0` iff **every** point of that cell has a
@@ -195,7 +195,7 @@ After all five checks, the updated `mask` is written back to
 `failure_modes(cell, pt)`. A dead cell (skipped early, §4.3 / §6) carries
 its old bitmask forward unchanged so the state is still written every fill.
 
-### 4.3 Live death propagation (`operator()`, last point of a cell)
+### 4.3 Same-fill death propagation (`operator()`, last point of a cell)
 
 When the kernel processes the last integration point of a cell
 (`pt == num_pts_ - 1`) and the workset carries a `death_status_vec`, it
@@ -208,8 +208,8 @@ This matters for nonlinear convergence: without it, Newton could push a
 cell that just crossed the all-points-failed threshold further into a
 nonphysical regime while the scatter evaluator — which has not run yet this
 fill — keeps assembling its stress contributions. Updating
-`death_status_vec` live lets scatter and the orphan-node fix see the new
-death within the same fill.
+`death_status_vec` during the fill lets the scatter evaluator and the
+orphan-node fix observe the new death within the same fill.
 
 ---
 
@@ -219,7 +219,7 @@ death within the same fill.
 (`src/LCM/solvers/ACE_ThermoMechanical.cpp`), at the start of each
 mechanical step:
 
-1. Reads the mechanical application's live `cell_death` element-state
+1. Reads the mechanical application's current `cell_death` element-state
    array. The states persist in the shared STK mesh between steps, so no
    snapshot save/restore is involved.
 2. Builds `Application::death_status_vecs_[ws]` so that
@@ -227,8 +227,8 @@ mechanical step:
 
 `cell_death` is a cell scalar — there is no integration-point dimension to
 index past. From this point on, every residual/Jacobian fill of that step
-sees the dead set as it stood at the end of the previous converged step,
-plus any cells that die *live* during the fill (§4.3).
+uses the set of dead cells as of the end of the previous converged step,
+plus any cells that die during the fill itself (§4.3).
 
 ---
 
@@ -254,7 +254,7 @@ between steps (§7).
 
 ---
 
-## 7. Between-step housekeeping (`applyDeathToActivePart`)
+## 7. Between-step structural update (`applyDeathToActivePart`)
 
 `Application::applyDeathToActivePart` (`src/Albany_Application.cpp`) is
 called once per accepted step from the observer. It turns the *flags* set
@@ -264,8 +264,8 @@ It scans `death_status_vecs_` for cells that are flagged dead but still
 members of `activePart`, and for that set:
 
 - **B1 — `stk::mesh::process_killed_elements`.** STK removes the killed
-  cells from `activePart`, walks the active/dead interface, and creates the
-  newly-exposed face entities. Each new face is painted into `side_parts`
+  cells from `activePart`, traverses the active/dead interface, and creates
+  the newly-exposed face entities. Each new face is added to `side_parts`
   (`{activePart, deadCellsPart}` plus every `-erodible` side-set, §8) and
   inherits the existing side-set membership of the adjacent live element
   via `boundary_mesh_parts` — so a Neumann-style BC on an old boundary
@@ -273,44 +273,102 @@ members of `activePart`, and for that set:
 - **B2 — `change_entity_parts`.** The killed cells are added to
   `deadCellsPart`.
 - **B3 — `rebuildWorksets()`.** The worksets are recomputed. Because
-  `computeWorksetInfo` selects `& activePart`, the dead cells now drop out
-  of every workset and subsequent fills never see them again.
+  `computeWorksetInfo` selects `& activePart`, the dead cells are now
+  excluded from every workset, and subsequent fills never include them.
 
-No element entity is ever destroyed; the cells live on in `deadCellsPart`.
+No element entity is ever destroyed; the cells remain in `deadCellsPart`.
 
 ---
 
-## 8. The `-erodible` naming convention (BC propagation)
+## 8. Boundary conditions on the eroding surface: the "-erodible" convention
 
-Side sets and node sets whose name **contains the substring `erodible`**
-get special handling, so Dirichlet and Neumann boundary conditions follow
-the receding surface as it erodes. The authoring convention is to name them
-`<name>-erodible` (the code matches the substring, not a strict suffix).
+As the surface erodes it recedes, so a boundary condition on that surface
+must move with it. This is handled by a naming convention together with a
+specific interaction between a side set and one or more node sets. Any
+side set or node set whose name **contains the substring `erodible`**
+participates; the code matches the substring, so the `<name>-erodible`
+form is just a convention.
 
-**Side sets.** `applyDeathToActivePart` adds every `-erodible` side set to
-the face-creating parts passed to `process_killed_elements` (§7, B1). Every
-newly-exposed face therefore joins those side sets, so an `-erodible` side
-set *grows* to track the receding surface. A Neumann BC declared on such a
-side set automatically covers the new interface.
+### 8.1 The two roles — a side set and the node sets
 
-**Node sets.** An `-erodible` node set is normally authored as a
-full-depth slab — a mesh-generation convenience that spans the interior and
-back-face nodes, not just the exposed face.
-`STKDiscretization::computeNodeSets` clips any node set whose name contains
-`erodible` to the union of all `-erodible` side sets' nodes (STK induces
-face -> node membership). The effective node set is therefore
-`authored slab ∩ nodes-on-erodible-faces`. It is recomputed on every
-`rebuildWorksets()`, so it follows the surface as it erodes and never lands
-on interior or back-face nodes — from step 0 onward.
+The eroding-surface boundary condition is built from two kinds of mesh
+object that play different roles. Both must be defined.
 
-Net effect: a Dirichlet BC assigned to an `-erodible` node set applies only
-to nodes on the live eroding surface, and a Neumann BC on an `-erodible`
-side set applies only to live exposed faces.
+- **An erodible side set — the surface.** It represents the exposed
+  eroding surface itself. It must be defined as the *actual exposed
+  surface at the start of the run* — for MiniErosion, the faces on the
+  x+ bluff. It does **not** need to be defined for any later state: as
+  cells die the solver extends it automatically (§8.2), so at every step
+  it is exactly the current, receding surface.
 
-Example (`tests/LCM/ACE/MiniErosion/grid/cuboid_denudation.jou`): a side
-set `bluff_face-erodible` and node sets `interval1-erodible` ...
-`interval4-erodible` (depth-banded slabs, each clipped to the eroding
-bluff face).
+- **Erodible node sets — the bands and the values.** Each carries the
+  actual Dirichlet data. They are defined as full-depth slabs: each
+  spans its band across the whole block — bluff, interior, and back
+  face. This is a convenience, so the definition does not have to
+  anticipate where the receding surface will be at any future step.
+
+The Dirichlet BC is assigned (in the problem YAML) to the node sets. The
+side set is what restricts that BC to the current surface.
+
+### 8.2 How the side set tracks the receding surface
+
+In the between-step structural update (§7), `applyDeathToActivePart`
+passes every `-erodible` side set to `process_killed_elements` as a part
+that should receive newly created sides. When STK exposes the faces behind
+a layer of just-killed cells, each new face is added to the `-erodible`
+side set(s). An `-erodible` side set therefore *grows*, one layer at a
+time, and at every step it is exactly the set of currently exposed
+erodible faces.
+
+### 8.3 How the node sets are clipped to the side set
+
+`STKDiscretization::computeNodeSets`, which runs on every
+`rebuildWorksets()`, forms the union of all `-erodible` side sets and
+intersects every `-erodible` node set with it:
+
+    effective node set = defined slab  AND  nodes on the erodible side set
+
+STK induces face -> node membership, so "nodes on the erodible side set"
+is well defined: a node belongs to it exactly when it is a node of one of
+the side set's faces. Because this intersection is recomputed on every
+rebuild and the side set has grown (§8.2), the effective node set follows
+the surface inward as it erodes.
+
+### 8.4 The resulting effect
+
+A Dirichlet BC assigned to an `-erodible` node set is applied only where
+that node set's band overlaps the current eroding surface. It is applied
+on the exposed surface within the band, follows it inward as the surface
+recedes, and never reaches interior or back-face nodes — those never
+become part of the erodible side set, so the intersection removes them,
+from the first step onward. (A Neumann BC declared directly on an
+`-erodible` side set likewise covers only currently exposed faces, since
+the side set is exactly those faces.)
+
+### 8.5 Definition requirement
+
+The intersection in §8.3 restricts the BC only if the erodible side set
+is defined as the *real* surface. If it is defined too broadly — for
+example with a selection test that ends up matching every face of the
+block — then every node counts as being "on the erodible surface", the
+intersection removes nothing, and the BC spreads across the whole domain.
+The erodible side set must therefore be exactly the actual initial
+exposed surface, and nothing more. The node sets, by contrast, are meant
+to be broad: the intersection is what restricts them.
+
+### 8.6 MiniErosion example
+
+`tests/LCM/ACE/MiniErosion/grid/cuboid_denudation.jou` defines:
+
+- Side set `bluff_face-erodible` — the faces on the x+ bluff, i.e. the
+  actual exposed surface at t = 0.
+- Node sets `interval1-erodible` ... `interval4-erodible` — four z
+  bands, each a full-depth slab, each carrying one temperature value of
+  the thermal Dirichlet ramp.
+
+The temperature for band k is applied on the portion of the bluff inside
+band k and follows the bluff inward as it denudes; the back (x-) face
+never joins `bluff_face-erodible`, so it stays at the initial condition.
 
 ---
 
@@ -339,8 +397,8 @@ preconditioner is not disturbed.
 
 ## 10. `Disable Erosion`
 
-Setting `Disable Erosion: true` in the mechanics material YAML makes the
-element-death machinery completely inert for that material:
+Setting `Disable Erosion: true` in the mechanics material YAML disables
+the element-death algorithm entirely for that material:
 
 - `trip(...)` returns immediately, so **no bit is ever set, the `failed`
   accumulator never moves, and the bitmask stays empty.**
@@ -351,8 +409,7 @@ element-death machinery completely inert for that material:
   visualization still works with erosion disabled.
 
 In other words, `Disable Erosion: true` gives you the full constitutive
-response and all the diagnostic fields, with the death pathway switched
-off.
+response and all the diagnostic fields, with the death pathway disabled.
 
 ---
 
@@ -395,7 +452,7 @@ becomes non-zero as soon as a single integration point fails, so it would
 hide cells that are still alive under the all-points-failed predicate.
 
 `cell_death` and `failure_state` are monotone non-decreasing over the run —
-a faithful per-cell history — because the bitmask they are derived from is
+an accurate per-cell history — because the bitmask they are derived from is
 an STK-backed state that survives the workset rebuilds of §7.
 
 The continuous indicator fields (`*_indicator`) can be enabled with their
@@ -403,7 +460,7 @@ own `Output * Indicator` flags for "how close to failure" colormaps.
 
 ---
 
-## 13. Tinkering guide
+## 13. Modification guide
 
 Common modifications and where to make them:
 
@@ -414,19 +471,19 @@ Common modifications and where to make them:
   (`100000`) and add it to the seeding loop in `init()`. The death
   predicate needs no change — it only asks whether each point's mask is
   non-zero.
-- **Change the death predicate** — it lives in exactly two places, and
-  both must stay in sync:
+- **Change the death predicate** — it is implemented in exactly two places,
+  and both must remain consistent:
   - `J2ErosionKernel::init()` — the per-cell seeding of `cell_death`.
-  - `J2ErosionKernel::operator()` — the live last-point propagation.
+  - `J2ErosionKernel::operator()` — the same-fill last-point propagation.
   For example, to require a *fraction* of points to fail rather than all
   of them, change the "every point has a non-zero mask" test in both
-  spots.
+  places.
 - **Change what counts as dead at assembly time** — the scatter skip test
   in `PHAL_ScatterResidual_Def.hpp` (`death_status_(cell) > 0.0`).
 - **Change how `death_status_vec` is seeded** — the loop in
   `ACEThermoMechanical::ThermoMechanicalLoopDynamics` that reads
-  `cell_death` from the live element state (§5).
-- **Change the between-step structural step** — `applyDeathToActivePart`
+  `cell_death` from the current element state (§5).
+- **Change the between-step structural update** — `applyDeathToActivePart`
   in `Albany_Application.cpp` (§7).
 - **Change BC propagation onto the eroding surface** — the `-erodible`
   side-set handling in `applyDeathToActivePart` and the node-set clip in

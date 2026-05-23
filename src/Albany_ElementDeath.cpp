@@ -72,6 +72,8 @@ applyElementDeath(
       getScratchField(meta, side_rank, "deathFaceElemAttachCount");
   auto* faceExposureCount =
       getScratchField(meta, side_rank, "deathFaceExposureCount");
+  auto* boundaryFaceMarker =
+      getScratchField(meta, side_rank, "deathBoundaryFaceMarker");
 
   const auto& localPart = meta.locally_owned_part();
   const stk::mesh::Selector liveLocal =
@@ -110,11 +112,17 @@ applyElementDeath(
 
   // Phase 3: clone-and-disconnect inside a single modification block.
   // For each dying cell's shared face: detach the dying cell, declare
-  // a new locally-owned face on its side, and bump the original
-  // face's exposure marker. For each unshared face: flag for the
-  // Phase 5 deletion pass. Then move the dying cells into
-  // deadCellsPart (Step B1 of the LCM convention).
+  // a new locally-owned face on its side, bump the original face's
+  // exposure marker, AND set the boundary marker so Phase 5 can add
+  // the original face to sideSetParts on its owner rank (STK then
+  // propagates the part change to the live-side ghost, keeping the
+  // -erodible node-set consistent on both ranks -- otherwise DBCs on
+  // the eroding surface land on the dying-rank's nodes but not the
+  // live-rank's copies, and the solution drifts after a few steps).
+  // Unshared exterior faces are left alone. Then move the dying
+  // cells into deadCellsPart (Step B1 of the LCM convention).
   fieldFillZero(bulkData, *faceExposureCount);
+  fieldFillZero(bulkData, *boundaryFaceMarker);
 
   bulkData.modification_begin();
   for (stk::mesh::Entity elem : killed) {
@@ -142,6 +150,11 @@ applyElementDeath(
         if (exposure != nullptr) {
           *exposure += 1.0;
         }
+        double* boundaryMark =
+            stk::mesh::field_data(*boundaryFaceMarker, face);
+        if (boundaryMark != nullptr) {
+          *boundaryMark = 1.0;
+        }
       }
       // Unshared (boundary) faces of the dying cell are left attached
       // and unmodified. LCM keeps dying cells in the mesh
@@ -160,20 +173,32 @@ applyElementDeath(
   }
   bulkData.modification_end();
 
-  // Phase 4: parallel-assemble the exposure marker so every rank
-  // sees the global total for shared faces.
+  // Phase 4: parallel-assemble the exposure and boundary markers so
+  // every rank sees the global totals for shared faces.
   {
-    std::vector<const stk::mesh::FieldBase*> fields{faceExposureCount};
+    std::vector<const stk::mesh::FieldBase*> fields{
+        faceExposureCount, boundaryFaceMarker};
     stk::mesh::parallel_sum(bulkData, fields);
   }
 
-  // Phase 5: collect faces to destroy. A shared face whose exposure
-  // marker hit 2 has had BOTH sides drop their back-reference
-  // (dying-cell relations on each rank), so it now has zero live
-  // relations on any rank. destroy_entity here doesn't trip the
-  // multi-rank STK harmonization bug the recon avoids. Only the
-  // owner rank actually destroys; ghost copies are removed by STK's
-  // standard modification_end propagation.
+  // Phase 5: collect owned faces that need part-membership updates
+  // (boundary marker > 0) or destruction (exposure > 1.01), then do
+  // both inside a single modification block.
+  //
+  // A face whose exposure marker hit 2 has had BOTH sides drop their
+  // back-reference (dying-cell relations on each rank), so it now
+  // has zero live relations on any rank. destroy_entity here doesn't
+  // trip the multi-rank STK harmonization bug the recon avoids.
+  //
+  // A face whose boundary marker is > 0 but exposure is 1 has its
+  // dying-side relation gone but a live-side cell still uses it. Add
+  // it to sideSetParts so the live-side ghost (which STK propagates
+  // the part change to via the owner) sees it as a death-boundary
+  // face for DBC purposes.
+  //
+  // Only the owner rank acts; ghost copies are kept consistent by
+  // STK's standard modification_end propagation.
+  std::vector<stk::mesh::Entity> toAddToSideSetParts;
   std::vector<stk::mesh::Entity> toDelete;
   {
     const auto& faceBuckets =
@@ -184,14 +209,26 @@ applyElementDeath(
         stk::mesh::Entity face = (*bucket)[i];
         const double* exposure =
             stk::mesh::field_data(*faceExposureCount, face);
-        if (exposure != nullptr && (*exposure) > 1.01) {
+        const double* boundaryMark =
+            stk::mesh::field_data(*boundaryFaceMarker, face);
+        const bool isExposed =
+            exposure != nullptr && (*exposure) > 1.01;
+        const bool isBoundary =
+            boundaryMark != nullptr && (*boundaryMark) > 0.5;
+        if (isExposed) {
           toDelete.push_back(face);
+        } else if (isBoundary) {
+          toAddToSideSetParts.push_back(face);
         }
       }
     }
   }
 
   bulkData.modification_begin();
+  for (stk::mesh::Entity face : toAddToSideSetParts) {
+    bulkData.change_entity_parts(
+        face, sideSetParts, stk::mesh::PartVector{});
+  }
   for (stk::mesh::Entity face : toDelete) {
     bulkData.destroy_entity(face);
   }

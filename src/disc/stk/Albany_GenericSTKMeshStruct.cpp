@@ -273,6 +273,9 @@ GenericSTKMeshStruct::SetupFieldData(
   stk::mesh::put_field_on_mesh(
       metaData->declare_field<double>(side_rank, "deathFaceExposureCount"),
       metaData->universal_part(), 1, nullptr);
+  stk::mesh::put_field_on_mesh(
+      metaData->declare_field<double>(side_rank, "deathBoundaryFaceMarker"),
+      metaData->universal_part(), 1, nullptr);
 
 #if defined(ALBANY_STK_PERCEPT)
   // Build the eMesh if needed

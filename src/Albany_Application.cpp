@@ -21,6 +21,7 @@
 #include "Albany_DiscretizationFactory.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_DummyParameterAccessor.hpp"
+#include "Albany_ElementDeath.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ProblemFactory.hpp"
 #include "Albany_ResponseFactory.hpp"
@@ -1240,22 +1241,7 @@ Application::applyDeathToActivePart()
     return false;
   }
 
-  // Step B1: add the killed cells to deadCellsPart. They remain in
-  // activePart -- their assembly contribution is gated by the scatter
-  // skip via death_status_vec, not by part membership. deadCellsPart is
-  // what lets the remote-active query below and visualization filters
-  // tell dead cells from live ones.
-  bulkData.modification_begin();
-  for (stk::mesh::Entity cell : killed) {
-    bulkData.change_entity_parts(
-        cell,
-        stk::mesh::PartVector{deadCellsPart},  // add
-        stk::mesh::PartVector{});              // remove nothing
-  }
-  bulkData.modification_end();
-
-  // Step B2: let STK walk the active/dead interface and create the
-  // newly-exposed face entities.
+  // Build the part vectors that the death machinery needs.
   //
   // side_parts: new faces are painted into {activePart, deadCellsPart}
   // (so they are IO-visible and tagged on-the-dead-boundary) plus every
@@ -1281,29 +1267,58 @@ Application::applyDeathToActivePart()
     }
   }
 
-  // process_killed_elements walks the death boundary through the
-  // face-adjacent element graph, which spans rank boundaries in
-  // parallel. remoteActiveSelector tells each rank, for every graph
-  // edge crossing to another rank, whether the off-rank element is
-  // still live; without it the ranks build inconsistent interfaces and
-  // deadlock in the parallel modification-end exchange. Killed cells
-  // stay in activePart, so "live" is activePart minus deadCellsPart;
-  // populate_selected_value_for_remote_elements fills the map from that
-  // selector. In serial there are no cross-rank edges and it stays
-  // empty, leaving the serial result unchanged.
-  bulkData.initialize_face_adjacent_element_graph();
-  auto& elem_graph = bulkData.get_face_adjacent_element_graph();
-  stk::mesh::impl::ParallelSelectedInfo remoteActiveSelector;
-  stk::mesh::impl::populate_selected_value_for_remote_elements(
-      bulkData, elem_graph,
-      stk::mesh::Selector(*activePart) & !stk::mesh::Selector(*deadCellsPart),
-      remoteActiveSelector);
+  // The new clone-before-disconnect element-death path (Adagio-style)
+  // is gated by ALBANY_NEW_ELEMENT_DEATH=1 during bring-up. When set,
+  // it replaces Steps B1+B2 below. See doc/element_death_port.md.
+  const char* newElementDeathEnv = std::getenv("ALBANY_NEW_ELEMENT_DEATH");
+  const bool useNewElementDeath =
+      newElementDeathEnv != nullptr && newElementDeathEnv[0] == '1';
 
-  stk::mesh::process_killed_elements(
-      bulkData, killed, *activePart, remoteActiveSelector,
-      side_parts,
-      bc_mesh_parts.empty() ? nullptr : &bc_mesh_parts,
-      stk::mesh::impl::MeshModification::modification_optimization::MOD_END_SORT);
+  if (useNewElementDeath) {
+    applyElementDeath(
+        bulkData, *activePart, *deadCellsPart,
+        killed, side_parts, bc_mesh_parts);
+  } else {
+    // Step B1: add the killed cells to deadCellsPart. They remain in
+    // activePart -- their assembly contribution is gated by the scatter
+    // skip via death_status_vec, not by part membership. deadCellsPart
+    // is what lets the remote-active query below and visualization
+    // filters tell dead cells from live ones.
+    bulkData.modification_begin();
+    for (stk::mesh::Entity cell : killed) {
+      bulkData.change_entity_parts(
+          cell,
+          stk::mesh::PartVector{deadCellsPart},  // add
+          stk::mesh::PartVector{});              // remove nothing
+    }
+    bulkData.modification_end();
+
+    // Step B2: let STK walk the active/dead interface and create the
+    // newly-exposed face entities. process_killed_elements walks the
+    // death boundary through the face-adjacent element graph, which
+    // spans rank boundaries in parallel. remoteActiveSelector tells
+    // each rank, for every graph edge crossing to another rank, whether
+    // the off-rank element is still live; without it the ranks build
+    // inconsistent interfaces and deadlock in the parallel
+    // modification-end exchange. Killed cells stay in activePart, so
+    // "live" is activePart minus deadCellsPart;
+    // populate_selected_value_for_remote_elements fills the map from
+    // that selector. In serial there are no cross-rank edges and it
+    // stays empty, leaving the serial result unchanged.
+    bulkData.initialize_face_adjacent_element_graph();
+    auto& elem_graph = bulkData.get_face_adjacent_element_graph();
+    stk::mesh::impl::ParallelSelectedInfo remoteActiveSelector;
+    stk::mesh::impl::populate_selected_value_for_remote_elements(
+        bulkData, elem_graph,
+        stk::mesh::Selector(*activePart) & !stk::mesh::Selector(*deadCellsPart),
+        remoteActiveSelector);
+
+    stk::mesh::process_killed_elements(
+        bulkData, killed, *activePart, remoteActiveSelector,
+        side_parts,
+        bc_mesh_parts.empty() ? nullptr : &bc_mesh_parts,
+        stk::mesh::impl::MeshModification::modification_optimization::MOD_END_SORT);
+  }
 
   // Step B3: rebuild worksets so the discretization picks up the new
   // faces and computeNodeSets re-clips the "-erodible" node sets to the

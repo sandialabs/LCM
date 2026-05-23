@@ -1,4 +1,4 @@
-# Hand-rolled element death port: design and recon
+# Element death port: design and recon
 
 ## Why this document exists
 
@@ -189,7 +189,7 @@ on any rank references at this point.
    `exposed_boundary_part` for marking newly-exposed surfaces. LCM
    currently paints exposed faces with `activePart`, `deadCellsPart`,
    and any `-erodible` side-sets (lines 1270-1279 of
-   `Albany_Application.cpp`). The hand-rolled code should preserve
+   `Albany_Application.cpp`). The new code should preserve
    the LCM convention. Decide whether to:
    - Reuse `_created_during_death` part (created by STK in
      `ProcessKilledElements.cpp:236`) — requires us to also create
@@ -199,7 +199,7 @@ on any rank references at this point.
 2. **Face permutation handling.** Adagio's lines 1473-1488 track the
    permutation between an element and its face. STK's
    `declare_element_side` handles permutation internally for standard
-   topologies, but the hand-roll's manual `declare_relation` calls
+   topologies, but the port's manual `declare_relation` calls
    need explicit permutation. Verify that
    `declare_element_side(elem, side_ord, parts)` gives the same
    result we'd want; if so, we can skip the manual permutation
@@ -226,7 +226,7 @@ on any rank references at this point.
 
 5. **Orphan-node handling.** LCM's `fixOrphanNodesForElementDeath`
    currently regularizes zero-diagonal rows in the operator. With
-   the hand-rolled approach, nodes that lose all their live-cell
+   the new approach, nodes that lose all their live-cell
    references behave the same way (only dying cells reference them).
    The existing fix should still apply. No change needed.
 
@@ -238,9 +238,8 @@ on any rank references at this point.
 
 ## Sketch of LCM source structure
 
-New file: `src/disc/stk/Albany_HandRolledElementDeath.{hpp,cpp}`
-(or under `src/LCM/` if we want to keep it in LCM-specific code).
-Exports:
+New file: `src/Albany_ElementDeath.{hpp,cpp}` (parallel to
+`Albany_Application.cpp` where the entry point lives). Exports:
 
 ```cpp
 namespace Albany {
@@ -249,7 +248,7 @@ namespace Albany {
 // Application::applyDeathToActivePart from Step B1 onward (Steps B1-B3).
 // Returns true if any cell was killed.
 bool
-applyHandRolledElementDeath(
+applyElementDeath(
     stk::mesh::BulkData& bulkData,
     stk::mesh::Part& activePart,
     stk::mesh::Part& deadCellsPart,
@@ -281,7 +280,7 @@ void deleteOrphanedAndExhaustedFaces(
 
 `Albany_Application.cpp` change: replace the body of
 `applyDeathToActivePart` from "Step B1" onward with a call to
-`applyHandRolledElementDeath(...)`. Preserve the prologue (gather
+`applyElementDeath(...)`. Preserve the prologue (gather
 `killed`, dedup against `deadCellsPart`, the global early-out, the
 `side_parts` and `bc_mesh_parts` construction). Drop the
 `initialize_face_adjacent_element_graph` + `remoteActiveSelector`
@@ -318,13 +317,13 @@ Three commits, each independently testable:
 
 1. **Skeleton + single-rank parity.** Add the new file with the
    algorithm in place, wired behind an env flag
-   (`ALBANY_HAND_ROLLED_DEATH=1`). Leave
+   (`ALBANY_NEW_ELEMENT_DEATH=1`). Leave
    `process_killed_elements` path as default. Verify single-rank
    parallel MiniErosion under the env flag matches serial.
 2. **Multi-rank parity.** Iterate until 4-rank MiniErosion under the
    env flag matches serial bit-comparably (or to within an agreed
    tolerance). This is the actual STK-bug-avoidance proof.
-3. **Cut over and retire.** Flip the default to the hand-rolled path,
+3. **Cut over and retire.** Flip the default to the new path,
    remove the env gate, delete the `process_killed_elements` call,
    the `initialize_face_adjacent_element_graph` call, and the
    `populate_selected_value_for_remote_elements` machinery. Update

@@ -21,6 +21,7 @@ set(SOURCES
     PHAL_Dimension.cpp
     PHAL_Setup.cpp
     Albany_Application.cpp
+    Albany_ElementDeath.cpp
     Albany_Memory.cpp
     Albany_ModelEvaluator.cpp
     Albany_NullSpaceUtils.cpp
@@ -39,6 +40,7 @@ set(HEADERS
     Albany_DistributedParameterDerivativeOp.hpp
     Albany_DummyParameterAccessor.hpp
     Albany_EigendataInfoStructT.hpp
+    Albany_ElementDeath.hpp
     Albany_KokkosTypes.hpp
     Albany_Memory.hpp
     Albany_ModelEvaluator.hpp

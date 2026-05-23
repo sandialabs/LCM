@@ -1222,7 +1222,10 @@ Application::applyDeathToActivePart()
 
     stk::mesh::Entity cell = bulkData.get_entity(stk::topology::ELEMENT_RANK, gid);
     if (!bulkData.is_valid(cell)) continue;
-    if (!bulkData.bucket(cell).member(*activePart)) continue;  // already killed in a prior step
+    if (!bulkData.bucket(cell).member(*activePart)) continue;
+    // Killed cells stay in activePart (Step B1 adds to deadCellsPart but
+    // does not remove from activePart), so dedup against deadCellsPart.
+    if (bulkData.bucket(cell).member(*deadCellsPart)) continue;
 
     killed.push_back(cell);
   }

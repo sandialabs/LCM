@@ -16,6 +16,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest_serial.cmake COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_np4.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/runtest_np4.cmake COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_denudation.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/coupled_denudation.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_denudation.yaml
@@ -45,3 +47,20 @@ add_test(
     -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -P
     ${runtest.cmake})
 set_tests_properties(ACE_${testName}_Denudation_Serial PROPERTIES LABELS "LCM;Tpetra;Forward")
+
+# 4-rank parallel test - same gold, exodiff after merging with epu.
+# Guards against regressions in the clone-before-disconnect element-death
+# algorithm (Albany::applyElementDeath) which is what makes parallel
+# erosion work; see doc/element_death_port.md.
+set(runtest_np4.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_np4.cmake)
+add_test(
+  NAME ACE_${testName}_Denudation_np4
+  COMMAND
+  ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=denudation
+    -DTEST_ARGS=coupled_denudation.yaml -DMPIMNP=${MPIMNP}
+    -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DSEACAS_EPU=${SEACAS_EPU}
+    -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -P
+    ${runtest_np4.cmake})
+set_tests_properties(ACE_${testName}_Denudation_np4
+                     PROPERTIES LABELS "LCM;Tpetra;Forward"
+                                PROCESSORS ${MPIMNP})

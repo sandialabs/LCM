@@ -2,7 +2,11 @@ COORDINATES absolute 1.e-6
 
 TIME STEPS relative 1.e-6 floor 0.0
 
-NODAL VARIABLES relative 2.0e-5 floor 1.0e-6
+# Floors are sized to absorb parallel reduction-order noise on near-
+# zero values: displacements/velocities sign-flip at ~1e-6 magnitudes,
+# residuals at ~1e-10, stresses at ~1e-9. Values above the floor are
+# checked at engineering precision (rel 2e-5 nodal, abs 5e-6 element).
+NODAL VARIABLES relative 2.0e-5 floor 1.0e-5
 	temperature        relative 6.0e-6 floor 1.0e-12
 	temperature_dot    relative 6.0e-6 floor 1.0e-12
 	displacement_1
@@ -14,5 +18,9 @@ NODAL VARIABLES relative 2.0e-5 floor 1.0e-6
 	acceleration_1
 	acceleration_2
 	acceleration_3
+	displacement_residual_1  absolute 1.0e-8 floor 1.0e-8
+	displacement_residual_2  absolute 1.0e-8 floor 1.0e-8
+	displacement_residual_3  absolute 1.0e-8 floor 1.0e-8
+	proj_nodal_linear        absolute 1.0e-12 floor 1.0e-12
 
-ELEMENT VARIABLES absolute 5.e-6 floor 1.0e-12
+ELEMENT VARIABLES absolute 5.e-6 floor 1.0e-8

@@ -8,10 +8,6 @@
 
 #include "stk_mesh/base/BulkData.hpp"
 #include "stk_mesh/base/Part.hpp"
-#include "stk_mesh/baseImpl/elementGraph/ElemElemGraph.hpp"
-#include "stk_mesh/baseImpl/elementGraph/GraphTypes.hpp"
-#include "stk_mesh/baseImpl/elementGraph/ParallelInfoForGraph.hpp"
-#include "stk_mesh/baseImpl/elementGraph/ProcessKilledElements.hpp"
 #include "stk_util/parallel/ParallelReduceBool.hpp"
 
 #include "AAdapt_RC_Manager.hpp"
@@ -1231,9 +1227,9 @@ Application::applyDeathToActivePart()
     killed.push_back(cell);
   }
 
-  // process_killed_elements -- and the collective calls preceding it
-  // (modification cycles, the element-graph build, the remote-active
-  // exchange, rebuildWorksets) -- must be entered by *every* rank, even
+  // applyElementDeath -- and the collective calls inside it
+  // (modification cycles, the parallel field-sum exchanges) and
+  // rebuildWorksets below -- must be entered by *every* rank, even
   // ranks with no locally killed cells: they pass an empty list. Make
   // the early-out a global decision so the ranks never diverge and
   // deadlock.
@@ -1267,58 +1263,15 @@ Application::applyDeathToActivePart()
     }
   }
 
-  // The new clone-before-disconnect element-death path (Adagio-style)
-  // is gated by ALBANY_NEW_ELEMENT_DEATH=1 during bring-up. When set,
-  // it replaces Steps B1+B2 below. See doc/element_death_port.md.
-  const char* newElementDeathEnv = std::getenv("ALBANY_NEW_ELEMENT_DEATH");
-  const bool useNewElementDeath =
-      newElementDeathEnv != nullptr && newElementDeathEnv[0] == '1';
-
-  if (useNewElementDeath) {
-    applyElementDeath(
-        bulkData, *activePart, *deadCellsPart,
-        killed, side_parts, bc_mesh_parts);
-  } else {
-    // Step B1: add the killed cells to deadCellsPart. They remain in
-    // activePart -- their assembly contribution is gated by the scatter
-    // skip via death_status_vec, not by part membership. deadCellsPart
-    // is what lets the remote-active query below and visualization
-    // filters tell dead cells from live ones.
-    bulkData.modification_begin();
-    for (stk::mesh::Entity cell : killed) {
-      bulkData.change_entity_parts(
-          cell,
-          stk::mesh::PartVector{deadCellsPart},  // add
-          stk::mesh::PartVector{});              // remove nothing
-    }
-    bulkData.modification_end();
-
-    // Step B2: let STK walk the active/dead interface and create the
-    // newly-exposed face entities. process_killed_elements walks the
-    // death boundary through the face-adjacent element graph, which
-    // spans rank boundaries in parallel. remoteActiveSelector tells
-    // each rank, for every graph edge crossing to another rank, whether
-    // the off-rank element is still live; without it the ranks build
-    // inconsistent interfaces and deadlock in the parallel
-    // modification-end exchange. Killed cells stay in activePart, so
-    // "live" is activePart minus deadCellsPart;
-    // populate_selected_value_for_remote_elements fills the map from
-    // that selector. In serial there are no cross-rank edges and it
-    // stays empty, leaving the serial result unchanged.
-    bulkData.initialize_face_adjacent_element_graph();
-    auto& elem_graph = bulkData.get_face_adjacent_element_graph();
-    stk::mesh::impl::ParallelSelectedInfo remoteActiveSelector;
-    stk::mesh::impl::populate_selected_value_for_remote_elements(
-        bulkData, elem_graph,
-        stk::mesh::Selector(*activePart) & !stk::mesh::Selector(*deadCellsPart),
-        remoteActiveSelector);
-
-    stk::mesh::process_killed_elements(
-        bulkData, killed, *activePart, remoteActiveSelector,
-        side_parts,
-        bc_mesh_parts.empty() ? nullptr : &bc_mesh_parts,
-        stk::mesh::impl::MeshModification::modification_optimization::MOD_END_SORT);
-  }
+  // Drive the active/dead interface update. applyElementDeath uses the
+  // clone-before-disconnect algorithm (Adagio-style), which sidesteps
+  // an STK multi-rank harmonization bug in
+  // make_mesh_parallel_consistent_after_element_death. See
+  // doc/element_death_port.md for the algorithm and
+  // ~/LCM/stk_findings_draft.txt for the STK-bug diagnosis.
+  applyElementDeath(
+      bulkData, *activePart, *deadCellsPart,
+      killed, side_parts, bc_mesh_parts);
 
   // Step B3: rebuild worksets so the discretization picks up the new
   // faces and computeNodeSets re-clips the "-erodible" node sets to the

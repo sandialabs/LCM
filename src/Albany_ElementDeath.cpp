@@ -143,12 +143,13 @@ applyElementDeath(
           *exposure += 1.0;
         }
       }
-      // Unshared (boundary) faces of the dying cell are left
-      // attached. LCM keeps dying cells in the mesh (deadCellsPart);
-      // destroying their exclusive faces would lose data and break
-      // assembly. The original process_killed_elements painted these
-      // with sideSetParts for DBC propagation -- Phase 2b will add
-      // that paint pass once the structural algorithm is validated.
+      // Unshared (boundary) faces of the dying cell are left attached
+      // and unmodified. LCM keeps dying cells in the mesh
+      // (deadCellsPart), so destroying their exclusive faces would
+      // lose data. The original process_killed_elements only iterated
+      // the dying cell's element-graph neighbors (shared interior
+      // faces), so it never touched these unshared exterior faces
+      // either -- there is nothing to mirror for them.
     }
   }
   for (stk::mesh::Entity elem : killed) {

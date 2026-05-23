@@ -261,22 +261,49 @@ called once per accepted step from the observer. It turns the *flags* set
 during the step into a *structural* change of the mesh.
 
 It scans `death_status_vecs_` for cells that are flagged dead but still
-members of `activePart`, and for that set:
+members of `activePart` and not yet in `deadCellsPart`, builds the
+`side_parts` and `bc_mesh_parts` part vectors (§8), and then delegates
+to `Albany::applyElementDeath` (`src/Albany_ElementDeath.cpp`), which
+runs a clone-before-disconnect algorithm modeled on Sierra/SM's Adagio
+(see `doc/element_death_port.md` and `~/LCM/stk_findings_draft.txt`
+for the STK bug this routes around). The phases:
 
-- **B1 — `stk::mesh::process_killed_elements`.** STK removes the killed
-  cells from `activePart`, traverses the active/dead interface, and creates
-  the newly-exposed face entities. Each new face is added to `side_parts`
-  (`{activePart, deadCellsPart}` plus every `-erodible` side-set, §8) and
-  inherits the existing side-set membership of the adjacent live element
-  via `boundary_mesh_parts` — so a Neumann-style BC on an old boundary
-  extends automatically onto the new interface.
-- **B2 — `change_entity_parts`.** The killed cells are added to
-  `deadCellsPart`.
-- **B3 — `rebuildWorksets()`.** The worksets are recomputed. Because
-  `computeWorksetInfo` selects `& activePart`, the dead cells are now
-  excluded from every workset, and subsequent fills never include them.
+- **Pre-modification count.** Each rank counts elements attached to
+  every face over its locally-owned live cells (writes to a
+  side-rank scratch field `deathFaceElemAttachCount`), then
+  `stk::mesh::parallel_sum` aggregates the counts so shared faces
+  see the global total.
+- **Clone-and-disconnect (single modification block).** For every
+  face of every killed cell:
+  - If the face is *shared* (count > 1): destroy the killed cell's
+    relation to it, declare a new locally-owned face on the killed
+    cell's side via `declare_element_side(elem, side_ord, sideSetParts)`,
+    bump the original face's exposure marker, and set its boundary-face
+    marker.
+  - If the face is *unshared*: leave it attached. LCM keeps killed
+    cells in the mesh (see below), so their exclusive boundary faces
+    stay too.
+  Then move every killed cell into `deadCellsPart`.
+- **Post-modification parallel sum.** `stk::mesh::parallel_sum` of
+  the exposure and boundary markers, so every rank sees the global
+  totals on shared faces.
+- **Part-membership update and deletion (second modification block).**
+  Each rank, for its owned faces: faces whose boundary marker is set
+  but whose exposure is not 2 are added to `sideSetParts` (STK then
+  propagates the part change to the ghost copy on the other rank, so
+  the `-erodible` node-set comes out the same on both sides — §8.3);
+  faces whose exposure hit 2 have had both sides drop their back-
+  reference and are destroyed (zero remaining live relations on any
+  rank).
+- **`rebuildWorksets()`.** The worksets are recomputed. Because
+  `computeWorksetInfo` selects `& activePart`, the dead cells are
+  excluded from every workset, and subsequent fills never include
+  them.
 
-No element entity is ever destroyed; the cells remain in `deadCellsPart`.
+No element entity is ever destroyed; the cells remain in
+`deadCellsPart`. Faces created on the killed-cell side via
+`declare_element_side` are kept; only shared faces whose live
+neighbors are also gone are destroyed.
 
 ---
 
@@ -313,12 +340,15 @@ side set is what restricts that BC to the current surface.
 ### 8.2 How the side set tracks the receding surface
 
 In the between-step structural update (§7), `applyDeathToActivePart`
-passes every `-erodible` side set to `process_killed_elements` as a part
-that should receive newly created sides. When STK exposes the faces behind
-a layer of just-killed cells, each new face is added to the `-erodible`
-side set(s). An `-erodible` side set therefore *grows*, one layer at a
-time, and at every step it is exactly the set of currently exposed
-erodible faces.
+passes every `-erodible` side set in `sideSetParts` to
+`applyElementDeath`. When a killed cell's shared face is cloned, the
+new face is declared into `sideSetParts` (so the clone lands directly
+in the `-erodible` side set). The original face on the live-side
+ghost is added to `sideSetParts` in the post-modification update so
+the live rank's clipping sees it in `-erodible` too. An `-erodible`
+side set therefore *grows*, one layer at a time, and at every step
+it is exactly the set of currently exposed erodible faces — on both
+sides of every rank boundary.
 
 ### 8.3 How the node sets are clipped to the side set
 
@@ -420,7 +450,7 @@ mechanical — over a single shared STK `BulkData`. Each owns its own
 `STKDiscretization`, and each caches raw pointers into STK field storage.
 
 Erosion happens during the mechanical phase and reallocates that storage
-(`process_killed_elements` plus the modification cycle). **Every**
+(`applyElementDeath`'s two modification cycles). **Every**
 discretization viewing the shared mesh must be re-synced with
 `rebuildWorksets()` afterward, not only the eroding application's own — a
 stale discretization would dereference dangling pointers. The ACE solver

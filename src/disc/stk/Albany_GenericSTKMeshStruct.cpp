@@ -259,6 +259,21 @@ GenericSTKMeshStruct::SetupFieldData(
   deadCellsPart = &metaData->declare_part("dead_cells");
   stk::io::put_io_part_attribute(*deadCellsPart);
 
+  // Scratch fields for the new element-death path (see
+  // doc/element_death_port.md and src/Albany_ElementDeath.cpp). All
+  // three live on the side rank; each is a single scalar zeroed at
+  // the start of every applyElementDeath call. Declared
+  // unconditionally so the same metadata works whether erosion is on
+  // or not; the per-face storage is small and the fields are only
+  // read/written inside the death path.
+  const auto side_rank = metaData->side_rank();
+  stk::mesh::put_field_on_mesh(
+      metaData->declare_field<double>(side_rank, "deathFaceElemAttachCount"),
+      metaData->universal_part(), 1, nullptr);
+  stk::mesh::put_field_on_mesh(
+      metaData->declare_field<double>(side_rank, "deathFaceExposureCount"),
+      metaData->universal_part(), 1, nullptr);
+
 #if defined(ALBANY_STK_PERCEPT)
   // Build the eMesh if needed
   if (buildEMesh) eMesh = Teuchos::rcp(new stk::percept::PerceptMesh(metaData, bulkData, false));

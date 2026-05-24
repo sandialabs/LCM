@@ -104,11 +104,7 @@ set(HEADERS
     utility/Albany_ThyraUtils.hpp
     utility/Albany_TpetraThyraUtils.hpp
     utility/VariableMonitor.hpp
-    utility/StaticAllocator.hpp
-    utility/math/Tensor.hpp
-    utility/math/TensorCommon.hpp
-    utility/math/TensorDetail.hpp
-    utility/math/TensorImpl.hpp)
+    utility/StaticAllocator.hpp)
 
 add_executable(xml2yaml utility/xml2yaml.cpp)
 add_executable(yaml2xml utility/yaml2xml.cpp)
@@ -562,7 +558,6 @@ include_directories(
   ./LCM/evaluators/ACE
   ./LCM/evaluators/bc
   ./LCM/evaluators/contact
-  ./LCM/evaluators/HMC
   ./LCM/evaluators/kinematics
   ./LCM/evaluators/lame
   ./LCM/evaluators/linear-elasticity
@@ -573,10 +568,8 @@ include_directories(
   ./LCM/evaluators/surface-element
   ./LCM/evaluators/size-field
   ./LCM/evaluators/transport
-  ./LCM/evaluators/HMC
   ./LCM/models
   ./LCM/parallel_evaluators
-  ./LCM/parallel_models
   ./LCM/solvers
   ./LCM/utils
   ./LCM/utils/dtk)

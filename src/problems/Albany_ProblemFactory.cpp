@@ -29,7 +29,6 @@
 #include "LCM/problems/ConstitutiveDriverProblem.hpp"
 #include "LCM/problems/ElasticityProblem.hpp"
 #include "LCM/problems/ElectroMechanicsProblem.hpp"
-#include "LCM/problems/HMCProblem.hpp"
 #include "LCM/problems/MechanicsProblem.hpp"
 #include "LCM/problems/ThermoElasticityProblem.hpp"
 
@@ -143,12 +142,6 @@ Albany::ProblemFactory::create()
     strategy = rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 2));
   } else if (method == "ThermoElasticity 3D") {
     strategy = rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 3));
-  } else if (method == "HMC 1D") {
-    strategy = rcp(new Albany::HMCProblem(problemParams, paramLib, 1, commT));
-  } else if (method == "HMC 2D") {
-    strategy = rcp(new Albany::HMCProblem(problemParams, paramLib, 2, commT));
-  } else if (method == "HMC 3D") {
-    strategy = rcp(new Albany::HMCProblem(problemParams, paramLib, 3, commT));
   } else if (method == "Electromechanics 1D") {
     strategy = rcp(new Albany::ElectroMechanicsProblem(problemParams, paramLib, 1, commT));
   } else if (method == "Electromechanics 2D") {

@@ -32,7 +32,6 @@
 #include "NeohookeanModel.hpp"
 #include "NewtonianFluidModel.hpp"
 #include "OrtizPandolfiModel.hpp"
-#include "ParallelNeohookeanModel.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "RIHMRModel.hpp"
 #include "StVenantKirchhoffModel.hpp"
@@ -301,8 +300,6 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
     model = rcp(new NewtonianFluidModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Ortiz Pandolfi") {
     model = rcp(new OrtizPandolfiModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Parallel Neohookean") {
-    model = rcp(new ParallelNeohookeanModel<EvalT, Traits>(p, dl));
   } else if (model_name == "RIHMR") {
     model = rcp(new RIHMRModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Saint Venant Kirchhoff") {

@@ -14,7 +14,6 @@ set(problem-sources
     "${LCM_DIR}/problems/ACEThermalProblem.cpp"
     "${LCM_DIR}/problems/ElectroMechanicsProblem.cpp"
     "${LCM_DIR}/problems/FieldNameMap.cpp"
-    "${LCM_DIR}/problems/HMCProblem.cpp"
     "${LCM_DIR}/problems/MechanicsProblem.cpp"
     "${LCM_DIR}/problems/ThermoElasticityProblem.cpp")
 set(problem-headers
@@ -23,7 +22,6 @@ set(problem-headers
     "${LCM_DIR}/problems/ACEThermalProblem.hpp"
     "${LCM_DIR}/problems/ElectroMechanicsProblem.hpp"
     "${LCM_DIR}/problems/FieldNameMap.hpp"
-    "${LCM_DIR}/problems/HMCProblem.hpp"
     "${LCM_DIR}/problems/MechanicsProblem.hpp"
     "${LCM_DIR}/problems/ThermoElasticityProblem.hpp")
 
@@ -101,25 +99,6 @@ set(bc-headers
     "${LCM_DIR}/evaluators/bc/SchwarzBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/StrongSchwarzBC.hpp"
     "${LCM_DIR}/evaluators/bc/StrongSchwarzBC_Def.hpp")
-
-# LCM HMC evaluators
-set(hmc-sources
-    "${LCM_DIR}/evaluators/HMC/HMC_MicroResidual.cpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_StrainDifference.cpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_Stresses.cpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_TotalStress.cpp"
-    "${LCM_DIR}/evaluators/HMC/UpdateField.cpp")
-set(hmc-headers
-    "${LCM_DIR}/evaluators/HMC/HMC_MicroResidual_Def.hpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_MicroResidual.hpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_StrainDifference_Def.hpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_StrainDifference.hpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_Stresses_Def.hpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_Stresses.hpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_TotalStress_Def.hpp"
-    "${LCM_DIR}/evaluators/HMC/HMC_TotalStress.hpp"
-    "${LCM_DIR}/evaluators/HMC/UpdateField_Def.hpp"
-    "${LCM_DIR}/evaluators/HMC/UpdateField.hpp")
 
 # LCM kinematics evaluators
 set(kin-sources
@@ -357,8 +336,7 @@ set(models-sources
     "${LCM_DIR}/models/RIHMRModel.cpp"
     "${LCM_DIR}/models/StVenantKirchhoffModel.cpp"
     "${LCM_DIR}/models/TvergaardHutchinsonModel.cpp"
-    "${LCM_DIR}/models/ViscoElasticModel.cpp"
-    "${LCM_DIR}/parallel_models/ParallelNeohookeanModel.cpp")
+    "${LCM_DIR}/models/ViscoElasticModel.cpp")
 set(models-headers
     "${LCM_DIR}/models/AAAModel_Def.hpp"
     "${LCM_DIR}/models/AAAModel.hpp"
@@ -446,9 +424,7 @@ set(models-headers
     "${LCM_DIR}/models/CrystalPlasticity/ParameterReader_Def.hpp"
     "${LCM_DIR}/models/CrystalPlasticity/ParameterReader.hpp"
     "${LCM_DIR}/models/KernelConstitutiveModel_Def.hpp"
-    "${LCM_DIR}/models/KernelConstitutiveModel.hpp"
-    "${LCM_DIR}/parallel_models/ParallelNeohookeanModel_Def.hpp"
-    "${LCM_DIR}/parallel_models/ParallelNeohookeanModel.hpp")
+    "${LCM_DIR}/models/KernelConstitutiveModel.hpp")
 set(models-sources
     ${models-sources}
     "${LCM_DIR}/models/CrystalPlasticityModel.cpp"
@@ -545,7 +521,6 @@ set(SOURCES
     ${model-eval-sources}
     ${surface-element-sources}
     ${transport-sources}
-    ${hmc-sources}
     ${pd-sources}
     ${poro-sources}
     ${ace-sources}
@@ -566,7 +541,6 @@ set(HEADERS
     ${model-eval-headers}
     ${surface-element-headers}
     ${transport-headers}
-    ${hmc-headers}
     ${pd-headers}
     ${poro-headers}
     ${ace-headers}
@@ -610,7 +584,6 @@ set(INCLUDE_DIRS
     ${LCM_DIR}/problems
     ${LCM_DIR}/evaluators
     ${LCM_DIR}/evaluators/bc
-    ${LCM_DIR}/evaluators/HMC
     ${LCM_DIR}/evaluators/kinematics
     ${LCM_DIR}/evaluators/lame
     ${LCM_DIR}/evaluators/linear-elasticity
@@ -622,7 +595,6 @@ set(INCLUDE_DIRS
     ${LCM_DIR}/evaluators/surface-element
     ${LCM_DIR}/evaluators/size-field
     ${LCM_DIR}/evaluators/transport
-    ${LCM_DIR}/evaluators/HMC
     ${LCM_DIR}/models
     ${LCM_DIR}/utils
     ${LCM_DIR}/utils/dtk_interp_and_error

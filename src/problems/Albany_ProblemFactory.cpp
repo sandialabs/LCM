@@ -28,7 +28,6 @@
 #include "LCM/problems/ACEThermalProblem.hpp"
 #include "LCM/problems/ConstitutiveDriverProblem.hpp"
 #include "LCM/problems/ElasticityProblem.hpp"
-#include "LCM/problems/ElectroMechanicsProblem.hpp"
 #include "LCM/problems/MechanicsProblem.hpp"
 #include "LCM/problems/ThermoElasticityProblem.hpp"
 
@@ -142,12 +141,6 @@ Albany::ProblemFactory::create()
     strategy = rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 2));
   } else if (method == "ThermoElasticity 3D") {
     strategy = rcp(new Albany::ThermoElasticityProblem(problemParams, paramLib, 3));
-  } else if (method == "Electromechanics 1D") {
-    strategy = rcp(new Albany::ElectroMechanicsProblem(problemParams, paramLib, 1, commT));
-  } else if (method == "Electromechanics 2D") {
-    strategy = rcp(new Albany::ElectroMechanicsProblem(problemParams, paramLib, 2, commT));
-  } else if (method == "Electromechanics 3D") {
-    strategy = rcp(new Albany::ElectroMechanicsProblem(problemParams, paramLib, 3, commT));
   } else {
     ALBANY_ABORT(std::endl << "Error!  Unknown problem " << method << "!" << std::endl << "Supplied parameter list is " << std::endl << *problemParams);
   }

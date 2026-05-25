@@ -4,21 +4,17 @@ LCM:
     Solution Method: Continuation
     Phalanx Graph Visualization Detail: 1
     MaterialDB Filename: materials.yaml
-    Dirichlet BCs:
-      DBC on NS NodeSet0 for DOF X: 0.00000000e+00
-      DBC on NS NodeSet1 for DOF X: -4.00000000e-02
-      DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
-      DBC on NS NodeSet3 for DOF Y: 0.00000000e+00
-      DBC on NS NodeSet4 for DOF Z: 0.00000000e+00
-      DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Parameters:
-      Number: 6
-      Parameter 0: DBC on NS NodeSet0 for DOF X
-      Parameter 1: DBC on NS NodeSet1 for DOF X
-      Parameter 2: DBC on NS NodeSet2 for DOF Y
-      Parameter 3: DBC on NS NodeSet3 for DOF Y
-      Parameter 4: DBC on NS NodeSet4 for DOF Z
-      Parameter 5: DBC on NS NodeSet5 for DOF Z
+      Number: 1
+      Parameter 0: Time
+      Nominal Values: [1.0]
+    Dirichlet BCs:
+      SDBC on NS NodeSet0 for DOF X: 0.00000000e+00
+      ExpressionEvaluated SDBC on NS NodeSet1 for DOF X: '-4.00000000e-02 * t'
+      SDBC on NS NodeSet2 for DOF Y: 0.00000000e+00
+      SDBC on NS NodeSet3 for DOF Y: 0.00000000e+00
+      SDBC on NS NodeSet4 for DOF Z: 0.00000000e+00
+      SDBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Response Functions:
       Number: 1
       Response 0: Solution Average
@@ -31,7 +27,7 @@ LCM:
     Exodus Output File Name: stel3d_explicit_fd.exo
   Regression Results:
     Number of Comparisons: 1
-    Test Values: [2.095615265146e-04]
+    Test Values: [-6.357147775969e-04]
     Relative Tolerance: 1.00000000e-07
     Number of Sensitivity Comparisons: 0
     Sensitivity Test Values 0: [0.16666666, 0.16666666, 0.33333333, 0.33333333]
@@ -45,15 +41,15 @@ LCM:
         First Step Predictor: { }
         Last Step Predictor: { }
       Step Size:
-        Initial Step Size: -1.00000000e-04
+        Initial Step Size: 1.250000000e-02
         Method: Constant
       Stepper:
         Initial Value: 0.00000000e+00
-        Continuation Parameter: DBC on NS NodeSet1 for DOF X
+        Continuation Parameter: Time
         Max Steps: 80
-        Max Value: 0.00000000e+00
+        Max Value: 1.00000000e+00
         Return Failed on Reaching Max Steps: false
-        Min Value: -4.00000000e-02
+        Min Value: 0.00000000e+00
         Compute Eigenvalues: false
         Eigensolver:
           Method: Anasazi

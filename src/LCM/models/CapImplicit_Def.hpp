@@ -2,11 +2,10 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 #include <MiniTensor.h>
-#include <cmath>
 
 #include "Albany_Utils.hpp"
 #include "CapImplicit.hpp"
-#include "MiniNonlinearSolver.hpp"
+#include "LocalNonlinearSolver.hpp"
 
 namespace LCM {
 
@@ -33,12 +32,14 @@ CapImplicitKernel<EvalT, Traits>::CapImplicitKernel(
       phi_(p->get<RealType>("phi")),
       Q_(p->get<RealType>("Q"))
 {
+  // retrieve appropriate field name strings
   std::string const cauchy_string           = field_name_map_["Cauchy_Stress"];
   std::string const backStress_string       = field_name_map_["Back_Stress"];
   std::string const capParameter_string     = field_name_map_["Cap_Parameter"];
   std::string const eqps_string             = field_name_map_["eqps"];
   std::string const volPlasticStrain_string = field_name_map_["volPlastic_Strain"];
 
+  // define the dependent fields
   setDependentField("Poissons Ratio", dl->qp_scalar);
   setDependentField("Elastic Modulus", dl->qp_scalar);
 
@@ -50,6 +51,7 @@ CapImplicitKernel<EvalT, Traits>::CapImplicitKernel(
     setDependentField(F_string, dl->qp_tensor);
     setDependentField(J_string, dl->qp_scalar);
 
+    // Fp is evaluated and a state variable
     setEvaluatedField(Fp_string, dl->qp_tensor);
     addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true,
                      p->get<bool>("Output Fp", false));
@@ -57,19 +59,37 @@ CapImplicitKernel<EvalT, Traits>::CapImplicitKernel(
     std::string const strain_string = field_name_map_["Strain"];
 
     setDependentField("Strain", dl->qp_tensor);
+
+    // strain is a state variable (old state needed)
     addStateVariable(strain_string, dl->qp_tensor, "scalar", 0.0, true, true);
   }
 
+  // define the evaluated fields
   setEvaluatedField(cauchy_string, dl->qp_tensor);
   setEvaluatedField(backStress_string, dl->qp_tensor);
   setEvaluatedField(capParameter_string, dl->qp_scalar);
   setEvaluatedField(eqps_string, dl->qp_scalar);
   setEvaluatedField(volPlasticStrain_string, dl->qp_scalar);
 
+  if (compute_tangent_) {
+    std::string const tangent_string = field_name_map_["Material Tangent"];
+    setEvaluatedField(tangent_string, dl->qp_tensor4);
+  }
+
+  // define the state variables
+  // stress
   addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, true, true);
+
+  // backStress
   addStateVariable(backStress_string, dl->qp_tensor, "scalar", 0.0, true, true);
+
+  // capParameter
   addStateVariable(capParameter_string, dl->qp_scalar, "scalar", kappa0_, true, true);
+
+  // eqps
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, true);
+
+  // volPlasticStrain
   addStateVariable(volPlasticStrain_string, dl->qp_scalar, "scalar", 0.0, true, true);
 }
 
@@ -86,6 +106,7 @@ CapImplicitKernel<EvalT, Traits>::init(
   std::string eqps_string             = field_name_map_["eqps"];
   std::string volPlasticStrain_string = field_name_map_["volPlastic_Strain"];
 
+  // extract dependent MDFields
   elastic_modulus_ = *dep_fields["Elastic Modulus"];
   poissons_ratio_  = *dep_fields["Poissons Ratio"];
 
@@ -97,21 +118,33 @@ CapImplicitKernel<EvalT, Traits>::init(
     def_grad_ = *dep_fields[F_string];
     J_        = *dep_fields[J_string];
 
-    Fp_     = *eval_fields[Fp_string];
+    // extract evaluated MDFields
+    Fp_ = *eval_fields[Fp_string];
+
+    // get old state
     Fp_old_ = (*workset.stateArrayPtr)[Fp_string + "_old"];
   } else {
     std::string strain_string = field_name_map_["Strain"];
 
-    strain_     = *dep_fields["Strain"];
+    strain_ = *dep_fields["Strain"];
+
+    // get old state
     strain_old_ = (*workset.stateArrayPtr)[strain_string + "_old"];
   }
 
+  // extract evaluated MDFields
   stress_           = *eval_fields[cauchy_string];
   backStress_       = *eval_fields[backStress_string];
   capParameter_     = *eval_fields[capParameter_string];
   eqps_             = *eval_fields[eqps_string];
   volPlasticStrain_ = *eval_fields[volPlasticStrain_string];
 
+  if (compute_tangent_) {
+    std::string tangent_string = field_name_map_["Material Tangent"];
+    tangent_ = *eval_fields[tangent_string];
+  }
+
+  // get old state variables
   stress_old_           = (*workset.stateArrayPtr)[cauchy_string + "_old"];
   backStress_old_       = (*workset.stateArrayPtr)[backStress_string + "_old"];
   capParameter_old_     = (*workset.stateArrayPtr)[capParameter_string + "_old"];
@@ -119,382 +152,52 @@ CapImplicitKernel<EvalT, Traits>::init(
   volPlasticStrain_old_ = (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
 }
 
-// ---------------------------------------------------------------------------
-// CapImplicitNLS: 13-unknown nonlinear residual for the local return map.
-//
-// Unknowns (matches Sec.6 of doc/developersGuide/cap_plasticity.tex):
-//   X = (sigma_11, sigma_22, sigma_33,
-//        sigma_23, sigma_13, sigma_12,
-//        alpha_11, alpha_22,
-//        alpha_23, alpha_13, alpha_12,
-//        kappa, dgamma)
-//
-// dim(X) = 13.  alpha_33 = -(alpha_11 + alpha_22) by deviatoric constraint.
-//
-// Residual (backward-Euler, eq 50-55 of the doc):
-//   R_sigma   = sigma - sigma_tr + dgamma * (Celastic : dg/dsigma)
-//   R_alpha   = alpha - alpha_n - dgamma * h_alpha(alpha, dg/dsigma)
-//   R_kappa   = kappa - kappa_n - dgamma * h_kappa(I1(dg/dsigma), kappa)
-//   R_gamma   = f(sigma, alpha, kappa)
-//
-// dg/dsigma is provided analytically by compute_dgdsigma below, in tensor
-// form using the standard invariant-chain-rule formulas
-//   dI1/dsigma  = I
-//   dJ2/dsigma  = s
-//   dJ3/dsigma  = s*s - (2/3) J2 I
-// so that the gradient method is purely algebraic.  hessian comes from
-// minitensor's default AD on gradient.
-// ---------------------------------------------------------------------------
-template <typename EvalT, minitensor::Index NUM_UNK = 13>
-class CapImplicitNLS : public minitensor::Function_Base<CapImplicitNLS<EvalT, NUM_UNK>, typename EvalT::ScalarT, NUM_UNK>
-{
-  using S = typename EvalT::ScalarT;
-
- public:
-  CapImplicitNLS(
-      RealType A, RealType C, RealType D, RealType theta, RealType R, RealType kappa0,
-      RealType W, RealType D1, RealType D2, RealType calpha, RealType psi,
-      RealType N, RealType L, RealType phi, RealType Q,
-      S const& lame, S const& mu,
-      minitensor::Tensor<S, 3> const& sigma_tr,
-      minitensor::Tensor<S, 3> const& alpha_n,
-      S const& kappa_n)
-      : A_(A), C_(C), D_(D), theta_(theta), R_(R), kappa0_(kappa0),
-        W_(W), D1_(D1), D2_(D2), calpha_(calpha), psi_(psi),
-        N_(N), L_(L), phi_(phi), Q_(Q),
-        lame_(lame), mu_(mu),
-        sigma_tr_(sigma_tr), alpha_n_(alpha_n), kappa_n_(kappa_n)
-  {
-  }
-
-  constexpr static char const* const NAME{"CapImplicit NLS"};
-
-  using Base = minitensor::Function_Base<CapImplicitNLS<EvalT, NUM_UNK>, S, NUM_UNK>;
-
-  // value: default merit function 0.5 * dot(residual, residual)
-  template <typename T, minitensor::Index N>
-  T
-  value(minitensor::Vector<T, N> const& x)
-  {
-    return Base::value(*this, x);
-  }
-
-  // gradient: returns the 13-component backward-Euler residual.
-  template <typename T, minitensor::Index N>
-  minitensor::Vector<T, N>
-  gradient(minitensor::Vector<T, N> const& x)
-  {
-    minitensor::Index const dim = x.get_dimension();
-    ALBANY_EXPECT(dim == Base::DIMENSION);
-
-    // Material constants are RealType -> implicit-convertible to T.
-    // Lame parameters and trial state carry outer FAD info on S; peel
-    // them down to T (handles S=Residual::ScalarT, ValueT, AD<...,N>).
-    T const lame = peel<EvalT, T, N>()(lame_);
-    T const mu   = peel<EvalT, T, N>()(mu_);
-
-    minitensor::Tensor<T, 3> sigma_tr(3);
-    minitensor::Tensor<T, 3> alpha_n(3);
-    for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 3; ++j) {
-        sigma_tr(i, j) = peel<EvalT, T, N>()(sigma_tr_(i, j));
-        alpha_n(i, j)  = peel<EvalT, T, N>()(alpha_n_(i, j));
-      }
-    }
-    T const kappa_n = peel<EvalT, T, N>()(kappa_n_);
-
-    // Unpack unknowns from x.
-    minitensor::Tensor<T, 3> sigma(3);
-    sigma(0, 0) = x(0);
-    sigma(1, 1) = x(1);
-    sigma(2, 2) = x(2);
-    sigma(1, 2) = x(3);  sigma(2, 1) = x(3);
-    sigma(0, 2) = x(4);  sigma(2, 0) = x(4);
-    sigma(0, 1) = x(5);  sigma(1, 0) = x(5);
-
-    minitensor::Tensor<T, 3> alpha(3);
-    alpha(0, 0) = x(6);
-    alpha(1, 1) = x(7);
-    alpha(2, 2) = -x(6) - x(7);
-    alpha(1, 2) = x(8);  alpha(2, 1) = x(8);
-    alpha(0, 2) = x(9);  alpha(2, 0) = x(9);
-    alpha(0, 1) = x(10); alpha(1, 0) = x(10);
-
-    T const kappa  = x(11);
-    T const dgamma = x(12);
-
-    // dg/dsigma and the hardening terms.
-    minitensor::Tensor<T, 3> const dgdsigma = compute_dgdsigma(sigma, alpha, kappa);
-    T const                        I1_dgds  = minitensor::trace(dgdsigma);
-
-    T const                        J2_alpha = T(0.5) * minitensor::dotdot(alpha, alpha);
-    minitensor::Tensor<T, 3> const halpha   = compute_halpha(dgdsigma, J2_alpha);
-
-    T const dedkappa = compute_dedkappa(kappa);
-    T const hkappa   = (dedkappa != T(0)) ? I1_dgds / dedkappa : T(0);
-
-    // Celastic : dg/dsigma  =  lame * tr(dg/dsigma) * I + 2 mu * dg/dsigma
-    T const                        tr_dgds = I1_dgds;
-    minitensor::Tensor<T, 3> const Cdgds   = lame * tr_dgds * minitensor::eye<T, 3>(3)
-                                           + T(2.0) * mu * dgdsigma;
-
-    // Backward-Euler residuals.
-    minitensor::Tensor<T, 3> const R_sigma = sigma - sigma_tr + dgamma * Cdgds;
-    minitensor::Tensor<T, 3> const R_alpha = alpha - alpha_n - dgamma * halpha;
-    T const                        R_kappa = kappa - kappa_n - dgamma * hkappa;
-    T const                        R_gamma = compute_f(sigma, alpha, kappa);
-
-    minitensor::Vector<T, N> r(dim);
-    r(0)  = R_sigma(0, 0);
-    r(1)  = R_sigma(1, 1);
-    r(2)  = R_sigma(2, 2);
-    r(3)  = R_sigma(1, 2);
-    r(4)  = R_sigma(0, 2);
-    r(5)  = R_sigma(0, 1);
-    r(6)  = R_alpha(0, 0);
-    r(7)  = R_alpha(1, 1);
-    r(8)  = R_alpha(1, 2);
-    r(9)  = R_alpha(0, 2);
-    r(10) = R_alpha(0, 1);
-    r(11) = R_kappa;
-    r(12) = R_gamma;
-
-    return r;
-  }
-
-  // hessian: default AD from gradient.
-  template <typename T, minitensor::Index N>
-  minitensor::Tensor<T, N>
-  hessian(minitensor::Vector<T, N> const& x)
-  {
-    return Base::hessian(*this, x);
-  }
-
-  // ----- helpers (templated on T, purely algebraic) -----
-
-  template <typename T>
-  T
-  compute_f(minitensor::Tensor<T, 3> const& sigma,
-            minitensor::Tensor<T, 3> const& alpha,
-            T const&                        kappa) const
-  {
-    minitensor::Tensor<T, 3> const xi = sigma - alpha;
-    T const                        I1 = minitensor::trace(xi);
-    T const                        p  = I1 / T(3);
-    minitensor::Tensor<T, 3> const s  = xi - p * minitensor::eye<T, 3>(3);
-    T const                        J2 = T(0.5) * minitensor::dotdot(s, s);
-    T const                        J3 = minitensor::det(s);
-
-    T const                        Gamma = compute_Gamma(J2, J3);
-    T const Ff_I1                        = A_ - C_ * std::exp(D_ * I1) - theta_ * I1;
-    T const Ff_kappa                     = A_ - C_ * std::exp(D_ * kappa) - theta_ * kappa;
-    T const X                            = kappa - R_ * Ff_kappa;
-    T const Fc                           = compute_Fc(I1, kappa, X);
-
-    return Gamma * Gamma * J2 - Fc * (Ff_I1 - N_) * (Ff_I1 - N_);
-  }
-
-  template <typename T>
-  T
-  compute_g(minitensor::Tensor<T, 3> const& sigma,
-            minitensor::Tensor<T, 3> const& alpha,
-            T const&                        kappa) const
-  {
-    minitensor::Tensor<T, 3> const xi = sigma - alpha;
-    T const                        I1 = minitensor::trace(xi);
-    T const                        p  = I1 / T(3);
-    minitensor::Tensor<T, 3> const s  = xi - p * minitensor::eye<T, 3>(3);
-    T const                        J2 = T(0.5) * minitensor::dotdot(s, s);
-    T const                        J3 = minitensor::det(s);
-
-    T const                        Gamma   = compute_Gamma(J2, J3);
-    T const Ff_I1                          = A_ - C_ * std::exp(L_ * I1) - phi_ * I1;
-    T const Ff_kappa                       = A_ - C_ * std::exp(L_ * kappa) - phi_ * kappa;
-    T const X                              = kappa - Q_ * Ff_kappa;
-    T const Fc                             = compute_Fc(I1, kappa, X);
-
-    return Gamma * Gamma * J2 - Fc * (Ff_I1 - N_) * (Ff_I1 - N_);
-  }
-
-  // dg/dsigma analytically, via the invariant chain rule.
-  template <typename T>
-  minitensor::Tensor<T, 3>
-  compute_dgdsigma(minitensor::Tensor<T, 3> const& sigma,
-                   minitensor::Tensor<T, 3> const& alpha,
-                   T const&                        kappa) const
-  {
-    minitensor::Tensor<T, 3> const I_3 = minitensor::eye<T, 3>(3);
-    minitensor::Tensor<T, 3> const xi  = sigma - alpha;
-    T const                        I1  = minitensor::trace(xi);
-    T const                        p   = I1 / T(3);
-    minitensor::Tensor<T, 3> const s   = xi - p * I_3;
-    T const                        J2  = T(0.5) * minitensor::dotdot(s, s);
-    T const                        J3  = minitensor::det(s);
-
-    // Plastic-potential shear surface (uses L, phi, Q -- not D, theta, R).
-    T const Ff_I1    = A_ - C_ * std::exp(L_ * I1) - phi_ * I1;
-    T const dFf_dI1  = -C_ * L_ * std::exp(L_ * I1) - phi_;
-    T const Ff_kappa = A_ - C_ * std::exp(L_ * kappa) - phi_ * kappa;
-    T const X        = kappa - Q_ * Ff_kappa;
-    T const Fc       = compute_Fc(I1, kappa, X);
-
-    // dFc/dI1:  Fc = 1 - H(kappa - I1) * (I1 - kappa)^2 / (X - kappa)^2
-    T dFc_dI1 = T(0);
-    T const J2_tol(1.0e-12);
-    if (kappa - I1 > T(0) && (X - kappa) != T(0)) {
-      dFc_dI1 = -T(2.0) * (I1 - kappa) / ((X - kappa) * (X - kappa));
-    }
-
-    // dg/dI1:  d(Gamma^2 J2)/dI1 = 0 (Gamma, J2 don't depend on I1);
-    //          d(-Fc (Ff - N)^2)/dI1 = -[dFc/dI1 (Ff-N)^2 + 2 Fc (Ff-N) dFf/dI1]
-    T const dg_dI1 = -dFc_dI1 * (Ff_I1 - N_) * (Ff_I1 - N_)
-                     - T(2.0) * Fc * (Ff_I1 - N_) * dFf_dI1;
-
-    // Gamma and dGamma/d{J2,J3}.
-    T const                        Gamma = compute_Gamma(J2, J3);
-    T                              dG_dJ2(0);
-    T                              dG_dJ3(0);
-    compute_dGamma(J2, J3, dG_dJ2, dG_dJ3);
-
-    // dg/dJ2 = d(Gamma^2 J2)/dJ2 = 2 Gamma (dG/dJ2) J2 + Gamma^2
-    T const dg_dJ2 = T(2.0) * Gamma * dG_dJ2 * J2 + Gamma * Gamma;
-
-    // dg/dJ3 = d(Gamma^2)/dJ3 J2 = 2 Gamma (dG/dJ3) J2
-    T const dg_dJ3 = T(2.0) * Gamma * dG_dJ3 * J2;
-
-    // Invariant gradients in tensor form.
-    minitensor::Tensor<T, 3> const dJ2_dsigma = s;
-    // dJ3/dsigma = s*s - (2/3) J2 I.
-    minitensor::Tensor<T, 3> const s2         = s * s;
-    minitensor::Tensor<T, 3> const dJ3_dsigma = s2 - (T(2.0) / T(3.0)) * J2 * I_3;
-
-    // Assemble.  dI1/dsigma = I.
-    minitensor::Tensor<T, 3> const dgdsigma =
-        dg_dI1 * I_3 + dg_dJ2 * dJ2_dsigma + dg_dJ3 * dJ3_dsigma;
-
-    return dgdsigma;
-    (void)J2_tol;
-  }
-
-  // Kinematic hardening direction:  halpha = c_alpha * G_alpha(alpha) * dev(dg/dsigma)
-  template <typename T>
-  minitensor::Tensor<T, 3>
-  compute_halpha(minitensor::Tensor<T, 3> const& dgdsigma, T const& J2_alpha) const
-  {
-    T const                        Galpha   = T(1.0) - std::sqrt(J2_alpha) / N_;
-    T const                        I1_dgds  = minitensor::trace(dgdsigma);
-    minitensor::Tensor<T, 3> const dev_dgds = dgdsigma - (I1_dgds / T(3.0)) * minitensor::eye<T, 3>(3);
-    return calpha_ * Galpha * dev_dgds;
-  }
-
-  // d(epsilon_v^p)/d(kappa) via chain rule through X(kappa).
-  template <typename T>
-  T
-  compute_dedkappa(T const& kappa) const
-  {
-    T const X0       = kappa0_ - R_ * (A_ - C_ * std::exp(D_ * kappa0_) - theta_ * kappa0_);
-    T const Ff_kappa = A_ - C_ * std::exp(D_ * kappa) - theta_ * kappa;
-    T const X        = kappa - R_ * Ff_kappa;
-    T const dX_dkap  = T(1.0) - R_ * (-C_ * D_ * std::exp(D_ * kappa) - theta_);
-    T const arg      = D1_ * (X - X0) - D2_ * (X - X0) * (X - X0);
-    T const evp_X    = W_ * (std::exp(arg) - T(1.0));
-    T const devp_dX  = W_ * std::exp(arg) * (D1_ - T(2.0) * D2_ * (X - X0));
-    (void)evp_X;
-    return devp_dX * dX_dkap;
-  }
-
-  // Lode coefficient Gamma; degenerates to 1 for small J2 to avoid
-  // J3 / J2^{3/2} blow-up at near-hydrostatic stress.
-  template <typename T>
-  T
-  compute_Gamma(T const& J2, T const& J3) const
-  {
-    T const J2_tol(1.0e-12);
-    if (psi_ == 0.0 || J2 <= J2_tol) return T(1);
-    T const root_3   = std::sqrt(T(3.0));
-    T const ratio    = T(3.0) * root_3 * J3 / (T(2.0) * std::pow(J2, T(1.5)));
-    return T(0.5) * (T(1.0) - ratio + (T(1.0) + ratio) / psi_);
-  }
-
-  template <typename T>
-  void
-  compute_dGamma(T const& J2, T const& J3, T& dG_dJ2, T& dG_dJ3) const
-  {
-    T const J2_tol(1.0e-12);
-    if (psi_ == 0.0 || J2 <= J2_tol) {
-      dG_dJ2 = T(0);
-      dG_dJ3 = T(0);
-      return;
-    }
-    T const root_3  = std::sqrt(T(3.0));
-    T const J2_15   = std::pow(J2, T(1.5));
-    T const J2_25   = std::pow(J2, T(2.5));
-    T const coeff   = T(0.5) * (T(1.0) / psi_ - T(1.0));
-    // d(ratio)/dJ2 = -1.5 * (3 sqrt(3) * J3 / 2) / J2^{2.5}
-    //              = -2.25 sqrt(3) J3 / J2^{2.5}
-    T const dratio_dJ2 = -T(2.25) * root_3 * J3 / J2_25;
-    T const dratio_dJ3 = T(1.5) * root_3 / J2_15;
-    dG_dJ2 = coeff * dratio_dJ2;
-    dG_dJ3 = coeff * dratio_dJ3;
-  }
-
-  template <typename T>
-  T
-  compute_Fc(T const& I1, T const& kappa, T const& X) const
-  {
-    if (kappa - I1 > T(0) && (X - kappa) != T(0)) {
-      return T(1.0) - (I1 - kappa) * (I1 - kappa) / ((X - kappa) * (X - kappa));
-    }
-    return T(1.0);
-  }
-
-  // ----- captured state (held by reference / value) -----
-  RealType const A_, C_, D_, theta_, R_, kappa0_;
-  RealType const W_, D1_, D2_, calpha_, psi_;
-  RealType const N_, L_, phi_, Q_;
-
-  S const& lame_;
-  S const& mu_;
-
-  minitensor::Tensor<S, 3> const& sigma_tr_;
-  minitensor::Tensor<S, 3> const& alpha_n_;
-  S const&                        kappa_n_;
-};
-
-// ---------------------------------------------------------------------------
-// Kernel operator(): elastic trial + (if yielding) local return map via
-// MiniSolver, then state update.
-// ---------------------------------------------------------------------------
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
 CapImplicitKernel<EvalT, Traits>::operator()(int cell, int pt) const
 {
-  constexpr minitensor::Index MAX_DIM{3};
-  using Tensor = minitensor::Tensor<ScalarT, MAX_DIM>;
+  using Tensor  = minitensor::Tensor<ScalarT>;
+  using Tensor4 = minitensor::Tensor4<ScalarT>;
 
-  Tensor const I(minitensor::eye<ScalarT, MAX_DIM>(num_dims_));
+  Tensor const I(minitensor::eye<ScalarT>(num_dims_));
 
-  ScalarT const E           = elastic_modulus_(cell, pt);
-  ScalarT const nu          = poissons_ratio_(cell, pt);
+  // local parameters
+  ScalarT const E  = elastic_modulus_(cell, pt);
+  ScalarT const nu = poissons_ratio_(cell, pt);
   ScalarT const lame        = E * nu / (1.0 + nu) / (1.0 - 2.0 * nu);
   ScalarT const mu          = E / 2.0 / (1.0 + nu);
   ScalarT const bulkModulus = lame + (2.0 / 3.0) * mu;
-  (void)bulkModulus;
 
-  // Old state.
-  Tensor alpha_n(num_dims_);
+  // elastic tangent
+  Tensor4 const Celastic =
+      lame * minitensor::identity_3<ScalarT>(num_dims_) +
+      mu * (minitensor::identity_1<ScalarT>(num_dims_) + minitensor::identity_2<ScalarT>(num_dims_));
+
+  // elastic compliance tangent matrix
+  Tensor4 const compliance =
+      (1.0 / bulkModulus / 9.0) * minitensor::identity_3<ScalarT>(num_dims_) +
+      (1.0 / mu / 2.0) * (0.5 * (minitensor::identity_1<ScalarT>(num_dims_) + minitensor::identity_2<ScalarT>(num_dims_)) -
+      (1.0 / 3.0) * minitensor::identity_3<ScalarT>(num_dims_));
+
+  // Load old back stress and cap parameter
+  Tensor alphaVal(num_dims_);
   for (int i = 0; i < num_dims_; ++i)
     for (int j = 0; j < num_dims_; ++j)
-      alpha_n(i, j) = backStress_old_(cell, pt, i, j);
+      alphaVal(i, j) = backStress_old_(cell, pt, i, j);
 
-  ScalarT kappa_n = capParameter_old_(cell, pt);
+  ScalarT kappaVal = capParameter_old_(cell, pt);
 
-  // Trial state (small strain OR finite deformation -> Kirchhoff).
-  Tensor sigma_tr(num_dims_);
+  // Trial stress computation - depends on kinematics
+  Tensor sigmaVal(num_dims_);
+  Tensor sigmaTr(num_dims_);
+  Tensor depsilon(num_dims_);
+
+  // Variables for FD path
   Tensor Fpn(num_dims_);
   Tensor Fpnew(num_dims_);
 
   if (finite_deformation_) {
+    // Finite deformation path
     Tensor F(num_dims_);
     F.fill(def_grad_, cell, pt, 0, 0);
 
@@ -502,15 +205,18 @@ CapImplicitKernel<EvalT, Traits>::operator()(int cell, int pt) const
       for (int j = 0; j < num_dims_; ++j)
         Fpn(i, j) = ScalarT(Fp_old_(cell, pt, i, j));
 
+    // Compute trial elastic log strain
     Tensor const Fpinv = minitensor::inverse(Fpn);
     Tensor const Cpinv = Fpinv * minitensor::transpose(Fpinv);
     Tensor const be    = F * Cpinv * minitensor::transpose(F);
     Tensor const logbe = minitensor::log_sym<ScalarT>(be);
     Tensor const eps_e = 0.5 * logbe;
 
-    sigma_tr = lame * minitensor::trace(eps_e) * I + 2.0 * mu * eps_e;
+    // Trial Kirchhoff stress
+    sigmaTr  = lame * minitensor::trace(eps_e) * I + 2.0 * mu * eps_e;
+    sigmaVal = sigmaTr;
   } else {
-    Tensor depsilon(num_dims_);
+    // Small strain path
     Tensor sigmaN(num_dims_);
     for (int i = 0; i < num_dims_; ++i) {
       for (int j = 0; j < num_dims_; ++j) {
@@ -518,153 +224,755 @@ CapImplicitKernel<EvalT, Traits>::operator()(int cell, int pt) const
         sigmaN(i, j)   = stress_old_(cell, pt, i, j);
       }
     }
-    sigma_tr = sigmaN + minitensor::dotdot(
-                            lame * minitensor::identity_3<ScalarT, MAX_DIM>(num_dims_)
-                                + mu * (minitensor::identity_1<ScalarT, MAX_DIM>(num_dims_)
-                                        + minitensor::identity_2<ScalarT, MAX_DIM>(num_dims_)),
-                            depsilon);
+
+    sigmaVal = sigmaN + minitensor::dotdot(Celastic, depsilon);
+    sigmaTr  = sigmaVal;
   }
 
-  // Trial state for the return-map output (gets updated if plastic).
-  Tensor sigma_out(num_dims_);
-  Tensor alpha_out(num_dims_);
-  for (int i = 0; i < num_dims_; ++i) {
-    for (int j = 0; j < num_dims_; ++j) {
-      sigma_out(i, j) = sigma_tr(i, j);
-      alpha_out(i, j) = alpha_n(i, j);
-    }
-  }
-  ScalarT kappa_out = kappa_n;
-  ScalarT dgamma_out(0.0);
+  ScalarT dgammaVal = 0.0;
 
-  // Yield check.  compute_f here uses a stack-local NLS-equivalent helper
-  // -- we instantiate a tiny one for the trial evaluation only.
-  using NLS = CapImplicitNLS<EvalT>;
-  NLS nls(A_, C_, D_, theta_, R_, kappa0_,
-          W_, D1_, D2_, calpha_, psi_,
-          N_, L_, phi_, Q_,
-          lame, mu,
-          sigma_tr, alpha_n, kappa_n);
-
-  ScalarT const f_trial = nls.template compute_f<ScalarT>(sigma_tr, alpha_n, kappa_n);
-
-  if (f_trial > 1.0e-11) {  // plastic yielding
-    using ValueT = typename Sacado::ValueType<ScalarT>::type;
-    constexpr minitensor::Index nls_dim{NLS::DIMENSION};
-
-    using MIN  = minitensor::Minimizer<ValueT, nls_dim>;
-    using STEP = minitensor::NewtonWithLineSearchStep<NLS, ValueT, nls_dim>;
-
-    MIN  minimizer;
-    minimizer.max_num_iter = 30;
-    minimizer.rel_tol      = 1.0e-10;
-    minimizer.abs_tol      = 1.0e-10;
-    STEP step;
-
-    // Initial guess: x = (sigma_tr packed, alpha_n packed, kappa_n, 0)
-    minitensor::Vector<ScalarT, nls_dim> x(nls_dim);
-    x(0)  = sigma_tr(0, 0);
-    x(1)  = sigma_tr(1, 1);
-    x(2)  = sigma_tr(2, 2);
-    x(3)  = sigma_tr(1, 2);
-    x(4)  = sigma_tr(0, 2);
-    x(5)  = sigma_tr(0, 1);
-    x(6)  = alpha_n(0, 0);
-    x(7)  = alpha_n(1, 1);
-    x(8)  = alpha_n(1, 2);
-    x(9)  = alpha_n(0, 2);
-    x(10) = alpha_n(0, 1);
-    x(11) = kappa_n;
-    x(12) = ScalarT(0.0);
-
-    LCM::MiniSolver<MIN, STEP, NLS, EvalT, nls_dim> mini_solver(minimizer, step, nls, x);
-
-    // If the local return map failed or produced non-finite output (the
-    // 13-equation Newton is sensitive to a far-from-physical initial
-    // guess that the global solver can produce in early iterations),
-    // fall back to the elastic trial so the global Newton can retry
-    // from a sane state instead of poisoning everything with NaN.
-    bool                    local_ok = !minimizer.failed;
-    typename Sacado::ValueType<ScalarT>::type x_max(0);
-    for (int k = 0; k < int(nls_dim) && local_ok; ++k) {
-      auto const xk = Sacado::ScalarValue<ScalarT>::eval(x(k));
-      if (!std::isfinite(xk)) {
-        local_ok = false;
-        break;
-      }
-      x_max = std::max(x_max, std::abs(xk));
-    }
-    if (local_ok) {
-      // Unpack converged solution.  x carries the correct outer
-      // Sacado-FAD info via the implicit function theorem (applied by
-      // MiniSolver).
-      sigma_out(0, 0) = x(0);
-      sigma_out(1, 1) = x(1);
-      sigma_out(2, 2) = x(2);
-      sigma_out(1, 2) = x(3); sigma_out(2, 1) = x(3);
-      sigma_out(0, 2) = x(4); sigma_out(2, 0) = x(4);
-      sigma_out(0, 1) = x(5); sigma_out(1, 0) = x(5);
-
-      alpha_out(0, 0) = x(6);
-      alpha_out(1, 1) = x(7);
-      alpha_out(2, 2) = -x(6) - x(7);
-      alpha_out(1, 2) = x(8); alpha_out(2, 1) = x(8);
-      alpha_out(0, 2) = x(9); alpha_out(2, 0) = x(9);
-      alpha_out(0, 1) = x(10); alpha_out(1, 0) = x(10);
-
-      kappa_out  = x(11);
-      dgamma_out = x(12);
-    }
-    // If !local_ok, sigma_out/alpha_out/kappa_out/dgamma_out remain the
-    // elastic trial; the global Newton must retry from a saner state.
-    (void)x_max;
-  }
-
-  // Plastic-strain invariants from the stress drop (elastic compliance).
-  // For elastic IPs dgamma_out is 0 so sigma_tr == sigma_out and these
-  // come out zero.
+  // define plastic strain increment, its two invariants: dev, and vol
+  Tensor  deps_plastic(num_dims_, minitensor::Filler::ZEROS);
   ScalarT deqps(0.0), devolps(0.0);
-  if (dgamma_out > ScalarT(0.0)) {
-    ScalarT const comp_iso = 1.0 / (3.0 * bulkModulus);
-    ScalarT const comp_dev = 1.0 / (2.0 * mu);
-    Tensor  const dsigma   = sigma_tr - sigma_out;
-    ScalarT const trd      = minitensor::trace(dsigma);
-    Tensor  const dev_d    = dsigma - (trd / 3.0) * I;
-    devolps                = comp_iso * trd;
-    Tensor  const dev_eps  = comp_dev * dev_d;
-    deqps                  = std::sqrt(2.0 / 3.0) * minitensor::norm(dev_eps);
-  }
+
+  // check yielding
+  ScalarT f = compute_f(sigmaVal, alphaVal, kappaVal);
+
+  // Local return mapping (plastic branch only).  Mirrors the pattern used in
+  // GursonModel/DruckerPragerModel: the std::vector<ScalarT> pack, the
+  // local Newton, and the unpack all live inside `if (f > 0)`.  For elastic
+  // IPs we leave sigmaVal/alphaVal/kappaVal as their trial values and skip
+  // the unpack entirely -- this preserves the outer Sacado-FAD info that
+  // sigmaVal carries from the trial computation through to the global
+  // stress field, which the std::vector<ScalarT> roundtrip otherwise strips.
+  if (f > 1.e-11) {  // plastic yielding
+
+    std::vector<ScalarT> XXVal = initialize(sigmaVal, alphaVal, kappaVal, dgammaVal);
+
+    ScalarT normR, normR0, conv;
+    bool    kappa_flag = false;
+    bool    converged  = false;
+    int     iter       = 0;
+
+    std::vector<ScalarT>                R(13);
+    std::vector<ScalarT>                dRdX(13 * 13);
+    LocalNonlinearSolver<EvalT, Traits> solver;
+
+    while (!converged) {
+      // assemble residual vector and local Jacobian
+      compute_ResidJacobian(XXVal, R, dRdX, sigmaTr, alphaVal, kappaVal, Celastic, kappa_flag);
+
+      normR = 0.0;
+      for (int i = 0; i < 13; i++) normR += R[i] * R[i];
+
+      normR = std::sqrt(normR);
+
+      if (iter == 0) normR0 = normR;
+      if (normR0 != 0)
+        conv = normR / normR0;
+      else
+        conv = normR0;
+
+      if (conv < 1.e-11 || normR < 1.e-11) break;
+
+      if (iter > 20) break;
+
+      std::vector<ScalarT> XXValK = XXVal;
+      solver.solve(dRdX, XXValK, R);
+
+      // put restrictions on kappa: only allows monotonic decreasing (cap
+      // hardening)
+      if (XXValK[11] > XXVal[11]) {
+        kappa_flag = true;
+      } else {
+        XXVal      = XXValK;
+        kappa_flag = false;
+      }
+
+      iter++;
+    }  // end local NR
+
+    // compute sensitivity information, and pack back to X.
+    solver.computeFadInfo(dRdX, XXVal, R);
+
+    // unpack converged plastic state into sigmaVal / alphaVal / kappaVal.
+    sigmaVal(0, 0) = XXVal[0];
+    sigmaVal(0, 1) = XXVal[5];
+    sigmaVal(0, 2) = XXVal[4];
+    sigmaVal(1, 0) = XXVal[5];
+    sigmaVal(1, 1) = XXVal[1];
+    sigmaVal(1, 2) = XXVal[3];
+    sigmaVal(2, 0) = XXVal[4];
+    sigmaVal(2, 1) = XXVal[3];
+    sigmaVal(2, 2) = XXVal[2];
+
+    alphaVal(0, 0) = XXVal[6];
+    alphaVal(0, 1) = XXVal[10];
+    alphaVal(0, 2) = XXVal[9];
+    alphaVal(1, 0) = XXVal[10];
+    alphaVal(1, 1) = XXVal[7];
+    alphaVal(1, 2) = XXVal[8];
+    alphaVal(2, 0) = XXVal[9];
+    alphaVal(2, 1) = XXVal[8];
+    alphaVal(2, 2) = -XXVal[6] - XXVal[7];
+
+    kappaVal  = XXVal[11];
+    dgammaVal = XXVal[12];
+
+    // plastic strain increment via elastic compliance from the stress drop
+    Tensor dsigma      = sigmaTr - sigmaVal;
+    deps_plastic       = minitensor::dotdot(compliance, dsigma);
+    devolps            = minitensor::trace(deps_plastic);
+    Tensor dev_plastic = deps_plastic - (1.0 / 3.0) * devolps * I;
+    deqps              = std::sqrt(2.0 / 3.0) * minitensor::norm(dev_plastic);
+
+  }  // end of plasticity
 
   if (finite_deformation_) {
-    if (dgamma_out > ScalarT(0.0)) {
-      Tensor const dgdsigma = nls.template compute_dgdsigma<ScalarT>(sigma_out, alpha_out, kappa_out);
-      Tensor const A_exp    = dgamma_out * dgdsigma;
-      Tensor const expA     = minitensor::exp(A_exp);
-      Fpnew                 = expA * Fpn;
+    // Update Fp via exponential map
+    if (dgammaVal > 0) {
+      std::vector<ScalarT> XX = initialize(sigmaVal, alphaVal, kappaVal, dgammaVal);
+      Tensor dgdsigma_loc     = compute_dgdsigma(XX);
+      Tensor const expA       = minitensor::exp(dgammaVal * dgdsigma_loc);
+      Fpnew                   = expA * Fpn;
     } else {
       Fpnew = Fpn;
     }
 
+    // Cauchy stress = Kirchhoff stress / J
     ScalarT const Jdet = J_(cell, pt);
     for (int i = 0; i < num_dims_; ++i) {
       for (int j = 0; j < num_dims_; ++j) {
-        stress_(cell, pt, i, j)     = sigma_out(i, j) / Jdet;
+        stress_(cell, pt, i, j)     = sigmaVal(i, j) / Jdet;
         Fp_(cell, pt, i, j)         = Fpnew(i, j);
-        backStress_(cell, pt, i, j) = alpha_out(i, j);
+        backStress_(cell, pt, i, j) = alphaVal(i, j);
       }
     }
   } else {
     for (int i = 0; i < num_dims_; ++i) {
       for (int j = 0; j < num_dims_; ++j) {
-        stress_(cell, pt, i, j)     = sigma_out(i, j);
-        backStress_(cell, pt, i, j) = alpha_out(i, j);
+        stress_(cell, pt, i, j)     = sigmaVal(i, j);
+        backStress_(cell, pt, i, j) = alphaVal(i, j);
       }
     }
   }
 
-  capParameter_(cell, pt)     = kappa_out;
+  capParameter_(cell, pt)     = kappaVal;
   eqps_(cell, pt)             = eqps_old_(cell, pt) + deqps;
   volPlasticStrain_(cell, pt) = volPlasticStrain_old_(cell, pt) + devolps;
+
+  if (compute_tangent_) {
+    Tensor4 Cep = compute_Cep(const_cast<Tensor4&>(Celastic), sigmaVal, alphaVal, kappaVal, dgammaVal);
+    for (int i(0); i < num_dims_; ++i) {
+      for (int j(0); j < num_dims_; ++j) {
+        for (int k(0); k < num_dims_; ++k) {
+          for (int l(0); l < num_dims_; ++l) {
+            tangent_(cell, pt, i, j, k, l) = Cep(i, j, k, l);
+          }
+        }
+      }
+    }
+  }
+}
+
+//
+// Helper functions
+//
+
+//------------------------------ yield function ------------------------------//
+template <typename EvalT, typename Traits>
+template <typename T>
+T
+CapImplicitKernel<EvalT, Traits>::compute_f(
+    minitensor::Tensor<T>& sigma,
+    minitensor::Tensor<T>& alpha,
+    T& kappa) const
+{
+  minitensor::Tensor<T> xi = sigma - alpha;
+
+  T I1 = minitensor::trace(xi), p = I1 / 3.;
+
+  minitensor::Tensor<T> s = xi - p * minitensor::identity<T>(3);
+
+  T J2 = 0.5 * minitensor::dotdot(s, s);
+
+  T J3 = minitensor::det(s);
+
+  // Lode coefficient Γ.  The doc says "set Γ ≡ 1 when ψ = 0 or J₂ = 0 to
+  // avoid the singularity".  We use a small positive tolerance instead of
+  // exact zero: under Sacado-FAD evaluation, IPs with vanishing deviatoric
+  // stress (e.g., a hydrostatic trial state on the first load step) can
+  // produce J₂ ≈ machine ε > 0, which slips past `J2 != 0` but blows up
+  // J₃ / J₂^{3/2}, yielding spurious "plastic" yield (f ≫ 0) and singular
+  // global Jacobian rows.
+  T Gamma = 1.0;
+  T const J2_tol = T(1.0e-12);
+
+  if (psi_ != 0 && J2 > J2_tol)
+    Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
+            (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi_);
+
+  T Ff_I1 = A_ - C_ * std::exp(D_ * I1) - theta_ * I1;
+
+  T Ff_kappa = A_ - C_ * std::exp(D_ * kappa) - theta_ * kappa;
+
+  T X = kappa - R_ * Ff_kappa;
+
+  T Fc = 1.0;
+
+  if ((kappa - I1) > 0 && ((X - kappa) != 0))
+    Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
+
+  return Gamma * Gamma * J2 - Fc * (Ff_I1 - N_) * (Ff_I1 - N_);
+}
+
+//---------------------------- plastic potential -----------------------------//
+template <typename EvalT, typename Traits>
+template <typename T>
+T
+CapImplicitKernel<EvalT, Traits>::compute_g(
+    minitensor::Tensor<T>& sigma,
+    minitensor::Tensor<T>& alpha,
+    T& kappa) const
+{
+  minitensor::Tensor<T> xi = sigma - alpha;
+
+  T I1 = minitensor::trace(xi);
+
+  T p = I1 / 3.;
+
+  minitensor::Tensor<T> s = xi - p * minitensor::identity<T>(3);
+
+  T J2 = 0.5 * minitensor::dotdot(s, s);
+
+  T J3 = minitensor::det(s);
+
+  // Lode coefficient Γ.  The doc says "set Γ ≡ 1 when ψ = 0 or J₂ = 0 to
+  // avoid the singularity".  We use a small positive tolerance instead of
+  // exact zero: under Sacado-FAD evaluation, IPs with vanishing deviatoric
+  // stress (e.g., a hydrostatic trial state on the first load step) can
+  // produce J₂ ≈ machine ε > 0, which slips past `J2 != 0` but blows up
+  // J₃ / J₂^{3/2}, yielding spurious "plastic" yield (f ≫ 0) and singular
+  // global Jacobian rows.
+  T Gamma = 1.0;
+  T const J2_tol = T(1.0e-12);
+
+  if (psi_ != 0 && J2 > J2_tol)
+    Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
+            (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi_);
+
+  T Ff_I1 = A_ - C_ * std::exp(L_ * I1) - phi_ * I1;
+
+  T Ff_kappa = A_ - C_ * std::exp(L_ * kappa) - phi_ * kappa;
+
+  T X = kappa - Q_ * Ff_kappa;
+
+  T Fc = 1.0;
+
+  if ((kappa - I1) > 0 && ((X - kappa) != 0))
+    Fc = 1.0 - (I1 - kappa) * (I1 - kappa) / (X - kappa) / (X - kappa);
+
+  return Gamma * Gamma * J2 - Fc * (Ff_I1 - N_) * (Ff_I1 - N_);
+}
+
+//------------------------ unknown variable value list ------------------------//
+template <typename EvalT, typename Traits>
+std::vector<typename CapImplicitKernel<EvalT, Traits>::ScalarT>
+CapImplicitKernel<EvalT, Traits>::initialize(
+    minitensor::Tensor<ScalarT>& sigmaVal,
+    minitensor::Tensor<ScalarT>& alphaVal,
+    ScalarT& kappaVal,
+    ScalarT& dgammaVal) const
+{
+  std::vector<ScalarT> XX(13);
+
+  XX[0]  = sigmaVal(0, 0);
+  XX[1]  = sigmaVal(1, 1);
+  XX[2]  = sigmaVal(2, 2);
+  XX[3]  = sigmaVal(1, 2);
+  XX[4]  = sigmaVal(0, 2);
+  XX[5]  = sigmaVal(0, 1);
+  XX[6]  = alphaVal(0, 0);
+  XX[7]  = alphaVal(1, 1);
+  XX[8]  = alphaVal(1, 2);
+  XX[9]  = alphaVal(0, 2);
+  XX[10] = alphaVal(0, 1);
+  XX[11] = kappaVal;
+  XX[12] = dgammaVal;
+
+  return XX;
+}
+
+//----------------------- local iteration jacobian ---------------------------//
+template <typename EvalT, typename Traits>
+void
+CapImplicitKernel<EvalT, Traits>::compute_ResidJacobian(
+    std::vector<ScalarT> const&         XXVal,
+    std::vector<ScalarT>&               R,
+    std::vector<ScalarT>&               dRdX,
+    const minitensor::Tensor<ScalarT>&  sigmaVal,
+    const minitensor::Tensor<ScalarT>&  alphaVal,
+    ScalarT const&                      kappaVal,
+    minitensor::Tensor4<ScalarT> const& Celastic,
+    bool                                kappa_flag) const
+{
+  std::vector<DFadType> Rfad(13);
+  std::vector<DFadType> XX(13);
+  std::vector<ScalarT>  XXtmp(13);
+
+  // initialize DFadType local unknown vector
+  for (int i = 0; i < 13; ++i) {
+    XXtmp[i] = Sacado::ScalarValue<ScalarT>::eval(XXVal[i]);
+    XX[i]    = DFadType(13, i, XXtmp[i]);
+  }
+
+  minitensor::Tensor<DFadType> sigma(3), alpha(3);
+
+  sigma(0, 0) = XX[0];
+  sigma(0, 1) = XX[5];
+  sigma(0, 2) = XX[4];
+  sigma(1, 0) = XX[5];
+  sigma(1, 1) = XX[1];
+  sigma(1, 2) = XX[3];
+  sigma(2, 0) = XX[4];
+  sigma(2, 1) = XX[3];
+  sigma(2, 2) = XX[2];
+
+  alpha(0, 0) = XX[6];
+  alpha(0, 1) = XX[10];
+  alpha(0, 2) = XX[9];
+  alpha(1, 0) = XX[10];
+  alpha(1, 1) = XX[7];
+  alpha(1, 2) = XX[8];
+  alpha(2, 0) = XX[9];
+  alpha(2, 1) = XX[8];
+  alpha(2, 2) = -XX[6] - XX[7];
+
+  DFadType kappa = XX[11];
+
+  DFadType dgamma = XX[12];
+
+  DFadType f = compute_f(sigma, alpha, kappa);
+
+  minitensor::Tensor<DFadType> dgdsigma = compute_dgdsigma(XX);
+
+  DFadType J2_alpha = 0.5 * minitensor::dotdot(alpha, alpha);
+
+  minitensor::Tensor<DFadType> halpha = compute_halpha(dgdsigma, J2_alpha);
+
+  DFadType I1_dgdsigma = minitensor::trace(dgdsigma);
+
+  DFadType dedkappa = compute_dedkappa(kappa);
+
+  DFadType hkappa = compute_hkappa(I1_dgdsigma, dedkappa);
+
+  DFadType t;
+
+  t = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(0, 0, i, j) * dgdsigma(i, j);
+    }
+  }
+  Rfad[0] = dgamma * t + sigma(0, 0) - sigmaVal(0, 0);
+
+  t = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(1, 1, i, j) * dgdsigma(i, j);
+    }
+  }
+  Rfad[1] = dgamma * t + sigma(1, 1) - sigmaVal(1, 1);
+
+  t = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(2, 2, i, j) * dgdsigma(i, j);
+    }
+  }
+  Rfad[2] = dgamma * t + sigma(2, 2) - sigmaVal(2, 2);
+
+  t = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(1, 2, i, j) * dgdsigma(i, j);
+    }
+  }
+  Rfad[3] = dgamma * t + sigma(1, 2) - sigmaVal(1, 2);
+
+  t = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(0, 2, i, j) * dgdsigma(i, j);
+    }
+  }
+  Rfad[4] = dgamma * t + sigma(0, 2) - sigmaVal(0, 2);
+
+  t = 0;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      t = t + Celastic(0, 1, i, j) * dgdsigma(i, j);
+    }
+  }
+  Rfad[5] = dgamma * t + sigma(0, 1) - sigmaVal(0, 1);
+
+  Rfad[6] = dgamma * halpha(0, 0) - alpha(0, 0) + alphaVal(0, 0);
+
+  Rfad[7] = dgamma * halpha(1, 1) - alpha(1, 1) + alphaVal(1, 1);
+
+  Rfad[8] = dgamma * halpha(1, 2) - alpha(1, 2) + alphaVal(1, 2);
+
+  Rfad[9] = dgamma * halpha(0, 2) - alpha(0, 2) + alphaVal(0, 2);
+
+  Rfad[10] = dgamma * halpha(0, 1) - alpha(0, 1) + alphaVal(0, 1);
+
+  if (kappa_flag == false)
+    Rfad[11] = dgamma * hkappa - kappa + kappaVal;
+  else
+    Rfad[11] = 0;
+
+  Rfad[12] = f;
+
+  // get ScalarT Residual
+  for (int i = 0; i < 13; i++) R[i] = Rfad[i].val();
+
+  // get Jacobian
+  for (int i = 0; i < 13; i++)
+    for (int j = 0; j < 13; j++) dRdX[i + 13 * j] = Rfad[i].dx(j);
+
+  if (kappa_flag == true) {
+    for (int j = 0; j < 13; j++) dRdX[11 + 13 * j] = 0.0;
+
+    dRdX[11 + 13 * 11] = 1.0;
+  }
+}
+
+//----------------------------- derivative -----------------------------------//
+template <typename EvalT, typename Traits>
+minitensor::Tensor<typename CapImplicitKernel<EvalT, Traits>::ScalarT>
+CapImplicitKernel<EvalT, Traits>::compute_dfdsigma(std::vector<ScalarT> const& XX) const
+{
+  std::vector<DFadType> XXFad(13);
+  std::vector<ScalarT>  XXtmp(13);
+
+  for (int i = 0; i < 13; ++i) {
+    XXtmp[i] = Sacado::ScalarValue<ScalarT>::eval(XX[i]);
+    XXFad[i] = DFadType(13, i, XXtmp[i]);
+  }
+
+  minitensor::Tensor<DFadType> sigma(3), alpha(3);
+
+  sigma(0, 0) = XXFad[0];
+  sigma(0, 1) = XXFad[5];
+  sigma(0, 2) = XXFad[4];
+  sigma(1, 0) = XXFad[5];
+  sigma(1, 1) = XXFad[1];
+  sigma(1, 2) = XXFad[3];
+  sigma(2, 0) = XXFad[4];
+  sigma(2, 1) = XXFad[3];
+  sigma(2, 2) = XXFad[2];
+
+  alpha(0, 0) = XXFad[6];
+  alpha(0, 1) = XXFad[10];
+  alpha(0, 2) = XXFad[9];
+  alpha(1, 0) = XXFad[10];
+  alpha(1, 1) = XXFad[7];
+  alpha(1, 2) = XXFad[8];
+  alpha(2, 0) = XXFad[9];
+  alpha(2, 1) = XXFad[8];
+  alpha(2, 2) = -XXFad[6] - XXFad[7];
+
+  DFadType kappa = XXFad[11];
+
+  DFadType f = compute_f(sigma, alpha, kappa);
+
+  minitensor::Tensor<ScalarT> dfdsigma(3);
+
+  dfdsigma(0, 0) = f.dx(0);
+  dfdsigma(0, 1) = f.dx(5);
+  dfdsigma(0, 2) = f.dx(4);
+  dfdsigma(1, 0) = f.dx(5);
+  dfdsigma(1, 1) = f.dx(1);
+  dfdsigma(1, 2) = f.dx(3);
+  dfdsigma(2, 0) = f.dx(4);
+  dfdsigma(2, 1) = f.dx(3);
+  dfdsigma(2, 2) = f.dx(2);
+
+  return dfdsigma;
+}
+
+template <typename EvalT, typename Traits>
+typename CapImplicitKernel<EvalT, Traits>::ScalarT
+CapImplicitKernel<EvalT, Traits>::compute_dfdkappa(std::vector<ScalarT> const& XX) const
+{
+  std::vector<DFadType> XXFad(13);
+  std::vector<ScalarT>  XXtmp(13);
+
+  for (int i = 0; i < 13; ++i) {
+    XXtmp[i] = Sacado::ScalarValue<ScalarT>::eval(XX[i]);
+    XXFad[i] = DFadType(13, i, XXtmp[i]);
+  }
+
+  minitensor::Tensor<DFadType> sigma(3), alpha(3);
+
+  sigma(0, 0) = XXFad[0];
+  sigma(0, 1) = XXFad[5];
+  sigma(0, 2) = XXFad[4];
+  sigma(1, 0) = XXFad[5];
+  sigma(1, 1) = XXFad[1];
+  sigma(1, 2) = XXFad[3];
+  sigma(2, 0) = XXFad[4];
+  sigma(2, 1) = XXFad[3];
+  sigma(2, 2) = XXFad[2];
+
+  alpha(0, 0) = XXFad[6];
+  alpha(0, 1) = XXFad[10];
+  alpha(0, 2) = XXFad[9];
+  alpha(1, 0) = XXFad[10];
+  alpha(1, 1) = XXFad[7];
+  alpha(1, 2) = XXFad[8];
+  alpha(2, 0) = XXFad[9];
+  alpha(2, 1) = XXFad[8];
+  alpha(2, 2) = -XXFad[6] - XXFad[7];
+
+  DFadType kappa = XXFad[11];
+
+  DFadType f = compute_f(sigma, alpha, kappa);
+
+  ScalarT dfdkappa;
+
+  dfdkappa = f.dx(11);
+
+  return dfdkappa;
+}
+
+template <typename EvalT, typename Traits>
+minitensor::Tensor<typename CapImplicitKernel<EvalT, Traits>::ScalarT>
+CapImplicitKernel<EvalT, Traits>::compute_dgdsigma(std::vector<ScalarT> const& XX) const
+{
+  std::vector<DFadType> XXFad(13);
+  std::vector<ScalarT>  XXtmp(13);
+
+  for (int i = 0; i < 13; ++i) {
+    XXtmp[i] = Sacado::ScalarValue<ScalarT>::eval(XX[i]);
+    XXFad[i] = DFadType(13, i, XXtmp[i]);
+  }
+
+  minitensor::Tensor<DFadType> sigma(3), alpha(3);
+
+  sigma(0, 0) = XXFad[0];
+  sigma(0, 1) = XXFad[5];
+  sigma(0, 2) = XXFad[4];
+  sigma(1, 0) = XXFad[5];
+  sigma(1, 1) = XXFad[1];
+  sigma(1, 2) = XXFad[3];
+  sigma(2, 0) = XXFad[4];
+  sigma(2, 1) = XXFad[3];
+  sigma(2, 2) = XXFad[2];
+
+  alpha(0, 0) = XXFad[6];
+  alpha(0, 1) = XXFad[10];
+  alpha(0, 2) = XXFad[9];
+  alpha(1, 0) = XXFad[10];
+  alpha(1, 1) = XXFad[7];
+  alpha(1, 2) = XXFad[8];
+  alpha(2, 0) = XXFad[9];
+  alpha(2, 1) = XXFad[8];
+  alpha(2, 2) = -XXFad[6] - XXFad[7];
+
+  DFadType kappa = XXFad[11];
+
+  DFadType g = compute_g(sigma, alpha, kappa);
+
+  minitensor::Tensor<ScalarT> dgdsigma(3);
+
+  dgdsigma(0, 0) = g.dx(0);
+  dgdsigma(0, 1) = g.dx(5);
+  dgdsigma(0, 2) = g.dx(4);
+  dgdsigma(1, 0) = g.dx(5);
+  dgdsigma(1, 1) = g.dx(1);
+  dgdsigma(1, 2) = g.dx(3);
+  dgdsigma(2, 0) = g.dx(4);
+  dgdsigma(2, 1) = g.dx(3);
+  dgdsigma(2, 2) = g.dx(2);
+
+  return dgdsigma;
+}
+
+template <typename EvalT, typename Traits>
+minitensor::Tensor<typename CapImplicitKernel<EvalT, Traits>::DFadType>
+CapImplicitKernel<EvalT, Traits>::compute_dgdsigma(std::vector<DFadType> const& XX) const
+{
+  std::vector<D2FadType> D2XX(13);
+  std::vector<DFadType>  XXFadtmp(13);
+  std::vector<ScalarT>   XXtmp(13);
+
+  for (int i = 0; i < 13; ++i) {
+    XXtmp[i]    = Sacado::ScalarValue<ScalarT>::eval(XX[i].val());
+    XXFadtmp[i] = DFadType(13, i, XXtmp[i]);
+    D2XX[i]     = D2FadType(13, i, XXFadtmp[i]);
+  }
+
+  minitensor::Tensor<D2FadType> sigma(3), alpha(3);
+
+  sigma(0, 0) = D2XX[0];
+  sigma(0, 1) = D2XX[5];
+  sigma(0, 2) = D2XX[4];
+  sigma(1, 0) = D2XX[5];
+  sigma(1, 1) = D2XX[1];
+  sigma(1, 2) = D2XX[3];
+  sigma(2, 0) = D2XX[4];
+  sigma(2, 1) = D2XX[3];
+  sigma(2, 2) = D2XX[2];
+
+  alpha(0, 0) = D2XX[6];
+  alpha(0, 1) = D2XX[10];
+  alpha(0, 2) = D2XX[9];
+  alpha(1, 0) = D2XX[10];
+  alpha(1, 1) = D2XX[7];
+  alpha(1, 2) = D2XX[8];
+  alpha(2, 0) = D2XX[9];
+  alpha(2, 1) = D2XX[8];
+  alpha(2, 2) = -D2XX[6] - D2XX[7];
+
+  D2FadType kappa = D2XX[11];
+
+  D2FadType g = compute_g(sigma, alpha, kappa);
+
+  minitensor::Tensor<DFadType> dgdsigma(3);
+
+  dgdsigma(0, 0) = g.dx(0);
+  dgdsigma(0, 1) = g.dx(5);
+  dgdsigma(0, 2) = g.dx(4);
+  dgdsigma(1, 0) = g.dx(5);
+  dgdsigma(1, 1) = g.dx(1);
+  dgdsigma(1, 2) = g.dx(3);
+  dgdsigma(2, 0) = g.dx(4);
+  dgdsigma(2, 1) = g.dx(3);
+  dgdsigma(2, 2) = g.dx(2);
+
+  return dgdsigma;
+}
+
+//--------------------------- hardening functions ----------------------------//
+template <typename EvalT, typename Traits>
+template <typename T>
+T
+CapImplicitKernel<EvalT, Traits>::compute_Galpha(T J2_alpha) const
+{
+  if (N_ != 0)
+    return 1.0 - pow(J2_alpha, 0.5) / N_;
+  else
+    return 0.0;
+}
+
+template <typename EvalT, typename Traits>
+template <typename T>
+minitensor::Tensor<T>
+CapImplicitKernel<EvalT, Traits>::compute_halpha(
+    minitensor::Tensor<T> const& dgdsigma,
+    T const J2_alpha) const
+{
+  T Galpha = compute_Galpha(J2_alpha);
+
+  T I1 = minitensor::trace(dgdsigma), p = I1 / 3.0;
+
+  minitensor::Tensor<T> s = dgdsigma - p * minitensor::identity<T>(3);
+
+  minitensor::Tensor<T> halpha(3);
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      halpha(i, j) = calpha_ * Galpha * s(i, j);
+    }
+  }
+
+  return halpha;
+}
+
+template <typename EvalT, typename Traits>
+template <typename T>
+T
+CapImplicitKernel<EvalT, Traits>::compute_dedkappa(T const kappa) const
+{
+  T Ff_kappa0 = A_ - C_ * std::exp(L_ * kappa0_) - phi_ * kappa0_;
+
+  T X0 = kappa0_ - Q_ * Ff_kappa0;
+
+  T Ff_kappa = A_ - C_ * std::exp(L_ * kappa) - phi_ * kappa;
+
+  T X = kappa - Q_ * Ff_kappa;
+
+  T dedX = (D1_ - 2. * D2_ * (X - X0)) *
+      std::exp((D1_ - D2_ * (X - X0)) * (X - X0)) * W_;
+
+  T dXdkappa = 1. + Q_ * C_ * L_ * exp(L_ * kappa) + Q_ * phi_;
+
+  return dedX * dXdkappa;
+}
+
+template <typename EvalT, typename Traits>
+template <typename T>
+T
+CapImplicitKernel<EvalT, Traits>::compute_hkappa(T const I1_dgdsigma, T const dedkappa) const
+{
+  if (dedkappa != 0)
+    return I1_dgdsigma / dedkappa;
+  else
+    return 0;
+}
+
+//------------------------ elasto-plastic tangent modulus --------------------//
+template <typename EvalT, typename Traits>
+minitensor::Tensor4<typename CapImplicitKernel<EvalT, Traits>::ScalarT>
+CapImplicitKernel<EvalT, Traits>::compute_Cep(
+    minitensor::Tensor4<ScalarT>& Celastic,
+    minitensor::Tensor<ScalarT>&  sigma,
+    minitensor::Tensor<ScalarT>&  alpha,
+    ScalarT&                      kappa,
+    ScalarT&                      dgamma) const
+{
+  if (dgamma == 0) return Celastic;
+
+  // define variable
+  minitensor::Tensor4<ScalarT> Cep(num_dims_);
+
+  std::vector<ScalarT> XX(13);
+
+  minitensor::Tensor<ScalarT> dfdsigma;
+  minitensor::Tensor<ScalarT> dfdalpha;
+  minitensor::Tensor<ScalarT> dgdsigma;
+  minitensor::Tensor<ScalarT> halpha_loc;
+  ScalarT                     hkappa_loc;
+  ScalarT                     dfdkappa;
+  ScalarT                     chi;
+
+  // compute variable
+  XX = initialize(sigma, alpha, kappa, dgamma);
+
+  dfdsigma = compute_dfdsigma(XX);
+  dfdalpha = dfdsigma * (-1.0);
+  dfdkappa = compute_dfdkappa(XX);
+  dgdsigma = compute_dgdsigma(XX);
+
+  ScalarT J2_alpha = 0.5 * minitensor::dotdot(alpha, alpha);
+  halpha_loc       = compute_halpha(dgdsigma, J2_alpha);
+
+  ScalarT I1_dgdsigma = minitensor::trace(dgdsigma);
+  ScalarT dedkappa    = compute_dedkappa(kappa);
+  hkappa_loc          = compute_hkappa(I1_dgdsigma, dedkappa);
+
+  chi = minitensor::dotdot(minitensor::dotdot(dfdsigma, Celastic), dgdsigma) -
+        minitensor::dotdot(dfdalpha, halpha_loc) - dfdkappa * hkappa_loc;
+
+  if (chi == 0) {
+    chi = 1e-16;
+  }
+
+  // compute tangent
+  Cep = Celastic - 1.0 / chi * minitensor::dotdot(Celastic,
+      minitensor::tensor(dgdsigma, minitensor::dotdot(dfdsigma, Celastic)));
+
+  return Cep;
 }
 
 }  // namespace LCM

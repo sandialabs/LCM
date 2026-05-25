@@ -11,23 +11,6 @@
 
 namespace LCM {
 
-///
-/// Three-invariant cap plasticity model with kinematic + isotropic
-/// (volumetric) hardening, integrated by a fully-implicit backward-Euler
-/// return map on the 13-unknown system (6 stress + 5 deviatoric back
-/// stress + cap parameter + plastic multiplier).  The local Newton solve
-/// is driven by LCM::MiniSolver, which keeps the iteration on value-only
-/// arithmetic and re-derives global Sacado-FAD sensitivities once via the
-/// implicit-function theorem (see MiniNonlinearSolver_Def.hpp).
-///
-/// All helper functions (yield surface f, plastic potential g, its
-/// gradient dg/dsigma, kinematic hardening h_alpha, isotropic hardening
-/// h_kappa, etc.) live in the local CapImplicitNLS class in the _Def
-/// file rather than as kernel members so that the std::vector + nested
-/// Sacado::Fad::DFad code path the old LocalNonlinearSolver pattern
-/// relied on is avoided -- that path corrupts the outer FAD info on
-/// sigmaVal under gcc release optimization even when never executed.
-///
 template <typename EvalT, typename Traits>
 struct CapImplicitKernel : public ParallelKernel<EvalT, Traits>
 {
@@ -52,6 +35,9 @@ struct CapImplicitKernel : public ParallelKernel<EvalT, Traits>
   using ConstScalarField = PHX::MDField<ScalarT const>;
   using BaseKernel       = ParallelKernel<EvalT, Traits>;
   using Workset          = typename BaseKernel::Workset;
+
+  typedef typename Sacado::mpl::apply<FadType, ScalarT>::type  DFadType;
+  typedef typename Sacado::mpl::apply<FadType, DFadType>::type D2FadType;
 
   using BaseKernel::field_name_map_;
   using BaseKernel::num_dims_;
@@ -78,6 +64,7 @@ struct CapImplicitKernel : public ParallelKernel<EvalT, Traits>
   ScalarField capParameter_;
   ScalarField eqps_;
   ScalarField volPlasticStrain_;
+  ScalarField tangent_;
 
   // Old state arrays
   Albany::MDArray Fp_old_;
@@ -114,6 +101,76 @@ struct CapImplicitKernel : public ParallelKernel<EvalT, Traits>
   KOKKOS_INLINE_FUNCTION
   void
   operator()(int cell, int pt) const;
+
+ private:
+  // yield function
+  template <typename T>
+  T
+  compute_f(minitensor::Tensor<T>& sigma, minitensor::Tensor<T>& alpha, T& kappa) const;
+
+  // plastic potential
+  template <typename T>
+  T
+  compute_g(minitensor::Tensor<T>& sigma, minitensor::Tensor<T>& alpha, T& kappa) const;
+
+  // unknown variable value list
+  std::vector<ScalarT>
+  initialize(
+      minitensor::Tensor<ScalarT>& sigmaVal,
+      minitensor::Tensor<ScalarT>& alphaVal,
+      ScalarT&                     kappaVal,
+      ScalarT&                     dgammaVal) const;
+
+  // local iteration jacobian
+  void
+  compute_ResidJacobian(
+      std::vector<ScalarT> const&         XXVal,
+      std::vector<ScalarT>&               R,
+      std::vector<ScalarT>&               dRdX,
+      const minitensor::Tensor<ScalarT>&  sigmaVal,
+      const minitensor::Tensor<ScalarT>&  alphaVal,
+      ScalarT const&                      kappaVal,
+      minitensor::Tensor4<ScalarT> const& Celastic,
+      bool                                kappa_flag) const;
+
+  // derivatives via AD
+  minitensor::Tensor<ScalarT>
+  compute_dfdsigma(std::vector<ScalarT> const& XX) const;
+
+  ScalarT
+  compute_dfdkappa(std::vector<ScalarT> const& XX) const;
+
+  minitensor::Tensor<ScalarT>
+  compute_dgdsigma(std::vector<ScalarT> const& XX) const;
+
+  minitensor::Tensor<DFadType>
+  compute_dgdsigma(std::vector<DFadType> const& XX) const;
+
+  // hardening functions
+  template <typename T>
+  T
+  compute_Galpha(T J2_alpha) const;
+
+  template <typename T>
+  minitensor::Tensor<T>
+  compute_halpha(minitensor::Tensor<T> const& dgdsigma, T const J2_alpha) const;
+
+  template <typename T>
+  T
+  compute_dedkappa(T const kappa) const;
+
+  template <typename T>
+  T
+  compute_hkappa(T const I1_dgdsigma, T const dedkappa) const;
+
+  // elasto-plastic tangent modulus
+  minitensor::Tensor4<ScalarT>
+  compute_Cep(
+      minitensor::Tensor4<ScalarT>& Celastic,
+      minitensor::Tensor<ScalarT>&  sigma,
+      minitensor::Tensor<ScalarT>&  alpha,
+      ScalarT&                      kappa,
+      ScalarT&                      dgamma) const;
 };
 
 template <typename EvalT, typename Traits>

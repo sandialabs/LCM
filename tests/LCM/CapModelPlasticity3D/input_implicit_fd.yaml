@@ -3,7 +3,7 @@ LCM:
     Name: Mechanics 3D
     Solution Method: Continuation
     Phalanx Graph Visualization Detail: 1
-    MaterialDB Filename: materials.yaml
+    MaterialDB Filename: materials_implicit_fd.yaml
     Dirichlet BCs:
       DBC on NS NodeSet0 for DOF X: 0.00000000e+00
       DBC on NS NodeSet1 for DOF X: -4.00000000e-02

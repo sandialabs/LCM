@@ -63,7 +63,8 @@ applyElementDeath(
     const stk::mesh::PartVector&    /*boundarySideSetParts*/)
 {
   // Clone-before-disconnect element death (Adagio-style port).
-  // Phases match doc/element_death_port.md.
+  // Phases match doc/element_death.md, "Implementation reference"
+  // section D ("Structural update").
 
   const auto& meta = bulkData.mesh_meta_data();
   const auto side_rank = meta.side_rank();

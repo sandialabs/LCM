@@ -260,7 +260,8 @@ GenericSTKMeshStruct::SetupFieldData(
   stk::io::put_io_part_attribute(*deadCellsPart);
 
   // Scratch fields for the new element-death path (see
-  // doc/element_death_port.md and src/Albany_ElementDeath.cpp). All
+  // doc/element_death.md "Implementation reference" and
+  // src/Albany_ElementDeath.cpp). All
   // three live on the side rank; each is a single scalar zeroed at
   // the start of every applyElementDeath call. Declared
   // unconditionally so the same metadata works whether erosion is on

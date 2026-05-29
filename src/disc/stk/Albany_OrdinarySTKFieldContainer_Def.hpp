@@ -37,6 +37,27 @@ static char const* res_id_name[1] = {
     "residual",
 };
 
+namespace {
+
+// Tag a multi-component nodal field with its IOSS output type so the
+// Exodus writer emits it as a vector (components named _x/_y/_z) rather
+// than as N scalar variables (_1/_2/_3). The vector tagging is what lets
+// ParaView's IOSS reader aggregate the components and apply the
+// "Apply Displacements" filter. Lost in the STK simple-fields migration
+// (commit 63379cb3f3) because the typed Field<double, Cartesian> used
+// to carry the hint implicitly.
+inline void
+applyVectorOutputType(stk::mesh::FieldBase& field, int numComponents)
+{
+  if (numComponents == 2) {
+    stk::io::set_field_output_type(field, stk::io::FieldOutputType::VECTOR_2D);
+  } else if (numComponents == 3) {
+    stk::io::set_field_output_type(field, stk::io::FieldOutputType::VECTOR_3D);
+  }
+}
+
+}  // namespace
+
 template <bool Interleaved>
 OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     const Teuchos::RCP<Teuchos::ParameterList>&               params_,
@@ -62,11 +83,13 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   this->coordinates_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates");
   stk::mesh::put_field_on_mesh(*this->coordinates_field, metaData_->universal_part(), numDim_, nullptr);
   stk::io::set_field_role(*this->coordinates_field, Ioss::Field::MESH);
+  applyVectorOutputType(*this->coordinates_field, numDim_);
   if (numDim_ == 3) {
     this->coordinates_field3d = this->coordinates_field;
   } else {
     this->coordinates_field3d = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates3d");
     stk::mesh::put_field_on_mesh(*this->coordinates_field3d, metaData_->universal_part(), 3, nullptr);
+    applyVectorOutputType(*this->coordinates_field3d, 3);
     if (params_->get<bool>("Export 3d coordinates field", false)) {
       stk::io::set_field_role(*this->coordinates_field3d, Ioss::Field::TRANSIENT);
     }
@@ -79,12 +102,14 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     solution_field[num_vecs] =
         &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(sol_tag_name[num_vecs], sol_id_name[num_vecs]));
     stk::mesh::put_field_on_mesh(*solution_field[num_vecs], metaData_->universal_part(), neq_, nullptr);
+    applyVectorOutputType(*solution_field[num_vecs], neq_);
 
 #if defined(ALBANY_DTK)
     if (output_dtk_field == true) {
       solution_field_dtk[num_vecs] =
           &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(sol_dtk_tag_name[num_vecs], sol_dtk_id_name[num_vecs]));
       stk::mesh::put_field_on_mesh(*solution_field_dtk[num_vecs], metaData_->universal_part(), neq_, nullptr);
+      applyVectorOutputType(*solution_field_dtk[num_vecs], neq_);
     }
 #endif
 
@@ -96,6 +121,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
   residual_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(res_tag_name[0], res_id_name[0]));
   stk::mesh::put_field_on_mesh(*residual_field, metaData_->universal_part(), neq_, nullptr);
+  applyVectorOutputType(*residual_field, neq_);
   stk::io::set_field_role(*residual_field, Ioss::Field::TRANSIENT);
 
   // sphere volume is a mesh attribute read from a genesis mesh file containing

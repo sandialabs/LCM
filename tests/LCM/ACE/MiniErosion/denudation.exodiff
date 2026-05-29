@@ -9,18 +9,18 @@ TIME STEPS relative 1.e-6 floor 0.0
 NODAL VARIABLES relative 2.0e-5 floor 1.0e-5
 	temperature        relative 6.0e-6 floor 1.0e-12
 	temperature_dot    relative 6.0e-6 floor 1.0e-12
-	displacement_1
-	displacement_2
-	displacement_3
-	velocity_1
-	velocity_2
-	velocity_3
-	acceleration_1
-	acceleration_2
-	acceleration_3
-	displacement_residual_1  absolute 1.0e-8 floor 1.0e-8
-	displacement_residual_2  absolute 1.0e-8 floor 1.0e-8
-	displacement_residual_3  absolute 1.0e-8 floor 1.0e-8
+	displacement_x
+	displacement_y
+	displacement_z
+	velocity_x
+	velocity_y
+	velocity_z
+	acceleration_x
+	acceleration_y
+	acceleration_z
+	displacement_residual_x  absolute 1.0e-8 floor 1.0e-8
+	displacement_residual_y  absolute 1.0e-8 floor 1.0e-8
+	displacement_residual_z  absolute 1.0e-8 floor 1.0e-8
 	proj_nodal_linear        absolute 1.0e-12 floor 1.0e-12
 
 ELEMENT VARIABLES absolute 5.e-6 floor 1.0e-8

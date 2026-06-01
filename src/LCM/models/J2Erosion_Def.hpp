@@ -99,6 +99,9 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   std::string const angle_indicator_str        = field_name_map_["Angle_Indicator"];
   std::string const displacement_indicator_str = field_name_map_["Displacement_Indicator"];
 
+  // Elastic modulus used (for output)
+  std::string const elastic_modulus_str = field_name_map_["Elastic_Modulus_Used"];
+
   // define the dependent fields
   setDependentField(F_str, dl->qp_tensor);
   setDependentField(J_str, dl->qp_scalar);
@@ -125,6 +128,8 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   setEvaluatedField(strain_indicator_str, dl->qp_scalar);
   setEvaluatedField(angle_indicator_str, dl->qp_scalar);
   setEvaluatedField(displacement_indicator_str, dl->qp_scalar);
+  setEvaluatedField(elastic_modulus_str, dl->qp_scalar);
+  
   if (have_temperature_ == true) {
     setDependentField("Temperature", dl->qp_scalar);
     setEvaluatedField(source_str, dl->qp_scalar);
@@ -143,6 +148,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(strain_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
   addStateVariable(angle_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
   addStateVariable(displacement_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
+  addStateVariable(elastic_modulus_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Elastic Modulus", false));
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
   addStateVariable("cell_death", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Cell Death", false));
   addStateVariable("failure_modes", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Failure Modes", false));
@@ -172,6 +178,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   std::string const strain_indicator_str       = field_name_map_["Strain_Indicator"];
   std::string const angle_indicator_str        = field_name_map_["Angle_Indicator"];
   std::string const displacement_indicator_str = field_name_map_["Displacement_Indicator"];
+  std::string const elastic_modulus_str        = field_name_map_["Elastic_Modulus_Used"];
 
   // extract dependent MDFields
   def_grad_          = *dep_fields[F_str];
@@ -196,6 +203,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   strain_indicator_       = *eval_fields[strain_indicator_str];
   angle_indicator_        = *eval_fields[angle_indicator_str];
   displacement_indicator_ = *eval_fields[displacement_indicator_str];
+  elastic_modulus_used_   = *eval_fields[elastic_modulus_str];
   failed_                 = *eval_fields["failure_state"];
   dead_                   = *eval_fields["cell_death"];
   failure_modes_          = *eval_fields["failure_modes"];
@@ -464,6 +472,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     strain_indicator_(cell, pt)       = 0.0;
     angle_indicator_(cell, pt)        = 0.0;
     displacement_indicator_(cell, pt) = 0.0;
+    elastic_modulus_used_(cell, pt)        = 0.0;
     // Carry the failure-mode bitmask forward unchanged: a dead cell never
     // trips new bits, but the state must still be written every fill.
     failure_modes_(cell, pt) = failure_modes_old_(cell, pt);
@@ -533,6 +542,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
       strain_limit = 1.0 + ((strain_limit - 1.0) / SL_weakening_factor_);
     }
   }
+
+  // Save the elastic modulus used for output: 
+  elastic_modulus_used_(cell, pt) = E;
 
   ScalarT const nu    = poissons_ratio_(cell, pt);
   ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));

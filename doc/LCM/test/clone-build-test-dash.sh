@@ -1,40 +1,52 @@
 #!/bin/bash
+#
+# Nightly clone, build and test script for LCM.
+# Clones Trilinos and LCM from scratch, then builds and tests.
+# DTK is absorbed into LCM (no separate clone needed).
+#
+set -e
 
-source ./env-all.sh
+export LCM_DIR=$(pwd)
+export MODULEPATH=$LCM_DIR/LCM/doc/LCM/modulefiles:$MODULEPATH
 
-cd "$LCM_DIR"
+echo "=== LCM Nightly Build ==="
+echo "Date: $(date)"
+echo "Host: $(hostname)"
+echo "LCM_DIR: $LCM_DIR"
+echo
 
-# Clone package repositories.
-for PACKAGE in $PACKAGES; do
-    case "$PACKAGE" in
-	trilinos)
-	    PACKAGE_NAME="Trilinos"
-	    REPO="git@github.com:trilinos/Trilinos.git"
-            BRANCH="develop"
-            SHA="84124e66709dc3679e6dbef1f8352c9909ce7900"
-	    ;;
-	lcm)
-	    PACKAGE_NAME="LCM"
-	    REPO="git@github.com:sandialabs/LCM.git"
-            BRANCH="main"
-            SHA="head"
-	    ;;
-	*)
-	    echo "Unrecognized package option"
-	    exit 1
-	    ;;
-    esac
-    PACKAGE_DIR="$LCM_DIR/$PACKAGE_NAME"
-    CHECKOUT_LOG="$PACKAGE-checkout.log"
-    if [ -d "$PACKAGE_DIR" ]; then
-	rm "$PACKAGE_DIR" -rf
-    fi
-    git clone -v -b "$BRANCH" "$REPO" "$PACKAGE_NAME" &> "$CHECKOUT_LOG"
-    if [[ "$SHA" != *"head"* ]]; then
-        git reset --hard "$SHA"
-    fi
+# Clone repositories
+echo "--- Cloning repositories ---"
+
+for REPO_INFO in \
+    "Trilinos|git@github.com:trilinos/Trilinos.git|develop" \
+    "LCM|git@github.com:sandialabs/LCM.git|main"
+do
+    IFS='|' read -r NAME URL BRANCH <<< "$REPO_INFO"
+    echo "Cloning $NAME ($BRANCH)..."
+    rm -rf "$NAME"
+    git clone -q -b "$BRANCH" "$URL" "$NAME" 2>&1 | tail -1
 done
 
-./clean-config-build-test-dash-all.sh
+echo
 
-cd "$LCM_DIR"
+# Create lcm symlink
+ln -sf LCM/doc/LCM/build/lcm .
+
+# Build and test with each compiler.
+# Use 'nproc --all' to report installed CPUs regardless of OMP_NUM_THREADS,
+# which is set to 1 in the user environment for Sierra but should not cap
+# the LCM build parallelism.
+NUM_PROCS=$(nproc --all)
+
+for MODULE in serial-gcc-release serial-clang-release; do
+    echo "=== Building with module: $MODULE ==="
+    ./lcm all "$NUM_PROCS" --module="$MODULE" --cdash || {
+        echo "FAILED: $MODULE"
+        continue
+    }
+    echo "PASSED: $MODULE"
+    echo
+done
+
+echo "=== Nightly build complete: $(date) ==="

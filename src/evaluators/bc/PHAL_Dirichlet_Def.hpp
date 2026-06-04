@@ -66,27 +66,13 @@ template <typename Traits>
 void
 Dirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto        rcp_disc    = workset.disc;
-  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto const  x           = workset.x;
-  auto        f           = workset.f;
-  auto const  x_view      = Albany::getLocalData(x);
-  auto        f_view      = Albany::getNonconstLocalData(f);
-  auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
-  auto const  ns_id       = this->nodeSetID;
-  auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
-  auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
+  auto const  x        = workset.x;
+  auto        f        = workset.f;
+  auto const  x_view   = Albany::getLocalData(x);
+  auto        f_view   = Albany::getNonconstLocalData(f);
+  auto const  ns_id    = this->nodeSetID;
+  auto const& ns_nodes = workset.nodeSets->find(ns_id)->second;
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-    if (has_nbi == true) {
-      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
-      auto const  gid      = ns_gids[ns_node] + 1;
-      auto const  it       = bi_field.find(gid);
-      if (it == bi_field.end()) continue;
-      auto const nbi = *(it->second);
-      if (is_erodible == true && nbi != 2.0) continue;
-      if (nbi == 0.0) continue;
-    }
     auto const dof = ns_nodes[ns_node][this->offset];
     f_view[dof]    = x_view[dof] - this->value;
     // Record DOFs to avoid setting Schwarz BCs on them.
@@ -107,19 +93,15 @@ template <typename Traits>
 void
 Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto        rcp_disc    = workset.disc;
-  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto        x           = workset.x;
-  auto        f           = workset.f;
-  auto        J           = workset.Jac;
-  auto const  fill        = f != Teuchos::null;
-  auto        f_view      = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
-  auto        x_view      = fill ? Albany::getLocalData(x) : Teuchos::null;
-  auto const  j_coeff     = workset.j_coeff;
-  auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
-  auto const  ns_id       = this->nodeSetID;
-  auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
-  auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
+  auto        x        = workset.x;
+  auto        f        = workset.f;
+  auto        J        = workset.Jac;
+  auto const  fill     = f != Teuchos::null;
+  auto        f_view   = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
+  auto        x_view   = fill ? Albany::getLocalData(x) : Teuchos::null;
+  auto const  j_coeff  = workset.j_coeff;
+  auto const  ns_id    = this->nodeSetID;
+  auto const& ns_nodes = workset.nodeSets->find(ns_id)->second;
 
   Teuchos::Array<LO> index(1);
   Teuchos::Array<ST> value(1);
@@ -128,16 +110,6 @@ Dirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits:
   value[0] = j_coeff;
 
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-    if (has_nbi == true) {
-      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
-      auto const  gid      = ns_gids[ns_node] + 1;
-      auto const  it       = bi_field.find(gid);
-      if (it == bi_field.end()) continue;
-      auto const nbi = *(it->second);
-      if (is_erodible == true && nbi != 2.0) continue;
-      if (nbi == 0.0) continue;
-    }
     auto const dof = ns_nodes[ns_node][this->offset];
     index[0]       = dof;
 

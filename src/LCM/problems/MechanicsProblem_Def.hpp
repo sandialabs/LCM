@@ -300,20 +300,6 @@ MechanicsProblem::constructEvaluators(
     auto entity = StateStruct::ElemData;
     stateMgr.registerStateVariable("Lattice_Orientation", dl_->cell_tensor, meshSpecs.ebName, false, &entity);
   }
-  if (hasRequirement("cell_boundary_indicator")) {
-    auto entity = StateStruct::ElemData;
-    stateMgr.registerStateVariable("cell_boundary_indicator", dl_->cell_scalar2, meshSpecs.ebName, false, &entity);
-  }
-  if (hasRequirement("face_boundary_indicator")) {
-    auto entity = StateStruct::ElemData;
-    stateMgr.registerStateVariable("face_boundary_indicator", dl_->face_scalar, meshSpecs.ebName, false, &entity);
-  }
-  // TODO: Layout for edge does not exist yet.
-  if (hasRequirement("node_boundary_indicator")) {
-    auto entity = StateStruct::ElemData;
-    stateMgr.registerStateVariable("node_boundary_indicator", dl_->node_scalar, meshSpecs.ebName, false, &entity);
-  }
-
   // Define Field Names
   // generate the field name map to deal with outputing surface element info
   LCM::FieldNameMap field_name_map(surface_element);

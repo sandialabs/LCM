@@ -228,17 +228,6 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
     has_failed_old_   = true;
   }
 
-  auto& disc                    = *workset.disc;
-  auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
-  auto& mesh_struct             = *(stk_disc.getSTKMeshStruct());
-  auto& field_cont              = *(mesh_struct.getFieldContainer());
-  have_cell_boundary_indicator_ = field_cont.hasCellBoundaryIndicatorField();
-
-  if (have_cell_boundary_indicator_ == true) {
-    cell_boundary_indicator_ = workset.cell_boundary_indicator;
-    ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
-  }
-
   current_time_ = workset.current_time;
 
   // Seed failed_ (diagnostic, decimal-encoded per-mode counts) and
@@ -521,9 +510,8 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 
-  auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
-  auto const is_at_boundary = cell_bi == 1.0;
-  auto const is_erodible    = cell_bi == 2.0;
+  // TODO Phase B: derive from "*-erodible" side-set membership.
+  bool const is_erodible = false;
 
   auto strain_limit = strain_limit_;
   if ((porosity < 0.99) && (strain_limit > 0.0)) {

@@ -285,54 +285,6 @@ class STKDiscretization : public AbstractDiscretization
     return latticeOrientation;
   }
 
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getCellBoundaryIndicator() const
-  {
-    return cell_boundary_indicator;
-  }
-
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getFaceBoundaryIndicator() const
-  {
-    return face_boundary_indicator;
-  }
-
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getEdgeBoundaryIndicator() const
-  {
-    return edge_boundary_indicator;
-  }
-
-  std::map<GO, double*> const&
-  getNodeBoundaryIndicator() const
-  {
-    return node_boundary_indicator;
-  }
-
-  bool
-  hasCellBoundaryIndicator() const
-  {
-    return stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField();
-  }
-
-  bool
-  hasFaceBoundaryIndicator() const
-  {
-    return stkMeshStruct->getFieldContainer()->hasFaceBoundaryIndicatorField();
-  }
-
-  bool
-  hasEdgeBoundaryIndicator() const
-  {
-    return stkMeshStruct->getFieldContainer()->hasEdgeBoundaryIndicatorField();
-  }
-
-  bool
-  hasNodeBoundaryIndicator() const
-  {
-    return stkMeshStruct->getFieldContainer()->hasNodeBoundaryIndicatorField();
-  }
-
   void
   printElemGIDws() const;
 
@@ -707,12 +659,6 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<Teuchos::ArrayRCP<double>>::type                     sphereVolume;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type                    latticeOrientation;
 
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type cell_boundary_indicator;
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type face_boundary_indicator;
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type edge_boundary_indicator;
-
-  std::map<GO, double*> node_boundary_indicator;
-
 #if defined(ALBANY_CONTACT)
   Teuchos::RCP<ContactManager> contactManager;
 #endif
@@ -795,9 +741,6 @@ class STKDiscretization : public AbstractDiscretization
 
   void
   fillCompleteGraphs();
-
-  void
-  computeWorksetInfoBoundaryIndicators();
 };
 
 }  // namespace Albany

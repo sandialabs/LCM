@@ -105,30 +105,6 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   {
     return failure_state[rank];
   }
-  stk::mesh::Field<double>*
-  getCellBoundaryIndicator()
-  {
-    ALBANY_ASSERT(cell_boundary_indicator != nullptr);
-    return cell_boundary_indicator;
-  }
-  stk::mesh::Field<double>*
-  getFaceBoundaryIndicator()
-  {
-    ALBANY_ASSERT(face_boundary_indicator != nullptr);
-    return face_boundary_indicator;
-  }
-  stk::mesh::Field<double>*
-  getEdgeBoundaryIndicator()
-  {
-    ALBANY_ASSERT(edge_boundary_indicator != nullptr);
-    return edge_boundary_indicator;
-  }
-  stk::mesh::Field<double>*
-  getNodeBoundaryIndicator()
-  {
-    ALBANY_ASSERT(node_boundary_indicator != nullptr);
-    return node_boundary_indicator;
-  }
   SphereVolumeFieldType*
   getSphereVolumeField()
   {
@@ -218,15 +194,6 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   virtual bool
   hasLatticeOrientationField() const = 0;
 
-  virtual bool
-  hasCellBoundaryIndicatorField() const = 0;
-  virtual bool
-  hasFaceBoundaryIndicatorField() const = 0;
-  virtual bool
-  hasEdgeBoundaryIndicatorField() const = 0;
-  virtual bool
-  hasNodeBoundaryIndicatorField() const = 0;
-
   std::map<std::string, double>&
   getTime()
   {
@@ -280,10 +247,6 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   IntScalarFieldType*       proc_rank_field;
   IntScalarFieldType*       refine_field;
   ScalarFieldType*          failure_state[stk::topology::ELEMENT_RANK + 1];
-  stk::mesh::Field<double>* cell_boundary_indicator;
-  stk::mesh::Field<double>* face_boundary_indicator;
-  stk::mesh::Field<double>* edge_boundary_indicator;
-  stk::mesh::Field<double>* node_boundary_indicator;
 
   // Required for Peridynamics in LCM
   SphereVolumeFieldType* sphereVolume_field;

@@ -150,17 +150,6 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
   double current_time = workset.current_time;
   double delta_time   = workset.time_step;
 
-  Albany::AbstractDiscretization&    disc        = *workset.disc;
-  Albany::STKDiscretization&         stk_disc    = dynamic_cast<Albany::STKDiscretization&>(disc);
-  Albany::AbstractSTKMeshStruct&     mesh_struct = *(stk_disc.getSTKMeshStruct());
-  Albany::AbstractSTKFieldContainer& field_cont  = *(mesh_struct.getFieldContainer());
-  have_cell_boundary_indicator_                  = field_cont.hasCellBoundaryIndicatorField();
-
-  if (have_cell_boundary_indicator_ == true) {
-    cell_boundary_indicator_ = workset.cell_boundary_indicator;
-    ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
-  }
-
   std::vector<RealType> const salinity_eb               = this->queryElementBlockParameterMap(eb_name, salinity_map_);
   std::vector<RealType> const z_above_mean_sea_level_eb = this->queryElementBlockParameterMap(eb_name, z_above_mean_sea_level_map_);
   std::vector<RealType> const time_eb                   = this->queryElementBlockParameterMap(eb_name, time_map_);
@@ -200,8 +189,8 @@ ACEThermalParameters<EvalT, Traits>::evaluateFields(typename Traits::EvalData wo
   ScalarT const factor             = per_exposed_length * salt_enhanced_D_eb;
 
   for (std::size_t cell = 0; cell < num_cells; ++cell) {
-    double const cell_bi     = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
-    bool const   is_erodible = cell_bi == 2.0;
+    // TODO Phase B: derive from "*-erodible" side-set membership.
+    bool const is_erodible = false;
     for (std::size_t qp = 0; qp < num_qps_; ++qp) {
       RealType const height = Sacado::Value<ScalarT>::eval(coord_vec_(cell, qp, 2));
       ScalarT        sal_eb = salinity_base_eb;

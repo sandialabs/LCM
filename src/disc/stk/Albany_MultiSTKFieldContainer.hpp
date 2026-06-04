@@ -43,27 +43,6 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
     return buildLatticeOrientation;
   }
 
-  bool
-  hasCellBoundaryIndicatorField() const
-  {
-    return build_cell_boundary_indicator;
-  }
-  bool
-  hasFaceBoundaryIndicatorField() const
-  {
-    return build_face_boundary_indicator;
-  }
-  bool
-  hasEdgeBoundaryIndicatorField() const
-  {
-    return build_edge_boundary_indicator;
-  }
-  bool
-  hasNodeBoundaryIndicatorField() const
-  {
-    return build_node_boundary_indicator;
-  }
-
   void
   fillSolnVector(Thyra_Vector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);
   void
@@ -126,11 +105,6 @@ class MultiSTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
 
   bool buildSphereVolume;
   bool buildLatticeOrientation;
-
-  bool build_cell_boundary_indicator{false};
-  bool build_face_boundary_indicator{false};
-  bool build_edge_boundary_indicator{false};
-  bool build_node_boundary_indicator{false};
 
   // Containers for residual and solution
 

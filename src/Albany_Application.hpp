@@ -723,28 +723,6 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
   auto const& wsEBNames               = disc->getWsEBNames();
   auto const& sphereVolume            = disc->getSphereVolume();
   auto const& latticeOrientation      = disc->getLatticeOrientation();
-  auto const& cell_boundary_indicator = disc->getCellBoundaryIndicator();
-  auto const& face_boundary_indicator = disc->getFaceBoundaryIndicator();
-  auto const& edge_boundary_indicator = disc->getEdgeBoundaryIndicator();
-  auto const& node_boundary_indicator = disc->getNodeBoundaryIndicator();
-
-  auto const has_cell = cell_boundary_indicator != Teuchos::null && ws < cell_boundary_indicator.size();
-  auto const has_face = face_boundary_indicator != Teuchos::null && ws < face_boundary_indicator.size();
-  auto const has_edge = edge_boundary_indicator != Teuchos::null && ws < edge_boundary_indicator.size();
-  auto const has_node = node_boundary_indicator.size() > 0;
-
-  if (has_cell == true) {
-    workset.cell_boundary_indicator = cell_boundary_indicator[ws];
-  }
-  if (has_face == true) {
-    workset.face_boundary_indicator = face_boundary_indicator[ws];
-  }
-  if (has_edge == true) {
-    workset.edge_boundary_indicator = edge_boundary_indicator[ws];
-  }
-  if (has_node == true) {
-    workset.node_boundary_indicator = node_boundary_indicator;
-  }
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);
   workset.wsElNodeEqID         = wsElNodeEqID[ws];

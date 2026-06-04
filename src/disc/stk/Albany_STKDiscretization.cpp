@@ -1584,88 +1584,6 @@ STKDiscretization::fillCompleteGraphs()
 }
 
 void
-STKDiscretization::computeWorksetInfoBoundaryIndicators()
-{
-  auto local_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
-
-  auto& field_container = *(stkMeshStruct->getFieldContainer());
-
-  auto const& cell_buckets     = bulkData.get_buckets(stk::topology::ELEM_RANK, local_part);
-  auto const  num_cell_buckets = cell_buckets.size();
-  cell_boundary_indicator.resize(num_cell_buckets);
-  auto const has_cell = field_container.hasCellBoundaryIndicatorField();
-  if (has_cell == true) {
-    auto* cell_field = field_container.getCellBoundaryIndicator();
-    for (auto b = 0; b < num_cell_buckets; ++b) {
-      auto& cell_bucket = *cell_buckets[b];
-      cell_boundary_indicator[b].resize(cell_bucket.size());
-      for (auto i = 0; i < cell_bucket.size(); ++i) {
-        auto cell                     = cell_bucket[i];
-        cell_boundary_indicator[b][i] = static_cast<double*>(stk::mesh::field_data(*cell_field, cell));
-      }
-    }
-  }
-
-  auto const& face_buckets     = bulkData.get_buckets(stk::topology::FACE_RANK, local_part);
-  auto const  num_face_buckets = face_buckets.size();
-  auto const  has_face         = field_container.hasFaceBoundaryIndicatorField();
-  face_boundary_indicator.resize(num_face_buckets);
-  if (has_face == true) {
-    auto* face_field = field_container.getFaceBoundaryIndicator();
-    for (auto b = 0; b < num_face_buckets; ++b) {
-      auto& face_bucket = *face_buckets[b];
-      face_boundary_indicator[b].resize(face_bucket.size());
-      for (auto i = 0; i < face_bucket.size(); ++i) {
-        auto face                     = face_bucket[i];
-        face_boundary_indicator[b][i] = static_cast<double*>(stk::mesh::field_data(*face_field, face));
-      }
-    }
-  }
-
-  auto const& edge_buckets     = bulkData.get_buckets(stk::topology::EDGE_RANK, local_part);
-  auto const  num_edge_buckets = edge_buckets.size();
-  auto const  has_edge         = field_container.hasEdgeBoundaryIndicatorField();
-  edge_boundary_indicator.resize(num_edge_buckets);
-  if (has_edge == true) {
-    auto* edge_field = field_container.getEdgeBoundaryIndicator();
-    for (auto b = 0; b < num_edge_buckets; ++b) {
-      auto& edge_bucket = *edge_buckets[b];
-      edge_boundary_indicator[b].resize(edge_bucket.size());
-      for (auto i = 0; i < edge_bucket.size(); ++i) {
-        auto edge                     = edge_bucket[i];
-        edge_boundary_indicator[b][i] = static_cast<double*>(stk::mesh::field_data(*edge_field, edge));
-      }
-    }
-  }
-
-  // Place all node boundary indicators in a single workset and ignore
-  // the distribution in buckets, which is an obstacle for this purpose.
-  auto const& node_buckets     = bulkData.get_buckets(stk::topology::NODE_RANK, local_part);
-  auto const  num_node_buckets = node_buckets.size();
-  auto const  has_node         = field_container.hasNodeBoundaryIndicatorField();
-  auto        num_nodes        = 0;
-  for (auto b = 0; b < num_node_buckets; ++b) {
-    auto const& node_bucket = *node_buckets[b];
-    num_nodes += node_bucket.size();
-  }
-  node_boundary_indicator.clear();
-  if (has_node == true) {
-    auto* node_field = field_container.getNodeBoundaryIndicator();
-    for (auto b = 0; b < num_node_buckets; ++b) {
-      auto& node_bucket = *node_buckets[b];
-      for (auto i = 0; i < node_bucket.size(); ++i) {
-        auto const node     = node_bucket[i];
-        auto const num_node = node.m_value - 1;
-        auto const gid      = bulkData.identifier(node);
-        node_GID_2_LID_map.insert(std::make_pair(gid, num_node));
-        auto* nbi_ptr = static_cast<double*>(stk::mesh::field_data(*node_field, node));
-        node_boundary_indicator.insert(std::make_pair(gid, nbi_ptr));
-      }
-    }
-  }
-}
-
-void
 STKDiscretization::computeWorksetInfo()
 {
   stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
@@ -2044,8 +1962,6 @@ STKDiscretization::computeWorksetInfo()
     }
   }
 
-  // Set boundary indicator fields
-  computeWorksetInfoBoundaryIndicators();
 }
 
 void

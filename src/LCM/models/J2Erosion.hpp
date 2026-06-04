@@ -102,9 +102,6 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray failure_modes_old_;
   ScalarField     failure_modes_;
 
-  bool                       have_cell_boundary_indicator_{false};
-  Teuchos::ArrayRCP<double*> cell_boundary_indicator_;
-
   PHX::MDField<bool> exposed_;
 
   // Baseline constants

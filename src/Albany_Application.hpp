@@ -723,6 +723,11 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
   auto const& wsEBNames               = disc->getWsEBNames();
   auto const& sphereVolume            = disc->getSphereVolume();
   auto const& latticeOrientation      = disc->getLatticeOrientation();
+  auto const& cell_is_erodible        = disc->getCellIsErodible();
+
+  if (ws < static_cast<int>(cell_is_erodible.size())) {
+    workset.cell_is_erodible = cell_is_erodible[ws];
+  }
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);
   workset.wsElNodeEqID         = wsElNodeEqID[ws];

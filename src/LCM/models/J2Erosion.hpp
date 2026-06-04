@@ -102,6 +102,10 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray failure_modes_old_;
   ScalarField     failure_modes_;
 
+  // Per-cell flag for "*-erodible" side-set membership. Phase B
+  // replacement for the old cell_boundary_indicator-based check.
+  Teuchos::ArrayRCP<std::uint8_t> cell_is_erodible_;
+
   PHX::MDField<bool> exposed_;
 
   // Baseline constants

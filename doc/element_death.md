@@ -270,6 +270,37 @@ inside band k and follows the bluff inward as it denudes; the back
 (x-) face never joins `bluff_face-erodible`, so it stays at the initial
 condition.
 
+### 5.7 Cell-level `is_erodible` for material models
+
+Two ACE material models change their constitutive behavior on cells
+that sit on the eroding surface:
+
+- `LCM::J2Erosion` (`models/J2Erosion_Def.hpp`) — when the cell is
+  erodible AND the integration point is below sea level, the elastic
+  modulus, yield strength, and strain limit are each divided by their
+  respective "weakening factors" to soften the bluff face.
+- `LCM::ACEThermalParameters` (`evaluators/ACEThermalParameters_Def.hpp`)
+  — under the same condition, `bluff_salinity` is overridden with the
+  ocean salinity, and `thermal_conductivity` / `heat_capacity` are scaled
+  by a user-supplied `thermal_factor` (Jenn's sub-grid niche-formation
+  model).
+
+Both rely on a per-cell predicate that reuses the same `-erodible`
+convention as §5. At workset build time `STKDiscretization::
+computeWorksetInfoErodibleCells` constructs the union of all side-set
+parts whose name contains `erodible`, walks each owned cell's face
+entities, and flags the cell when any face is in that selector. The
+result is exposed as `Workset::cell_is_erodible` (a per-cell
+`std::uint8_t`) and the evaluators dereference it directly. Because the
+predicate is rebuilt on every `rebuildWorksets()` call, newly exposed
+cells become erodible automatically when the bluff recedes — the same
+"side set tracks the receding surface" mechanism §5.2 already
+described.
+
+This is the third independent consumer of the `-erodible` substring
+convention, alongside the death side-part propagation (§5.2) and the
+node-set BC clipping (§5.3). One mesh tag, three behaviors.
+
 ---
 
 ## 6. Orphan-node fix

@@ -285,6 +285,12 @@ class STKDiscretization : public AbstractDiscretization
     return latticeOrientation;
   }
 
+  const WorksetArray<Teuchos::ArrayRCP<std::uint8_t>>::type&
+  getCellIsErodible() const
+  {
+    return cell_is_erodible;
+  }
+
   void
   printElemGIDws() const;
 
@@ -658,6 +664,7 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type coords;
   WorksetArray<Teuchos::ArrayRCP<double>>::type                     sphereVolume;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type                    latticeOrientation;
+  WorksetArray<Teuchos::ArrayRCP<std::uint8_t>>::type               cell_is_erodible;
 
 #if defined(ALBANY_CONTACT)
   Teuchos::RCP<ContactManager> contactManager;
@@ -741,6 +748,12 @@ class STKDiscretization : public AbstractDiscretization
 
   void
   fillCompleteGraphs();
+
+  //! Flag every owned cell that touches a "*-erodible" side-set.
+  //! Rebuilt on every computeWorksetInfo / rebuildWorksets so the
+  //! predicate tracks the receding bluff after element death.
+  void
+  computeWorksetInfoErodibleCells();
 };
 
 }  // namespace Albany

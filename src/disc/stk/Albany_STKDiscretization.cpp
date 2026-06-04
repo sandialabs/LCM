@@ -1962,6 +1962,53 @@ STKDiscretization::computeWorksetInfo()
     }
   }
 
+  computeWorksetInfoErodibleCells();
+}
+
+void
+STKDiscretization::computeWorksetInfoErodibleCells()
+{
+  // Mark every owned cell that touches a side-set whose name contains
+  // "erodible". Same naming convention as element death
+  // (Application::applyDeathToActivePart) and erodible-DBC handling
+  // (computeNodeSets), so a single mesh tag drives all three.
+  stk::mesh::Selector erodible_surface;
+  bool                have_erodible_surface = false;
+  for (auto& kv : stkMeshStruct->ssPartVec) {
+    if (kv.second == nullptr) continue;
+    if (kv.first.find("erodible") == std::string::npos) continue;
+    erodible_surface      = have_erodible_surface ? (erodible_surface | stk::mesh::Selector(*kv.second)) :
+                                                    stk::mesh::Selector(*kv.second);
+    have_erodible_surface = true;
+  }
+
+  stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
+  auto*               active_part_ws       = stkMeshStruct->getActivePart();
+  if (active_part_ws != nullptr) {
+    select_owned_in_part &= stk::mesh::Selector(*active_part_ws);
+  }
+
+  auto const& cell_buckets     = bulkData.get_buckets(stk::topology::ELEMENT_RANK, select_owned_in_part);
+  auto const  num_cell_buckets = cell_buckets.size();
+  cell_is_erodible.resize(num_cell_buckets);
+  for (std::size_t b = 0; b < num_cell_buckets; ++b) {
+    auto&      cell_bucket = *cell_buckets[b];
+    auto const num_cells   = cell_bucket.size();
+    cell_is_erodible[b]    = Teuchos::arcp<std::uint8_t>(num_cells);
+    std::fill(cell_is_erodible[b].begin(), cell_is_erodible[b].end(), 0);
+    if (!have_erodible_surface) continue;
+    for (std::size_t i = 0; i < num_cells; ++i) {
+      auto       cell       = cell_bucket[i];
+      auto const num_faces  = bulkData.num_faces(cell);
+      auto const face_begin = bulkData.begin_faces(cell);
+      for (unsigned f = 0; f < num_faces; ++f) {
+        if (erodible_surface(bulkData.bucket(face_begin[f]))) {
+          cell_is_erodible[b][i] = 1;
+          break;
+        }
+      }
+    }
+  }
 }
 
 void

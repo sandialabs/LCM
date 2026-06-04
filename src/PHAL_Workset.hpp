@@ -115,6 +115,7 @@ struct Workset
   // Needed for Schwarz coupling
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> apps_;
   Teuchos::RCP<Albany::Application>                    current_app_;
+  Teuchos::ArrayRCP<std::uint8_t>                      cell_is_erodible;
   std::set<int>                                        fixed_dofs_;
   bool                                                 is_schwarz_bc_{false};
 

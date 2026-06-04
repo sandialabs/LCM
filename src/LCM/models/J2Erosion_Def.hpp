@@ -228,6 +228,8 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
     has_failed_old_   = true;
   }
 
+  cell_is_erodible_ = workset.cell_is_erodible;
+
   current_time_ = workset.current_time;
 
   // Seed failed_ (diagnostic, decimal-encoded per-mode counts) and
@@ -510,8 +512,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 
-  // TODO Phase B: derive from "*-erodible" side-set membership.
-  bool const is_erodible = false;
+  bool const is_erodible = cell_is_erodible_.size() > 0 && cell_is_erodible_[cell] != 0;
 
   auto strain_limit = strain_limit_;
   if ((porosity < 0.99) && (strain_limit > 0.0)) {

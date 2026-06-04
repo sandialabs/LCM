@@ -144,6 +144,13 @@ class AbstractDiscretization
   virtual const WorksetArray<Teuchos::ArrayRCP<double*>>::type&
   getLatticeOrientation() const = 0;
 
+  //! Per-cell flag: 1 if the cell touches any side-set whose name
+  //! contains "erodible" (the convention used by element death and
+  //! erodible-DBC handling); 0 otherwise. Used by ACEThermalParameters
+  //! and J2Erosion to gate sea-level salinity/E-weakening updates.
+  virtual const WorksetArray<Teuchos::ArrayRCP<std::uint8_t>>::type&
+  getCellIsErodible() const = 0;
+
   virtual void
   printElemGIDws() const
   {

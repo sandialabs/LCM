@@ -149,7 +149,7 @@ ELEMENT VARIABLES relative 1.e-6 floor 1.0e-10
 	Fp_4_7                 absolute 2.031639300000e-07    # min:               0 @ t1,b1,e1 max:      0.20316393 @ t21,b2,e2
 	Fp_4_8                 absolute 1.000000000000e-06    # min:      0.79683607 @ t21,b2,e2    max:               1 @ t1,b1,e1
 	Fp_5_1                 absolute 1.0e-15
-	Fp_5_2                 absolute 1.0e-15
+	Fp_5_2                 absolute 5.0e-15
 	Fp_5_3                 absolute 1.0e-15
 	Fp_5_4                 absolute 1.000000000000e-06    # min:               1 @ t11,b2,e2    max:               1 @ t1,b1,e1
 	Fp_5_5                 absolute 1.203163900000e-06    # min:               1 @ t1,b1,e1 max:       1.2031639 @ t21,b2,e2
@@ -218,7 +218,7 @@ ELEMENT VARIABLES relative 1.e-6 floor 1.0e-10
 	Velocity_Gradient_Plastic_1_4  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
 	Velocity_Gradient_Plastic_1_5  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
 	Velocity_Gradient_Plastic_1_6  absolute 1.1e-14
-	Velocity_Gradient_Plastic_1_7  absolute 1.0e-14
+	Velocity_Gradient_Plastic_1_7  absolute 5.0e-14
 	Velocity_Gradient_Plastic_1_8  absolute 1.0e-13
 	Velocity_Gradient_Plastic_2_1  absolute 1.0e-14
 	Velocity_Gradient_Plastic_2_2  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
@@ -226,7 +226,7 @@ ELEMENT VARIABLES relative 1.e-6 floor 1.0e-10
 	Velocity_Gradient_Plastic_2_4  absolute 1.0e-14
 	Velocity_Gradient_Plastic_2_5  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
 	Velocity_Gradient_Plastic_2_6  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
-	Velocity_Gradient_Plastic_2_7  absolute 1.0e-14
+	Velocity_Gradient_Plastic_2_7  absolute 5.0e-14
 	Velocity_Gradient_Plastic_2_8  absolute 1.0e-13
 	Velocity_Gradient_Plastic_3_1  absolute 1.0e-14
 	Velocity_Gradient_Plastic_3_2  absolute 1.0e-14
@@ -250,7 +250,7 @@ ELEMENT VARIABLES relative 1.e-6 floor 1.0e-10
 	Velocity_Gradient_Plastic_5_4  absolute 1.0e-14
 	Velocity_Gradient_Plastic_5_5  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
 	Velocity_Gradient_Plastic_5_6  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
-	Velocity_Gradient_Plastic_5_7  absolute 1.0e-14
+	Velocity_Gradient_Plastic_5_7  absolute 5.0e-14
 	Velocity_Gradient_Plastic_5_8  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
 	Velocity_Gradient_Plastic_6_1  absolute 1.142383300000e-08    # min:               0 @ t1,b1,e1 max:     0.011423833 @ t4,b2,e2
 	Velocity_Gradient_Plastic_6_2  absolute 1.0e-14

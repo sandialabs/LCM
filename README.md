@@ -1,8 +1,8 @@
-<img src="https://github.com/sandialabs/LCM/blob/main/wiki/albany_lcm.png" width="300">
+<img src="https://github.com/sandialabs/LCM/blob/main/wiki/lcm_logo.png" width="300">
 
-# Albany-LCM
+# LCM
 
-Albany-LCM (Laboratory for Computational Mechanics) is a fork of [Albany](https://github.com/sandialabs/Albany), an implicit, unstructured grid, finite element code for the solution and analysis of multiphysics problems. Albany-LCM focuses on computational solid mechanics and thermo-mechanics, with nearly 200 regression tests demonstrating capabilities across a wide variety of problems.
+LCM (Laboratory for Computational Mechanics) is a fork of [Albany](https://github.com/sandialabs/Albany), an implicit, unstructured grid, finite element code for the solution and analysis of multiphysics problems. LCM focuses on computational solid mechanics and thermo-mechanics, with nearly 200 regression tests demonstrating capabilities across a wide variety of problems.
 
 ## Features
 
@@ -10,7 +10,7 @@ Albany-LCM (Laboratory for Computational Mechanics) is a fork of [Albany](https:
 
 ![Notched Cylinder Multi-Scale Simulation](https://github.com/sandialabs/LCM/blob/main/wiki/lcm_image_notched_cylinder.png)
 
-Solid mechanics simulation of a notched cylinder using the [alternating Schwarz-based multi-scale coupling capability](https://onlinelibrary.wiley.com/doi/10.1002/nme.6982) in Albany-LCM.
+Solid mechanics simulation of a notched cylinder using the [alternating Schwarz-based multi-scale coupling capability](https://onlinelibrary.wiley.com/doi/10.1002/nme.6982) in LCM.
 
 ### Capabilities
 
@@ -23,7 +23,7 @@ Solid mechanics simulation of a notched cylinder using the [alternating Schwarz-
 
 ## Prerequisites
 
-Albany-LCM requires [Trilinos](https://trilinos.org) and the following system packages.
+LCM requires [Trilinos](https://trilinos.org) and the following system packages.
 
 ### RHEL / Fedora
 

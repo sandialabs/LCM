@@ -1883,7 +1883,7 @@ Application::determinePiroSolver(const Teuchos::RCP<Teuchos::ParameterList>& top
       sens_method = piroParams->get<std::string>("Sensitivity Method", "Forward");
     }
     if ((sens_method == "Adjoint") && (piroSolverToken == "Tempus")) {
-      ALBANY_ABORT("Albany/LCM does not have support for adjoint transient sensitivities!\n");
+      ALBANY_ABORT("LCM does not have support for adjoint transient sensitivities!\n");
     }
   }
 }

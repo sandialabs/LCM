@@ -1,4 +1,4 @@
-ALBANY:
+LCM:
   Coupled System: 
     Model XML Files: [pipe.yaml, reactor.yaml]
     Network Model: Reactor Network

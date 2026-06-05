@@ -50,10 +50,18 @@ Two ideas are kept deliberately separate:
 
 - **Bookkeeping** — *how* each integration point failed (which of the
   five criteria tripped). Recorded for diagnostics and never discarded.
-- **The death predicate** — *whether* the element is dead. This is a
-  single rule: **an element dies when every one of its integration
-  points has failed in at least one way.** It does not matter which
-  criteria tripped or how many.
+- **The death predicate** — *whether* the element is dead. The rule
+  counts integration points: **an element dies when at least the
+  user-configured number of its integration points have failed in at
+  least one way.** It does not matter which criteria tripped or how
+  many at each point. The count is the YAML key `ACE Failed
+  Integration Points For Death`; its default value `0` means "all
+  points must have failed", which matches the historical semantics.
+
+Once a cell is declared dead, the whole cell is removed from assembly
+— there is no partial-cell continuity in which surviving integration
+points keep contributing. That is what lets the residual structure
+stay SPD (§3).
 
 ---
 
@@ -75,6 +83,19 @@ setting the parameter to `0.0` disables that criterion.
 `ACE Strain Limit` and `ACE Maximum Displacement` are mandatory
 parameters — the model aborts at construction if they are absent — so
 disable them explicitly with `0.0` rather than by omission.
+
+One additional material-YAML key controls the cell-level death
+predicate (§1), separately from the per-IP criteria above:
+
+| YAML parameter                              | Effect                                                                 |
+|---------------------------------------------|------------------------------------------------------------------------|
+| `ACE Failed Integration Points For Death`   | how many of the cell's IPs must have failed before the cell is dead    |
+
+Default value `0` means "all integration points must have failed"
+(= `num_pts_`), which is the historical semantics. Any positive value
+is clamped into `[1, num_pts_]` at fill time. The setting affects
+*when* a cell dies, not *whether* an integration point trips a
+failure mode.
 
 Independently of failure, each criterion also writes a continuous
 **indicator** field — the ratio of the actual quantity to its threshold
@@ -492,8 +513,12 @@ and, from `failure_modes_old`:
 
 - recomputes `failure_state(cell, 0)` (the decimal encoding of §A.2),
   and
-- sets `cell_death(cell, 0) = 1.0` iff **every** point of that cell has
-  a non-zero bitmask entry, else `0.0`.
+- sets `cell_death(cell, 0) = 1.0` iff **at least `threshold` of that
+  cell's integration points** have a non-zero bitmask entry, else
+  `0.0`. The threshold is read from the YAML key `ACE Failed
+  Integration Points For Death`; the default value `0` means "all
+  points must have failed" (= `num_pts_`), which is the historical
+  behavior and is bit-identical to omitting the key.
 
 This makes both per-cell fields consistent with the bitmask converged
 at the previous step; `operator()` then adds the current fill's trips.
@@ -520,10 +545,12 @@ The exact tests are the `trip(...)` calls following the stress update.
 
 When the kernel processes the last integration point of a cell
 (`pt == num_pts_ - 1`) and the workset carries a `death_status_vec`,
-it checks `failure_modes` for every point of the cell. If every point
-now has at least one bit set and the cell is not already marked dead,
-it sets *both* `death_status_vec[cell] = 1.0` and
-`cell_death(cell, 0) = 1.0` **in the same fill**.
+it checks `failure_modes` for every point of the cell. If at least
+`threshold` of those points (§B.1) now have at least one bit set and
+the cell is not already marked dead, it sets *both*
+`death_status_vec[cell] = 1.0` and `cell_death(cell, 0) = 1.0` **in
+the same fill**. The threshold used here must match the one used in
+`init()` — both read from the same member set in the constructor.
 
 This is what lets the scatter evaluator and the orphan-node fix
 observe the new death within the same fill (§3).
@@ -666,9 +693,13 @@ Common modifications and where to make them:
   - `J2ErosionKernel::operator()` — the same-fill last-point
     propagation.
 
-  For example, to require a *fraction* of points to fail rather than
-  all of them, change the "every point has a non-zero mask" test in
-  both places.
+  The threshold "how many integration points must have a non-zero
+  mask before the cell dies" is already exposed as the YAML key `ACE
+  Failed Integration Points For Death` (default `0`, meaning all
+  points must have failed). Use it from an input deck rather than
+  changing code, unless the shape of the predicate itself needs to
+  change (e.g. require a *fraction* rather than a count, or weight
+  modes differently).
 - **Change what counts as dead at assembly time** — the scatter skip
   test in `PHAL_ScatterResidual_Def.hpp`
   (`death_status_(cell) > 0.0`).

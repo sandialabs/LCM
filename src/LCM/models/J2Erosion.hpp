@@ -125,6 +125,13 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType maximum_displacement_{0.0};
   bool     disable_erosion_{false};
 
+  // Number of integration points whose failure_modes mask must be
+  // non-zero before the cell is declared dead. 0 means "all"
+  // (= num_pts_), which is the historical default and preserves
+  // existing input decks bit-identically. Clamped into [1, num_pts_]
+  // at first init() once num_pts_ is known.
+  int num_failed_pts_for_death_{0};
+
   // Params with depth or time:
   std::vector<RealType> z_above_mean_sea_level_;
   std::vector<RealType> peat_from_file_;

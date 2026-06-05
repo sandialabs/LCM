@@ -26,6 +26,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   ice_saturation_material_fit_truncation_ = p->get<RealType>("ACE Material Fit Truncation Ice Saturation", 0.0);
   disable_erosion_          = p->get<bool>("Disable Erosion", false);
+  num_failed_pts_for_death_ = p->get<int>("ACE Failed Integration Points For Death", 0);
 
   if (p->isParameter("ACE Strain Limit")) {
     strain_limit_ = p->get<RealType>("ACE Strain Limit");
@@ -232,6 +233,14 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
 
   current_time_ = workset.current_time;
 
+  // Resolve the death threshold against num_pts_. A 0 value (the
+  // default, or what comes out of an input deck that omits the key)
+  // means "all integration points must fail", which is the historical
+  // semantics. Any other value is clamped into [1, num_pts_].
+  int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
+                        (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
+                                                                                  num_failed_pts_for_death_);
+
   // Seed failed_ (diagnostic, decimal-encoded per-mode counts) and
   // dead_ (binary cell-death flag) from the per-(cell, pt) failure-mode
   // bitmask converged at the previous step (failure_modes_old). The mask
@@ -243,13 +252,15 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // back to per-mode trip counts across all pts of the cell. operator()
   // adds this fill's newly tripped bits on top.
   //
-  // dead_(cell, 0) is 1.0 iff every pt in the cell has at least one bit
-  // set, i.e. every integration point has failed in some way. This is the
+  // dead_(cell, 0) is 1.0 once at least `threshold` integration points
+  // have a non-zero failure_modes mask. Default threshold = num_pts_
+  // (every point must have failed); a smaller value lets the cell die
+  // once the user-specified number of points have failed. This is the
   // predicate consumed by the ACE solver to populate death_status_vec.
   auto const num_cells = workset.numCells;
   for (auto cell = 0; cell < num_cells; ++cell) {
-    double seed       = 0.0;
-    bool   all_failed = true;
+    double seed              = 0.0;
+    int    num_failed_pts    = 0;
     for (auto pt = 0; pt < num_pts_; ++pt) {
       uint8_t const m = static_cast<uint8_t>(failure_modes_old_(cell, pt));
       if (m & 0x01) seed += 1.0;
@@ -257,10 +268,10 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
       if (m & 0x04) seed += 100.0;
       if (m & 0x08) seed += 1000.0;
       if (m & 0x10) seed += 10000.0;
-      if (m == 0u) all_failed = false;
+      if (m != 0u) ++num_failed_pts;
     }
     failed_(cell, 0) = seed;
-    dead_(cell, 0)   = all_failed ? 1.0 : 0.0;
+    dead_(cell, 0)   = num_failed_pts >= threshold ? 1.0 : 0.0;
   }
 }
 
@@ -734,26 +745,34 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   failure_modes_(cell, pt) = static_cast<double>(mask);
 
   // Live death propagation: when the last pt of a cell is processed,
-  // check whether every pt in this cell now has at least one failure bit
-  // set. If so, mark the cell dead so the scatter evaluator and
-  // fixOrphanNodesForElementDeath see it as dead in this same fill.
-  // Without this, Newton can push partially-failed cells (now condemned
-  // by the last-pt trip) into regimes where they would fail more, while
-  // scatter keeps assembling their nonphysical stress contributions —
-  // breaking convergence after a death cascade. Points are processed in
-  // order, so at the last pt every failure_modes_(cell, p) is current.
+  // check whether enough pts in this cell now have at least one failure
+  // bit set to meet the death threshold. If so, mark the cell dead so the
+  // scatter evaluator and fixOrphanNodesForElementDeath see it as dead in
+  // this same fill. Without this, Newton can push partially-failed cells
+  // (now condemned by the last-pt trip) into regimes where they would
+  // fail more, while scatter keeps assembling their nonphysical stress
+  // contributions — breaking convergence after a death cascade. Points
+  // are processed in order, so at the last pt every failure_modes_(cell,
+  // p) is current.
+  //
+  // The threshold defaults to num_pts_ (every point must have failed —
+  // historical behavior); a smaller user-supplied value lets the cell
+  // die once that many points have failed. Must match the threshold used
+  // by init() above so the seed and the live update are consistent.
   //
   // When disable_erosion_ is true, trips above are no-ops, so no pt
   // ever has a bit set and the predicate cannot trigger.
   if (pt == num_pts_ - 1 && has_failed_old_) {
-    bool all_failed = true;
+    int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
+                          (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
+                                                                                    num_failed_pts_for_death_);
+    int num_failed_pts = 0;
     for (auto p = 0; p < num_pts_; ++p) {
-      if (static_cast<uint8_t>(Sacado::Value<ScalarT>::eval(failure_modes_(cell, p))) == 0u) {
-        all_failed = false;
-        break;
+      if (static_cast<uint8_t>(Sacado::Value<ScalarT>::eval(failure_modes_(cell, p))) != 0u) {
+        ++num_failed_pts;
       }
     }
-    if (all_failed && (*death_status_vec_)[cell] == 0.0) {
+    if (num_failed_pts >= threshold && (*death_status_vec_)[cell] == 0.0) {
       (*death_status_vec_)[cell] = 1.0;
       dead_(cell, 0)             = 1.0;
     }

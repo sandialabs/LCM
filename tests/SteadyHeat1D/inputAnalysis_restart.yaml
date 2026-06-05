@@ -9,10 +9,8 @@ LCM:
       Quadratic: 
         Nonlinear Factor: 2.00000000000000000e+00
     Parameters: 
-      Number: 3
-      Parameter 0: DBC on NS NodeSet0 for DOF T
-      Parameter 1: DBC on NS NodeSet1 for DOF T
-      Parameter 2: Quadratic Nonlinear Factor
+      Number: 1
+      Parameter 0: Quadratic Nonlinear Factor
     Response Functions: 
       Number: 3
       Response 0: Solution Average

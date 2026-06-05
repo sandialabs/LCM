@@ -27,10 +27,6 @@ DirichletBase<EvalT, Traits>::DirichletBase(Teuchos::ParameterList& p) : offset(
   this->addEvaluatedField(fieldTag);
   this->setName(name + PHX::print<EvalT>());
 
-  // Set up values as parameters for parameter library
-  auto paramLib = p.get<Teuchos::RCP<ParamLib>>("Parameter Library", Teuchos::null);
-  this->registerSacadoParameter(name, paramLib);
-
   {
     // Impose an ordering on DBC evaluators. This code works with the function
     // imposeOrder defined elsewhere. It happens that "Data Layout" is Dummy, so

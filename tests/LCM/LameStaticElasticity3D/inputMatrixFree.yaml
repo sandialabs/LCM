@@ -14,10 +14,6 @@ LCM:
       DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Parameters:
       Number: 0
-      Parameter 0: DBC on NS NodeSet0 for DOF X
-      Parameter 1: DBC on NS NodeSet1 for DOF X
-      Parameter 2: DBC on NS NodeSet2 for DOF Y
-      Parameter 3: DBC on NS NodeSet5 for DOF Z
     Response Functions:
       Number: 1
       Response 0: Solution Average
@@ -32,9 +28,7 @@ LCM:
     Test Values: [0.16666667]
     Relative Tolerance: 1.00000000e-07
     Number of Sensitivity Comparisons: 0
-    Sensitivity Test Values 0: [0.16666666, 0.16666666, 0.33333333, 0.33333333]
     Number of Dakota Comparisons: 0
-    Dakota Test Values: [1.00000000, 1.00000000]
   Piro:
     Jacobian Operator: 'Matrix-Free'
     LOCA:

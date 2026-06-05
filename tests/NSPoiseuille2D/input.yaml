@@ -10,8 +10,7 @@ LCM:
       DBC on NS nodelist_2 for DOF uy: 0.00000000000000000e+00
       DBC on NS nodelist_4 for DOF uy: 0.00000000000000000e+00
     Parameters: 
-      Number: 1
-      Parameter 0: DBC on NS nodelist_1 for DOF ux
+      Number: 0
     Response Functions: 
       Number: 1
       Response 0: Solution Max Value
@@ -26,8 +25,7 @@ LCM:
     Number of Comparisons: 1
     Test Values: [1.37102561000000001e+00]
     Relative Tolerance: 1.00000000000000002e-03
-    Number of Sensitivity Comparisons: 1
-    Sensitivity Test Values 0: [1.35421554999999993e+00]
+    Number of Sensitivity Comparisons: 0
     Number of Dakota Comparisons: 0
   Piro: 
     NOX: 

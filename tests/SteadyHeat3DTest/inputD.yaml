@@ -11,10 +11,9 @@ LCM:
       ThermalConductivity Type: Constant
       Value: 5.00000000000000000e+01
     Parameters: 
-      Number: 3
-      Parameter 0: DBC on NS nodelist_1 for DOF T
-      Parameter 1: 'NBC on SS surface_3 for DOF T set radiate[0]'
-      Parameter 2: ThermalConductivity
+      Number: 2
+      Parameter 0: 'NBC on SS surface_3 for DOF T set radiate[0]'
+      Parameter 1: ThermalConductivity
   Discretization: 
     Method: Pamgen
     Exodus Output File Name: beamD.exo

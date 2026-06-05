@@ -621,9 +621,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     Kind              kind           = Kind::Constant;
     LO                overlap_lid    = -1;
     LO                full_owned_lid = -1;  // LID in full (pre-elimination) owned VS; -1 if this rank does not own this DOF
-    // Full BC key ("DBC on NS <ns> for DOF <dof>", etc.). Used to look up
-    // LOCA-driven parameter updates in paramLib at eval time.
-    std::string bc_key;
     // Constant
     double constant = 0.0;
     // TimeArray (piecewise-linear interpolation)
@@ -658,12 +655,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
   void
   injectConstrainedDOFValues(double time);
-
-  //! If a constrained DOF's BC key is registered as a Sacado parameter,
-  //! refresh the descriptor's constant value from paramLib so LOCA/analysis
-  //! parameter updates propagate into the injected overlap values.
-  void
-  refreshDBCValuesFromParamLib();
 
   bool is_schwarz_{false};
 

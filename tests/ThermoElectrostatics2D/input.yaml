@@ -1,6 +1,7 @@
 LCM:
-  Problem: 
+  Problem:
     Name: ThermoElectrostatics 2D
+    Solution Method: Steady
     Convection Velocity: '{0.0,0.0}'
     Phalanx Graph Visualization Detail: 1
     Dirichlet BCs: 
@@ -15,10 +16,9 @@ LCM:
       Electrical Conductivity: '{50.0}'
       Rho Cp: '{1.0}'
       X Bounds: '{0.0,2.0}'
-    Parameters: 
+    Parameters:
       Number: 0
-      Parameter 0: DBC on NS NodeSet0 for DOF T
-    Response Functions: 
+    Response Functions:
       Number: 1
       Response 0: Solution Average
   Discretization: 
@@ -33,14 +33,8 @@ LCM:
     Relative Tolerance: 1.00000000000000005e-04
     Absolute Tolerance: 1.00000000000000005e-04
     Number of Sensitivity Comparisons: 0
-    Sensitivity Test Values 0: [1.64132959999999994e-01, 1.69200370999999988e-01, 1.66666669999999989e-01, 9.20558999999999973e-06, 2.38723499999999992e-04]
-  Piro: 
-    LOCA: 
-      Step Size: { }
-      Stepper: 
-        Continuation Method: Natural
-        Eigensolver: { }
-    NOX: 
+  Piro:
+    NOX:
       Direction: 
         Method: Newton
         Newton: 

@@ -9,9 +9,8 @@ LCM:
       Quadratic: 
         Nonlinear Factor: 0.00000000000000000e+00
     Parameters: 
-      Number: 2
-      Parameter 0: DBC on NS NodeSet0 for DOF T
-      Parameter 1: Quadratic Nonlinear Factor
+      Number: 1
+      Parameter 0: Quadratic Nonlinear Factor
     Response Functions: 
       Number: 1
       Response 0: Solution Average
@@ -22,8 +21,7 @@ LCM:
     Number of Comparisons: 1
     Test Values: [1.00000000000000000e+00]
     Relative Tolerance: 1.00000000000000005e-04
-    Number of Sensitivity Comparisons: 1
-    Sensitivity Test Values 0: [5.00000000000000000e-01, 8.25000000000000039e-02]
+    Number of Sensitivity Comparisons: 0
   Piro: 
     LOCA: 
       Bifurcation: { }

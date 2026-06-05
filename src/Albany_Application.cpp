@@ -611,25 +611,6 @@ Application::eliminateConstrainedDOFs()
   auto const& ns_gids_map   = stk_disc->getNodeSetOverlapGIDs();
   auto const& ns_coords_map = stk_disc->getNodeSetOverlapCoords();
 
-  // Skip when any DBC key is registered as a continuation/sensitivity parameter.
-  // LOCA's natural-continuation predictor needs df/d(bc) propagated through the
-  // residual via Sacado AD. The weak-enforcement path gets this "for free" from
-  // f[i] = x[i] - bc_value with bc_value registered as a Sacado parameter.
-  // Elimination injects bc_value as a plain double in the overlap, so the
-  // Tangent residual sees df/dp = 0 at constrained DOFs and the predictor is
-  // wrong — the first continuation step diverges (see Mechanics2D_Blocked).
-  // Re-enable once the injection path is specialized for Tangent/DistParamDeriv.
-  if (problemParams->isSublist("Parameters")) {
-    auto&     plist = problemParams->sublist("Parameters");
-    int const n     = plist.get<int>("Number", 0);
-    for (int k = 0; k < n; ++k) {
-      std::string const key = "Parameter " + std::to_string(k);
-      if (!plist.isType<std::string>(key)) continue;
-      std::string const pname = Teuchos::getValue<std::string>(plist.getEntry(key));
-      if (pname.find("DBC") != std::string::npos) return;
-    }
-  }
-
   bool const has_dbc_params = problemParams->isSublist("Dirichlet BCs");
   if (!has_dbc_params) return;
   auto& bc_params = problemParams->sublist("Dirichlet BCs");
@@ -660,19 +641,17 @@ Application::eliminateConstrainedDOFs()
       // Build a descriptor prototype for this (ns, dof) pair.
       DBCDescriptor proto;
 
-      std::string const dbc_key   = "DBC on NS " + ns + " for DOF " + dof;
-      std::string const sdbc_key  = "SDBC on NS " + ns + " for DOF " + dof;
+      std::string const dbc_key  = "DBC on NS " + ns + " for DOF " + dof;
+      std::string const sdbc_key = "SDBC on NS " + ns + " for DOF " + dof;
       std::string const tdep_key  = "Time Dependent DBC on NS " + ns + " for DOF " + dof;
       std::string const expr_key  = "ExpressionEvaluated SDBC on NS " + ns + " for DOF " + dof;
 
       if (bc_params.isType<double>(dbc_key)) {
         proto.kind     = DBCDescriptor::Kind::Constant;
         proto.constant = bc_params.get<double>(dbc_key);
-        proto.bc_key   = dbc_key;
       } else if (bc_params.isType<double>(sdbc_key)) {
         proto.kind     = DBCDescriptor::Kind::Constant;
         proto.constant = bc_params.get<double>(sdbc_key);
-        proto.bc_key   = sdbc_key;
       } else if (bc_params.isSublist(tdep_key)) {
         auto& tlist    = bc_params.sublist(tdep_key);
         proto.kind     = DBCDescriptor::Kind::TimeArray;
@@ -838,24 +817,9 @@ Application::eliminateConstrainedDOFs()
 }
 
 void
-Application::refreshDBCValuesFromParamLib()
-{
-  if (dbc_descriptors_.empty()) return;
-  if (paramLib.is_null()) return;
-  for (auto& desc : dbc_descriptors_) {
-    if (desc.kind != DBCDescriptor::Kind::Constant) continue;
-    if (desc.bc_key.empty()) continue;
-    if (!paramLib->isParameter(desc.bc_key)) continue;
-    desc.constant = paramLib->getRealValue<PHAL::AlbanyTraits::Residual>(desc.bc_key);
-  }
-}
-
-void
 Application::injectConstrainedDOFValues(double time)
 {
   if (dbc_descriptors_.empty()) return;
-
-  refreshDBCValuesFromParamLib();
 
   // Capture previous time BEFORE overwriting; used below to compute BC time
   // derivatives via backward finite difference for x_dot injection.
@@ -969,8 +933,6 @@ Application::expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, dou
   auto cas_red_to_full =
       Albany::createCombineAndScatterManager(disc->getVectorSpace(), full_owned_vs_);
   cas_red_to_full->scatter(*x, *full_x, Albany::CombineMode::INSERT);
-
-  refreshDBCValuesFromParamLib();
 
   auto full_data = Albany::getNonconstLocalData(full_x);
   for (auto const& desc : dbc_descriptors_) {

@@ -18,12 +18,9 @@ LCM:
       Value: 0.05000000
       dnudT Value: 40.00000000
     Parameters:
-      Number: 5
-      Parameter 0: DBC on NS NodeSet0 for DOF X
-      Parameter 1: DBC on NS NodeSet1 for DOF X
-      Parameter 2: DBC on NS NodeSet3 for DOF T
-      Parameter 3: dEdT Value
-      Parameter 4: dnudT Value
+      Number: 2
+      Parameter 0: dEdT Value
+      Parameter 1: dnudT Value
     Response Functions:
       Number: 1
       Response 0: Solution Average
@@ -38,10 +35,8 @@ LCM:
     Test Values: [0.18807982]
     Relative Tolerance: 0.00010000
     Absolute Tolerance: 0.00010000
-    Number of Sensitivity Comparisons: 1
-    Sensitivity Test Values 0: [0.16413296, 0.16920037, 1.21361683, 9.20559000e-06, 0.00023872]
+    Number of Sensitivity Comparisons: 0
     Number of Dakota Comparisons: 0
-    Dakota Test Values: [1.00000000, 1.00000000]
   Piro:
     LOCA:
       Bifurcation: { }

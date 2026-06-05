@@ -17,8 +17,6 @@ LCM:
       Value: 0.35000000
     Parameters:
       Number: 0
-      Parameter 0: DBC on NS nodelist_21 for DOF X
-      Parameter 1: DBC on NS nodelist_21 for DOF Y
     Response Functions:
       Number: 1
       Response 0: Solution Average
@@ -31,9 +29,7 @@ LCM:
     Test Values: [0.58953013]
     Relative Tolerance: 1.00000000e-07
     Number of Sensitivity Comparisons: 0
-    Sensitivity Test Values 0: [0.33333333, 0.33333333]
     Number of Dakota Comparisons: 0
-    Dakota Test Values: [1.00000000, 1.00000000]
   Piro:
     LOCA:
       Bifurcation: { }

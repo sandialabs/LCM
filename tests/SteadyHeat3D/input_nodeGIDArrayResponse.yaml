@@ -19,8 +19,7 @@ LCM:
       Quadratic: 
         Nonlinear Factor: 3.00000000000000000e+00
     Parameters: 
-      Number: 1
-      Parameter 0: DBC on NS NodeSet0 for DOF T
+      Number: 0
     Response Functions: 
       Number: 1
       Response 0: Solution Values

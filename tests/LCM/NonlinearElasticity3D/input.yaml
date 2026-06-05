@@ -5,7 +5,7 @@ LCM:
     Phalanx Graph Visualization Detail: 1
     Dirichlet BCs:
       DBC on NS NodeSet0 for DOF X: 0.00000000e+00
-      DBC on NS NodeSet1 for DOF X: 1.00000000
+      ExpressionEvaluated SDBC on NS NodeSet1 for DOF X: '1.0 * t'
       DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
       DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Elastic Modulus:
@@ -17,11 +17,9 @@ LCM:
       Poissons Ratio Type: Constant
       Value: 0.25000000
     Parameters:
-      Number: 4
-      Parameter 0: DBC on NS NodeSet0 for DOF X
-      Parameter 1: DBC on NS NodeSet1 for DOF X
-      Parameter 2: DBC on NS NodeSet2 for DOF Y
-      Parameter 3: DBC on NS NodeSet5 for DOF Z
+      Number: 1
+      Parameter 0: Time
+      Nominal Values: [1.0]
     Response Functions:
       Number: 1
       Response 0: Solution Average
@@ -37,10 +35,8 @@ LCM:
     Number of Comparisons: 0
     Test Values: [0.16666667]
     Relative Tolerance: 1.00000000e-07
-    Number of Sensitivity Comparisons: 1
-    Sensitivity Test Values 0: [0.16666666, 0.16666666, 0.33333333, 0.33333333]
+    Number of Sensitivity Comparisons: 0
     Number of Dakota Comparisons: 0
-    Dakota Test Values: [1.00000000, 1.00000000]
   Piro:
     LOCA:
       Bifurcation: { }
@@ -49,7 +45,7 @@ LCM:
         Method: Tangent
       Stepper:
         Initial Value: 0.00000000e+00
-        Continuation Parameter: DBC on NS NodeSet1 for DOF X
+        Continuation Parameter: Time
         Max Steps: 10
         Max Value: 1.00000000
         Min Value: 0.00000000e+00

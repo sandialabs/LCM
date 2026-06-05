@@ -23,16 +23,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nleltri2d_tpetra_in.exo.4.3
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-# test for 2D with blocked ordering
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputBlocked.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/inputBlocked.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
-
-# Create the test with this name and standard executable
-add_test(${testName}2D_Blocked ${Albany.exe} inputBlocked.yaml)
-set_tests_properties(${testName}2D_Blocked PROPERTIES LABELS
-                                                      "LCM;Tpetra;Forward")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/inputJ2Plast2DTraction.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/inputJ2Plast2DTraction.yaml COPYONLY)

@@ -18,8 +18,7 @@ LCM:
       Number: 1
       Response 0: Solution Average
     Parameters: 
-      Number: 1
-      Parameter 0: SDBC on NS NodeSet0 for DOF T
+      Number: 0
       #Parameter 1: SDBC on NS NodeSet2 for DOF T
   Discretization: 
     1D Elements: 10
@@ -36,7 +35,6 @@ LCM:
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
     Number of Sensitivity Comparisons: 0
-    Sensitivity Test Values 0: [3.05378999999999998e-02, 3.30262109999999998e-01]
   Piro: 
     Tempus: 
       Lump Mass Matrix: true

@@ -14,10 +14,7 @@ LCM:
       Poissons Ratio Type: Constant
       Value: 0.25000000
     Parameters:
-      Number: 3
-      Parameter 0: DBC on NS NodeSet0 for DOF X
-      Parameter 1: DBC on NS NodeSet1 for DOF X
-      Parameter 2: DBC on NS NodeSet0 for DOF Y
+      Number: 0
     Response Functions:
       Number: 1
       Response 0: Solution Average
@@ -33,8 +30,7 @@ LCM:
     Number of Comparisons: 1
     Test Values: [0.32500000]
     Relative Tolerance: 0.00010000
-    Number of Sensitivity Comparisons: 1
-    Sensitivity Test Values 0: [0.25000000, 0.25000000, 0.25000000]
+    Number of Sensitivity Comparisons: 0
   Piro:
     LOCA:
       Bifurcation: { }

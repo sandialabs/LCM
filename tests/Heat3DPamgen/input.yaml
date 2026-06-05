@@ -19,15 +19,9 @@ LCM:
       Quadratic: 
         Nonlinear Factor: 3.00000000000000000e+00
     Parameters: 
-      Number: 8
-      Parameter 0: DBC on NS nodelist_1 for DOF T
-      Parameter 1: DBC on NS nodelist_2 for DOF T
-      Parameter 2: DBC on NS nodelist_3 for DOF T
-      Parameter 3: DBC on NS nodelist_4 for DOF T
-      Parameter 4: DBC on NS nodelist_5 for DOF T
-      Parameter 5: DBC on NS nodelist_6 for DOF T
-      Parameter 6: Quadratic Nonlinear Factor
-      Parameter 7: ThermalConductivity
+      Number: 2
+      Parameter 0: Quadratic Nonlinear Factor
+      Parameter 1: ThermalConductivity
     Response Functions: 
       Number: 1
       Response 0: Solution Two Norm
@@ -41,8 +35,7 @@ LCM:
     Number of Comparisons: 1
     Test Values: [6.68057000000000016e+01]
     Relative Tolerance: 1.00000000000000002e-03
-    Number of Sensitivity Comparisons: 1
-    Sensitivity Test Values 0: [8.14700999999999986e+00, 8.14700999999999986e+00, 6.27970000000000006e+00, 6.27977000000000007e+00, 7.84370000000000012e+00, 7.84374000000000038e+00, 6.24310000000000032e-01, -6.24310000000000032e-01]
+    Number of Sensitivity Comparisons: 0
   Piro: 
     LOCA: 
       Bifurcation: { }

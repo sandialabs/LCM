@@ -12,8 +12,7 @@ LCM:
       DBC on NS NodeSet0 for DOF C2: 0.00000000000000000e+00
       DBC on NS NodeSet1 for DOF C2: 3.00000000000000000e+00
     Parameters: 
-      Number: 1
-      Parameter 0: DBC on NS NodeSet0 for DOF Phi
+      Number: 0
     Response Functions: 
       Number: 1
       Response 0: Solution Average
@@ -27,8 +26,7 @@ LCM:
     Number of Comparisons: 1
     Test Values: [1.15708755700000010e+00]
     Relative Tolerance: 1.00000000000000002e-03
-    Number of Sensitivity Comparisons: 1
-    Sensitivity Test Values 0: [4.75051109000000013e-02]
+    Number of Sensitivity Comparisons: 0
   Piro: 
     NOX: 
       Direction: 

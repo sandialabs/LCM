@@ -5,7 +5,7 @@ LCM:
     Phalanx Graph Visualization Detail: 1
     Dirichlet BCs:
       DBC on NS NodeSet0 for DOF X: 0.00000000e+00
-      DBC on NS NodeSet1 for DOF X: 0.10000000
+      ExpressionEvaluated SDBC on NS NodeSet1 for DOF X: '0.10000000 * t'
       DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
       DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Material Model:
@@ -48,11 +48,9 @@ LCM:
       Ring Center Values: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00]
     isLocalCoord: false
     Parameters:
-      Number: 4
-      Parameter 0: DBC on NS NodeSet0 for DOF X
-      Parameter 1: DBC on NS NodeSet1 for DOF X
-      Parameter 2: DBC on NS NodeSet2 for DOF Y
-      Parameter 3: DBC on NS NodeSet5 for DOF Z
+      Number: 1
+      Parameter 0: Time
+      Nominal Values: [1.0]
     Response Functions:
       Number: 1
       Response 0: Solution Average
@@ -68,9 +66,7 @@ LCM:
     Test Values: [0.02937739]
     Relative Tolerance: 1.00000000e-07
     Number of Sensitivity Comparisons: 0
-    Sensitivity Test Values 0: [0.16666666, 0.16666666, 0.33333333, 0.33333333]
     Number of Dakota Comparisons: 0
-    Dakota Test Values: [1.00000000, 1.00000000]
   Piro:
     LOCA:
       Bifurcation: { }
@@ -79,9 +75,9 @@ LCM:
         Method: Tangent
       Stepper:
         Initial Value: 0.00000000e+00
-        Continuation Parameter: DBC on NS NodeSet1 for DOF X
+        Continuation Parameter: Time
         Max Steps: 100
-        Max Value: 0.10000000
+        Max Value: 1.00000000
         Min Value: 0.00000000e+00
         Compute Eigenvalues: false
         Eigensolver:
@@ -89,7 +85,7 @@ LCM:
           Operator: Jacobian Inverse
           Num Eigenvalues: 0
       Step Size:
-        Initial Step Size: 0.00100000
+        Initial Step Size: 0.01000000
         Method: Constant
     NOX:
       Direction:

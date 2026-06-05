@@ -156,29 +156,12 @@ class AbstractDiscretization
   virtual const WorksetArray<Teuchos::ArrayRCP<double*>>::type&
   getLatticeOrientation() const = 0;
 
-  virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getCellBoundaryIndicator() const = 0;
-
-  virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getFaceBoundaryIndicator() const = 0;
-
-  virtual WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getEdgeBoundaryIndicator() const = 0;
-
-  virtual std::map<GO, double*> const&
-  getNodeBoundaryIndicator() const = 0;
-
-  virtual bool
-  hasCellBoundaryIndicator() const = 0;
-
-  virtual bool
-  hasFaceBoundaryIndicator() const = 0;
-
-  virtual bool
-  hasEdgeBoundaryIndicator() const = 0;
-
-  virtual bool
-  hasNodeBoundaryIndicator() const = 0;
+  //! Per-cell flag: 1 if the cell touches any side-set whose name
+  //! contains "erodible" (the convention used by element death and
+  //! erodible-DBC handling); 0 otherwise. Used by ACEThermalParameters
+  //! and J2Erosion to gate sea-level salinity/E-weakening updates.
+  virtual const WorksetArray<Teuchos::ArrayRCP<std::uint8_t>>::type&
+  getCellIsErodible() const = 0;
 
   virtual void
   printElemGIDws() const
@@ -319,6 +302,14 @@ class AbstractDiscretization
   // Routine that disables writing out of initial condition to Exodus file
   virtual void
   outputExodusSolutionInitialTime(const bool output_initial_soln_to_exo_file_) = 0;
+
+  // Phase 0 of the activePart-based element-death port: exercise the
+  // workset-rebuild path without changing semantics. Default is a no-op;
+  // STKDiscretization overrides.
+  virtual void
+  rebuildWorksets()
+  {
+  }
 };
 
 }  // namespace Albany

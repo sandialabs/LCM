@@ -115,10 +115,7 @@ struct Workset
   // Needed for Schwarz coupling
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>> apps_;
   Teuchos::RCP<Albany::Application>                    current_app_;
-  Teuchos::ArrayRCP<double*>                           cell_boundary_indicator;
-  Teuchos::ArrayRCP<double*>                           face_boundary_indicator;
-  Teuchos::ArrayRCP<double*>                           edge_boundary_indicator;
-  std::map<GO, double*>                                node_boundary_indicator;
+  Teuchos::ArrayRCP<std::uint8_t>                      cell_is_erodible;
   std::set<int>                                        fixed_dofs_;
   bool                                                 is_schwarz_bc_{false};
 
@@ -131,16 +128,6 @@ struct Workset
   // Read by the scatter evaluator to skip dead elements.
   Teuchos::RCP<std::vector<double>> death_status_vec{Teuchos::null};
 
-  // Per-(cell, pt) failure-mode bitmask for erosion models. Bits:
-  //   bit 0 = tension, bit 1 = strain, bit 2 = yield,
-  //   bit 3 = angle,   bit 4 = displacement.
-  // Once a bit is set at a (cell, pt) it stays set for the life of the run —
-  // OR-semantics give failure accumulation across fills and time steps while
-  // preventing a criterion that keeps tripping at the same point from being
-  // counted more than once. Indexed [cell][pt]. Owned and attached by the
-  // Application (see Albany::Application::failure_mode_vecs_); sized lazily
-  // on first use by the kernel that knows num_pts for its model.
-  Teuchos::RCP<std::vector<std::vector<uint8_t>>> failure_mode_vec{Teuchos::null};
   Teuchos::RCP<Tpetra_MultiVector> auxDataPtrT;
 
   bool transientTerms{false};

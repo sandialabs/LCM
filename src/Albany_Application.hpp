@@ -57,7 +57,28 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       Teuchos::RCP<Thyra_Vector const> const&     initial_guess = Teuchos::null,
       bool const                                  schwarz       = false);
 
+  //! Ctor for orchestrated shared-mesh construction: caller (e.g.
+  //! ACE_ThermoMechanical) supplies a pre-built STKMeshStruct that is
+  //! shared with other Applications, and sets deferPostCommit=true so
+  //! that this ctor stops after createDiscretization (without running
+  //! disc->updateMesh or finalSetUp). The orchestrator then calls
+  //! sharedMesh->commitAndPopulate exactly once, followed by
+  //! finalizePostCommit() on each Application.
+  Application(
+      const Teuchos::RCP<Teuchos_Comm const>&            comm,
+      const Teuchos::RCP<Teuchos::ParameterList>&        params,
+      const Teuchos::RCP<Albany::AbstractMeshStruct>&    sharedMesh,
+      bool const                                         deferPostCommit,
+      Teuchos::RCP<Thyra_Vector const> const&            initial_guess = Teuchos::null,
+      bool const                                         schwarz       = false);
+
   Application(const Teuchos::RCP<Teuchos_Comm const>& comm);
+
+  //! Run the post-commit portion of construction: disc->updateMesh() +
+  //! finalSetUp. Called by the orchestrator after the shared mesh's
+  //! commitAndPopulate has fired. No-op if the ordinary ctor was used.
+  void
+  finalizePostCommit(Teuchos::RCP<Thyra_Vector const> const& initial_guess = Teuchos::null);
 
   Application(const Application&) = delete;
 
@@ -250,19 +271,19 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       double const                            dt = 0.0);
 
   void
-  fixOrphanNodesForElementDeath(
-      Teuchos::RCP<Thyra_Vector>   f,
-      Teuchos::RCP<Thyra_LinearOp> jac);
+  fixOrphanNodesForElementDeath(Teuchos::RCP<Thyra_LinearOp> jac);
+
+  //! Phase 1 of the activePart-based element-death port: at step
+  //! boundaries, remove cells flagged dead in death_status_vecs_ from
+  //! STK's activePart and rebuild worksets so they no longer appear in
+  //! assembly. Returns true if any cells were removed (caller can use
+  //! this to drive preconditioner reset later).
+  bool
+  applyDeathToActivePart();
 
   // Element death status per workset, set by the ACE solver.
   // death_status_vecs_[ws] is a vector of per-cell death indicators.
   std::vector<Teuchos::RCP<std::vector<double>>> death_status_vecs_;
-
-  // Per-(cell, pt) failure-mode bitmask per workset. Persists across
-  // Phalanx fills and across time steps; OR-accumulated by erosion kernels.
-  // Shells are allocated here in loadWorksetBucketInfo; the [cell][pt] grid
-  // is sized lazily by the kernel (which knows num_pts for its model).
-  std::vector<Teuchos::RCP<std::vector<std::vector<uint8_t>>>> failure_mode_vecs_;
 
  private:
   void
@@ -645,6 +666,12 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   refreshDBCValuesFromParamLib();
 
   bool is_schwarz_{false};
+
+  //! Set by the shared-mesh ctor; tells finalizePostCommit which
+  //! params to re-use for the deferred finalSetUp call.
+  bool                                            deferred_post_commit_pending_{false};
+  Teuchos::RCP<Teuchos::ParameterList>            deferred_params_;
+  Teuchos::RCP<Albany::AbstractMeshStruct>        deferred_shared_mesh_;
   bool no_dir_bcs_{false};
   bool requires_sdbcs_{false};
   bool requires_orig_dbcs_{false};
@@ -769,27 +796,10 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
   auto const& wsEBNames               = disc->getWsEBNames();
   auto const& sphereVolume            = disc->getSphereVolume();
   auto const& latticeOrientation      = disc->getLatticeOrientation();
-  auto const& cell_boundary_indicator = disc->getCellBoundaryIndicator();
-  auto const& face_boundary_indicator = disc->getFaceBoundaryIndicator();
-  auto const& edge_boundary_indicator = disc->getEdgeBoundaryIndicator();
-  auto const& node_boundary_indicator = disc->getNodeBoundaryIndicator();
+  auto const& cell_is_erodible        = disc->getCellIsErodible();
 
-  auto const has_cell = cell_boundary_indicator != Teuchos::null && ws < cell_boundary_indicator.size();
-  auto const has_face = face_boundary_indicator != Teuchos::null && ws < face_boundary_indicator.size();
-  auto const has_edge = edge_boundary_indicator != Teuchos::null && ws < edge_boundary_indicator.size();
-  auto const has_node = node_boundary_indicator.size() > 0;
-
-  if (has_cell == true) {
-    workset.cell_boundary_indicator = cell_boundary_indicator[ws];
-  }
-  if (has_face == true) {
-    workset.face_boundary_indicator = face_boundary_indicator[ws];
-  }
-  if (has_edge == true) {
-    workset.edge_boundary_indicator = edge_boundary_indicator[ws];
-  }
-  if (has_node == true) {
-    workset.node_boundary_indicator = node_boundary_indicator;
+  if (ws < static_cast<int>(cell_is_erodible.size())) {
+    workset.cell_is_erodible = cell_is_erodible[ws];
   }
 
   workset.numCells             = wsElNodeEqID[ws].extent(0);
@@ -810,23 +820,25 @@ Application::loadWorksetBucketInfo(PHAL::Workset& workset, int const& ws, std::s
 
   workset.stateArrayPtr = &stateMgr.getStateArray(Albany::StateManager::ELEM, ws);
 
-  // Element death: pass per-workset death status to the scatter evaluator
+  // Element death: pass per-workset death status to the scatter and
+  // material evaluators. Erosion can rebuild the worksets mid-solve
+  // (Application::applyDeathToActivePart), which re-buckets the mesh and
+  // changes per-workset cell counts. The death-flag buffer is a cached
+  // member, so it can fall out of sync; resize it here to the workset's
+  // current cell count so the evaluators never index out of bounds. A
+  // size change means a rebuild just happened -- every surviving cell is
+  // alive (the dead ones were removed), so the flags reset to zero. When
+  // the size is unchanged the buffer is left intact, preserving flags
+  // the material model wrote earlier in this solve.
   if (ws < static_cast<int>(death_status_vecs_.size())) {
-    workset.death_status_vec = death_status_vecs_[ws];
+    auto& dsv = death_status_vecs_[ws];
+    if (Teuchos::nonnull(dsv) && static_cast<int>(dsv->size()) != workset.numCells) {
+      dsv->assign(workset.numCells, 0.0);
+    }
+    workset.death_status_vec = dsv;
   } else {
     workset.death_status_vec = Teuchos::null;
   }
-
-  // Erosion failure-mode bitmask: persistent per-workset storage. Allocated
-  // here as an empty shell on first access so every solver path sees a
-  // non-null RCP; the kernel sizes the [cell][pt] grid on first use.
-  if (ws >= static_cast<int>(failure_mode_vecs_.size())) {
-    failure_mode_vecs_.resize(ws + 1);
-  }
-  if (failure_mode_vecs_[ws].is_null()) {
-    failure_mode_vecs_[ws] = Teuchos::rcp(new std::vector<std::vector<uint8_t>>{});
-  }
-  workset.failure_mode_vec = failure_mode_vecs_[ws];
 }
 
 }  // namespace Albany

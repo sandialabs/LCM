@@ -40,27 +40,6 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
     return false;
   }
 
-  bool
-  hasCellBoundaryIndicatorField() const
-  {
-    return build_cell_boundary_indicator;
-  }
-  bool
-  hasFaceBoundaryIndicatorField() const
-  {
-    return build_face_boundary_indicator;
-  }
-  bool
-  hasEdgeBoundaryIndicatorField() const
-  {
-    return build_edge_boundary_indicator;
-  }
-  bool
-  hasNodeBoundaryIndicatorField() const
-  {
-    return build_node_boundary_indicator;
-  }
-
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>
   getSolutionFieldArray()
   {
@@ -149,11 +128,6 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   initializeSTKAdaptation();
 
   bool buildSphereVolume;
-
-  bool build_cell_boundary_indicator{false};
-  bool build_face_boundary_indicator{false};
-  bool build_edge_boundary_indicator{false};
-  bool build_node_boundary_indicator{false};
 
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field;
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> solution_field_dtk;

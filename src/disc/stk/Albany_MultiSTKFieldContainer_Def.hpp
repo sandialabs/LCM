@@ -32,6 +32,22 @@ static char const* res_id_name = {
     "residual",
 };
 
+namespace {
+
+// See Albany_OrdinarySTKFieldContainer_Def.hpp for the rationale; same
+// helper repeated here to keep the IOSS hint local to each container.
+inline void
+applyVectorOutputType(stk::mesh::FieldBase& field, int numComponents)
+{
+  if (numComponents == 2) {
+    stk::io::set_field_output_type(field, stk::io::FieldOutputType::VECTOR_2D);
+  } else if (numComponents == 3) {
+    stk::io::set_field_output_type(field, stk::io::FieldOutputType::VECTOR_3D);
+  }
+}
+
+}  // namespace
+
 template <bool Interleaved>
 MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
     const Teuchos::RCP<Teuchos::ParameterList>&               params_,
@@ -73,6 +89,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
       std::string name     = params_->get<std::string>(sol_tag_name[vec_num], sol_id_name[vec_num]);
       VFT*        solution = &metaData_->declare_field<double>(stk::topology::NODE_RANK, name);
       stk::mesh::put_field_on_mesh(*solution, metaData_->universal_part(), neq_, nullptr);
+      applyVectorOutputType(*solution, neq_);
       stk::io::set_field_role(*solution, Ioss::Field::TRANSIENT);
 
       sol_vector_name[vec_num].push_back(name);
@@ -83,6 +100,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 
       VFT* solution = &metaData_->declare_field<double>(stk::topology::NODE_RANK, solution_vector[vec_num][0]);
       stk::mesh::put_field_on_mesh(*solution, metaData_->universal_part(), neq_, nullptr);
+      applyVectorOutputType(*solution, neq_);
       stk::io::set_field_role(*solution, Ioss::Field::TRANSIENT);
 
       sol_vector_name[vec_num].push_back(solution_vector[vec_num][0]);
@@ -106,6 +124,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
           accum += len;
           VFT* solution = &metaData_->declare_field<double>(stk::topology::NODE_RANK, solution_vector[vec_num][i]);
           stk::mesh::put_field_on_mesh(*solution, metaData_->universal_part(), len, nullptr);
+          applyVectorOutputType(*solution, len);
           stk::io::set_field_role(*solution, Ioss::Field::TRANSIENT);
           sol_vector_name[vec_num].push_back(solution_vector[vec_num][i]);
           sol_index[vec_num].push_back(len);
@@ -141,6 +160,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
     std::string name     = params_->get<std::string>(res_tag_name, res_id_name);
     VFT*        residual = &metaData_->declare_field<double>(stk::topology::NODE_RANK, name);
     stk::mesh::put_field_on_mesh(*residual, metaData_->universal_part(), neq_, nullptr);
+    applyVectorOutputType(*residual, neq_);
     stk::io::set_field_role(*residual, Ioss::Field::TRANSIENT);
 
     res_vector_name.push_back(name);
@@ -151,6 +171,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
 
     VFT* residual = &metaData_->declare_field<double>(stk::topology::NODE_RANK, residual_vector[0]);
     stk::mesh::put_field_on_mesh(*residual, metaData_->universal_part(), neq_, nullptr);
+    applyVectorOutputType(*residual, neq_);
     stk::io::set_field_role(*residual, Ioss::Field::TRANSIENT);
 
     res_vector_name.push_back(residual_vector[0]);
@@ -174,6 +195,7 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
         accum += len;
         VFT* residual = &metaData_->declare_field<double>(stk::topology::NODE_RANK, residual_vector[i]);
         stk::mesh::put_field_on_mesh(*residual, metaData_->universal_part(), len, nullptr);
+        applyVectorOutputType(*residual, len);
         stk::io::set_field_role(*residual, Ioss::Field::TRANSIENT);
         res_vector_name.push_back(residual_vector[i]);
         res_index.push_back(len);
@@ -207,12 +229,14 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
   this->coordinates_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates");
   stk::mesh::put_field_on_mesh(*this->coordinates_field, metaData_->universal_part(), numDim_, nullptr);
   stk::io::set_field_role(*this->coordinates_field, Ioss::Field::MESH);
+  applyVectorOutputType(*this->coordinates_field, numDim_);
 
   if (numDim_ == 3) {
     this->coordinates_field3d = this->coordinates_field;
   } else {
     this->coordinates_field3d = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates3d");
     stk::mesh::put_field_on_mesh(*this->coordinates_field3d, metaData_->universal_part(), 3, nullptr);
+    applyVectorOutputType(*this->coordinates_field3d, 3);
     if (params_->get<bool>("Export 3d coordinates field", false)) {
       stk::io::set_field_role(*this->coordinates_field3d, Ioss::Field::TRANSIENT);
     }
@@ -241,39 +265,6 @@ MultiSTKFieldContainer<Interleaved>::MultiSTKFieldContainer(
   this->addStateStructs(sis);
 
   initializeSTKAdaptation();
-
-  bool const has_cell_boundary_indicator = (std::find(req.begin(), req.end(), "cell_boundary_indicator") != req.end());
-  bool const has_face_boundary_indicator = (std::find(req.begin(), req.end(), "face_boundary_indicator") != req.end());
-  bool const has_edge_boundary_indicator = (std::find(req.begin(), req.end(), "edge_boundary_indicator") != req.end());
-  bool const has_node_boundary_indicator = (std::find(req.begin(), req.end(), "node_boundary_indicator") != req.end());
-  if (has_cell_boundary_indicator) {
-    this->cell_boundary_indicator = metaData_->template get_field<double>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
-    if (this->cell_boundary_indicator != nullptr) {
-      build_cell_boundary_indicator = true;
-      stk::io::set_field_role(*this->cell_boundary_indicator, Ioss::Field::INFORMATION);
-    }
-  }
-  if (has_face_boundary_indicator) {
-    this->face_boundary_indicator = metaData_->template get_field<double>(stk::topology::FACE_RANK, "face_boundary_indicator");
-    if (this->face_boundary_indicator != nullptr) {
-      build_face_boundary_indicator = true;
-      stk::io::set_field_role(*this->face_boundary_indicator, Ioss::Field::INFORMATION);
-    }
-  }
-  if (has_edge_boundary_indicator) {
-    this->edge_boundary_indicator = metaData_->template get_field<double>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
-    if (this->edge_boundary_indicator != nullptr) {
-      build_edge_boundary_indicator = true;
-      stk::io::set_field_role(*this->edge_boundary_indicator, Ioss::Field::INFORMATION);
-    }
-  }
-  if (has_node_boundary_indicator) {
-    this->node_boundary_indicator = metaData_->template get_field<double>(stk::topology::NODE_RANK, "node_boundary_indicator");
-    if (this->node_boundary_indicator != nullptr) {
-      build_node_boundary_indicator = true;
-      stk::io::set_field_role(*this->node_boundary_indicator, Ioss::Field::INFORMATION);
-    }
-  }
 }
 
 template <bool Interleaved>
@@ -297,22 +288,6 @@ MultiSTKFieldContainer<Interleaved>::initializeSTKAdaptation()
     this->failure_state[rank] = &this->metaData->template declare_field<double>(rank, "failure_state");
     stk::mesh::put_field_on_mesh(*this->failure_state[rank], this->metaData->universal_part(), nullptr);
   }
-
-  // Cell boundary indicator
-  this->cell_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
-  stk::mesh::put_field_on_mesh(*this->cell_boundary_indicator, this->metaData->universal_part(), nullptr);
-
-  // Face boundary indicator
-  this->face_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::FACE_RANK, "face_boundary_indicator");
-  stk::mesh::put_field_on_mesh(*this->face_boundary_indicator, this->metaData->universal_part(), nullptr);
-
-  // Edge boundary indicator
-  this->edge_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
-  stk::mesh::put_field_on_mesh(*this->edge_boundary_indicator, this->metaData->universal_part(), nullptr);
-
-  // Node boundary indicator
-  this->node_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::NODE_RANK, "node_boundary_indicator");
-  stk::mesh::put_field_on_mesh(*this->node_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
   stk::io::set_field_role(*this->refine_field, Ioss::Field::MESH);

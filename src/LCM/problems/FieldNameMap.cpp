@@ -44,6 +44,7 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(std::make_pair("Strain_Indicator", "Strain_Indicator"));
   name_map->insert(std::make_pair("Angle_Indicator", "Angle_Indicator"));
   name_map->insert(std::make_pair("Displacement_Indicator", "Displacement_Indicator"));
+  name_map->insert(std::make_pair("Elastic_Modulus_Used", "Elastic_Modulus_Used"));
 
   // Crystal plasticity model
   int const max_slip_systems = 48;

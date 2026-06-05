@@ -25,62 +25,11 @@ template <typename Traits>
 void
 SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::preEvaluate(typename Traits::EvalData workset)
 {
-  auto        rcp_disc    = workset.disc;
-  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto        x           = workset.x;
-  auto        x_view      = Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x));
-  auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
-  auto const  ns_id       = this->nodeSetID;
-  auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
-  auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
-
-#if defined(DEBUG)
-  {
-    ALBANY_ASSERT(has_nbi == true);
-    auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-    ALBANY_DUMP("**** GLOBAL BOUNDARY INDICATOR MAP :\n");
-    for (auto&& kv : bi_field) {
-      ALBANY_DUMP("GID : " << kv.first << ", BI : " << *kv.second << "\n");
-    }
-    std::cout << "*** NODESET BOUNDARY INDICATOR : " << ns_id << " ***\n";
-    for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-      ALBANY_ASSERT(has_nbi == true);
-      auto&       stk_mesh_struct = *(stk_disc->getSTKMeshStruct());
-      auto&       coord_field     = *(stk_mesh_struct.getCoordinatesField());
-      auto const& bi_field        = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids         = workset.nodeSetGIDs->find(ns_id)->second;
-      auto const  node            = ns_gids[ns_node];
-      auto const  it              = bi_field.find(node + 1);
-      ALBANY_ASSERT(it != bi_field.end());
-      auto const    bi                 = *(it->second);
-      auto          overlap_node_vs    = stk_disc->getOverlapNodeVectorSpace();
-      auto          ov_node_vs_indexer = Albany::createGlobalLocalIndexer(overlap_node_vs);
-      auto const    local_node_id      = ov_node_vs_indexer->getLocalElement(node);
-      auto const&   coordinates        = stk_disc->getCoordinates();
-      double* const pc                 = &(coordinates[3 * local_node_id]);
-      auto const    x                  = pc[0];
-      auto const    y                  = pc[1];
-      auto const    z                  = pc[2];
-      std::cout << "NODE GID: " << std::setw(4) << node + 1 << ", BI : " << std::setw(2) << bi << ", ";
-      std::cout << "X : " << std::setw(24) << std::setprecision(16) << x << ", ";
-      std::cout << "Y : " << std::setw(24) << std::setprecision(16) << y << ", ";
-      std::cout << "Z : " << std::setw(24) << std::setprecision(16) << z << "\n";
-    }
-    exit(0);
-  }
-#endif  // DEBUG
-
+  auto        x        = workset.x;
+  auto        x_view   = Teuchos::arcp_const_cast<ST>(Albany::getLocalData(x));
+  auto const  ns_id    = this->nodeSetID;
+  auto const& ns_nodes = workset.nodeSets->find(ns_id)->second;
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-    if (has_nbi == true) {
-      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
-      auto const  gid      = ns_gids[ns_node] + 1;
-      auto const  it       = bi_field.find(gid);
-      if (it == bi_field.end()) continue;
-      auto const nbi = *(it->second);
-      if (is_erodible == true && nbi != 2.0) continue;
-      if (nbi == 0.0) continue;
-    }
     auto const dof = ns_nodes[ns_node][this->offset];
     if (dof < 0) continue;  // eliminated DOF
     x_view[dof]    = this->value;
@@ -91,25 +40,11 @@ template <typename Traits>
 void
 SDirichlet<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto        rcp_disc    = workset.disc;
-  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto        f           = workset.f;
-  auto        f_view      = Albany::getNonconstLocalData(f);
-  auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
-  auto const  ns_id       = this->nodeSetID;
-  auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
-  auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
+  auto        f        = workset.f;
+  auto        f_view   = Albany::getNonconstLocalData(f);
+  auto const  ns_id    = this->nodeSetID;
+  auto const& ns_nodes = workset.nodeSets->find(ns_id)->second;
   for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-    if (has_nbi == true) {
-      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-      auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
-      auto const  gid      = ns_gids[ns_node] + 1;
-      auto const  it       = bi_field.find(gid);
-      if (it == bi_field.end()) continue;
-      auto const nbi = *(it->second);
-      if (is_erodible == true && nbi != 2.0) continue;
-      if (nbi == 0.0) continue;
-    }
     auto const dof = ns_nodes[ns_node][this->offset];
     if (dof < 0) continue;  // eliminated DOF
     f_view[dof]    = 0.0;
@@ -127,16 +62,12 @@ template <typename Traits>
 void
 SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(typename Traits::EvalData workset)
 {
-  auto        rcp_disc    = workset.disc;
-  auto        stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto        J           = workset.Jac;
-  auto        range_vs    = J->range();
-  auto        col_vs      = Albany::getColumnSpace(J);
-  auto const  has_nbi     = stk_disc->hasNodeBoundaryIndicator();
-  auto const  ns_id       = this->nodeSetID;
-  auto const  is_erodible = ns_id.find("erodible") != std::string::npos;
-  auto const& ns_nodes    = workset.nodeSets->find(ns_id)->second;
-  auto const  domain_vs   = range_vs;  // we are assuming this!
+  auto        J         = workset.Jac;
+  auto        range_vs  = J->range();
+  auto        col_vs    = Albany::getColumnSpace(J);
+  auto const  ns_id     = this->nodeSetID;
+  auto const& ns_nodes  = workset.nodeSets->find(ns_id)->second;
+  auto const  domain_vs = range_vs;  // we are assuming this!
 
   row_is_dbc_ = Thyra::createMember(range_vs);
   col_is_dbc_ = Thyra::createMember(col_vs);
@@ -147,16 +78,6 @@ SDirichlet<PHAL::AlbanyTraits::Jacobian, Traits>::set_row_and_col_is_dbc(typenam
   auto        row_is_dbc_data = Albany::getNonconstLocalData(row_is_dbc_);
   if (workset.is_schwarz_bc_ == false) {  // regular SDBC
     for (auto ns_node = 0; ns_node < ns_nodes.size(); ++ns_node) {
-      if (has_nbi == true) {
-        auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-        auto const  ns_gids  = workset.nodeSetGIDs->find(ns_id)->second;
-        auto const  gid      = ns_gids[ns_node] + 1;
-        auto const  it       = bi_field.find(gid);
-        if (it == bi_field.end()) continue;
-        auto const nbi = *(it->second);
-        if (is_erodible == true && nbi != 2.0) continue;
-        if (nbi == 0.0) continue;
-      }
       auto const dof = ns_nodes[ns_node][this->offset];
       if (dof < 0) continue;  // eliminated DOF
       row_is_dbc_data[dof] = 1;

@@ -79,6 +79,22 @@ class DiscretizationFactory
       std::map<int, std::vector<std::string>> const& sideSetEquations,
       const Teuchos::RCP<Albany::RigidBodyModes>&    rigidBodyModes);
 
+  //! Inject an externally-built mesh struct, replacing what createMeshSpecs
+  //! / setupInternalMeshStruct would otherwise build internally. Used by
+  //! ACE_ThermoMechanical when thermal and mechanical apps share one
+  //! STK mesh. Must be called before createMeshSpecs() / createDiscretization().
+  void
+  setExternalMeshStruct(Teuchos::RCP<Albany::AbstractMeshStruct> mesh)
+  {
+    meshStruct = mesh;
+  }
+
+  //! When true, createDiscretizationFromInternalMeshStruct constructs the
+  //! Discretization but skips disc->updateMesh(). The caller (typically an
+  //! orchestrator that defers commit across multiple apps sharing one mesh)
+  //! must invoke disc->updateMesh() after commitAndPopulate has fired.
+  bool deferUpdateMesh{false};
+
   /* This function overwrite previous discretization parameter list */
   void
   setDiscretizationParameters(Teuchos::RCP<Teuchos::ParameterList> disc_params);

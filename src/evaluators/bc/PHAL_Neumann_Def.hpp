@@ -1069,55 +1069,9 @@ template <typename Traits>
 void
 Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto       rcp_disc    = workset.disc;
-  auto       stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto       nodeID      = workset.wsElNodeEqID;
-  auto       node_gids   = workset.wsElNodeID;
-  auto       f           = workset.f;
-  auto       f_view      = Albany::getNonconstLocalData(f);
-  auto const has_nbi     = stk_disc->hasNodeBoundaryIndicator();
-  auto const ss_id       = this->sideSetID;
-  auto const is_erodible = ss_id.find("erodible") != std::string::npos;
-  auto       commT       = stk_disc->getComm();
-  auto const is_parallel = commT->getSize() > 1;
-
-#if defined(DEBUG)
-  {
-    if (is_erodible == true) {
-      ALBANY_ASSERT(has_nbi == true);
-      auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-      ALBANY_DUMP("**** GLOBAL BOUNDARY INDICATOR MAP :\n");
-      for (auto&& kv : bi_field) {
-        ALBANY_DUMP("NODE GID : " << kv.first << ", BI : " << *kv.second << "\n");
-      }
-      std::cout << "*** SIDESET BOUNDARY INDICATOR : " << ss_id << " ***\n";
-      for (auto cell = 0; cell < workset.numCells; ++cell) {
-        for (auto ss_node = 0; ss_node < this->numNodes; ++ss_node) {
-          ALBANY_ASSERT(has_nbi == true);
-          auto&       stk_mesh_struct = *(stk_disc->getSTKMeshStruct());
-          auto const& bi_field        = stk_disc->getNodeBoundaryIndicator();
-          auto const  gid             = node_gids[cell][ss_node] + 1;
-          auto const  it              = bi_field.find(gid);
-          ALBANY_ASSERT(it != bi_field.end());
-          auto const    bi                 = *(it->second);
-          auto          overlap_node_vs    = stk_disc->getOverlapNodeVectorSpace();
-          auto          ov_node_vs_indexer = Albany::createGlobalLocalIndexer(overlap_node_vs);
-          auto const    local_node_id      = ov_node_vs_indexer->getLocalElement(gid - 1);
-          auto const&   coordinates        = stk_disc->getCoordinates();
-          double* const pc                 = &(coordinates[3 * local_node_id]);
-          auto const    x                  = pc[0];
-          auto const    y                  = pc[1];
-          auto const    z                  = pc[2];
-          std::cout << "CELL: " << std::setw(4) << cell << ", NODE GID: " << std::setw(4) << gid;
-          std::cout << ", BI : " << std::setw(2) << bi << ", ";
-          std::cout << "X : " << std::setw(24) << std::setprecision(16) << x << ", ";
-          std::cout << "Y : " << std::setw(24) << std::setprecision(16) << y << ", ";
-          std::cout << "Z : " << std::setw(24) << std::setprecision(16) << z << "\n";
-        }
-      }
-    }
-  }
-#endif  // DEBUG
+  auto nodeID = workset.wsElNodeEqID;
+  auto f      = workset.f;
+  auto f_view = Albany::getNonconstLocalData(f);
 
   // Fill in "neumann" array
   this->evaluateNeumannContribution(workset);
@@ -1125,15 +1079,6 @@ Neumann<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(typename Traits::E
   // Place it at the appropriate offset into F
   for (auto cell = 0; cell < workset.numCells; ++cell) {
     for (auto node = 0; node < this->numNodes; ++node) {
-      if (has_nbi == true && is_parallel == false) {
-        auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-        auto const  gid      = node_gids[cell][node] + 1;
-        auto const  it       = bi_field.find(gid);
-        if (it == bi_field.end()) continue;
-        auto const nbi = *(it->second);
-        if (is_erodible == true && nbi != 2.0) continue;
-        if (nbi == 0.0) continue;
-      }
       for (auto dim = 0; dim < this->numDOFsSet; ++dim) {
         auto const dof = nodeID(cell, node, this->offset[dim]);
         f_view[dof] += this->neumann(cell, node, dim);
@@ -1156,19 +1101,11 @@ template <typename Traits>
 void
 Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
-  auto       rcp_disc    = workset.disc;
-  auto       stk_disc    = dynamic_cast<Albany::STKDiscretization*>(rcp_disc.get());
-  auto       nodeID      = workset.wsElNodeEqID;
-  auto       node_gids   = workset.wsElNodeID;
-  auto       f           = workset.f;
-  auto       jac         = workset.Jac;
-  auto const has_nbi     = stk_disc->hasNodeBoundaryIndicator();
-  auto const ss_id       = this->sideSetID;
-  auto const is_erodible = ss_id.find("erodible") != std::string::npos;
-  auto       commT       = stk_disc->getComm();
-  auto const is_parallel = commT->getSize() > 1;
-  auto const fill        = f != Teuchos::null;
-  auto       f_view      = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
+  auto       nodeID = workset.wsElNodeEqID;
+  auto       f      = workset.f;
+  auto       jac    = workset.Jac;
+  auto const fill   = f != Teuchos::null;
+  auto       f_view = fill ? Albany::getNonconstLocalData(f) : Teuchos::null;
 
   // Fill in "neumann" array
   this->evaluateNeumannContribution(workset);
@@ -1178,15 +1115,6 @@ Neumann<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits::E
 
   for (auto cell = 0; cell < workset.numCells; ++cell) {
     for (auto node = 0; node < this->numNodes; ++node) {
-      if (has_nbi == true && is_parallel == false) {
-        auto const& bi_field = stk_disc->getNodeBoundaryIndicator();
-        auto const  gid      = node_gids[cell][node] + 1;
-        auto const  it       = bi_field.find(gid);
-        if (it == bi_field.end()) continue;
-        auto const nbi = *(it->second);
-        if (is_erodible == true && nbi != 2.0) continue;
-        if (nbi == 0.0) continue;
-      }
       for (auto dim = 0; dim < this->numDOFsSet; ++dim) {
         row[0]         = nodeID(cell, node, this->offset[dim]);
         auto const neq = nodeID.extent(2);

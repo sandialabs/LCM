@@ -10,14 +10,19 @@
 #include <string>
 
 #include "Teuchos_DefaultMpiComm.hpp"
+#include "stk_mesh/base/BulkData.hpp"
+#include "stk_mesh/base/Part.hpp"
+#include "stk_util/parallel/ParallelReduceBool.hpp"
 
 #include "AAdapt_RC_Manager.hpp"
+#include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_DataTypes.hpp"
 #include "utility/Albany_GlobalLocalIndexer.hpp"
 #include "Albany_DiscretizationFactory.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
 #include "Albany_DummyParameterAccessor.hpp"
+#include "Albany_ElementDeath.hpp"
 #include "Albany_Macros.hpp"
 #include "Albany_ProblemFactory.hpp"
 #include "Albany_ResponseFactory.hpp"
@@ -109,6 +114,76 @@ Application::Application(const RCP<Teuchos_Comm const>& comm_)
       perturbBetaForDirichlets(0.0)
 {
   // Nothing to be done here
+}
+
+Application::Application(
+    const RCP<Teuchos_Comm const>&                     comm_,
+    const RCP<Teuchos::ParameterList>&                 params,
+    const Teuchos::RCP<Albany::AbstractMeshStruct>&    sharedMesh,
+    bool const                                         deferPostCommit,
+    RCP<Thyra_Vector const> const&                     initial_guess,
+    bool const                                         schwarz)
+    : is_schwarz_{schwarz},
+      no_dir_bcs_(false),
+      requires_sdbcs_(false),
+      requires_orig_dbcs_(false),
+      comm(comm_),
+      out(Teuchos::VerboseObjectBase::getDefaultOStream()),
+      params_(params),
+      physicsBasedPreconditioner(false),
+      shapeParamsHaveBeenReset(false),
+      phxGraphVisDetail(0),
+      stateGraphVisDetail(0),
+      morphFromInit(true),
+      perturbBetaForDirichlets(0.0)
+{
+  initialSetUp(params);
+
+  // Shared-mesh path: inject the pre-built mesh struct so the
+  // DiscretizationFactory uses it instead of constructing its own from
+  // YAML. createMeshSpecs(mesh) registers the shared mesh on the factory.
+  ALBANY_PANIC(sharedMesh.is_null(), "Application shared-mesh ctor requires non-null sharedMesh.\n");
+  createMeshSpecs(sharedMesh);
+  buildProblem();
+
+  if (deferPostCommit) {
+    // Defer disc->updateMesh() so the orchestrator can call
+    // sharedMesh->commitAndPopulate() first. createDiscretization
+    // still runs setFieldAndBulkData (which declares this app's fields
+    // on the shared metaData but skips commit when deferCommit is set
+    // on the mesh).
+    discFactory->deferUpdateMesh = true;
+    createDiscretization();
+    discFactory->deferUpdateMesh = false;  // restore for any later calls
+
+    // Stash state finalizePostCommit needs.
+    deferred_post_commit_pending_ = true;
+    deferred_params_              = params;
+    deferred_shared_mesh_         = sharedMesh;
+    // initial_guess is captured by finalizePostCommit's parameter.
+    (void)initial_guess;
+  } else {
+    createDiscretization();
+    finalSetUp(params, initial_guess);
+  }
+}
+
+void
+Application::finalizePostCommit(RCP<Thyra_Vector const> const& initial_guess)
+{
+  if (!deferred_post_commit_pending_) return;
+
+  // The shared mesh has been committed and populated by the orchestrator.
+  // Run the discretization update + finalSetUp that the shared-mesh ctor
+  // deferred. updateMesh lives on STKDiscretization specifically; for
+  // shared-mesh ACE coupling we always have STK.
+  auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(disc, true);
+  stk_disc->updateMesh();
+  finalSetUp(deferred_params_, initial_guess);
+
+  deferred_post_commit_pending_ = false;
+  deferred_params_              = Teuchos::null;
+  deferred_shared_mesh_         = Teuchos::null;
 }
 
 void
@@ -1485,127 +1560,183 @@ Application::writePhalanxGraph(Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits
 }
 
 // Element death: fix orphan nodes after global assembly.
-// Orphan nodes are connected only to dead elements and receive no
-// stiffness contributions (dead elements are skipped in scatter).
-// Set their Jacobian diagonal to 1.0 and residual to 0.0.
+// Element death leaves orphan nodes -- nodes connected only to dead
+// (deactivated) elements. No active element contributes to an orphan
+// DOF, so its row in any assembled operator is entirely zero. A zero
+// row makes the operator singular, which breaks the linear solves and,
+// for the mass matrix that Piro::InvertMassMatrixDecorator lumps for
+// the explicit thermal solve, causes a divide-by-zero.
+//
+// This regularizes every zero-diagonal row: it zeroes the row and sets
+// the diagonal to a representative magnitude, decoupling the orphan DOF
+// (and giving a finite 1/m for a lumped mass matrix). Detecting orphans
+// straight from the assembled operator -- rather than from a per-app
+// cell-death snapshot -- keeps the fix correct no matter how erosion
+// has rebuilt the worksets, and needs no death bookkeeping that could
+// go stale across a mid-solve workset rebuild.
+//
+// The residual needs no companion fix: an orphan node belongs to no
+// active-element workset, so nothing scatters into its residual entry
+// and it is already zero.
 void
-Application::fixOrphanNodesForElementDeath(
-    Teuchos::RCP<Thyra_Vector>   f,
-    Teuchos::RCP<Thyra_LinearOp> jac)
+Application::fixOrphanNodesForElementDeath(Teuchos::RCP<Thyra_LinearOp> jac)
 {
-  auto& state_mgr = getStateMgr();
-  auto const& ws_el_node_id = disc->getWsElNodeID();
-  int  const  num_worksets  = ws_el_node_id.size();
-  auto        neq_per_node  = disc->getNumEq();
+  if (Teuchos::is_null(jac)) return;
 
-  if (death_status_vecs_.empty()) return;
+  // The operator arrives fill-complete (just assembled and combined).
+  // Read the diagonal and the orphan rows' column layouts in that
+  // state -- getDiagonalCopy / getLocalRowValues are only valid on a
+  // fill-complete matrix -- then re-open it for value modification.
+  // The caller fill-completes the operator afterward, so this routine
+  // leaves it fill-active, matching the Dirichlet-BC code path.
+  Teuchos::RCP<Thyra_Vector> diag;
+  Albany::getDiagonalCopy(jac, diag);
+  Teuchos::ArrayRCP<const ST> const diag_data = Albany::getLocalData(diag.getConst());
+  LO const                          num_rows  = static_cast<LO>(diag_data.size());
 
-  bool any_dead_overall = false;
-  for (int ws = 0; ws < num_worksets; ++ws) {
-    if (ws >= static_cast<int>(death_status_vecs_.size())) break;
-    if (death_status_vecs_[ws] == Teuchos::null) continue;
-    for (auto v : *death_status_vecs_[ws]) {
-      if (v > 0.0) { any_dead_overall = true; break; }
-    }
-    if (any_dead_overall) break;
-  }
-  if (!any_dead_overall) return;
-
-  // For each node, track whether it appears in any alive element.
-  std::map<GO, bool> node_has_alive;
-
-  for (int ws = 0; ws < num_worksets; ++ws) {
-    if (ws >= static_cast<int>(death_status_vecs_.size())) break;
-    if (death_status_vecs_[ws] == Teuchos::null) continue;
-    auto& ds        = *death_status_vecs_[ws];
-    int   num_cells = ds.size();
-
-    for (int cell = 0; cell < num_cells; ++cell) {
-      bool is_dead = ds[cell] > 0.0;
-      int  nn      = ws_el_node_id[ws][cell].size();
-      for (int n = 0; n < nn; ++n) {
-        GO node_gid = ws_el_node_id[ws][cell][n];
-        if (!is_dead) {
-          node_has_alive[node_gid] = true;
-        } else if (node_has_alive.find(node_gid) == node_has_alive.end()) {
-          node_has_alive[node_gid] = false;
-        }
-      }
+  // Representative diagonal magnitude from the non-orphan rows.
+  ST rep_sum   = 0.0;
+  LO rep_count = 0;
+  for (LO i = 0; i < num_rows; ++i) {
+    ST const d = std::abs(diag_data[i]);
+    if (d > 0.0) {
+      rep_sum += d;
+      ++rep_count;
     }
   }
+  ST const diag_scale = (rep_count > 0) ? rep_sum / rep_count : 1.0;
 
-  // Collect orphan node GIDs
-  std::vector<GO> orphan_node_gids;
-  for (auto& [gid, has_alive] : node_has_alive) {
-    if (!has_alive) {
-      orphan_node_gids.push_back(gid);
+  // Collect orphan rows (exact-zero diagonal) and their column layout
+  // while the operator is still fill-complete.
+  std::vector<LO>                 orphan_rows;
+  std::vector<Teuchos::Array<LO>> orphan_cols;
+  for (LO i = 0; i < num_rows; ++i) {
+    if (diag_data[i] != 0.0) continue;  // not an orphan DOF
+    Teuchos::Array<LO> indices;
+    Teuchos::Array<ST> values;
+    Albany::getLocalRowValues(jac, i, indices, values);
+    if (indices.size() == 0) continue;
+    orphan_rows.push_back(i);
+    orphan_cols.push_back(indices);
+  }
+
+  // Re-open for value modification; the caller fill-completes later.
+  resumeFill(jac);
+  for (size_t r = 0; r < orphan_rows.size(); ++r) {
+    LO const                  row     = orphan_rows[r];
+    Teuchos::Array<LO> const& indices = orphan_cols[r];
+    Teuchos::Array<ST>        values(indices.size(), 0.0);
+    for (int k = 0; k < indices.size(); ++k) {
+      if (indices[k] == row) values[k] = diag_scale;
+    }
+    Albany::setLocalRowValues(jac, row, indices(), values());
+  }
+}
+
+bool
+Application::applyDeathToActivePart()
+{
+  // Phase 1 of the activePart-based element-death port.
+  //
+  // Pre: death_status_vecs_ has been populated by the material model
+  //   (J2Erosion writes (*death_status_vec_)[cell] = 1.0 at the last-pt
+  //   propagation point in J2Erosion_Def.hpp:770). Called once per
+  //   accepted time step from the observer hooks.
+  //
+  // Within the step that a cell dies, the existing scatter-skip in
+  // PHAL_ScatterResidual_Def.hpp still gates its assembly contribution.
+  // This routine handles the BETWEEN-steps housekeeping: the dead cell
+  // physically leaves activePart and the workset buckets, so subsequent
+  // steps never see it again.
+
+  if (death_status_vecs_.empty()) return false;
+
+  auto stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
+  if (stk_disc == nullptr) return false;
+
+  auto& stk_mesh = *stk_disc->getSTKMeshStruct();
+  auto* activePart    = stk_mesh.getActivePart();
+  auto* deadCellsPart = stk_mesh.getDeadCellsPart();
+  if (activePart == nullptr || deadCellsPart == nullptr) return false;
+
+  auto& bulkData = *stk_mesh.bulkData;
+  auto& elemGIDws = stk_disc->getElemGIDws();
+
+  // Gather killed cells: those flagged dead in death_status_vecs_ that
+  // are still members of activePart. Mirrors the workset/cell scan in
+  // fixOrphanNodesForElementDeath.
+  stk::mesh::EntityVector killed;
+  int const num_worksets = static_cast<int>(death_status_vecs_.size());
+  for (auto const& [gid, lid] : elemGIDws) {
+    if (lid.ws >= num_worksets) continue;
+    if (death_status_vecs_[lid.ws] == Teuchos::null) continue;
+    auto const& ds = *death_status_vecs_[lid.ws];
+    if (lid.LID >= static_cast<int>(ds.size())) continue;
+    if (ds[lid.LID] <= 0.0) continue;
+
+    stk::mesh::Entity cell = bulkData.get_entity(stk::topology::ELEMENT_RANK, gid);
+    if (!bulkData.is_valid(cell)) continue;
+    if (!bulkData.bucket(cell).member(*activePart)) continue;
+    // Killed cells stay in activePart (Step B1 adds to deadCellsPart but
+    // does not remove from activePart), so dedup against deadCellsPart.
+    if (bulkData.bucket(cell).member(*deadCellsPart)) continue;
+
+    killed.push_back(cell);
+  }
+
+  // applyElementDeath -- and the collective calls inside it
+  // (modification cycles, the parallel field-sum exchanges) and
+  // rebuildWorksets below -- must be entered by *every* rank, even
+  // ranks with no locally killed cells: they pass an empty list. Make
+  // the early-out a global decision so the ranks never diverge and
+  // deadlock.
+  if (!stk::is_true_on_any_proc(bulkData.parallel(), !killed.empty())) {
+    return false;
+  }
+
+  // Build the part vectors that the death machinery needs.
+  //
+  // side_parts: new faces are painted into {activePart, deadCellsPart}
+  // (so they are IO-visible and tagged on-the-dead-boundary) plus every
+  // "-erodible" side-set, so the eroding surface tracks the receding
+  // bluff -- STKDiscretization::computeNodeSets clips an "-erodible"
+  // node set to that side-set's nodes, keeping a Dirichlet BC on the
+  // live exposed surface (see doc/element_death.md section 8).
+  //
+  // bc_mesh_parts (boundary_mesh_parts): every declared side-set. STK
+  // inherits a dying cell's side-set membership onto the newly-exposed
+  // faces, so a Neumann-style BC extends onto the new interface. With
+  // the shared mesh both apps' side-sets live on one metaData; each
+  // app's BC evaluator iterates only its own parts, so the union is
+  // harmless.
+  stk::mesh::PartVector side_parts{activePart, deadCellsPart};
+  stk::mesh::PartVector bc_mesh_parts;
+  bc_mesh_parts.reserve(stk_mesh.ssPartVec.size());
+  for (auto& kv : stk_mesh.ssPartVec) {
+    if (kv.second == nullptr) continue;
+    bc_mesh_parts.push_back(kv.second);
+    if (kv.first.find("erodible") != std::string::npos) {
+      side_parts.push_back(kv.second);
     }
   }
 
-  if (orphan_node_gids.empty()) return;
+  // Drive the active/dead interface update. applyElementDeath uses the
+  // clone-before-disconnect algorithm (Adagio-style), which sidesteps
+  // an STK multi-rank harmonization bug in
+  // make_mesh_parallel_consistent_after_element_death. See
+  // doc/element_death.md (section "Implementation reference") for the
+  // algorithm and ~/LCM/stk_findings_draft.txt for the STK-bug
+  // diagnosis.
+  applyElementDeath(
+      bulkData, *activePart, *deadCellsPart,
+      killed, side_parts, bc_mesh_parts);
 
-  auto stk_disc_ptr = dynamic_cast<Albany::STKDiscretization*>(disc.get());
-  if (stk_disc_ptr == nullptr) return;
+  // Step B3: rebuild worksets so the discretization picks up the new
+  // faces and computeNodeSets re-clips the "-erodible" node sets to the
+  // grown side-set.
+  stk_disc->rebuildWorksets();
 
-  // Fix Jacobian: zero row, set diagonal to a representative scale.
-  // Use the average alive diagonal magnitude so the preconditioner
-  // sees uniform scaling across alive and orphan DOFs.
-  if (Teuchos::nonnull(jac)) {
-    auto jac_tpetra = Albany::getTpetraMatrix(jac);
-    resumeFill(jac);
-
-    // Compute average diagonal magnitude from alive DOFs
-    Tpetra_Vector diag_vec(jac_tpetra->getRowMap());
-    jac_tpetra->getLocalDiagCopy(diag_vec);
-    auto diag_data = diag_vec.getLocalViewHost(Tpetra::Access::ReadOnly);
-    ST diag_sum = 0.0;
-    LO diag_count = 0;
-    for (LO i = 0; i < static_cast<LO>(diag_data.extent(0)); ++i) {
-      ST d = std::abs(diag_data(i, 0));
-      if (d > 1.0) {  // skip orphan/dead DOFs (they have diagonal ~1 or 0)
-        diag_sum += d;
-        ++diag_count;
-      }
-    }
-    ST const diag_scale = (diag_count > 0) ? diag_sum / diag_count : 1.0;
-
-    for (GO node_gid : orphan_node_gids) {
-      for (int eq = 0; eq < neq_per_node; ++eq) {
-        GO dof_gid = stk_disc_ptr->getGlobalDOF(node_gid, eq);
-        LO dof_lid = jac_tpetra->getRowMap()->getLocalElement(dof_gid);
-        if (dof_lid == Teuchos::OrdinalTraits<LO>::invalid()) continue;
-        auto num_entries = jac_tpetra->getNumEntriesInLocalRow(dof_lid);
-        if (num_entries > 0) {
-          typename Tpetra_CrsMatrix::local_inds_host_view_type col_inds;
-          typename Tpetra_CrsMatrix::values_host_view_type     vals;
-          jac_tpetra->getLocalRowView(dof_lid, col_inds, vals);
-          std::vector<LO> cols_vec(col_inds.extent(0));
-          std::vector<ST> vals_vec(col_inds.extent(0), 0.0);
-          for (size_t k = 0; k < col_inds.extent(0); ++k) {
-            cols_vec[k] = col_inds(k);
-            if (col_inds(k) == dof_lid) vals_vec[k] = diag_scale;
-          }
-          jac_tpetra->replaceLocalValues(dof_lid, cols_vec, vals_vec);
-        }
-      }
-    }
-  }
-
-  // Fix residual: zero entries for orphan nodes
-  if (Teuchos::nonnull(f)) {
-    auto f_data    = Albany::getNonconstLocalData(f);
-    auto f_tpetra  = Albany::getTpetraVector(f);
-    auto f_row_map = f_tpetra->getMap();
-    for (GO node_gid : orphan_node_gids) {
-      for (int eq = 0; eq < neq_per_node; ++eq) {
-        GO dof_gid = stk_disc_ptr->getGlobalDOF(node_gid, eq);
-        LO dof_lid = f_row_map->getLocalElement(dof_gid);
-        if (dof_lid != Teuchos::OrdinalTraits<LO>::invalid()) {
-          f_data[dof_lid] = 0.0;
-        }
-      }
-    }
-  }
+  return true;
 }
 
 void
@@ -1712,9 +1843,6 @@ Application::computeGlobalResidualImpl(
     TEUCHOS_FUNC_TIME_MONITOR("Albany Residual Fill: Export");
     cas_manager->combine(overlapped_f, f, CombineMode::ADD);
   }
-
-  // Element death: fix orphan nodes
-  fixOrphanNodesForElementDeath(f, Teuchos::null);
 
   // Allocate scaleVec_
   if (scale != 1.0) {
@@ -1943,8 +2071,8 @@ Application::computeGlobalJacobianImpl(
     cas_manager->combine(overlapped_jac, jac, CombineMode::ADD);
   }
 
-  // Element death: fix orphan nodes
-  fixOrphanNodesForElementDeath(f, jac);
+  // Element death: regularize zero-diagonal (orphan) rows
+  fixOrphanNodesForElementDeath(jac);
 
   // scale Jacobian
   if (scaleBCdofs == false && scale != 1.0) {
@@ -2234,7 +2362,7 @@ Application::determinePiroSolver(const Teuchos::RCP<Teuchos::ParameterList>& top
       sens_method = piroParams->get<std::string>("Sensitivity Method", "Forward");
     }
     if ((sens_method == "Adjoint") && (piroSolverToken == "Tempus")) {
-      ALBANY_ABORT("Albany/LCM does not have support for adjoint transient sensitivities!\n");
+      ALBANY_ABORT("LCM does not have support for adjoint transient sensitivities!\n");
     }
   }
 }

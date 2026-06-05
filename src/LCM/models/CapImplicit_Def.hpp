@@ -235,14 +235,19 @@ CapImplicitKernel<EvalT, Traits>::operator()(int cell, int pt) const
   Tensor  deps_plastic(num_dims_, minitensor::Filler::ZEROS);
   ScalarT deqps(0.0), devolps(0.0);
 
-  std::vector<ScalarT> XXVal(13);
-
   // check yielding
   ScalarT f = compute_f(sigmaVal, alphaVal, kappaVal);
-  XXVal     = initialize(sigmaVal, alphaVal, kappaVal, dgammaVal);
 
-  // local Newton loop
+  // Local return mapping (plastic branch only).  Mirrors the pattern used in
+  // GursonModel/DruckerPragerModel: the std::vector<ScalarT> pack, the
+  // local Newton, and the unpack all live inside `if (f > 0)`.  For elastic
+  // IPs we leave sigmaVal/alphaVal/kappaVal as their trial values and skip
+  // the unpack entirely -- this preserves the outer Sacado-FAD info that
+  // sigmaVal carries from the trial computation through to the global
+  // stress field, which the std::vector<ScalarT> roundtrip otherwise strips.
   if (f > 1.e-11) {  // plastic yielding
+
+    std::vector<ScalarT> XXVal = initialize(sigmaVal, alphaVal, kappaVal, dgammaVal);
 
     ScalarT normR, normR0, conv;
     bool    kappa_flag = false;
@@ -255,7 +260,6 @@ CapImplicitKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
     while (!converged) {
       // assemble residual vector and local Jacobian
-      // For FD, pass sigmaTr (trial Kirchhoff stress); for small strain, pass sigmaVal (trial stress)
       compute_ResidJacobian(XXVal, R, dRdX, sigmaTr, alphaVal, kappaVal, Celastic, kappa_flag);
 
       normR = 0.0;
@@ -291,45 +295,46 @@ CapImplicitKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // compute sensitivity information, and pack back to X.
     solver.computeFadInfo(dRdX, XXVal, R);
 
+    // unpack converged plastic state into sigmaVal / alphaVal / kappaVal.
+    sigmaVal(0, 0) = XXVal[0];
+    sigmaVal(0, 1) = XXVal[5];
+    sigmaVal(0, 2) = XXVal[4];
+    sigmaVal(1, 0) = XXVal[5];
+    sigmaVal(1, 1) = XXVal[1];
+    sigmaVal(1, 2) = XXVal[3];
+    sigmaVal(2, 0) = XXVal[4];
+    sigmaVal(2, 1) = XXVal[3];
+    sigmaVal(2, 2) = XXVal[2];
+
+    alphaVal(0, 0) = XXVal[6];
+    alphaVal(0, 1) = XXVal[10];
+    alphaVal(0, 2) = XXVal[9];
+    alphaVal(1, 0) = XXVal[10];
+    alphaVal(1, 1) = XXVal[7];
+    alphaVal(1, 2) = XXVal[8];
+    alphaVal(2, 0) = XXVal[9];
+    alphaVal(2, 1) = XXVal[8];
+    alphaVal(2, 2) = -XXVal[6] - XXVal[7];
+
+    kappaVal  = XXVal[11];
+    dgammaVal = XXVal[12];
+
+    // plastic strain increment via elastic compliance from the stress drop
+    Tensor dsigma      = sigmaTr - sigmaVal;
+    deps_plastic       = minitensor::dotdot(compliance, dsigma);
+    devolps            = minitensor::trace(deps_plastic);
+    Tensor dev_plastic = deps_plastic - (1.0 / 3.0) * devolps * I;
+    deqps              = std::sqrt(2.0 / 3.0) * minitensor::norm(dev_plastic);
+
   }  // end of plasticity
-
-  // update
-  sigmaVal(0, 0) = XXVal[0];
-  sigmaVal(0, 1) = XXVal[5];
-  sigmaVal(0, 2) = XXVal[4];
-  sigmaVal(1, 0) = XXVal[5];
-  sigmaVal(1, 1) = XXVal[1];
-  sigmaVal(1, 2) = XXVal[3];
-  sigmaVal(2, 0) = XXVal[4];
-  sigmaVal(2, 1) = XXVal[3];
-  sigmaVal(2, 2) = XXVal[2];
-
-  alphaVal(0, 0) = XXVal[6];
-  alphaVal(0, 1) = XXVal[10];
-  alphaVal(0, 2) = XXVal[9];
-  alphaVal(1, 0) = XXVal[10];
-  alphaVal(1, 1) = XXVal[7];
-  alphaVal(1, 2) = XXVal[8];
-  alphaVal(2, 0) = XXVal[9];
-  alphaVal(2, 1) = XXVal[8];
-  alphaVal(2, 2) = -XXVal[6] - XXVal[7];
-
-  kappaVal  = XXVal[11];
-  dgammaVal = XXVal[12];
-
-  // compute plastic strain increment deps_plastic = compliance ( sigma_tr - sigma_(n+1))
-  Tensor dsigma    = sigmaTr - sigmaVal;
-  deps_plastic     = minitensor::dotdot(compliance, dsigma);
-  devolps          = minitensor::trace(deps_plastic);
-  Tensor dev_plastic = deps_plastic - (1.0 / 3.0) * devolps * I;
-  deqps = std::sqrt(2.0 / 3.0) * minitensor::norm(dev_plastic);
 
   if (finite_deformation_) {
     // Update Fp via exponential map
     if (dgammaVal > 0) {
-      Tensor dgdsigma_loc = compute_dgdsigma(XXVal);
-      Tensor const expA   = minitensor::exp(dgammaVal * dgdsigma_loc);
-      Fpnew = expA * Fpn;
+      std::vector<ScalarT> XX = initialize(sigmaVal, alphaVal, kappaVal, dgammaVal);
+      Tensor dgdsigma_loc     = compute_dgdsigma(XX);
+      Tensor const expA       = minitensor::exp(dgammaVal * dgdsigma_loc);
+      Fpnew                   = expA * Fpn;
     } else {
       Fpnew = Fpn;
     }
@@ -393,9 +398,17 @@ CapImplicitKernel<EvalT, Traits>::compute_f(
 
   T J3 = minitensor::det(s);
 
+  // Lode coefficient Γ.  The doc says "set Γ ≡ 1 when ψ = 0 or J₂ = 0 to
+  // avoid the singularity".  We use a small positive tolerance instead of
+  // exact zero: under Sacado-FAD evaluation, IPs with vanishing deviatoric
+  // stress (e.g., a hydrostatic trial state on the first load step) can
+  // produce J₂ ≈ machine ε > 0, which slips past `J2 != 0` but blows up
+  // J₃ / J₂^{3/2}, yielding spurious "plastic" yield (f ≫ 0) and singular
+  // global Jacobian rows.
   T Gamma = 1.0;
+  T const J2_tol = T(1.0e-12);
 
-  if (psi_ != 0 && J2 != 0)
+  if (psi_ != 0 && J2 > J2_tol)
     Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
             (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi_);
 
@@ -434,9 +447,17 @@ CapImplicitKernel<EvalT, Traits>::compute_g(
 
   T J3 = minitensor::det(s);
 
+  // Lode coefficient Γ.  The doc says "set Γ ≡ 1 when ψ = 0 or J₂ = 0 to
+  // avoid the singularity".  We use a small positive tolerance instead of
+  // exact zero: under Sacado-FAD evaluation, IPs with vanishing deviatoric
+  // stress (e.g., a hydrostatic trial state on the first load step) can
+  // produce J₂ ≈ machine ε > 0, which slips past `J2 != 0` but blows up
+  // J₃ / J₂^{3/2}, yielding spurious "plastic" yield (f ≫ 0) and singular
+  // global Jacobian rows.
   T Gamma = 1.0;
+  T const J2_tol = T(1.0e-12);
 
-  if (psi_ != 0 && J2 != 0)
+  if (psi_ != 0 && J2 > J2_tol)
     Gamma = 0.5 * (1. - 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5) +
             (1. + 3.0 * std::sqrt(3.0) * J3 / 2. / std::pow(J2, 1.5)) / psi_);
 

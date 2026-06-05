@@ -21,18 +21,15 @@
 #include "HyperelasticDamageModel.hpp"
 #include "J2Erosion.hpp"
 #include "J2FiberModel.hpp"
-#include "J2HMCModel.hpp"
 #include "J2MiniSolver.hpp"
 #include "J2Model.hpp"
 #include "LinearElasticModel.hpp"
 #include "LinearElasticVolDevModel.hpp"
-#include "LinearHMCModel.hpp"
 #include "LinearPiezoModel.hpp"
 #include "MooneyRivlinModel.hpp"
 #include "NeohookeanModel.hpp"
 #include "NewtonianFluidModel.hpp"
 #include "OrtizPandolfiModel.hpp"
-#include "ParallelNeohookeanModel.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "RIHMRModel.hpp"
 #include "StVenantKirchhoffModel.hpp"
@@ -279,8 +276,6 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
     model = rcp(new J2Erosion<EvalT, Traits>(p, dl));
   } else if (model_name == "J2Fiber") {
     model = rcp(new J2FiberModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "J2 HMC") {
-    model = rcp(new J2HMCModel<EvalT, Traits>(p, dl));
   } else if (model_name == "J2 MiniSolver") {
     model = rcp(new J2MiniSolver<EvalT, Traits>(p, dl));
   } else if (model_name == "J2") {
@@ -289,8 +284,6 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
     model = rcp(new LinearElasticModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Linear Elastic Volumetric Deviatoric") {
     model = rcp(new LinearElasticVolDevModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Linear HMC") {
-    model = rcp(new LinearHMCModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Linear Piezoelectric") {
     model = rcp(new LinearPiezoModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Mooney Rivlin") {
@@ -301,8 +294,6 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
     model = rcp(new NewtonianFluidModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Ortiz Pandolfi") {
     model = rcp(new OrtizPandolfiModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Parallel Neohookean") {
-    model = rcp(new ParallelNeohookeanModel<EvalT, Traits>(p, dl));
   } else if (model_name == "RIHMR") {
     model = rcp(new RIHMRModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Saint Venant Kirchhoff") {

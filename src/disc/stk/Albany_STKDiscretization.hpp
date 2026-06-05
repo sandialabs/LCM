@@ -298,52 +298,10 @@ class STKDiscretization : public AbstractDiscretization
     return latticeOrientation;
   }
 
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getCellBoundaryIndicator() const
+  const WorksetArray<Teuchos::ArrayRCP<std::uint8_t>>::type&
+  getCellIsErodible() const
   {
-    return cell_boundary_indicator;
-  }
-
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getFaceBoundaryIndicator() const
-  {
-    return face_boundary_indicator;
-  }
-
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type const&
-  getEdgeBoundaryIndicator() const
-  {
-    return edge_boundary_indicator;
-  }
-
-  std::map<GO, double*> const&
-  getNodeBoundaryIndicator() const
-  {
-    return node_boundary_indicator;
-  }
-
-  bool
-  hasCellBoundaryIndicator() const
-  {
-    return stkMeshStruct->getFieldContainer()->hasCellBoundaryIndicatorField();
-  }
-
-  bool
-  hasFaceBoundaryIndicator() const
-  {
-    return stkMeshStruct->getFieldContainer()->hasFaceBoundaryIndicatorField();
-  }
-
-  bool
-  hasEdgeBoundaryIndicator() const
-  {
-    return stkMeshStruct->getFieldContainer()->hasEdgeBoundaryIndicatorField();
-  }
-
-  bool
-  hasNodeBoundaryIndicator() const
-  {
-    return stkMeshStruct->getFieldContainer()->hasNodeBoundaryIndicatorField();
+    return cell_is_erodible;
   }
 
   void
@@ -441,6 +399,11 @@ class STKDiscretization : public AbstractDiscretization
   //! coordinates
   void
   updateMesh();
+
+  //! Phase 0: workset-only subset of updateMesh(), for testing the
+  //! mid-run rebuild path before any element-death semantics are layered on.
+  void
+  rebuildWorksets() override;
 
   //! Function that transforms an STK mesh of a unit cube (for LandIce problems)
   void
@@ -724,12 +687,7 @@ class STKDiscretization : public AbstractDiscretization
   WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type coords;
   WorksetArray<Teuchos::ArrayRCP<double>>::type                     sphereVolume;
   WorksetArray<Teuchos::ArrayRCP<double*>>::type                    latticeOrientation;
-
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type cell_boundary_indicator;
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type face_boundary_indicator;
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type edge_boundary_indicator;
-
-  std::map<GO, double*> node_boundary_indicator;
+  WorksetArray<Teuchos::ArrayRCP<std::uint8_t>>::type               cell_is_erodible;
 
 #if defined(ALBANY_CONTACT)
   Teuchos::RCP<ContactManager> contactManager;
@@ -814,8 +772,11 @@ class STKDiscretization : public AbstractDiscretization
   void
   fillCompleteGraphs();
 
+  //! Flag every owned cell that touches a "*-erodible" side-set.
+  //! Rebuilt on every computeWorksetInfo / rebuildWorksets so the
+  //! predicate tracks the receding bluff after element death.
   void
-  computeWorksetInfoBoundaryIndicators();
+  computeWorksetInfoErodibleCells();
 };
 
 }  // namespace Albany

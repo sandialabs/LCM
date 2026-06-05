@@ -15,6 +15,8 @@
 #include <set>
 
 #include "ACEcommon.hpp"
+#include "Albany_DiscretizationFactory.hpp"
+#include "Albany_IossSTKMeshStruct.hpp"
 #include "Albany_PiroObserver.hpp"
 #include "Teuchos_TimeMonitor.hpp"
 #include "Albany_STKDiscretization.hpp"
@@ -171,7 +173,6 @@ ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> co
   sub_outargs_.resize(num_subdomains_);
   curr_x_.resize(num_subdomains_);
   prev_step_x_.resize(num_subdomains_);
-  internal_states_.resize(num_subdomains_);
 
   // IKT NOTE 6/4/2020:the xdotdot arrays are
   // not relevant for thermal problems,
@@ -490,99 +491,160 @@ void
 ACEThermoMechanical::createPersistentApps()
 {
   Teuchos::TimeMonitor timer(*Teuchos::TimeMonitor::getNewTimer("ACE: Create Persistent Apps"));
+
+  // ----- Per-subdomain param setup (Exodus field names, workset size) -----
+  // Done up front so all subdomains' discretization params are settled
+  // before we build the shared mesh.
   for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    auto& app_params = *init_pls_[subdomain];
+    auto& app_params  = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
 
-    // Name mechanical solution fields
     if (prob_types_[subdomain] == MECHANICAL) {
       disc_params.set<std::string>("Exodus Solution Name", "displacement");
       disc_params.set<std::string>("Exodus SolutionDot Name", "velocity");
       disc_params.set<std::string>("Exodus SolutionDotDot Name", "acceleration");
-    }
+      // Distinct residual name: with shared mesh, both apps declare a
+      // residual field on the same metaData; defaulting both to "residual"
+      // produces a dim-mismatch conflict (mech: 3, thermal: 1).
+      disc_params.set<std::string>("Exodus Residual Name", "displacement_residual");
 
-    // Name thermal fields
+      // M4: single coupled output file. The mechanical subdomain solves
+      // last in the coupling loop, so its Exodus file captures the fully
+      // updated coupled state on the shared mesh; designate it the sole
+      // writer. Strip the thermal_/mechanical_ prefix from its filename
+      // so the coupled output has a physics-neutral name. This only
+      // mutates ACE's in-memory copy of the params (init_pls_); the YAML
+      // file is untouched, so a standalone mechanical run still produces
+      // mechanical_denudation.e.
+      if (disc_params.isType<std::string>("Exodus Output File Name")) {
+        std::string fname = disc_params.get<std::string>("Exodus Output File Name");
+        for (std::string const& pfx : {std::string("mechanical_"), std::string("thermal_")}) {
+          auto const pos = fname.find(pfx);
+          if (pos != std::string::npos) {
+            fname.erase(pos, pfx.size());
+            break;
+          }
+        }
+        disc_params.set<std::string>("Exodus Output File Name", fname);
+      }
+    }
     if (prob_types_[subdomain] == THERMAL) {
       disc_params.set<std::string>("Exodus Solution Name", "temperature");
       disc_params.set<std::string>("Exodus SolutionDot Name", "temperature_dot");
+      disc_params.set<std::string>("Exodus Residual Name", "temperature_residual");
+
+      // M4: non-writer subdomain. Drop its output file param so no
+      // output broker is created (setupExodusOutput is gated on
+      // exoOutput, which derives from this param). Again only ACE's
+      // in-memory copy is changed; standalone thermal runs are
+      // unaffected.
+      disc_params.remove("Exodus Output File Name", /*throwIfNotExists=*/false);
     }
 
-    // Force all subdomains to use the same workset size (-1 = one workset
-    // per element block) so that in-memory state transfer between apps
-    // operates on arrays with matching sizes.
+    // Force matching workset sizes so state arrays line up cell-for-cell
+    // between subdomains. -1 = one workset per element block.
     disc_params.set("Workset Size", -1);
+  }
 
-    solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(init_pls_[subdomain], comm_));
+  // ----- Build the shared STK mesh once, deferring commit -----
+  // ACE thermo-mechanical always uses the same mesh for both physics,
+  // so we open the Exodus file once via the first subdomain's params,
+  // then both Applications declare their fields on the shared metaData
+  // before a single commit fires.
+  auto first_disc_params    = Teuchos::sublist(init_pls_[0], "Discretization", true);
+  auto first_problem_params = Teuchos::sublist(init_pls_[0], "Problem", true);
+  Teuchos::RCP<Teuchos::ParameterList> first_adapt_params;
+  if (first_problem_params->isSublist("Adaptation")) {
+    first_adapt_params = Teuchos::sublist(first_problem_params, "Adaptation", true);
+  }
 
-    Teuchos::RCP<Albany::Application> app;
-    solvers_[subdomain] = solver_factories_[subdomain]->createAndGetAlbanyApp(app, comm_, comm_);
-    apps_[subdomain] = app;
+  // In the normal single-app path, Application::initialSetUp seeds
+  // "Number Of Time Derivatives" on the Discretization sublist by
+  // reading from the Problem sublist (which AbstractProblem's ctor
+  // populates). We're constructing the mesh BEFORE any Application
+  // exists, so AbstractProblem hasn't run and neither sublist has the
+  // value yet. Derive it directly from prob_types_: MECHANICAL needs 2
+  // (displacement/velocity/acceleration), THERMAL needs 1. Use the max
+  // across subdomains so the shared mesh has enough headroom for side-set
+  // inheritance.
+  int shared_num_time_deriv = 0;
+  for (int s = 0; s < num_subdomains_; ++s) {
+    int const ntd = (prob_types_[s] == MECHANICAL) ? 2 : 1;
+    if (ntd > shared_num_time_deriv) shared_num_time_deriv = ntd;
+  }
+  first_disc_params->set<int>("Number Of Time Derivatives", shared_num_time_deriv);
 
-    auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(app->getDiscretization());
-    discs_[subdomain] = stk_disc;
-    stk_mesh_structs_[subdomain] = stk_disc->getSTKMeshStruct();
+  auto shared_mesh_abs = Albany::DiscretizationFactory::createMeshStruct(
+      first_disc_params, first_adapt_params, comm_);
+  auto shared_mesh = Teuchos::rcp_dynamic_cast<Albany::IossSTKMeshStruct>(shared_mesh_abs);
+  ALBANY_PANIC(
+      shared_mesh.is_null(),
+      "ACE_ThermoMechanical shared-mesh path requires IossSTKMeshStruct "
+      "(Discretization Method: Ioss/Exodus/Pamgen).\n");
+  shared_mesh->deferCommit = true;
 
-    do_outputs_[subdomain]      = stk_mesh_structs_[subdomain]->exoOutput;
-    do_outputs_init_[subdomain] = stk_mesh_structs_[subdomain]->exoOutput;
+  // ----- Construct per-subdomain mesh struct: donor for 0, borrowing for the rest -----
+  std::vector<Teuchos::RCP<Albany::AbstractMeshStruct>> per_app_mesh(num_subdomains_);
+  per_app_mesh[0] = shared_mesh;
+  for (int s = 1; s < num_subdomains_; ++s) {
+    auto s_disc_params    = Teuchos::sublist(init_pls_[s], "Discretization", true);
+    auto s_problem_params = Teuchos::sublist(init_pls_[s], "Problem", true);
+    Teuchos::RCP<Teuchos::ParameterList> s_adapt_params;
+    if (s_problem_params->isSublist("Adaptation")) {
+      s_adapt_params = Teuchos::sublist(s_problem_params, "Adaptation", true);
+    }
+    per_app_mesh[s] = Teuchos::rcp(new Albany::IossSTKMeshStruct(
+        shared_mesh, s_disc_params, s_adapt_params, comm_));
+  }
 
-    model_evaluators_[subdomain] = solver_factories_[subdomain]->returnModel();
+  // ----- Construct each Application with its mesh, deferring post-commit -----
+  // Each app's createDiscretization runs setFieldAndBulkData on its mesh
+  // struct, which (because deferCommit is set) declares the app's field
+  // container on the shared metaData and stops before commit.
+  for (int s = 0; s < num_subdomains_; ++s) {
+    apps_[s] = Teuchos::rcp(new Albany::Application(
+        comm_, init_pls_[s], per_app_mesh[s], /*deferPostCommit=*/true));
+  }
 
-    curr_x_[subdomain] = Teuchos::null;
+  // ----- Single commit + populate on the shared mesh -----
+  // After this, both apps' fields are alive on the committed metaData
+  // and the bulk data is populated from the Exodus file. We pass the
+  // donor's params + the first app's StateInfoStruct; per-app state
+  // marking happens through each app's StateManager anyway.
+  shared_mesh->commitAndPopulate(
+      comm_, first_disc_params, apps_[0]->getStateMgr().getStateInfoStruct());
 
-    // Calculate and store the min value of the z-coordinate for wave pressure NBC
-    if (prob_types_[subdomain] == THERMAL) {
+  // ----- Finalize each app: runs disc->updateMesh() + finalSetUp -----
+  for (int s = 0; s < num_subdomains_; ++s) {
+    apps_[s]->finalizePostCommit();
+  }
+
+  // ----- Build SolverFactory + Piro per app, reusing the existing Application -----
+  for (int s = 0; s < num_subdomains_; ++s) {
+    solver_factories_[s] = Teuchos::rcp(new Albany::SolverFactory(init_pls_[s], comm_));
+
+    Teuchos::RCP<Albany::Application> app_ref = apps_[s];
+    solvers_[s] = solver_factories_[s]->createAndGetAlbanyApp(
+        app_ref, comm_, comm_, Teuchos::null, /*createAlbanyApp=*/false);
+
+    auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(apps_[s]->getDiscretization());
+    discs_[s]            = stk_disc;
+    stk_mesh_structs_[s] = stk_disc->getSTKMeshStruct();
+
+    do_outputs_[s]      = stk_mesh_structs_[s]->exoOutput;
+    do_outputs_init_[s] = stk_mesh_structs_[s]->exoOutput;
+
+    model_evaluators_[s] = solver_factories_[s]->returnModel();
+
+    curr_x_[s] = Teuchos::null;
+
+    if (prob_types_[s] == THERMAL) {
       Teuchos::RCP<const Thyra_MultiVector> coord_mv = stk_disc->getCoordMV();
-      Teuchos::RCP<const Thyra_Vector> z_coord = coord_mv->col(2);
-      zmin_ = Thyra::min(*z_coord);
+      Teuchos::RCP<const Thyra_Vector>      z_coord  = coord_mv->col(2);
+      zmin_                                          = Thyra::min(*z_coord);
     }
   }
 
-  // Cache initial internal states
-  for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-    auto& state_mgr = apps_[subdomain]->getStateMgr();
-    fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-  }
-}
-
-void
-ACEThermoMechanical::transferThermalToMechanical(int thermal_sub, int mech_sub) const
-{
-  auto& thermal_state_mgr = apps_[thermal_sub]->getStateMgr();
-  auto& mech_state_mgr = apps_[mech_sub]->getStateMgr();
-
-  auto& thermal_states = thermal_state_mgr.getStateArrays().elemStateArrays;
-  auto& mech_states = mech_state_mgr.getStateArrays().elemStateArrays;
-
-  // Transfer ACE_Ice_Saturation (and any other shared QP state fields).
-  // Both apps must use the same workset configuration (enforced in
-  // createPersistentApps) so that state arrays have matching sizes.
-  std::vector<std::string> shared_fields = {"ACE_Ice_Saturation"};
-  for (auto const& field_name : shared_fields) {
-    for (size_t ws = 0; ws < thermal_states.size() && ws < mech_states.size(); ++ws) {
-      auto it_thermal = thermal_states[ws].find(field_name);
-      auto it_mech = mech_states[ws].find(field_name);
-      if (it_thermal != thermal_states[ws].end() && it_mech != mech_states[ws].end()) {
-        auto const& src = it_thermal->second;
-        auto&       dst = it_mech->second;
-        ALBANY_ASSERT(src.size() == dst.size(),
-            "ACE_Ice_Saturation size mismatch at ws=" << ws
-            << ": thermal=" << src.size() << " mechanical=" << dst.size()
-            << ". Both apps must use the same Workset Size.");
-        for (size_t i = 0; i < src.size(); ++i) {
-          dst[i] = src[i];
-        }
-      }
-    }
-  }
-}
-
-void
-ACEThermoMechanical::transferMechanicalToThermal(int mech_sub, int thermal_sub) const
-{
-  // Mesh topology changes (element deactivation) are automatically
-  // visible to the thermal app since both apps share the same
-  // STK BulkData when using the active_part mechanism.
-  // No explicit field transfer needed.
 }
 
 bool
@@ -617,14 +679,6 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   }
   int stop{0};
   ST  current_time{initial_time_};
-
-  // Identify thermal and mechanical subdomain indices
-  int thermal_sub = -1;
-  int mech_sub = -1;
-  for (int s = 0; s < num_subdomains_; ++s) {
-    if (prob_types_[s] == THERMAL) thermal_sub = s;
-    if (prob_types_[s] == MECHANICAL) mech_sub = s;
-  }
 
   // Time-stepping loop
   while (stop < maximum_steps_ && current_time < final_time_) {
@@ -661,49 +715,28 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == THERMAL) {
           *fos_ << "Problem            :Thermal\n";
-          auto& app       = *apps_[subdomain];
-          auto& state_mgr = app.getStateMgr();
-          {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Restore Thermal States"));
-            fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-          }
           {
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Solve"));
             AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
           if (failed_ == false) {
-            {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Save Thermal States"));
-              fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-            }
-            {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Output"));
-              doDynamicInitialOutput(next_time, subdomain);
-            }
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Output"));
+            doDynamicInitialOutput(next_time, subdomain);
           }
         }
         if (prob_type == MECHANICAL && failed_ == false) {
           *fos_ << "Problem            :Mechanical\n";
-          auto& app       = *apps_[subdomain];
-          auto& state_mgr = app.getStateMgr();
-          {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Restore Mechanical States"));
-            fromTo(internal_states_[subdomain], state_mgr.getStateArrays());
-          }
-          // Transfer thermal results AFTER restoring mechanical states,
-          // so the thermal-to-mechanical transfer is not overwritten.
-          if (thermal_sub >= 0) {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Transfer Thermal->Mechanical"));
-            transferThermalToMechanical(thermal_sub, subdomain);
-          }
           // Set death status on the Application for scatter skip and orphan
-          // fix. Read the per-cell `cell_death` state variable, which J2Erosion
-          // sets to 1.0 once every integration point in the cell has failed
-          // (in any mode) and 0.0 otherwise. cell_death is a cell-scalar so
-          // there is no qp dimension to skip past.
+          // fix. Read the per-cell `cell_death` state variable, which
+          // J2Erosion sets to 1.0 once every integration point in the cell
+          // has failed (in any mode) and 0.0 otherwise. cell_death is a
+          // cell-scalar so there is no qp dimension to skip past. The
+          // mechanical app's live element-state arrays are read directly:
+          // states persist in the shared STK mesh between steps, so no
+          // snapshot restore is needed.
           {
             auto& app = *apps_[subdomain];
-            auto& esa = internal_states_[subdomain].element_state_arrays;
+            auto& esa = app.getStateMgr().getStateArrays().elemStateArrays;
             app.death_status_vecs_.resize(esa.size());
             for (size_t ws = 0; ws < esa.size(); ++ws) {
               auto it = esa[ws].find("cell_death");
@@ -723,14 +756,8 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
           if (failed_ == false) {
-            {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Save Mechanical States"));
-              fromTo(state_mgr.getStateArrays(), internal_states_[subdomain]);
-            }
-            {
-              Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Output"));
-              doDynamicInitialOutput(next_time, subdomain);
-            }
+            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Output"));
+            doDynamicInitialOutput(next_time, subdomain);
           }
         }
         if (failed_ == true) {
@@ -817,6 +844,18 @@ ACEThermoMechanical::AdvanceThermalDynamics(
     double const time_step) const
 {
   failed_ = false;
+
+  // Re-sync this subdomain's discretization to the shared STK mesh.
+  // The mechanical phase erodes cells, mutating the shared BulkData:
+  // process_killed_elements + modification_end reallocate STK bucket
+  // storage. Only the eroding app's own discretization is rebuilt at
+  // that point (Application::applyDeathToActivePart); the thermal
+  // discretization still holds worksets whose cached coordinate
+  // pointers now dangle. Rebuilding here re-reads geometry and
+  // connectivity from the current shared mesh -- and drops eroded
+  // cells from the thermal worksets -- before the thermal solve runs.
+  discs_[subdomain]->rebuildWorksets();
+
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
@@ -1129,6 +1168,13 @@ void
 ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain) const
 {
   if (do_outputs_[subdomain] == false) return;
+
+  // M4: single coupled output. Only the mechanical subdomain writes the
+  // Exodus file (it solves last, so its snapshot has the fully updated
+  // coupled state). The thermal subdomain has no output broker anyway
+  // (createPersistentApps removed its "Exodus Output File Name"); this
+  // early return also guards against do_outputs_ being forced true.
+  if (prob_types_[subdomain] != MECHANICAL) return;
 
   auto const xMV_rcp         = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
   auto&      abs_disc        = *discs_[subdomain];

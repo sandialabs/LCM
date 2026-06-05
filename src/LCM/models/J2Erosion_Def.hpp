@@ -26,6 +26,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   ice_saturation_material_fit_truncation_ = p->get<RealType>("ACE Material Fit Truncation Ice Saturation", 0.0);
   disable_erosion_          = p->get<bool>("Disable Erosion", false);
+  num_failed_pts_for_death_ = p->get<int>("ACE Failed Integration Points For Death", 0);
 
   if (p->isParameter("ACE Strain Limit")) {
     strain_limit_ = p->get<RealType>("ACE Strain Limit");
@@ -99,6 +100,9 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   std::string const angle_indicator_str        = field_name_map_["Angle_Indicator"];
   std::string const displacement_indicator_str = field_name_map_["Displacement_Indicator"];
 
+  // Elastic modulus used (for output)
+  std::string const elastic_modulus_str = field_name_map_["Elastic_Modulus_Used"];
+
   // define the dependent fields
   setDependentField(F_str, dl->qp_tensor);
   setDependentField(J_str, dl->qp_scalar);
@@ -113,6 +117,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   // define the evaluated fields
   setEvaluatedField("failure_state", dl->cell_scalar2);
   setEvaluatedField("cell_death", dl->cell_scalar2);
+  setEvaluatedField("failure_modes", dl->qp_scalar);
   setEvaluatedField(cauchy_str, dl->qp_tensor);
   setEvaluatedField(Fp_str, dl->qp_tensor);
   setEvaluatedField(eqps_str, dl->qp_scalar);
@@ -124,6 +129,8 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   setEvaluatedField(strain_indicator_str, dl->qp_scalar);
   setEvaluatedField(angle_indicator_str, dl->qp_scalar);
   setEvaluatedField(displacement_indicator_str, dl->qp_scalar);
+  setEvaluatedField(elastic_modulus_str, dl->qp_scalar);
+  
   if (have_temperature_ == true) {
     setDependentField("Temperature", dl->qp_scalar);
     setEvaluatedField(source_str, dl->qp_scalar);
@@ -142,8 +149,10 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(strain_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
   addStateVariable(angle_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
   addStateVariable(displacement_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
+  addStateVariable(elastic_modulus_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Elastic Modulus", false));
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
   addStateVariable("cell_death", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Cell Death", false));
+  addStateVariable("failure_modes", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Failure Modes", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
@@ -170,6 +179,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   std::string const strain_indicator_str       = field_name_map_["Strain_Indicator"];
   std::string const angle_indicator_str        = field_name_map_["Angle_Indicator"];
   std::string const displacement_indicator_str = field_name_map_["Displacement_Indicator"];
+  std::string const elastic_modulus_str        = field_name_map_["Elastic_Modulus_Used"];
 
   // extract dependent MDFields
   def_grad_          = *dep_fields[F_str];
@@ -194,8 +204,10 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   strain_indicator_       = *eval_fields[strain_indicator_str];
   angle_indicator_        = *eval_fields[angle_indicator_str];
   displacement_indicator_ = *eval_fields[displacement_indicator_str];
+  elastic_modulus_used_   = *eval_fields[elastic_modulus_str];
   failed_                 = *eval_fields["failure_state"];
   dead_                   = *eval_fields["cell_death"];
+  failure_modes_          = *eval_fields["failure_modes"];
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_str];
@@ -203,8 +215,9 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   }
 
   // get State Variables
-  Fp_old_   = (*workset.stateArrayPtr)[Fp_str + "_old"];
-  eqps_old_ = (*workset.stateArrayPtr)[eqps_str + "_old"];
+  Fp_old_            = (*workset.stateArrayPtr)[Fp_str + "_old"];
+  eqps_old_          = (*workset.stateArrayPtr)[eqps_str + "_old"];
+  failure_modes_old_ = (*workset.stateArrayPtr)["failure_modes_old"];
   // Read death status from the workset.  The ACE solver populates this
   // at the start of each step from the prior converged state, and
   // J2Erosion's operator() writes into it live when new failures occur
@@ -216,68 +229,49 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
     has_failed_old_   = true;
   }
 
-  auto& disc                    = *workset.disc;
-  auto& stk_disc                = dynamic_cast<Albany::STKDiscretization&>(disc);
-  auto& mesh_struct             = *(stk_disc.getSTKMeshStruct());
-  auto& field_cont              = *(mesh_struct.getFieldContainer());
-  have_cell_boundary_indicator_ = field_cont.hasCellBoundaryIndicatorField();
-
-  if (have_cell_boundary_indicator_ == true) {
-    cell_boundary_indicator_ = workset.cell_boundary_indicator;
-    ALBANY_ASSERT(cell_boundary_indicator_.is_null() == false);
-  }
+  cell_is_erodible_ = workset.cell_is_erodible;
 
   current_time_ = workset.current_time;
 
+  // Resolve the death threshold against num_pts_. A 0 value (the
+  // default, or what comes out of an input deck that omits the key)
+  // means "all integration points must fail", which is the historical
+  // semantics. Any other value is clamped into [1, num_pts_].
+  int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
+                        (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
+                                                                                  num_failed_pts_for_death_);
+
   // Seed failed_ (diagnostic, decimal-encoded per-mode counts) and
-  // dead_ (binary cell-death flag) from the persistent per-(cell, pt)
-  // failure bitmask. failure_mode_vec_ is owned by Albany::Application
-  // and persists across fills and time steps; once a bit is set at
-  // (cell, pt) it stays set.
+  // dead_ (binary cell-death flag) from the per-(cell, pt) failure-mode
+  // bitmask converged at the previous step (failure_modes_old). The mask
+  // is an STK-backed element state, so the discretization keeps it mapped
+  // to the right cell across workset rebuilds (erosion).
   //
   // Each set bit at (cell, pt) contributes a decimal magnitude (1, 10,
   // 100, 1000, 10000) to failed_(cell, 0) so the encoded value decodes
-  // back to per-mode trip counts across all pts of the cell.
+  // back to per-mode trip counts across all pts of the cell. operator()
+  // adds this fill's newly tripped bits on top.
   //
-  // dead_(cell, 0) is 1.0 iff every pt in the cell has at least one bit
-  // set in the bitmask, i.e. every integration point has failed in some
-  // way.  This is the predicate consumed by the ACE solver to populate
-  // death_status_vec.
-  //
-  // Lazy sizing: the kernel is the only place that knows num_pts_ for
-  // this model, so size the [cell][pt] grid here on first contact.  The
-  // Application-owned shell (RCP) was attached in loadWorksetBucketInfo.
+  // dead_(cell, 0) is 1.0 once at least `threshold` integration points
+  // have a non-zero failure_modes mask. Default threshold = num_pts_
+  // (every point must have failed); a smaller value lets the cell die
+  // once the user-specified number of points have failed. This is the
+  // predicate consumed by the ACE solver to populate death_status_vec.
   auto const num_cells = workset.numCells;
-  failure_mode_vec_    = workset.failure_mode_vec;
-  if (failure_mode_vec_ != Teuchos::null) {
-    if (static_cast<int>(failure_mode_vec_->size()) < num_cells) {
-      failure_mode_vec_->resize(num_cells);
-    }
-    for (auto cell = 0; cell < num_cells; ++cell) {
-      if (static_cast<int>((*failure_mode_vec_)[cell].size()) < num_pts_) {
-        (*failure_mode_vec_)[cell].resize(num_pts_, 0);
-      }
-    }
-  }
   for (auto cell = 0; cell < num_cells; ++cell) {
-    double seed     = 0.0;
-    bool   all_failed = true;
-    if (failure_mode_vec_ != Teuchos::null) {
-      auto const& mask_row = (*failure_mode_vec_)[cell];
-      for (auto pt = 0; pt < num_pts_; ++pt) {
-        uint8_t const m = mask_row[pt];
-        if (m & 0x01) seed += 1.0;
-        if (m & 0x02) seed += 10.0;
-        if (m & 0x04) seed += 100.0;
-        if (m & 0x08) seed += 1000.0;
-        if (m & 0x10) seed += 10000.0;
-        if (m == 0u) all_failed = false;
-      }
-    } else {
-      all_failed = false;
+    double seed              = 0.0;
+    int    num_failed_pts    = 0;
+    for (auto pt = 0; pt < num_pts_; ++pt) {
+      uint8_t const m = static_cast<uint8_t>(failure_modes_old_(cell, pt));
+      if (m & 0x01) seed += 1.0;
+      if (m & 0x02) seed += 10.0;
+      if (m & 0x04) seed += 100.0;
+      if (m & 0x08) seed += 1000.0;
+      if (m & 0x10) seed += 10000.0;
+      if (m != 0u) ++num_failed_pts;
     }
     failed_(cell, 0) = seed;
-    dead_(cell, 0)   = all_failed ? 1.0 : 0.0;
+    dead_(cell, 0)   = num_failed_pts >= threshold ? 1.0 : 0.0;
   }
 }
 
@@ -480,6 +474,10 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     strain_indicator_(cell, pt)       = 0.0;
     angle_indicator_(cell, pt)        = 0.0;
     displacement_indicator_(cell, pt) = 0.0;
+    elastic_modulus_used_(cell, pt)        = 0.0;
+    // Carry the failure-mode bitmask forward unchanged: a dead cell never
+    // trips new bits, but the state must still be written every fill.
+    failure_modes_(cell, pt) = failure_modes_old_(cell, pt);
     return;
   }
 
@@ -525,9 +523,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   auto&& delta_time = delta_time_(0);
   auto&& failed     = failed_(cell, 0);
 
-  auto const cell_bi        = have_cell_boundary_indicator_ == true ? *(cell_boundary_indicator_[cell]) : 0.0;
-  auto const is_at_boundary = cell_bi == 1.0;
-  auto const is_erodible    = cell_bi == 2.0;
+  bool const is_erodible = cell_is_erodible_.size() > 0 && cell_is_erodible_[cell] != 0;
 
   auto strain_limit = strain_limit_;
   if ((porosity < 0.99) && (strain_limit > 0.0)) {
@@ -546,6 +542,9 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
       strain_limit = 1.0 + ((strain_limit - 1.0) / SL_weakening_factor_);
     }
   }
+
+  // Save the elastic modulus used for output: 
+  elastic_modulus_used_(cell, pt) = E;
 
   ScalarT const nu    = poissons_ratio_(cell, pt);
   ScalarT const kappa = E / (3.0 * (1.0 - 2.0 * nu));
@@ -680,23 +679,18 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Per-(cell, pt) OR-accumulation: add each mode's decimal magnitude to
   // `failed` exactly the first time that mode trips at this integration
-  // point. `failure_mode_vec_` is persistent across fills and time steps
-  // (owned by the Application), so a criterion that keeps tripping at the
-  // same point contributes its magnitude once and only once.
+  // point. `mask` starts from the bitmask converged at the previous step
+  // (failure_modes_old) and is written back to failure_modes_ below, so a
+  // criterion that keeps tripping at the same point contributes its
+  // magnitude once and only once across the run.
   //
   // When disable_erosion_ is true the cell cannot die regardless of how
   // criteria trip, so skip both the bitmask update and the failed
   // accumulator. Indicators above are still computed for diagnostics.
-  auto trip = [&](bool fired, uint8_t bit, double magnitude) {
+  uint8_t mask = static_cast<uint8_t>(failure_modes_old_(cell, pt));
+  auto    trip = [&](bool fired, uint8_t bit, double magnitude) {
     if (fired == false) return;
     if (disable_erosion_) return;
-    if (failure_mode_vec_ == Teuchos::null) {
-      // No bitmask storage attached (non-standard workset path). Fall back
-      // to the pre-bitmask behavior so we don't silently lose failures.
-      failed += magnitude;
-      return;
-    }
-    auto& mask = (*failure_mode_vec_)[cell][pt];
     if ((mask & bit) != 0u) return;
     mask = static_cast<uint8_t>(mask | bit);
     failed += magnitude;
@@ -746,27 +740,39 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
       (maximum_displacement_ > 0.0) && (displacement_norm > maximum_displacement_);
   trip(disp_failure, 0x10, 10000.0);
 
+  // Persist this fill's updated bitmask (old | newly tripped bits) to the
+  // STK-backed state, so it follows the cell across workset rebuilds.
+  failure_modes_(cell, pt) = static_cast<double>(mask);
+
   // Live death propagation: when the last pt of a cell is processed,
-  // check whether every pt in this cell has at least one failure bit
-  // set in failure_mode_vec_. If so, mark the cell dead so the scatter
-  // evaluator and fixOrphanNodesForElementDeath see it as dead in this
-  // same fill. Without this, Newton can push partially-failed cells
+  // check whether enough pts in this cell now have at least one failure
+  // bit set to meet the death threshold. If so, mark the cell dead so the
+  // scatter evaluator and fixOrphanNodesForElementDeath see it as dead in
+  // this same fill. Without this, Newton can push partially-failed cells
   // (now condemned by the last-pt trip) into regimes where they would
   // fail more, while scatter keeps assembling their nonphysical stress
-  // contributions — breaking convergence after a death cascade.
+  // contributions — breaking convergence after a death cascade. Points
+  // are processed in order, so at the last pt every failure_modes_(cell,
+  // p) is current.
+  //
+  // The threshold defaults to num_pts_ (every point must have failed —
+  // historical behavior); a smaller user-supplied value lets the cell
+  // die once that many points have failed. Must match the threshold used
+  // by init() above so the seed and the live update are consistent.
   //
   // When disable_erosion_ is true, trips above are no-ops, so no pt
   // ever has a bit set and the predicate cannot trigger.
-  if (pt == num_pts_ - 1 && has_failed_old_ && failure_mode_vec_ != Teuchos::null) {
-    auto const& mask_row   = (*failure_mode_vec_)[cell];
-    bool        all_failed = true;
+  if (pt == num_pts_ - 1 && has_failed_old_) {
+    int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
+                          (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
+                                                                                    num_failed_pts_for_death_);
+    int num_failed_pts = 0;
     for (auto p = 0; p < num_pts_; ++p) {
-      if (mask_row[p] == 0u) {
-        all_failed = false;
-        break;
+      if (static_cast<uint8_t>(Sacado::Value<ScalarT>::eval(failure_modes_(cell, p))) != 0u) {
+        ++num_failed_pts;
       }
     }
-    if (all_failed && (*death_status_vec_)[cell] == 0.0) {
+    if (num_failed_pts >= threshold && (*death_status_vec_)[cell] == 0.0) {
       (*death_status_vec_)[cell] = 1.0;
       dead_(cell, 0)             = 1.0;
     }

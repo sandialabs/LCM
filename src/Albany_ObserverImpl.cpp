@@ -3,10 +3,36 @@
 // in the file license.txt in the top-level Albany directory.
 #include "Albany_ObserverImpl.hpp"
 
+#include <cstdlib>
+#include <string>
+
 #include "Albany_AbstractDiscretization.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
+#include "Teuchos_VerboseObject.hpp"
 
 namespace Albany {
+
+namespace {
+// Phase 0 gate: set ALBANY_TEST_REBUILD_WORKSETS=1 to exercise the
+// mid-run workset rebuild path after every accepted step. Default off
+// keeps existing behavior bit-identical.
+bool
+rebuildWorksetsEnabled()
+{
+  static bool const enabled = [] {
+    char const* v  = std::getenv("ALBANY_TEST_REBUILD_WORKSETS");
+    bool const  on = (v != nullptr) && (std::string(v) == "1");
+    if (on) {
+      *Teuchos::VerboseObjectBase::getDefaultOStream()
+          << "[Phase 0] ALBANY_TEST_REBUILD_WORKSETS=1: "
+             "rebuildWorksets() will fire after every accepted step.\n";
+    }
+    return on;
+  }();
+  return enabled;
+}
+
+}  // namespace
 
 ObserverImpl::ObserverImpl(const Teuchos::RCP<Application>& app) : StatelessObserverImpl(app) {}
 
@@ -33,6 +59,15 @@ ObserverImpl::observeSolution(
   }
 
   StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
+
+  // M3a: activePart-based element death is on by default. The function
+  // returns immediately if no cells died this step. It rebuilds worksets
+  // internally when it does kill cells, so the Phase 0 test-only rebuild
+  // is skipped in that case to avoid double work.
+  bool const killed = app_->applyDeathToActivePart();
+  if (!killed && rebuildWorksetsEnabled()) {
+    app_->getDiscretization()->rebuildWorksets();
+  }
 }
 
 void
@@ -41,6 +76,15 @@ ObserverImpl::observeSolution(double stamp, const Thyra_MultiVector& nonOverlapp
   app_->evaluateStateFieldManager(stamp, nonOverlappedSolution);
   app_->getStateMgr().updateStates();
   StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution);
+
+  // M3a: activePart-based element death is on by default. The function
+  // returns immediately if no cells died this step. It rebuilds worksets
+  // internally when it does kill cells, so the Phase 0 test-only rebuild
+  // is skipped in that case to avoid double work.
+  bool const killed = app_->applyDeathToActivePart();
+  if (!killed && rebuildWorksetsEnabled()) {
+    app_->getDiscretization()->rebuildWorksets();
+  }
 }
 
 void

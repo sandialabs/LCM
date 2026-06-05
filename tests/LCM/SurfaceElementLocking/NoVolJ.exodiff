@@ -28,12 +28,12 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 # No GLOBAL VARIABLES
 
 NODAL VARIABLES relative 1.e-6 floor 0.0
-	DISP_1  # min:             0.3 @ t1,n1	max:             0.3 @ t1,n1
-	DISP_2  # min:               0 @ t1,n1	max:               0 @ t1,n1
-	DISP_3  # min:           0.375 @ t1,n1	max:           0.375 @ t1,n1
-	FINT_1  # min:       23.027279 @ t1,n3	max:       881.22187 @ t1,n1
-	FINT_2  # min:       4073.8729 @ t1,n2	max:       51583.009 @ t1,n3
-	FINT_3  # min:       38.583346 @ t1,n3	max:        1009.729 @ t1,n1
+	DISP_x  # min:             0.3 @ t1,n1	max:             0.3 @ t1,n1
+	DISP_y  # min:               0 @ t1,n1	max:               0 @ t1,n1
+	DISP_z  # min:           0.375 @ t1,n1	max:           0.375 @ t1,n1
+	FINT_x  # min:       23.027279 @ t1,n3	max:       881.22187 @ t1,n1
+	FINT_y  # min:       4073.8729 @ t1,n2	max:       51583.009 @ t1,n3
+	FINT_z  # min:       38.583346 @ t1,n3	max:        1009.729 @ t1,n1
 
 ELEMENT VARIABLES relative 1.e-6 floor 0.0
 	SURF_F_1_01     # min:       1.3464102 @ t1,b1,e1	max:       1.3464102 @ t1,b1,e1

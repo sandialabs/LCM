@@ -46,6 +46,43 @@ get_element_block_sizes(stk::io::StkMeshIoBroker& mesh_data, std::vector<int>& e
 }  // Anonymous namespace
 
 Albany::IossSTKMeshStruct::IossSTKMeshStruct(
+    const Teuchos::RCP<IossSTKMeshStruct>&      donor,
+    const Teuchos::RCP<Teuchos::ParameterList>& params_,
+    const Teuchos::RCP<Teuchos::ParameterList>& adaptParams_,
+    const Teuchos::RCP<Teuchos_Comm const>&     commT)
+    : GenericSTKMeshStruct(params_, adaptParams_),
+      out(Teuchos::VerboseObjectBase::getDefaultOStream()),
+      useSerialMesh(donor->useSerialMesh),
+      periodic(donor->periodic),
+      mesh_data(donor->mesh_data),
+      m_hasRestartSolution(false),
+      m_restartDataTime(-1.0),
+      m_solutionFieldHistoryDepth(donor->m_solutionFieldHistoryDepth)
+{
+  // Borrowing construction path: share the file-derived STK state with
+  // the donor instead of opening the Exodus file a second time. The
+  // donor must have been constructed first (it ran the full file-loading
+  // ctor above). After this ctor, this->setFieldAndBulkData can declare
+  // this instance's own field container on the shared metaData; the
+  // donor's commitAndPopulate handles bulk-data setup and commit once
+  // for both.
+  this->borrowedSharedResources = true;
+  this->deferCommit             = true;
+  this->donor_for_borrowed_     = donor;
+
+  metaData    = donor->metaData;
+  bulkData    = donor->bulkData;
+  usePamgen   = donor->usePamgen;
+  numDim      = donor->numDim;
+  partVec     = donor->partVec;
+  nsPartVec   = donor->nsPartVec;
+  ssPartVec   = donor->ssPartVec;
+  meshSpecs   = donor->meshSpecs;
+  activePart  = donor->activePart;
+  deadCellsPart = donor->deadCellsPart;
+}
+
+Albany::IossSTKMeshStruct::IossSTKMeshStruct(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<Teuchos::ParameterList>& adaptParams_,
     const Teuchos::RCP<Teuchos_Comm const>&     commT)
@@ -299,7 +336,56 @@ Albany::IossSTKMeshStruct::setFieldAndBulkData(
     std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&              side_set_sis,
     std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req)
 {
+  // Borrowed instance: refresh bulkData from the donor right before
+  // SetupFieldData. The donor allocates bulkData inside its own
+  // setFieldAndBulkData (the first one to run); by the time we get
+  // here, the donor's bulkData is populated and we need to share it,
+  // not allocate a fresh one on the already-bulkData'd metaData.
+  if (borrowedSharedResources && Teuchos::nonnull(donor_for_borrowed_)) {
+    bulkData = donor_for_borrowed_->bulkData;
+  }
+
   this->SetupFieldData(commT, neq_, req, sis, worksetSize);
+
+  // Cache for a possible deferred commitAndPopulate. These are read by
+  // both the inline path (just below) and by commitAndPopulate when the
+  // orchestrator (e.g. ACE_ThermoMechanical) handles commit itself.
+  cached_req_           = req;
+  cached_side_set_sis_  = side_set_sis;
+  cached_side_set_req_  = side_set_req;
+  cached_worksetSize_   = worksetSize;
+
+  if (deferCommit) {
+    // Borrowing instance or donor whose orchestrator will call
+    // commitAndPopulate explicitly. Stop here; the post-declare work
+    // runs exactly once via commitAndPopulate on the donor.
+    return;
+  }
+
+  this->commitAndPopulate(commT, params, sis);
+}
+
+void
+Albany::IossSTKMeshStruct::commitAndPopulate(
+    const Teuchos::RCP<Teuchos_Comm const>&      commT,
+    const Teuchos::RCP<Teuchos::ParameterList>&  params,
+    const Teuchos::RCP<Albany::StateInfoStruct>& sis)
+{
+  ALBANY_PANIC(
+      borrowedSharedResources,
+      "IossSTKMeshStruct::commitAndPopulate must be called on the donor "
+      "instance, not a borrowed one.\n");
+
+  // The cached parameters come from the matching setFieldAndBulkData
+  // call (deferCommit path). If commitAndPopulate runs without an
+  // earlier deferred setFieldAndBulkData, the cached side-set fields
+  // are still default-constructed empties — safe for the no-side-set
+  // case, otherwise the orchestrator must have called setFieldAndBulkData
+  // with deferCommit=true beforehand to populate the cache.
+  AbstractFieldContainer::FieldContainerRequirements const&             req           = cached_req_;
+  std::map<std::string, Teuchos::RCP<Albany::StateInfoStruct>> const&   side_set_sis  = cached_side_set_sis_;
+  std::map<std::string, AbstractFieldContainer::FieldContainerRequirements> const& side_set_req  = cached_side_set_req_;
+  unsigned int const                                                    worksetSize   = cached_worksetSize_;
 
   mesh_data->set_bulk_data(*bulkData);
 

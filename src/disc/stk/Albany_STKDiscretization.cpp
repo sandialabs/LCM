@@ -1697,88 +1697,6 @@ STKDiscretization::setConstrainedDOFs(std::set<GO> const& constrained_dof_gids, 
 }
 
 void
-STKDiscretization::computeWorksetInfoBoundaryIndicators()
-{
-  auto local_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
-
-  auto& field_container = *(stkMeshStruct->getFieldContainer());
-
-  auto const& cell_buckets     = bulkData.get_buckets(stk::topology::ELEM_RANK, local_part);
-  auto const  num_cell_buckets = cell_buckets.size();
-  cell_boundary_indicator.resize(num_cell_buckets);
-  auto const has_cell = field_container.hasCellBoundaryIndicatorField();
-  if (has_cell == true) {
-    auto* cell_field = field_container.getCellBoundaryIndicator();
-    for (auto b = 0; b < num_cell_buckets; ++b) {
-      auto& cell_bucket = *cell_buckets[b];
-      cell_boundary_indicator[b].resize(cell_bucket.size());
-      for (auto i = 0; i < cell_bucket.size(); ++i) {
-        auto cell                     = cell_bucket[i];
-        cell_boundary_indicator[b][i] = static_cast<double*>(stk::mesh::field_data(*cell_field, cell));
-      }
-    }
-  }
-
-  auto const& face_buckets     = bulkData.get_buckets(stk::topology::FACE_RANK, local_part);
-  auto const  num_face_buckets = face_buckets.size();
-  auto const  has_face         = field_container.hasFaceBoundaryIndicatorField();
-  face_boundary_indicator.resize(num_face_buckets);
-  if (has_face == true) {
-    auto* face_field = field_container.getFaceBoundaryIndicator();
-    for (auto b = 0; b < num_face_buckets; ++b) {
-      auto& face_bucket = *face_buckets[b];
-      face_boundary_indicator[b].resize(face_bucket.size());
-      for (auto i = 0; i < face_bucket.size(); ++i) {
-        auto face                     = face_bucket[i];
-        face_boundary_indicator[b][i] = static_cast<double*>(stk::mesh::field_data(*face_field, face));
-      }
-    }
-  }
-
-  auto const& edge_buckets     = bulkData.get_buckets(stk::topology::EDGE_RANK, local_part);
-  auto const  num_edge_buckets = edge_buckets.size();
-  auto const  has_edge         = field_container.hasEdgeBoundaryIndicatorField();
-  edge_boundary_indicator.resize(num_edge_buckets);
-  if (has_edge == true) {
-    auto* edge_field = field_container.getEdgeBoundaryIndicator();
-    for (auto b = 0; b < num_edge_buckets; ++b) {
-      auto& edge_bucket = *edge_buckets[b];
-      edge_boundary_indicator[b].resize(edge_bucket.size());
-      for (auto i = 0; i < edge_bucket.size(); ++i) {
-        auto edge                     = edge_bucket[i];
-        edge_boundary_indicator[b][i] = static_cast<double*>(stk::mesh::field_data(*edge_field, edge));
-      }
-    }
-  }
-
-  // Place all node boundary indicators in a single workset and ignore
-  // the distribution in buckets, which is an obstacle for this purpose.
-  auto const& node_buckets     = bulkData.get_buckets(stk::topology::NODE_RANK, local_part);
-  auto const  num_node_buckets = node_buckets.size();
-  auto const  has_node         = field_container.hasNodeBoundaryIndicatorField();
-  auto        num_nodes        = 0;
-  for (auto b = 0; b < num_node_buckets; ++b) {
-    auto const& node_bucket = *node_buckets[b];
-    num_nodes += node_bucket.size();
-  }
-  node_boundary_indicator.clear();
-  if (has_node == true) {
-    auto* node_field = field_container.getNodeBoundaryIndicator();
-    for (auto b = 0; b < num_node_buckets; ++b) {
-      auto& node_bucket = *node_buckets[b];
-      for (auto i = 0; i < node_bucket.size(); ++i) {
-        auto const node     = node_bucket[i];
-        auto const num_node = node.m_value - 1;
-        auto const gid      = bulkData.identifier(node);
-        node_GID_2_LID_map.insert(std::make_pair(gid, num_node));
-        auto* nbi_ptr = static_cast<double*>(stk::mesh::field_data(*node_field, node));
-        node_boundary_indicator.insert(std::make_pair(gid, nbi_ptr));
-      }
-    }
-  }
-}
-
-void
 STKDiscretization::computeWorksetInfo()
 {
   stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
@@ -2157,8 +2075,53 @@ STKDiscretization::computeWorksetInfo()
     }
   }
 
-  // Set boundary indicator fields
-  computeWorksetInfoBoundaryIndicators();
+  computeWorksetInfoErodibleCells();
+}
+
+void
+STKDiscretization::computeWorksetInfoErodibleCells()
+{
+  // Mark every owned cell that touches a side-set whose name contains
+  // "erodible". Same naming convention as element death
+  // (Application::applyDeathToActivePart) and erodible-DBC handling
+  // (computeNodeSets), so a single mesh tag drives all three.
+  stk::mesh::Selector erodible_surface;
+  bool                have_erodible_surface = false;
+  for (auto& kv : stkMeshStruct->ssPartVec) {
+    if (kv.second == nullptr) continue;
+    if (kv.first.find("erodible") == std::string::npos) continue;
+    erodible_surface      = have_erodible_surface ? (erodible_surface | stk::mesh::Selector(*kv.second)) :
+                                                    stk::mesh::Selector(*kv.second);
+    have_erodible_surface = true;
+  }
+
+  stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
+  auto*               active_part_ws       = stkMeshStruct->getActivePart();
+  if (active_part_ws != nullptr) {
+    select_owned_in_part &= stk::mesh::Selector(*active_part_ws);
+  }
+
+  auto const& cell_buckets     = bulkData.get_buckets(stk::topology::ELEMENT_RANK, select_owned_in_part);
+  auto const  num_cell_buckets = cell_buckets.size();
+  cell_is_erodible.resize(num_cell_buckets);
+  for (std::size_t b = 0; b < num_cell_buckets; ++b) {
+    auto&      cell_bucket = *cell_buckets[b];
+    auto const num_cells   = cell_bucket.size();
+    cell_is_erodible[b]    = Teuchos::arcp<std::uint8_t>(num_cells);
+    std::fill(cell_is_erodible[b].begin(), cell_is_erodible[b].end(), 0);
+    if (!have_erodible_surface) continue;
+    for (std::size_t i = 0; i < num_cells; ++i) {
+      auto       cell       = cell_bucket[i];
+      auto const num_faces  = bulkData.num_faces(cell);
+      auto const face_begin = bulkData.begin_faces(cell);
+      for (unsigned f = 0; f < num_faces; ++f) {
+        if (erodible_surface(bulkData.bucket(face_begin[f]))) {
+          cell_is_erodible[b][i] = 1;
+          break;
+        }
+      }
+    }
+  }
 }
 
 void
@@ -2352,10 +2315,35 @@ STKDiscretization::computeNodeSets()
   std::map<std::string, stk::mesh::Part*>::iterator ns                = stkMeshStruct->nsPartVec.begin();
   AbstractSTKFieldContainer::VectorFieldType*       coordinates_field = stkMeshStruct->getCoordinatesField();
 
+  // Element-death Dirichlet-BC propagation. A node set whose name
+  // contains "erodible" carries a Dirichlet BC on an eroding surface,
+  // but the node set itself is a full-depth slab (it spans the bluff
+  // interior and back face, not just the exposed face). Restrict it to
+  // the nodes of the "-erodible" side-set(s): those side-sets track the
+  // receding surface because process_killed_elements paints every
+  // newly-exposed face into them (see Application::applyDeathToActivePart),
+  // and STK induces face -> node membership. Rebuilt on every
+  // rebuildWorksets(), this intersection follows the surface as it
+  // erodes -- and keeps the BC off interior/back nodes from step 0.
+  stk::mesh::Selector erodible_surface;
+  bool                have_erodible_surface = false;
+  for (auto& kv : stkMeshStruct->ssPartVec) {
+    if (kv.second == nullptr) continue;
+    if (kv.first.find("erodible") == std::string::npos) continue;
+    erodible_surface      = have_erodible_surface ? (erodible_surface | stk::mesh::Selector(*kv.second)) :
+                                                    stk::mesh::Selector(*kv.second);
+    have_erodible_surface = true;
+  }
+
   auto node_indexer = createGlobalLocalIndexer(m_node_vs);
   while (ns != stkMeshStruct->nsPartVec.end()) {  // Iterate over Node Sets
     // Get all owned nodes in this node set
     stk::mesh::Selector select_owned_in_nspart = stk::mesh::Selector(*(ns->second)) & stk::mesh::Selector(metaData.locally_owned_part());
+
+    // Erodible node sets are clipped to the live eroding surface.
+    if (have_erodible_surface && ns->first.find("erodible") != std::string::npos) {
+      select_owned_in_nspart &= erodible_surface;
+    }
 
     std::vector<stk::mesh::Entity> nodes;
     stk::mesh::get_selected_entities(select_owned_in_nspart, bulkData.buckets(stk::topology::NODE_RANK), nodes);
@@ -2704,6 +2692,19 @@ STKDiscretization::updateMesh()
     }
     buildSideSetProjectors();
   }
+}
+
+void
+STKDiscretization::rebuildWorksets()
+{
+  // Phase 0 of the activePart-based element-death port: re-run only the
+  // workset-related subset of updateMesh(). Safe to call mid-run only when
+  // the global DOF map and Jacobian graph are unchanged (true when no cells
+  // have been removed from activePart, as in Phase 0). Per-cell state
+  // survives because computeWorksetInfo() re-reads from STK fields.
+  computeWorksetInfo();
+  computeNodeSets();
+  computeSideSets();
 }
 
 }  // namespace Albany

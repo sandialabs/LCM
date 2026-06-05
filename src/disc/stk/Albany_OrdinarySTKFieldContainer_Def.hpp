@@ -37,6 +37,27 @@ static char const* res_id_name[1] = {
     "residual",
 };
 
+namespace {
+
+// Tag a multi-component nodal field with its IOSS output type so the
+// Exodus writer emits it as a vector (components named _x/_y/_z) rather
+// than as N scalar variables (_1/_2/_3). The vector tagging is what lets
+// ParaView's IOSS reader aggregate the components and apply the
+// "Apply Displacements" filter. Lost in the STK simple-fields migration
+// (commit 63379cb3f3) because the typed Field<double, Cartesian> used
+// to carry the hint implicitly.
+inline void
+applyVectorOutputType(stk::mesh::FieldBase& field, int numComponents)
+{
+  if (numComponents == 2) {
+    stk::io::set_field_output_type(field, stk::io::FieldOutputType::VECTOR_2D);
+  } else if (numComponents == 3) {
+    stk::io::set_field_output_type(field, stk::io::FieldOutputType::VECTOR_3D);
+  }
+}
+
+}  // namespace
+
 template <bool Interleaved>
 OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     const Teuchos::RCP<Teuchos::ParameterList>&               params_,
@@ -62,11 +83,13 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   this->coordinates_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates");
   stk::mesh::put_field_on_mesh(*this->coordinates_field, metaData_->universal_part(), numDim_, nullptr);
   stk::io::set_field_role(*this->coordinates_field, Ioss::Field::MESH);
+  applyVectorOutputType(*this->coordinates_field, numDim_);
   if (numDim_ == 3) {
     this->coordinates_field3d = this->coordinates_field;
   } else {
     this->coordinates_field3d = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates3d");
     stk::mesh::put_field_on_mesh(*this->coordinates_field3d, metaData_->universal_part(), 3, nullptr);
+    applyVectorOutputType(*this->coordinates_field3d, 3);
     if (params_->get<bool>("Export 3d coordinates field", false)) {
       stk::io::set_field_role(*this->coordinates_field3d, Ioss::Field::TRANSIENT);
     }
@@ -79,12 +102,14 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     solution_field[num_vecs] =
         &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(sol_tag_name[num_vecs], sol_id_name[num_vecs]));
     stk::mesh::put_field_on_mesh(*solution_field[num_vecs], metaData_->universal_part(), neq_, nullptr);
+    applyVectorOutputType(*solution_field[num_vecs], neq_);
 
 #if defined(ALBANY_DTK)
     if (output_dtk_field == true) {
       solution_field_dtk[num_vecs] =
           &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(sol_dtk_tag_name[num_vecs], sol_dtk_id_name[num_vecs]));
       stk::mesh::put_field_on_mesh(*solution_field_dtk[num_vecs], metaData_->universal_part(), neq_, nullptr);
+      applyVectorOutputType(*solution_field_dtk[num_vecs], neq_);
     }
 #endif
 
@@ -96,6 +121,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
   residual_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(res_tag_name[0], res_id_name[0]));
   stk::mesh::put_field_on_mesh(*residual_field, metaData_->universal_part(), neq_, nullptr);
+  applyVectorOutputType(*residual_field, neq_);
   stk::io::set_field_role(*residual_field, Ioss::Field::TRANSIENT);
 
   // sphere volume is a mesh attribute read from a genesis mesh file containing
@@ -116,39 +142,6 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
   this->addStateStructs(sis);
 
   initializeSTKAdaptation();
-
-  bool const has_cell_boundary_indicator = (std::find(req.begin(), req.end(), "cell_boundary_indicator") != req.end());
-  bool const has_face_boundary_indicator = (std::find(req.begin(), req.end(), "face_boundary_indicator") != req.end());
-  bool const has_edge_boundary_indicator = (std::find(req.begin(), req.end(), "edge_boundary_indicator") != req.end());
-  bool const has_node_boundary_indicator = (std::find(req.begin(), req.end(), "node_boundary_indicator") != req.end());
-  if (has_cell_boundary_indicator) {
-    this->cell_boundary_indicator = metaData_->template get_field<double>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
-    if (this->cell_boundary_indicator != nullptr) {
-      build_cell_boundary_indicator = true;
-      stk::io::set_field_role(*this->cell_boundary_indicator, Ioss::Field::INFORMATION);
-    }
-  }
-  if (has_face_boundary_indicator) {
-    this->face_boundary_indicator = metaData_->template get_field<double>(stk::topology::FACE_RANK, "face_boundary_indicator");
-    if (this->face_boundary_indicator != nullptr) {
-      build_face_boundary_indicator = true;
-      stk::io::set_field_role(*this->face_boundary_indicator, Ioss::Field::INFORMATION);
-    }
-  }
-  if (has_edge_boundary_indicator) {
-    this->edge_boundary_indicator = metaData_->template get_field<double>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
-    if (this->edge_boundary_indicator != nullptr) {
-      build_edge_boundary_indicator = true;
-      stk::io::set_field_role(*this->edge_boundary_indicator, Ioss::Field::INFORMATION);
-    }
-  }
-  if (has_node_boundary_indicator) {
-    this->node_boundary_indicator = metaData_->template get_field<double>(stk::topology::NODE_RANK, "node_boundary_indicator");
-    if (this->node_boundary_indicator != nullptr) {
-      build_node_boundary_indicator = true;
-      stk::io::set_field_role(*this->node_boundary_indicator, Ioss::Field::INFORMATION);
-    }
-  }
 }
 
 template <bool Interleaved>
@@ -173,22 +166,6 @@ OrdinarySTKFieldContainer<Interleaved>::initializeSTKAdaptation()
 
     stk::mesh::put_field_on_mesh(*this->failure_state[rank], this->metaData->universal_part(), nullptr);
   }
-
-  // Cell boundary indicator
-  this->cell_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::ELEMENT_RANK, "cell_boundary_indicator");
-  stk::mesh::put_field_on_mesh(*this->cell_boundary_indicator, this->metaData->universal_part(), nullptr);
-
-  // Face boundary indicator
-  this->face_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::FACE_RANK, "face_boundary_indicator");
-  stk::mesh::put_field_on_mesh(*this->face_boundary_indicator, this->metaData->universal_part(), nullptr);
-
-  // Edge boundary indicator
-  this->edge_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::EDGE_RANK, "edge_boundary_indicator");
-  stk::mesh::put_field_on_mesh(*this->edge_boundary_indicator, this->metaData->universal_part(), nullptr);
-
-  // Node boundary indicator
-  this->node_boundary_indicator = &this->metaData->template declare_field<double>(stk::topology::NODE_RANK, "node_boundary_indicator");
-  stk::mesh::put_field_on_mesh(*this->node_boundary_indicator, this->metaData->universal_part(), nullptr);
 
   stk::io::set_field_role(*this->proc_rank_field, Ioss::Field::MESH);
   stk::io::set_field_role(*this->refine_field, Ioss::Field::MESH);

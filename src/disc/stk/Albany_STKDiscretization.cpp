@@ -1105,14 +1105,23 @@ STKDiscretization::getSolutionMV(bool overlapped) const
   int const num_time_deriv = stkMeshStruct->num_time_deriv;
 
   if (!constrained_dof_gids_.empty() && !overlapped) {
-    // With DBC DOF elimination, m_vs is reduced and the direct fill path
-    // (which iterates all owned nodes) would write to DOF indices that don't
-    // exist in the reduced vector.  Return a zero vector instead; the
-    // AdaptiveSolutionManager applies initial conditions via the overlap
-    // path, which handles the reduced/full mapping correctly.
-    auto soln = Thyra::createMembers(m_vs, num_time_deriv + 1);
-    soln->assign(0.0);
-    return soln;
+    // Reduced owned space can't be filled directly from the STK field — the
+    // per-node fill writes to all neq DOF slots assuming the full layout.
+    // Detour through overlap (which has every DOF), then scatter to reduced
+    // owned (the cas manager naturally drops constrained GIDs since they're
+    // absent from m_vs). Schwarz_Alternating's per-step output goes through
+    // here: previously it got zeros and wrote zeros, leaving Schwarz Dynamics
+    // exodiffs failing at the interface.
+    auto overlap_soln = Thyra::createMembers(m_overlap_vs, num_time_deriv + 1);
+    Teuchos::RCP<AbstractSTKFieldContainer> container = stkMeshStruct->getFieldContainer();
+    stk::mesh::Selector overlap_part = metaData.locally_owned_part() | metaData.globally_shared_part();
+    container->fillSolnMultiVector(*overlap_soln, overlap_part, m_overlap_node_vs);
+
+    auto reduced_soln = Thyra::createMembers(m_vs, num_time_deriv + 1);
+    reduced_soln->assign(0.0);
+    auto cas = Albany::createCombineAndScatterManager(m_vs, m_overlap_vs);
+    cas->combine(*overlap_soln, *reduced_soln, Albany::CombineMode::INSERT);
+    return reduced_soln;
   }
 
   Teuchos::RCP<Thyra_MultiVector> soln = Thyra::createMembers(m_vs, num_time_deriv + 1);
@@ -1234,6 +1243,33 @@ STKDiscretization::setSolutionField(Thyra_Vector const& soln, bool const overlap
 void
 STKDiscretization::setSolutionField(Thyra_Vector const& soln, Thyra_Vector const& soln_dot, bool const overlapped)
 {
+  if (!constrained_dof_gids_.empty() && !overlapped) {
+    // Same expand-and-inject as the single-vector overload, applied to u and
+    // u̇ in lockstep. Constrained_dof_dot_values_ is empty when the caller hasn't
+    // refreshed yet (e.g., setupDBCElimination time); the slots get 0 in that
+    // case, which is the correct quiescent state.
+    auto overlap_soln     = Thyra::createMember(m_overlap_vs);
+    auto overlap_soln_dot = Thyra::createMember(m_overlap_vs);
+    overlap_soln->assign(0.0);
+    overlap_soln_dot->assign(0.0);
+    auto cas = Albany::createCombineAndScatterManager(m_vs, m_overlap_vs);
+    cas->scatter(soln, *overlap_soln, Albany::CombineMode::INSERT);
+    cas->scatter(soln_dot, *overlap_soln_dot, Albany::CombineMode::INSERT);
+    auto ov_data     = Albany::getNonconstLocalData(overlap_soln);
+    auto ov_dot_data = Albany::getNonconstLocalData(overlap_soln_dot);
+    auto ov_indexer  = createGlobalLocalIndexer(m_overlap_vs);
+    for (auto const& [gid, val] : constrained_dof_values_) {
+      LO const lid = ov_indexer->getLocalElement(gid);
+      if (lid >= 0) ov_data[lid] = val;
+    }
+    for (auto const& [gid, val] : constrained_dof_dot_values_) {
+      LO const lid = ov_indexer->getLocalElement(gid);
+      if (lid >= 0) ov_dot_data[lid] = val;
+    }
+    setSolutionField(*overlap_soln, *overlap_soln_dot, /*overlapped=*/true);
+    return;
+  }
+
   Teuchos::RCP<AbstractSTKFieldContainer> container = stkMeshStruct->getFieldContainer();
 
   // Select the proper mesh part and node vector space
@@ -1249,6 +1285,41 @@ STKDiscretization::setSolutionField(Thyra_Vector const& soln, Thyra_Vector const
 void
 STKDiscretization::setSolutionField(Thyra_Vector const& soln, Thyra_Vector const& soln_dot, Thyra_Vector const& soln_dotdot, bool const overlapped)
 {
+  if (!constrained_dof_gids_.empty() && !overlapped) {
+    // Expand-and-inject across u, u̇, ü. Schwarz dynamics tests need this:
+    // the gold files have non-zero coupled-app displacement/velocity/
+    // acceleration at the interface, and without the inject the reduced
+    // owned vectors would leave those slots at zero.
+    auto overlap_soln        = Thyra::createMember(m_overlap_vs);
+    auto overlap_soln_dot    = Thyra::createMember(m_overlap_vs);
+    auto overlap_soln_dotdot = Thyra::createMember(m_overlap_vs);
+    overlap_soln->assign(0.0);
+    overlap_soln_dot->assign(0.0);
+    overlap_soln_dotdot->assign(0.0);
+    auto cas = Albany::createCombineAndScatterManager(m_vs, m_overlap_vs);
+    cas->scatter(soln, *overlap_soln, Albany::CombineMode::INSERT);
+    cas->scatter(soln_dot, *overlap_soln_dot, Albany::CombineMode::INSERT);
+    cas->scatter(soln_dotdot, *overlap_soln_dotdot, Albany::CombineMode::INSERT);
+    auto ov_data        = Albany::getNonconstLocalData(overlap_soln);
+    auto ov_dot_data    = Albany::getNonconstLocalData(overlap_soln_dot);
+    auto ov_dotdot_data = Albany::getNonconstLocalData(overlap_soln_dotdot);
+    auto ov_indexer     = createGlobalLocalIndexer(m_overlap_vs);
+    for (auto const& [gid, val] : constrained_dof_values_) {
+      LO const lid = ov_indexer->getLocalElement(gid);
+      if (lid >= 0) ov_data[lid] = val;
+    }
+    for (auto const& [gid, val] : constrained_dof_dot_values_) {
+      LO const lid = ov_indexer->getLocalElement(gid);
+      if (lid >= 0) ov_dot_data[lid] = val;
+    }
+    for (auto const& [gid, val] : constrained_dof_dotdot_values_) {
+      LO const lid = ov_indexer->getLocalElement(gid);
+      if (lid >= 0) ov_dotdot_data[lid] = val;
+    }
+    setSolutionField(*overlap_soln, *overlap_soln_dot, *overlap_soln_dotdot, /*overlapped=*/true);
+    return;
+  }
+
   Teuchos::RCP<AbstractSTKFieldContainer> container = stkMeshStruct->getFieldContainer();
 
   // Select the proper mesh part and node vector space
@@ -1264,6 +1335,31 @@ STKDiscretization::setSolutionField(Thyra_Vector const& soln, Thyra_Vector const
 void
 STKDiscretization::setSolutionFieldMV(const Thyra_MultiVector& soln, bool const overlapped)
 {
+  if (!constrained_dof_gids_.empty() && !overlapped) {
+    // Per-column expand-and-inject, matching the single-vector overload's
+    // pattern. Column 0 uses the u map, 1 the v map, 2 the a map; any further
+    // columns just scatter cleanly (constrained slots stay 0 by default).
+    int const num_cols = soln.domain()->dim();
+    auto      ov_mv    = Thyra::createMembers(m_overlap_vs, num_cols);
+    ov_mv->assign(0.0);
+    auto cas = Albany::createCombineAndScatterManager(m_vs, m_overlap_vs);
+    cas->scatter(soln, *ov_mv, Albany::CombineMode::INSERT);
+    auto ov_indexer = createGlobalLocalIndexer(m_overlap_vs);
+    auto const inject_col = [&](int col, std::map<GO, double> const& vals) {
+      if (col >= num_cols) return;
+      auto data = Albany::getNonconstLocalData(ov_mv->col(col));
+      for (auto const& [gid, val] : vals) {
+        LO const lid = ov_indexer->getLocalElement(gid);
+        if (lid >= 0) data[lid] = val;
+      }
+    };
+    inject_col(0, constrained_dof_values_);
+    inject_col(1, constrained_dof_dot_values_);
+    inject_col(2, constrained_dof_dotdot_values_);
+    setSolutionFieldMV(*ov_mv, /*overlapped=*/true);
+    return;
+  }
+
   Teuchos::RCP<AbstractSTKFieldContainer> container = stkMeshStruct->getFieldContainer();
 
   // Select the proper mesh part and node vector space
@@ -1611,6 +1707,17 @@ STKDiscretization::fillCompleteGraphs()
   m_overlap_jac_factory->fillComplete();
 
   m_jac_factory = Teuchos::rcp(new ThyraCrsMatrixFactory(m_vs, m_vs, m_overlap_jac_factory));
+}
+
+void
+STKDiscretization::setConstrainedDOFValues(
+    std::map<GO, double> const& u_values,
+    std::map<GO, double> const& v_values,
+    std::map<GO, double> const& a_values)
+{
+  constrained_dof_values_        = u_values;
+  constrained_dof_dot_values_    = v_values;
+  constrained_dof_dotdot_values_ = a_values;
 }
 
 void

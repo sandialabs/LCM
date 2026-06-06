@@ -154,6 +154,12 @@ class STKDiscretization : public AbstractDiscretization
   void
   setConstrainedDOFs(std::set<GO> const& constrained_dof_gids, std::map<GO, double> const& constrained_dof_values = {}) override;
 
+  void
+  setConstrainedDOFValues(
+      std::map<GO, double> const& u_values,
+      std::map<GO, double> const& v_values = {},
+      std::map<GO, double> const& a_values = {}) override;
+
   //! Get Node set lists (typedef in Albany_AbstractDiscretization.hpp)
   NodeSetList const&
   getNodeSets() const
@@ -629,9 +635,14 @@ class STKDiscretization : public AbstractDiscretization
   Teuchos::RCP<Teuchos_Comm const> comm;
 
   //! DOF GIDs eliminated from the owned space via Dirichlet BC elimination,
-  //! and their prescribed values (for solution output reconstruction).
+  //! and their prescribed u / u̇ / ü values (for solution output reconstruction
+  //! via the expand-and-inject path in setSolutionField). The u map is seeded
+  //! at setConstrainedDOFs time and refreshed each call by Application::
+  //! injectConstrainedDOFValues; v and a are populated only when refreshed.
   std::set<GO>         constrained_dof_gids_;
   std::map<GO, double> constrained_dof_values_;
+  std::map<GO, double> constrained_dof_dot_values_;
+  std::map<GO, double> constrained_dof_dotdot_values_;
 
   //! Unknown map and node map
   Teuchos::RCP<Thyra_VectorSpace const> m_vs;

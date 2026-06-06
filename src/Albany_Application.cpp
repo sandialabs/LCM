@@ -958,15 +958,35 @@ Application::injectConstrainedDOFValues(double time)
     xdotdot_data    = Albany::getNonconstLocalData(xdotdot_overlap);
   }
 
+  // Build per-constrained-GID u, v, a maps for the discretization to inject
+  // when expanding the reduced owned solution back out to the overlap STK
+  // fields at Exodus output time. Only owned constrained DOFs participate —
+  // that's what the disc-side expand-and-inject loops index over.
+  std::map<GO, double> u_map;
+  std::map<GO, double> v_map;
+  std::map<GO, double> a_map;
+  auto const full_owned_vs_indexer = full_owned_vs_.is_null() ? Teuchos::null : Albany::createGlobalLocalIndexer(full_owned_vs_);
+
   for (auto const& desc : dbc_descriptors_) {
-    auto const derivs       = desc.derivs_at(time);
-    x_data[desc.overlap_lid] = desc.eval(time);
+    auto const derivs        = desc.derivs_at(time);
+    double const u           = desc.eval(time);
+    x_data[desc.overlap_lid] = u;
     if (num_time_deriv >= 1) {
       xdot_data[desc.overlap_lid] = derivs.v;
     }
     if (num_time_deriv >= 2) {
       xdotdot_data[desc.overlap_lid] = derivs.a;
     }
+    if (desc.full_owned_lid >= 0 && !full_owned_vs_indexer.is_null()) {
+      GO const gid = full_owned_vs_indexer->getGlobalElement(desc.full_owned_lid);
+      u_map[gid]   = u;
+      if (num_time_deriv >= 1) v_map[gid] = derivs.v;
+      if (num_time_deriv >= 2) a_map[gid] = derivs.a;
+    }
+  }
+
+  if (!full_owned_vs_.is_null()) {
+    disc->setConstrainedDOFValues(u_map, v_map, a_map);
   }
 }
 

@@ -80,6 +80,22 @@ class AbstractDiscretization
   {
   }
 
+  //! Refresh the per-GID prescribed values for the constrained DOFs.
+  //! Called each time step / Newton iter by Application::injectConstrainedDOFValues
+  //! so that setSolutionField can re-inject the current u, u̇, ü at constrained
+  //! slots when writing the reduced owned solution out to STK fields for Exodus
+  //! output. Without this, the 2-vec / 3-vec setSolutionField overloads would
+  //! see only the reduced owned vector and leave constrained slots at zero in
+  //! the output — invisible for Constant DBCs (snapshot already 0), wrong for
+  //! Schwarz / TimeArray / Expression at non-zero times.
+  virtual void
+  setConstrainedDOFValues(
+      std::map<GO, double> const& /*u_values*/,
+      std::map<GO, double> const& /*v_values*/ = {},
+      std::map<GO, double> const& /*a_values*/ = {})
+  {
+  }
+
   //! Get Node set lists
   virtual NodeSetList const&
   getNodeSets() const = 0;

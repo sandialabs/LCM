@@ -132,12 +132,6 @@ SolverFactory::createAndGetAlbanyApp(
 
   bool const is_schwarz = solutionMethod == "Schwarz Alternating";
 
-  if (is_schwarz == true) {
-#if !defined(ALBANY_DTK)
-    ALBANY_ASSERT(appComm->getSize() == 1, "Parallel Schwarz requires DTK");
-#endif  // ALBANY_DTK
-  }
-
   if (solutionMethod == "Schwarz Alternating") {
     return Teuchos::rcp(new LCM::SchwarzAlternating(appParams, solverComm));
   }

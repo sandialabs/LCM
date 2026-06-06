@@ -57,7 +57,6 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   {
     return residual_field;
   };
-#if defined(ALBANY_DTK)
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*>
   getSolutionFieldDTKArray()
   {
@@ -69,7 +68,6 @@ class OrdinarySTKFieldContainer : public GenericSTKFieldContainer<Interleaved>
   {
     return solution_field_dtk[0];
   };
-#endif
 
   void
   fillSolnVector(Thyra_Vector& soln, stk::mesh::Selector& sel, Teuchos::RCP<Thyra_VectorSpace const> const& node_vs);

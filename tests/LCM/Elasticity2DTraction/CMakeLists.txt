@@ -24,15 +24,10 @@ if((NOT ALBANY_PARALLEL_ONLY)
                  ${CMAKE_CURRENT_BINARY_DIR}/runtest.cmake COPYONLY)
 
   # 1. Copy the reference solution over
-  if(ALBANY_DTK)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/reference_hole_dtk.exo
-                   ${CMAKE_CURRENT_BINARY_DIR}/reference_hole_dtk.exo COPYONLY)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_dtk.cmake
-                   ${CMAKE_CURRENT_BINARY_DIR}/runtest_dtk.cmake COPYONLY)
-  else()
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/reference_hole.exo
-                   ${CMAKE_CURRENT_BINARY_DIR}/reference_hole.exo COPYONLY)
-  endif()
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/reference_hole_dtk.exo
+                 ${CMAKE_CURRENT_BINARY_DIR}/reference_hole_dtk.exo COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_dtk.cmake
+                 ${CMAKE_CURRENT_BINARY_DIR}/runtest_dtk.cmake COPYONLY)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/exodiff_commands
                  ${CMAKE_CURRENT_BINARY_DIR}/exodiff_commands COPYONLY)
 
@@ -44,22 +39,12 @@ if((NOT ALBANY_PARALLEL_ONLY)
 
   # 1. Run the "runtest.cmake" file in the CWD
 
-  if(ALBANY_DTK)
-    add_test(
-      NAME ${testName}
-      COMMAND
-        ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe};input.yaml"
-        -DTEST_NAME=${testName} -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
-        -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -P runtest_dtk.cmake)
-    set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
-  else()
-    add_test(
-      NAME ${testName}
-      COMMAND
-        ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe};input.yaml"
-        -DTEST_NAME=${testName} -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
-        -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -P runtest.cmake)
-    set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
-  endif()
+  add_test(
+    NAME ${testName}
+    COMMAND
+      ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe};input.yaml"
+      -DTEST_NAME=${testName} -DMPIMNP=${MPIMNP} -DSEACAS_EPU=${SEACAS_EPU}
+      -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -P runtest_dtk.cmake)
+  set_tests_properties(${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
 
 endif()

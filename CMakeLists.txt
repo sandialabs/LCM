@@ -456,9 +456,7 @@ else()
   set(ALBANY_ROL FALSE)
 endif()
 
-# DTK is now absorbed into LCM (no longer a Trilinos extra repository)
-set(ALBANY_DTK TRUE)
-message("-- DTK:                              Built-in")
+# DTK is built into LCM (absorbed from its former Trilinos-extra repository).
 
 # Check if Trilinos has Tempus
 list(FIND Trilinos_PACKAGE_LIST Tempus Tempus_List_ID)

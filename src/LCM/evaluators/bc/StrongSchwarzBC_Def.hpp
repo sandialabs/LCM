@@ -268,7 +268,6 @@ StrongSchwarzBC_Base<EvalT, Traits>::computeBCs(size_t const ns_node, T& x_val, 
   z_val = value(2);
 }
 
-#if defined(ALBANY_DTK)
 template <typename EvalT, typename Traits>
 Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>>
 StrongSchwarzBC_Base<EvalT, Traits>::computeBCsDTK()
@@ -414,7 +413,6 @@ StrongSchwarzBC_Base<EvalT, Traits>::doDTKInterpolation(
 
   return this_vector;
 }
-#endif  // ALBANY_DTK
 
 // Fill solution with Dirichlet values
 template <typename StrongSchwarzBC, typename Traits>
@@ -449,8 +447,6 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
   std::vector<std::vector<int>> const& ns_nodes = workset.nodeSets->find(sbc.nodeSetID)->second;
 
   auto const ns_number_nodes = ns_nodes.size();
-
-#if defined(ALBANY_DTK)
 
   Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>> bcs_array = sbc.computeBCsDTK();
 
@@ -529,27 +525,6 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
       }
     }
   }
-#else   // ALBANY_DTK
-  for (auto ns_node = 0; ns_node < ns_number_nodes; ++ns_node) {
-    ST x_val, y_val, z_val;
-    sbc.computeBCs(ns_node, x_val, y_val, z_val);
-    auto const           x_dof      = ns_nodes[ns_node][0];
-    auto const           y_dof      = ns_nodes[ns_node][1];
-    auto const           z_dof      = ns_nodes[ns_node][2];
-    std::set<int> const& fixed_dofs = workset.fixed_dofs_;
-
-    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
-      disp_view[x_dof] = x_val;
-    }
-    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) {
-      disp_view[y_dof] = y_val;
-    }
-    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) {
-      disp_view[z_dof] = z_val;
-    }
-
-  }  // node in node set loop
-#endif  // ALBANY_DTK
 }
 
 // Fill residual, used in both residual and Jacobian

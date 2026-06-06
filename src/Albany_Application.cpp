@@ -231,12 +231,10 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   else
     num_time_deriv = num_time_deriv_from_input;
 
-#if defined(ALBANY_DTK)
   if (is_schwarz_ == true) {
     // Write DTK Field to Exodus if Schwarz is used
     discParams.set<bool>("Output DTK Field to Exodus", true);
   }
-#endif
 
   ALBANY_PANIC(num_time_deriv > 2, "Input error: number of time derivatives must be <= 2 " << "(solution, solution_dot, solution_dotdot)");
 

@@ -617,7 +617,7 @@ if(INSTALL_ALBANY)
     PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}")
 endif()
 
-if(LCM_TEST_EXES AND ALBANY_DTK)
+if(LCM_TEST_EXES)
   add_executable(DTK_Interp_and_Error
                  utils/dtk_interp_and_error/dtk_interp_and_error.cpp)
   add_executable(DTK_Interp_Volume_to_NS
@@ -704,7 +704,7 @@ if(ALBANY_STK_REBALANCE)
 endif()
 
 # Linking tests
-if(LCM_TEST_EXES AND ALBANY_DTK)
+if(LCM_TEST_EXES)
   set(repeat_libs ${LCM_UT_LIBS} ${ALBANY_LIBRARIES} ${LCM_UT_LIBS}
                   ${ALBANY_LIBRARIES})
   target_link_libraries(DTK_Interp_and_Error ${repeat_libs} ${ALL_LIBRARIES})

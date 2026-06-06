@@ -59,10 +59,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CubesInelastic.exodiff
 	       ${CMAKE_CURRENT_BINARY_DIR}/CubesInelastic.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CubesInelasticParallel.exodiff
 	       ${CMAKE_CURRENT_BINARY_DIR}/CubesInelasticParallel.exodiff COPYONLY)
-if(ALBANY_DTK)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest_parallel_exodiff.cmake}
-                          ${CMAKE_CURRENT_BINARY_DIR}/runtest_parallel_exodiff.cmake)
-endif()
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest_parallel_exodiff.cmake}
+                        ${CMAKE_CURRENT_BINARY_DIR}/runtest_parallel_exodiff.cmake)
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
                         ${CMAKE_CURRENT_BINARY_DIR}/Albany)
@@ -71,7 +69,6 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest_serial_exod
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-IF (ALBANY_DTK) 
 # Add the tests
 set(OUTFILE0 "cuboid_00.e")
 set(REF_FILE0 "cuboid_00.gold.e")
@@ -81,19 +78,18 @@ add_test(NAME Schwarz_Alternating_Dynamics_${testName}
   COMMAND
   ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=CubesInelastic
     -DTEST_ARGS=cuboids.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-    -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0} 
-    -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 
+    -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0}
+    -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1}
     -P ${runtest_serial_exodiff.cmake})
 set_tests_properties(Schwarz_Alternating_Dynamics_${testName}
                    PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-  add_test(NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
-    COMMAND
-    ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=CubesInelasticParallel
-      -DTEST_ARGS=cuboids.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-      -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0} 
-      -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 
-      -P ${runtest_parallel_exodiff.cmake})
-  set_tests_properties(Schwarz_Alternating_Dynamics_${testName}_Parallel
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-endif()
+add_test(NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
+  COMMAND
+  ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=CubesInelasticParallel
+    -DTEST_ARGS=cuboids.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0}
+    -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1}
+    -P ${runtest_parallel_exodiff.cmake})
+set_tests_properties(Schwarz_Alternating_Dynamics_${testName}_Parallel
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

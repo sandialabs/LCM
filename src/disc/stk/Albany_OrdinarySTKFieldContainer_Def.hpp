@@ -21,17 +21,13 @@ static char const* sol_tag_name[3] = {"Exodus Solution Name", "Exodus SolutionDo
 
 static char const* sol_id_name[3] = {"solution", "solution_dot", "solution_dotdot"};
 
-#if defined(ALBANY_DTK)
 static char const* sol_dtk_id_name[3] = {"solution dtk", "solution_dot dtk", "solution_dotdot dtk"};
-#endif
 
 static char const* res_tag_name[1] = {
     "Exodus Residual Name",
 };
 
-#if defined(ALBANY_DTK)
 static char const* sol_dtk_tag_name[3] = {"Exodus Solution DTK Name", "Exodus SolutionDot DTK Name", "Exodus SolutionDotDot DTK Name"};
-#endif
 
 static char const* res_id_name[1] = {
     "residual",
@@ -75,9 +71,7 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
 
   int num_time_deriv = params_->get<int>("Number Of Time Derivatives");
 
-#if defined(ALBANY_DTK)
   int output_dtk_field = params_->get<bool>("Output DTK Field to Exodus", false);
-#endif
 
   // Start STK stuff
   this->coordinates_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, "coordinates");
@@ -104,19 +98,15 @@ OrdinarySTKFieldContainer<Interleaved>::OrdinarySTKFieldContainer(
     stk::mesh::put_field_on_mesh(*solution_field[num_vecs], metaData_->universal_part(), neq_, nullptr);
     applyVectorOutputType(*solution_field[num_vecs], neq_);
 
-#if defined(ALBANY_DTK)
     if (output_dtk_field == true) {
       solution_field_dtk[num_vecs] =
           &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(sol_dtk_tag_name[num_vecs], sol_dtk_id_name[num_vecs]));
       stk::mesh::put_field_on_mesh(*solution_field_dtk[num_vecs], metaData_->universal_part(), neq_, nullptr);
       applyVectorOutputType(*solution_field_dtk[num_vecs], neq_);
     }
-#endif
 
     stk::io::set_field_role(*solution_field[num_vecs], Ioss::Field::TRANSIENT);
-#if defined(ALBANY_DTK)
     if (output_dtk_field == true) stk::io::set_field_role(*solution_field_dtk[num_vecs], Ioss::Field::TRANSIENT);
-#endif
   }
 
   residual_field = &metaData_->declare_field<double>(stk::topology::NODE_RANK, params_->get<std::string>(res_tag_name[0], res_id_name[0]));

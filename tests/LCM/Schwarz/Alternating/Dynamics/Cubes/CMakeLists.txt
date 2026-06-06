@@ -30,7 +30,6 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${AlbanyPath}
                         ${CMAKE_CURRENT_BINARY_DIR}/Albany)
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest_serial_exodiff.cmake}
                         ${CMAKE_CURRENT_BINARY_DIR}/runtest_serial_exodiff.cmake)
-IF (ALBANY_DTK) 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 #set(OUTFILE "cuboid.log")
 #set(PYTHON_FILE "check_convergence.py")
@@ -58,4 +57,3 @@ get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
       -P ${runtest_serial_exodiff.cmake})
   set_tests_properties(Schwarz_Alternating_Dynamics_${testName}
                      PROPERTIES LABELS "LCM;Tpetra;Forward")
-ENDIF()

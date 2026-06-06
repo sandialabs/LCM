@@ -15,12 +15,10 @@
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_ParameterList.hpp"
 
-#if defined(ALBANY_DTK)
 #include "Albany_OrdinarySTKFieldContainer.hpp"
 #include "DTK_MapOperatorFactory.hpp"
 #include "DTK_STKMeshHelpers.hpp"
 #include "DTK_STKMeshManager.hpp"
-#endif
 
 namespace LCM {
 
@@ -45,7 +43,6 @@ class StrongSchwarzBC_Base : public PHAL::SDirichlet<EvalT, Traits>
   void
   computeBCs(size_t const ns_node, T& x_val, T& y_val, T& z_val);
 
-#if defined(ALBANY_DTK)
   Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>>
   computeBCsDTK();
 
@@ -57,7 +54,6 @@ class StrongSchwarzBC_Base : public PHAL::SDirichlet<EvalT, Traits>
       Albany::AbstractSTKFieldContainer::VectorFieldType* this_field,
       int const                                           neq,
       Teuchos::ParameterList&                             dtk_params);
-#endif  // ALBANY_DTK
 
   void
   setCoupledAppName(std::string const& can)

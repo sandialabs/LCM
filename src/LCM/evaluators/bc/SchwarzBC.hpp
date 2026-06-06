@@ -14,11 +14,9 @@
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_ParameterList.hpp"
 
-#if defined(ALBANY_DTK)
 #include "DTK_MapOperatorFactory.hpp"
 #include "DTK_STKMeshHelpers.hpp"
 #include "DTK_STKMeshManager.hpp"
-#endif
 
 namespace LCM {
 
@@ -40,10 +38,8 @@ class SchwarzBC_Base : public PHAL::DirichletBase<EvalT, Traits>
   void
   computeBCs(size_t const ns_node, T& x_val, T& y_val, T& z_val);
 
-#if defined(ALBANY_DTK)
   Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>
   computeBCsDTK();
-#endif  // ALBANY_DTK
 
   void
   setCoupledAppName(std::string const& can)

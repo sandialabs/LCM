@@ -41,18 +41,16 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest_parallel_ex
                         ${CMAKE_CURRENT_BINARY_DIR}/runtest_parallel_exodiff.cmake)
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-if(ALBANY_DTK)
-  set(OUTFILE0 "nobcs_00.e")
-  set(REF_FILE0 "nobcs_00.gold.e")
-  set(OUTFILE1 "nobcs_01.e")
-  set(REF_FILE1 "nobcs_01.gold.e")
-  add_test(NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
-    COMMAND
-    ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=TorsionParallel
-      -DTEST_ARGS=nobcs.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-      -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0} 
-      -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1} 
-      -P ${runtest_parallel_exodiff.cmake})
-  set_tests_properties(Schwarz_Alternating_Dynamics_${testName}_Parallel
-                       PROPERTIES LABELS "LCM;Tpetra;Forward")
-endif()
+set(OUTFILE0 "nobcs_00.e")
+set(REF_FILE0 "nobcs_00.gold.e")
+set(OUTFILE1 "nobcs_01.e")
+set(REF_FILE1 "nobcs_01.gold.e")
+add_test(NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
+  COMMAND
+  ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=TorsionParallel
+    -DTEST_ARGS=nobcs.yaml -DMPIMNP=4 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0}
+    -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1}
+    -P ${runtest_parallel_exodiff.cmake})
+set_tests_properties(Schwarz_Alternating_Dynamics_${testName}_Parallel
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

@@ -67,6 +67,12 @@ computeSchwarzTransferDTK(
       Teuchos::rcpFromRef(coupled_stk_disc->getSTKMetaData());
   Teuchos::RCP<Teuchos::ParameterList const> coupled_app_params = coupled_app.getAppPL();
   Teuchos::ParameterList                     dtk_params         = coupled_app_params->sublist("DataTransferKit");
+  // ParameterList::get(name, default) has a side effect of *adding* the
+  // parameter with the default value if not present. DTK's MapOperatorFactory
+  // expects "Map Type" to be in dtk_params before it can construct the
+  // operator; the original StrongSchwarzBC::computeBCsDTK relied on this
+  // side-effect call to seed it.
+  (void)dtk_params.get("Map Type", std::string("Consistent Interpolation"));
 
   Teuchos::Array<AbstractSTKFieldContainer::VectorFieldType*> coupled_field_array =
       Teuchos::rcp_dynamic_cast<OrdinarySTKFieldContainer<true>>(coupled_stk_disc->getSTKMeshStruct()->getFieldContainer())

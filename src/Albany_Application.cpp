@@ -863,7 +863,12 @@ Application::eliminateConstrainedDOFs()
 void
 Application::injectConstrainedDOFValues(double time)
 {
-  if (dbc_descriptors_.empty()) return;
+  // Gate on the GLOBAL elimination state, not the per-rank descriptor count.
+  // A rank may legitimately have an empty dbc_descriptors_ in parallel (e.g.
+  // when all constrained DOFs are owned/ghosted by other ranks) while other
+  // ranks need it to participate in the Schwarz DTK collectives below. An
+  // early return here on emptiness alone deadlocks the parallel solve.
+  if (full_owned_vs_.is_null() && schwarz_couplings_.empty()) return;
 
   last_transient_time_ = time;
 

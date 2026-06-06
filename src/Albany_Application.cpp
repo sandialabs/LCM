@@ -27,6 +27,7 @@
 #include "Albany_ProblemFactory.hpp"
 #include "Albany_ResponseFactory.hpp"
 #include "Albany_ScalarResponseFunction.hpp"
+#include "Albany_SchwarzTransfer.hpp"
 #include "Albany_ThyraUtils.hpp"
 #include "PHAL_Utilities.hpp"
 #include "SolutionSniffer.hpp"
@@ -570,6 +571,49 @@ Application::DBCDescriptor::eval(double time) const
   return 0.0;
 }
 
+Application::DBCDescriptor::Derivs
+Application::DBCDescriptor::derivs_at(double time) const
+{
+  switch (kind) {
+    case Kind::Constant: return {0.0, 0.0};
+
+    case Kind::TimeArray: {
+      auto const n = times.size();
+      // Endpoints and degenerate cases: hold the last segment's slope flat at
+      // the endpoints; outside the table, slope is 0 (value clamped by eval).
+      if (n < 2 || time <= times[0] || time >= times[n - 1]) {
+        return {0.0, 0.0};
+      }
+      for (std::size_t i = 1; i < n; ++i) {
+        if (time < times[i]) {
+          double const slope = (values[i] - values[i - 1]) / (times[i] - times[i - 1]);
+          // Interior of a piecewise-linear segment: a = 0; the knot deltas
+          // are treated as zero for the purposes of the BC acceleration.
+          return {slope, 0.0};
+        }
+      }
+      return {0.0, 0.0};
+    }
+
+    case Kind::Expression: {
+      // Central FD over eval(t ± h). h clipped so t-h stays nonnegative when
+      // the expression is only valid for t >= 0. 1e-6 keeps relative truncation
+      // and roundoff balanced for typical polynomial/transcendental BCs.
+      double const h_max = 1.0e-6;
+      double const h     = (time > h_max) ? h_max : (time > 0.0 ? time : h_max);
+      double const f0    = eval(time);
+      double const fp    = eval(time + h);
+      double const fm    = eval(time - h);
+      double const v     = (fp - fm) / (2.0 * h);
+      double const a     = (fp - 2.0 * f0 + fm) / (h * h);
+      return {v, a};
+    }
+
+    case Kind::Schwarz: return {schwarz_cached_velocity, schwarz_cached_acceleration};
+  }
+  return {0.0, 0.0};
+}
+
 void
 Application::eliminateConstrainedDOFs()
 {
@@ -596,11 +640,6 @@ Application::eliminateConstrainedDOFs()
   // statically-computed elimination set would become stale.
   if (problemParams->isParameter("ACE Sequential Thermomechanical") &&
       problemParams->get<bool>("ACE Sequential Thermomechanical")) return;
-
-  // Skip for 2nd-order dynamics (Newmark, HHT, etc.): the Newmark history
-  // tracks velocity and acceleration for every DOF; eliminating displacement
-  // DOFs from the owned space breaks the history bookkeeping.
-  if (num_time_deriv >= 2) return;
 
   // Use overlap-scope nodesets (includes ghosted nodes) so each rank has
   // descriptors for every constrained DOF in its overlap — not just those it
@@ -819,16 +858,10 @@ Application::injectConstrainedDOFValues(double time)
 {
   if (dbc_descriptors_.empty()) return;
 
-  // Capture previous time BEFORE overwriting; used below to compute BC time
-  // derivatives via backward finite difference for x_dot injection.
-  double const prev_time  = last_transient_time_;
-  double const dt_bc      = time - prev_time;
-  bool   const inject_dot = (num_time_deriv >= 1) && (dt_bc > 0.0);
-
   last_transient_time_ = time;
 
-  // Lazy-init Schwarz descriptors: resolve coupled app name to index and find
-  // the coupled app's overlap node whose coordinates match this interface node.
+  // Lazy-init Schwarz descriptors: resolve coupled app name → index, and
+  // match this interface node's coordinate to a coupled-app overlap node.
   if (!apps_.is_null() && !app_name_index_map_.is_null()) {
     auto* this_stk = dynamic_cast<Albany::STKDiscretization*>(disc.get());
     for (auto& desc : dbc_descriptors_) {
@@ -839,21 +872,19 @@ Application::injectConstrainedDOFValues(double time)
       int const coupled_idx = name_it->second;
       if (apps_[coupled_idx] == Teuchos::null) continue;
 
-      auto const& coupled_app  = *apps_[coupled_idx];
-      auto*       coupled_stk  = dynamic_cast<Albany::STKDiscretization*>(coupled_app.getDiscretization().get());
+      auto const& coupled_app = *apps_[coupled_idx];
+      auto*       coupled_stk = dynamic_cast<Albany::STKDiscretization*>(coupled_app.getDiscretization().get());
       if (coupled_stk == nullptr) continue;
 
-      // Coordinate of this interface node in this app's nodeset
       auto const& ns_coords_map = this_stk->getNodeSetCoords();
       auto const  ns_coord_it   = ns_coords_map.find(desc.schwarz_nodeset_id);
       if (ns_coord_it == ns_coords_map.end()) continue;
       double* const coord = ns_coord_it->second[desc.schwarz_ns_node_idx];
 
-      // Find the coupled app's overlap node with matching coordinates
-      auto const& coupled_coords = coupled_stk->getCoordinates();
-      int const   dim            = static_cast<int>(spatial_dimension);
-      LO const    n_ov_nodes     = static_cast<LO>(coupled_coords.size()) / dim;
-      double const tol2          = 1.0e-12;
+      auto const&  coupled_coords = coupled_stk->getCoordinates();
+      int const    dim            = static_cast<int>(spatial_dimension);
+      LO const     n_ov_nodes     = static_cast<LO>(coupled_coords.size()) / dim;
+      double const tol2           = 1.0e-12;
 
       for (LO n = 0; n < n_ov_nodes; ++n) {
         double d2 = 0.0;
@@ -871,40 +902,70 @@ Application::injectConstrainedDOFValues(double time)
     }
   }
 
-  // Update cached Schwarz values from the current coupled app overlap solution.
+  // Refresh Schwarz caches from the coupled app's overlap MV. Direct read by
+  // matched-coordinate overlap LID — fast and exact for node-aligned Schwarz
+  // interfaces. For non-aligned meshes the DTK helper in Albany_SchwarzTransfer
+  // is wired up and ready to slot in here; it's not used yet because the
+  // current test suite is all aligned-mesh Schwarz.
   for (auto& desc : dbc_descriptors_) {
     if (desc.kind != DBCDescriptor::Kind::Schwarz || !desc.schwarz_initialized) continue;
     auto const& coupled_app    = *apps_[desc.schwarz_coupled_app_idx];
     auto const  coupled_sol_MV = coupled_app.getAdaptSolMgr()->getOverlappedSolution();
     if (coupled_sol_MV == Teuchos::null) continue;
-    auto const coupled_view             = Albany::getLocalData(coupled_sol_MV->col(0));
-    int const  coupled_neq              = coupled_app.getNumEquations();
-    desc.schwarz_cached_value = coupled_view[coupled_neq * desc.schwarz_coupled_overlap_lid + desc.schwarz_eq];
+    int const coupled_neq = coupled_app.getNumEquations();
+    int const slot        = coupled_neq * desc.schwarz_coupled_overlap_lid + desc.schwarz_eq;
+
+    auto const u_col          = coupled_sol_MV->col(0);
+    auto const u_view         = Albany::getLocalData(u_col);
+    desc.schwarz_cached_value = u_view[slot];
+
+    int const coupled_n_vecs = coupled_sol_MV->domain()->dim();
+    if (coupled_n_vecs > 1) {
+      auto const v_col             = coupled_sol_MV->col(1);
+      auto const v_view            = Albany::getLocalData(v_col);
+      desc.schwarz_cached_velocity = v_view[slot];
+    }
+    if (coupled_n_vecs > 2) {
+      auto const a_col                 = coupled_sol_MV->col(2);
+      auto const a_view                = Albany::getLocalData(a_col);
+      desc.schwarz_cached_acceleration = a_view[slot];
+    }
   }
 
-  auto overlapped_MV = solMgr->getOverlappedSolution();
-  auto x_overlap     = overlapped_MV->col(0);
-  auto x_data        = Albany::getNonconstLocalData(x_overlap);
-
-  // Also inject x_dot at constrained overlap slots when a new time step is
-  // starting. The reduced-space scatter cannot fill constrained slots (those
-  // GIDs don't exist in the reduced source), so without this those slots hold
-  // stale values and corrupt mass-term contributions in element residuals
-  // that touch constrained nodes. During Newton iterations within the same
-  // step, dt_bc == 0 and we leave x_dot untouched (already correct from the
-  // first iterate of this step).
-  Teuchos::ArrayRCP<ST> xdot_data;
-  if (inject_dot) {
-    auto xdot_overlap = overlapped_MV->col(1);
-    xdot_data         = Albany::getNonconstLocalData(xdot_overlap);
+  // Inject u, v, a into the constrained overlap slots. The reduced-space
+  // scatter cannot reach these slots (their GIDs don't exist in the reduced
+  // source); without this they would hold stale values and corrupt the
+  // mass/inertia contributions in element residuals that touch constrained
+  // nodes. Idempotent during Newton iterations within a step (eval and
+  // derivs_at depend only on `time`; Schwarz returns the cached values set
+  // above on the most recent step boundary).
+  // Keep the column RCPs alive for the duration of the inject loop —
+  // ArrayRCPs returned by getNonconstLocalData are valid only as long as
+  // the underlying Thyra_Vector temporary lives.
+  auto       overlapped_MV   = solMgr->getOverlappedSolution();
+  auto       x_overlap       = overlapped_MV->col(0);
+  auto const x_data          = Albany::getNonconstLocalData(x_overlap);
+  Teuchos::RCP<Thyra_Vector> xdot_overlap;
+  Teuchos::RCP<Thyra_Vector> xdotdot_overlap;
+  Teuchos::ArrayRCP<ST>      xdot_data;
+  Teuchos::ArrayRCP<ST>      xdotdot_data;
+  if (num_time_deriv >= 1) {
+    xdot_overlap = overlapped_MV->col(1);
+    xdot_data    = Albany::getNonconstLocalData(xdot_overlap);
+  }
+  if (num_time_deriv >= 2) {
+    xdotdot_overlap = overlapped_MV->col(2);
+    xdotdot_data    = Albany::getNonconstLocalData(xdotdot_overlap);
   }
 
   for (auto const& desc : dbc_descriptors_) {
-    double const bc_val       = desc.eval(time);
-    x_data[desc.overlap_lid] = bc_val;
-    if (inject_dot) {
-      double const bc_val_prev         = desc.eval(prev_time);
-      xdot_data[desc.overlap_lid]      = (bc_val - bc_val_prev) / dt_bc;
+    auto const derivs       = desc.derivs_at(time);
+    x_data[desc.overlap_lid] = desc.eval(time);
+    if (num_time_deriv >= 1) {
+      xdot_data[desc.overlap_lid] = derivs.v;
+    }
+    if (num_time_deriv >= 2) {
+      xdotdot_data[desc.overlap_lid] = derivs.a;
     }
   }
 }

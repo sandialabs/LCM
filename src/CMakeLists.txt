@@ -27,6 +27,7 @@ set(SOURCES
     Albany_NullSpaceUtils.cpp
     Albany_ObserverImpl.cpp
     Albany_PiroObserver.cpp
+    Albany_SchwarzTransfer.cpp
     Albany_StatelessObserverImpl.cpp
     Albany_StateManager.cpp
     Albany_StateInfoStruct.cpp
@@ -48,6 +49,7 @@ set(HEADERS
     Albany_ObserverImpl.hpp
     Albany_PiroObserver.hpp
     Albany_ScalarOrdinalTypes.hpp
+    Albany_SchwarzTransfer.hpp
     Albany_SolverFactory.hpp
     Albany_StateManager.hpp
     Albany_StateInfoStruct.hpp

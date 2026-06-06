@@ -637,10 +637,35 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     bool        schwarz_initialized         = false;
     int         schwarz_coupled_app_idx     = -1;  // cached on init
     LO          schwarz_coupled_overlap_lid = -1;  // cached on init
-    mutable double schwarz_cached_value     = 0.0; // updated each inject
+    // Schwarz values refreshed each step from the coupled app via DTK
+    // mesh-to-mesh transfer (Albany::computeSchwarzTransferDTK). Slot 0 is
+    // displacement, slot 1 velocity, slot 2 acceleration; v and a stay at 0
+    // for quasistatics where num_time_deriv < 1 / < 2.
+    mutable double schwarz_cached_value        = 0.0;
+    mutable double schwarz_cached_velocity     = 0.0;
+    mutable double schwarz_cached_acceleration = 0.0;
 
+    // Prescribed BC value at `time`.
     double
     eval(double time) const;
+
+    // Prescribed time derivatives (ḃc, b̈c) at `time`. Per kind:
+    //   Constant   → {0, 0}.
+    //   TimeArray  → {segment slope, 0}; the second derivative is a delta at
+    //                knots, treated as 0 in segment interiors.
+    //   Expression → central FD over eval(t ± h) with h clipped to keep
+    //                t - h >= 0; gives exact derivatives for polynomials up
+    //                to degree 2 and high accuracy otherwise.
+    //   Schwarz    → cached velocity/acceleration set by the DTK transfer in
+    //                injectConstrainedDOFValues (cols 1 and 2 of the coupled
+    //                overlap MV, transferred the same way as col 0).
+    struct Derivs
+    {
+      double v;
+      double a;
+    };
+    Derivs
+    derivs_at(double time) const;
   };
 
   std::vector<DBCDescriptor> dbc_descriptors_;

@@ -396,17 +396,18 @@ fillResidual(SchwarzBC& sbc, typename Traits::EvalData workset)
     auto const x_dof = ns_dof[ns_node][0];
     auto const y_dof = ns_dof[ns_node][1];
     auto const z_dof = ns_dof[ns_node][2];
-    auto const dof   = x_dof / 3;
+    if (x_dof < 0 && y_dof < 0 && z_dof < 0) continue;  // eliminated DOF
+    auto const dof = x_dof / 3;
 
     std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
-    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
+    if (x_dof >= 0 && fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       f_view[x_dof] = x_const_view[x_dof] - schwarz_bcs_const_view_x[dof];
     }
-    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) {
+    if (y_dof >= 0 && fixed_dofs.find(y_dof) == fixed_dofs.end()) {
       f_view[y_dof] = x_const_view[y_dof] - schwarz_bcs_const_view_y[dof];
     }
-    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) {
+    if (z_dof >= 0 && fixed_dofs.find(z_dof) == fixed_dofs.end()) {
       f_view[z_dof] = x_const_view[z_dof] - schwarz_bcs_const_view_z[dof];
     }
   }
@@ -466,10 +467,11 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits:
     auto const x_dof = ns_nodes[ns_node][0];
     auto const y_dof = ns_nodes[ns_node][1];
     auto const z_dof = ns_nodes[ns_node][2];
+    if (x_dof < 0 && y_dof < 0 && z_dof < 0) continue;  // eliminated DOF
 
     std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
-    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
+    if (x_dof >= 0 && fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       // replace jac values for the X dof
       Albany::getLocalRowValues(jac, x_dof, matrixIndices, matrixEntries);
       for (auto& val : matrixEntries) {
@@ -480,7 +482,7 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits:
       Albany::setLocalRowValues(jac, x_dof, index(), value());
     }
 
-    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) {
+    if (y_dof >= 0 && fixed_dofs.find(y_dof) == fixed_dofs.end()) {
       // replace jac values for the y dof
       Albany::getLocalRowValues(jac, y_dof, matrixIndices, matrixEntries);
       for (auto& val : matrixEntries) {
@@ -491,7 +493,7 @@ SchwarzBC<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(typename Traits:
       Albany::setLocalRowValues(jac, y_dof, index(), value());
     }
 
-    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) {
+    if (z_dof >= 0 && fixed_dofs.find(z_dof) == fixed_dofs.end()) {
       // replace jac values for the z dof
       Albany::getLocalRowValues(jac, z_dof, matrixIndices, matrixEntries);
       for (auto& val : matrixEntries) {

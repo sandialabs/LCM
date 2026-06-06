@@ -493,11 +493,18 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
     auto const x_dof = ns_nodes[ns_node][0];
     auto const y_dof = ns_nodes[ns_node][1];
     auto const z_dof = ns_nodes[ns_node][2];
-    auto const dof   = x_dof / 3;
+    // Under DBC DOF elimination, Application::eliminateConstrainedDOFs
+    // retranslates constrained-DOF lids in workset.nodeSets to -1. Skip those
+    // here — disp_view[-1] = ... would be UB that silently corrupts the
+    // overlap solution vector just before its start. Application::
+    // injectConstrainedDOFValues already handles those slots via the per-kind
+    // descriptors.
+    if (x_dof < 0 && y_dof < 0 && z_dof < 0) continue;
+    auto const dof = x_dof / 3;
 
     std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
-    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
+    if (x_dof >= 0 && fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       disp_view[x_dof] = bcs_disp_const_view_x[dof];
       if (has_velo) {
         velo_view[x_dof] = bcs_velo_const_view_x[dof];
@@ -506,7 +513,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
         acce_view[x_dof] = bcs_acce_const_view_x[dof];
       }
     }
-    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) {
+    if (y_dof >= 0 && fixed_dofs.find(y_dof) == fixed_dofs.end()) {
       disp_view[y_dof] = bcs_disp_const_view_y[dof];
       if (has_velo) {
         velo_view[y_dof] = bcs_velo_const_view_y[dof];
@@ -515,7 +522,7 @@ fillSolution(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
         acce_view[y_dof] = bcs_acce_const_view_y[dof];
       }
     }
-    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) {
+    if (z_dof >= 0 && fixed_dofs.find(z_dof) == fixed_dofs.end()) {
       disp_view[z_dof] = bcs_disp_const_view_z[dof];
       if (has_velo) {
         velo_view[z_dof] = bcs_velo_const_view_z[dof];
@@ -547,13 +554,15 @@ fillResidual(StrongSchwarzBC& sbc, typename Traits::EvalData workset)
 
     std::set<int> const& fixed_dofs = workset.fixed_dofs_;
 
-    if (fixed_dofs.find(x_dof) == fixed_dofs.end()) {
+    // x_dof < 0 → eliminated DOF (set by setupDBCElimination retranslate).
+    // Skipping prevents UB writes to f_view[-1].
+    if (x_dof >= 0 && fixed_dofs.find(x_dof) == fixed_dofs.end()) {
       f_view[x_dof] = 0.0;
     }
-    if (fixed_dofs.find(y_dof) == fixed_dofs.end()) {
+    if (y_dof >= 0 && fixed_dofs.find(y_dof) == fixed_dofs.end()) {
       f_view[y_dof] = 0.0;
     }
-    if (fixed_dofs.find(z_dof) == fixed_dofs.end()) {
+    if (z_dof >= 0 && fixed_dofs.find(z_dof) == fixed_dofs.end()) {
       f_view[z_dof] = 0.0;
     }
   }

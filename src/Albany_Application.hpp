@@ -670,6 +670,15 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
   std::vector<DBCDescriptor> dbc_descriptors_;
 
+  //! Unique (coupled_app_name, nodeset_id) pairs that Schwarz DBCs in this
+  //! application's YAML couple to. Populated at BC parse time (every rank reads
+  //! the same YAML, so the set is the same on every rank). Used in
+  //! injectConstrainedDOFValues to drive Albany::computeSchwarzTransferDTK
+  //! collectively across ranks: every rank iterates this set and participates
+  //! in the DTK MapOperator setup/apply for every pair, even when no local
+  //! descriptor lands there.
+  std::vector<std::pair<std::string, std::string>> schwarz_couplings_;
+
   //! Full (pre-elimination) owned vector space; null when no elimination active.
   Teuchos::RCP<Thyra_VectorSpace const> full_owned_vs_;
 

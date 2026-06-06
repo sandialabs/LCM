@@ -742,6 +742,12 @@ Application::eliminateConstrainedDOFs()
     if (bc_params.isSublist(schwarz_key)) {
       auto const& schwarz_sub        = bc_params.sublist(schwarz_key);
       std::string const coupled_name = schwarz_sub.get<std::string>("Coupled Application");
+      // Record the coupling for the collective DTK transfer driver. Every
+      // rank reads the same YAML, so every rank registers the same coupling
+      // here — even ranks whose local mesh slice ghosts no Schwarz DOFs. This
+      // keeps Albany::computeSchwarzTransferDTK called consistently across
+      // ranks (DTK MapOperator::setup/apply is collective on the MPI comm).
+      schwarz_couplings_.emplace_back(coupled_name, schwarz_ns);
       for (int eq : offsets[i]) {
         for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
           GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], eq);
@@ -887,14 +893,28 @@ Application::injectConstrainedDOFValues(double time)
   std::map<std::pair<int, std::string>,
            Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>>>
       schwarz_xfer;
+  // Drive DTK calls from the rank-invariant schwarz_couplings_ set so that
+  // every MPI rank participates in computeSchwarzTransferDTK for every
+  // (coupled_app, nodeset) pair, even ranks with no local descriptor on that
+  // pair. DTK::MapOperator::setup is a collective on the MPI comm; asymmetric
+  // participation across ranks deadlocks the parallel solve.
+  if (!apps_.is_null() && !app_name_index_map_.is_null()) {
+    for (auto const& [coupled_name, ns_id] : schwarz_couplings_) {
+      auto const name_it = app_name_index_map_->find(coupled_name);
+      if (name_it == app_name_index_map_->end()) continue;
+      int const coupled_idx = name_it->second;
+      if (apps_[coupled_idx] == Teuchos::null) continue;
+      auto const& coupled_app   = *apps_[coupled_idx];
+      auto const  key           = std::make_pair(coupled_idx, ns_id);
+      schwarz_xfer[key]         = Albany::computeSchwarzTransferDTK(*this, coupled_app, ns_id);
+    }
+  }
   for (auto& desc : dbc_descriptors_) {
     if (desc.kind != DBCDescriptor::Kind::Schwarz || !desc.schwarz_initialized) continue;
     auto const key = std::make_pair(desc.schwarz_coupled_app_idx, desc.schwarz_nodeset_id);
-    if (schwarz_xfer.count(key) == 0) {
-      auto const& coupled_app = *apps_[desc.schwarz_coupled_app_idx];
-      schwarz_xfer[key]       = Albany::computeSchwarzTransferDTK(*this, coupled_app, desc.schwarz_nodeset_id);
-    }
-    auto const& xfer     = schwarz_xfer[key];
+    auto       it  = schwarz_xfer.find(key);
+    if (it == schwarz_xfer.end()) continue;
+    auto const& xfer = it->second;
     // The DTK target MV is created from this app's solution_field_dtk STK
     // field via createFieldMultiVector. Its row LID space matches the overlap
     // node LID space (StrongSchwarzBC's weak-path consumer relies on the same

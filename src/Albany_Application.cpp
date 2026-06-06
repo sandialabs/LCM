@@ -678,9 +678,10 @@ Application::eliminateConstrainedDOFs()
       // Build a descriptor prototype for this (ns, dof) pair.
       DBCDescriptor proto;
 
-      std::string const dbc_key  = "DBC on NS " + ns + " for DOF " + dof;
-      std::string const sdbc_key = "SDBC on NS " + ns + " for DOF " + dof;
+      std::string const dbc_key   = "DBC on NS " + ns + " for DOF " + dof;
+      std::string const sdbc_key  = "SDBC on NS " + ns + " for DOF " + dof;
       std::string const tdep_key  = "Time Dependent DBC on NS " + ns + " for DOF " + dof;
+      std::string const tdep_skey = "Time Dependent SDBC on NS " + ns + " for DOF " + dof;
       std::string const expr_key  = "ExpressionEvaluated SDBC on NS " + ns + " for DOF " + dof;
 
       if (bc_params.isType<double>(dbc_key)) {
@@ -689,8 +690,8 @@ Application::eliminateConstrainedDOFs()
       } else if (bc_params.isType<double>(sdbc_key)) {
         proto.kind     = DBCDescriptor::Kind::Constant;
         proto.constant = bc_params.get<double>(sdbc_key);
-      } else if (bc_params.isSublist(tdep_key)) {
-        auto& tlist    = bc_params.sublist(tdep_key);
+      } else if (bc_params.isSublist(tdep_key) || bc_params.isSublist(tdep_skey)) {
+        auto& tlist    = bc_params.sublist(bc_params.isSublist(tdep_key) ? tdep_key : tdep_skey);
         proto.kind     = DBCDescriptor::Kind::TimeArray;
         // Accept either inline "Time Values"/"BC Values" arrays or file-backed
         // "Time File"/"BC File" (whitespace-separated array text, as parsed by
@@ -860,75 +861,51 @@ Application::injectConstrainedDOFValues(double time)
 
   last_transient_time_ = time;
 
-  // Lazy-init Schwarz descriptors: resolve coupled app name → index, and
-  // match this interface node's coordinate to a coupled-app overlap node.
+  // Lazy-init Schwarz descriptors: resolve coupled-app name → app index.
+  // No coordinate matching is needed because the DTK transfer below does
+  // spatial interpolation — the Schwarz interface meshes can be non-aligned.
   if (!apps_.is_null() && !app_name_index_map_.is_null()) {
-    auto* this_stk = dynamic_cast<Albany::STKDiscretization*>(disc.get());
     for (auto& desc : dbc_descriptors_) {
       if (desc.kind != DBCDescriptor::Kind::Schwarz || desc.schwarz_initialized) continue;
-
       auto const name_it = app_name_index_map_->find(desc.schwarz_coupled_app_name);
       if (name_it == app_name_index_map_->end()) continue;
       int const coupled_idx = name_it->second;
       if (apps_[coupled_idx] == Teuchos::null) continue;
-
-      auto const& coupled_app = *apps_[coupled_idx];
-      auto*       coupled_stk = dynamic_cast<Albany::STKDiscretization*>(coupled_app.getDiscretization().get());
-      if (coupled_stk == nullptr) continue;
-
-      auto const& ns_coords_map = this_stk->getNodeSetCoords();
-      auto const  ns_coord_it   = ns_coords_map.find(desc.schwarz_nodeset_id);
-      if (ns_coord_it == ns_coords_map.end()) continue;
-      double* const coord = ns_coord_it->second[desc.schwarz_ns_node_idx];
-
-      auto const&  coupled_coords = coupled_stk->getCoordinates();
-      int const    dim            = static_cast<int>(spatial_dimension);
-      LO const     n_ov_nodes     = static_cast<LO>(coupled_coords.size()) / dim;
-      double const tol2           = 1.0e-12;
-
-      for (LO n = 0; n < n_ov_nodes; ++n) {
-        double d2 = 0.0;
-        for (int d = 0; d < dim; ++d) {
-          double const diff = coupled_coords[dim * n + d] - coord[d];
-          d2 += diff * diff;
-        }
-        if (d2 < tol2) {
-          desc.schwarz_coupled_app_idx     = coupled_idx;
-          desc.schwarz_coupled_overlap_lid = n;
-          desc.schwarz_initialized         = true;
-          break;
-        }
-      }
+      desc.schwarz_coupled_app_idx = coupled_idx;
+      desc.schwarz_initialized     = true;
     }
   }
 
-  // Refresh Schwarz caches from the coupled app's overlap MV. Direct read by
-  // matched-coordinate overlap LID — fast and exact for node-aligned Schwarz
-  // interfaces. For non-aligned meshes the DTK helper in Albany_SchwarzTransfer
-  // is wired up and ready to slot in here; it's not used yet because the
-  // current test suite is all aligned-mesh Schwarz.
+  // Refresh Schwarz caches per (coupled_app, nodeset) pair via DTK transfer.
+  // The returned MV array has one entry per time-derivative slot (length =
+  // num_time_deriv + 1). Each MV is backed by this app's solution_field_dtk
+  // STK field, so getData(eq)[overlap_node_lid] reads the interpolated value
+  // at this nodeset's local node identified by its overlap node LID.
+  // Recompute every call: the coupled-app state changes both across Schwarz
+  // iterations (subdomain solves alternate) and across time steps.
+  int const neq = getNumEquations();
+  std::map<std::pair<int, std::string>,
+           Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>>>
+      schwarz_xfer;
   for (auto& desc : dbc_descriptors_) {
     if (desc.kind != DBCDescriptor::Kind::Schwarz || !desc.schwarz_initialized) continue;
-    auto const& coupled_app    = *apps_[desc.schwarz_coupled_app_idx];
-    auto const  coupled_sol_MV = coupled_app.getAdaptSolMgr()->getOverlappedSolution();
-    if (coupled_sol_MV == Teuchos::null) continue;
-    int const coupled_neq = coupled_app.getNumEquations();
-    int const slot        = coupled_neq * desc.schwarz_coupled_overlap_lid + desc.schwarz_eq;
-
-    auto const u_col          = coupled_sol_MV->col(0);
-    auto const u_view         = Albany::getLocalData(u_col);
-    desc.schwarz_cached_value = u_view[slot];
-
-    int const coupled_n_vecs = coupled_sol_MV->domain()->dim();
-    if (coupled_n_vecs > 1) {
-      auto const v_col             = coupled_sol_MV->col(1);
-      auto const v_view            = Albany::getLocalData(v_col);
-      desc.schwarz_cached_velocity = v_view[slot];
+    auto const key = std::make_pair(desc.schwarz_coupled_app_idx, desc.schwarz_nodeset_id);
+    if (schwarz_xfer.count(key) == 0) {
+      auto const& coupled_app = *apps_[desc.schwarz_coupled_app_idx];
+      schwarz_xfer[key]       = Albany::computeSchwarzTransferDTK(*this, coupled_app, desc.schwarz_nodeset_id);
     }
-    if (coupled_n_vecs > 2) {
-      auto const a_col                 = coupled_sol_MV->col(2);
-      auto const a_view                = Albany::getLocalData(a_col);
-      desc.schwarz_cached_acceleration = a_view[slot];
+    auto const& xfer     = schwarz_xfer[key];
+    // The DTK target MV is created from this app's solution_field_dtk STK
+    // field via createFieldMultiVector. Its row LID space matches the overlap
+    // node LID space (StrongSchwarzBC's weak-path consumer relies on the same
+    // x_dof / neq indexing, which empirically works).
+    LO const node_lid         = desc.overlap_lid / neq;
+    desc.schwarz_cached_value = xfer[0]->getData(desc.schwarz_eq)[node_lid];
+    if (xfer.size() > 1) {
+      desc.schwarz_cached_velocity = xfer[1]->getData(desc.schwarz_eq)[node_lid];
+    }
+    if (xfer.size() > 2) {
+      desc.schwarz_cached_acceleration = xfer[2]->getData(desc.schwarz_eq)[node_lid];
     }
   }
 

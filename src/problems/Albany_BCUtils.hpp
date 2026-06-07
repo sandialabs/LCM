@@ -58,14 +58,8 @@ struct DirichletTraits
   {
     typeEe = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_expreval_sdbc
   };
-  enum
-  {
-    typeSw = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_schwarz_bc
-  };
-  enum
-  {
-    typeSsw = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_strong_schwarz_bc
-  };
+  // Schwarz / StrongSchwarz IDs (formerly typeSw / typeSsw) were removed
+  // when the DBC DOF-elimination path absorbed Schwarz coupling.
   enum
   {
     typeDa = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_dirichlet_aggregator

@@ -63,6 +63,7 @@ Albany::CahnHillProblem::constructDirichletEvaluators(std::vector<std::string> c
   use_sdbcs_  = bcUtils.useSDBCs();
   offsets_    = bcUtils.getOffsets();
   nodeSetIDs_ = bcUtils.getNodeSetIDs();
+  bcNames_    = bcNames;
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

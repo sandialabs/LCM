@@ -4,6 +4,7 @@ LCM:
     Solution Method: Steady
     Convection Velocity: '{0.0,0.0}'
     Phalanx Graph Visualization Detail: 1
+    Skip DOF Elimination: true
     Dirichlet BCs: 
       DBC on NS NodeSet0 for DOF T: 2.00000000000000000e+00
       DBC on NS NodeSet1 for DOF T: 0.00000000000000000e+00

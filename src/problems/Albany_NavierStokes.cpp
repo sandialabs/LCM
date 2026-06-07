@@ -163,6 +163,7 @@ Albany::NavierStokes::constructDirichletEvaluators(std::vector<std::string> cons
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
+  bcNames_    = dirichletNames;
 }
 
 // Neumann BCs

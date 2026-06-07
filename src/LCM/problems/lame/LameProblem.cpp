@@ -94,6 +94,7 @@ Albany::LameProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const&
   dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
+  bcNames_    = dirichletNames;
   use_sdbcs_  = dirUtils.useSDBCs();
 }
 

@@ -59,6 +59,7 @@ Albany::Helmholtz2DProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
+  bcNames_    = dirichletNames;
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

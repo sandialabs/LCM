@@ -9,8 +9,6 @@
 #include "LCM/evaluators/bc/ACEWavePressureBC.hpp"
 #include "LCM/evaluators/bc/EquilibriumConcentrationBC.hpp"
 #include "LCM/evaluators/bc/KfieldBC.hpp"
-#include "LCM/evaluators/bc/SchwarzBC.hpp"
-#include "LCM/evaluators/bc/StrongSchwarzBC.hpp"
 #include "LCM/evaluators/bc/TimeTracBC.hpp"
 #include "LCM/evaluators/bc/TorsionBC.hpp"
 #include "PHAL_Dirichlet.hpp"
@@ -53,9 +51,11 @@ struct DirichletFactoryTraits
   static int const id_eq_concentration_bc  = 7;
   static int const id_time                 = 8;
   static int const id_torsion_bc           = 9;
-  static int const id_schwarz_bc           = 10;
-  static int const id_strong_schwarz_bc    = 11;
 
+  // Schwarz and StrongSchwarz BC evaluators were retired: the DBC
+  // DOF-elimination path in Application::eliminateConstrainedDOFs and
+  // Application::injectConstrainedDOFValues drives DTK transfer and value
+  // injection directly without going through a Phalanx evaluator.
   typedef Sacado::mpl::vector<
       PHAL::Dirichlet<_, Traits>,                  //  0
       PHAL::DirichletAggregator<_, Traits>,        //  1
@@ -66,9 +66,7 @@ struct DirichletFactoryTraits
       LCM::KfieldBC<_, Traits>,                    //  6
       LCM::EquilibriumConcentrationBC<_, Traits>,  //  7
       LCM::Time<_, Traits>,                        //  8
-      LCM::TorsionBC<_, Traits>,                   //  9
-      LCM::SchwarzBC<_, Traits>,                   // 10
-      LCM::StrongSchwarzBC<_, Traits>              // 11
+      LCM::TorsionBC<_, Traits>                    //  9
       >
       EvaluatorTypes;
 };

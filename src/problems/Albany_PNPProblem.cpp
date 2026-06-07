@@ -87,6 +87,7 @@ Albany::PNPProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const& 
   use_sdbcs_  = dirUtils.useSDBCs();
   offsets_    = dirUtils.getOffsets();
   nodeSetIDs_ = dirUtils.getNodeSetIDs();
+  bcNames_    = dirichletNames;
 }
 
 // Neumann BCs

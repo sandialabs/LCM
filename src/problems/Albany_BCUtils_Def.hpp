@@ -45,10 +45,17 @@ imposeOrder(Teuchos::ParameterList const& bc_pl, std::map<std::string, Teuchos::
   char const*       parm_val = "BCOrder_";
 
   // Get the order of the BCs as they are written in the input file.
-  // ParameterList::ConstIterator preserves the text ordering.
+  // ParameterList::ConstIterator preserves the text ordering. StrongSchwarz
+  // entries are excluded because they are consumed by the DBC DOF-elimination
+  // path in Application::eliminateConstrainedDOFs rather than by a Phalanx
+  // evaluator, so the "all dependencies satisfied" check below would otherwise
+  // mis-fire on them.
   S2int order;
   int   ne = 0;
-  for (ParameterList::ConstIterator it = bc_pl.begin(); it != bc_pl.end(); ++it) order[it->first] = ne++;
+  for (ParameterList::ConstIterator it = bc_pl.begin(); it != bc_pl.end(); ++it) {
+    if (it->first.find("StrongSchwarz") != std::string::npos) continue;
+    order[it->first] = ne++;
+  }
 
   std::vector<bool> found(ne, false);
   for (S2PL::const_iterator it = evname2pl.begin(); it != evname2pl.end(); ++it) {
@@ -600,100 +607,12 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
     }
   }
 
-  ///
-  /// Schwarz BC specific
-  ///
-  for (auto i = 0; i < nodeSetIDs.size(); ++i) {
-    string ss = traits_type::constructBCName(nodeSetIDs[i], "Schwarz");
-
-    if (BCparams.isSublist(ss)) {
-      // grab the sublist
-      ParameterList& sub_list = BCparams.sublist(ss);
-
-      if (sub_list.get<string>("BC Function") == "Schwarz") {
-        RCP<ParameterList> p = rcp(new ParameterList);
-
-        p->set<int>("Type", traits_type::typeSw);
-
-        p->set<string>("Coupled Application", sub_list.get<string>("Coupled Application"));
-
-        p->set<string>("Coupled Block", sub_list.get<string>("Coupled Block", "NONE"));
-
-        // Get the application from the main parameters list above
-        // and pass it to the Schwarz BC evaluator.
-        Teuchos::RCP<Albany::Application> const& application = params->get<Teuchos::RCP<Albany::Application>>("Application");
-
-        p->set<Teuchos::RCP<Albany::Application>>("Application", application);
-
-        // Fill up ParameterList with things DirichletBase wants
-        p->set<RCP<DataLayout>>("Data Layout", dummy);
-        p->set<string>("Dirichlet Name", ss);
-        p->set<RealType>("Dirichlet Value", 0.0);
-        p->set<string>("Node Set ID", nodeSetIDs[i]);
-        p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) {
-          offsets_[i].push_back(j);
-        }
-        // if set to zero, the cubature degree of the side
-        // will be set to that of the element
-        p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));
-        p->set<RCP<ParamLib>>("Parameter Library", paramLib);
-
-        evaluators_to_build[evaluatorsToBuildName(ss)] = p;
-
-        bcs->push_back(ss);
-        use_dbcs_ = true;
-      }
-    }
-  }
-
-  ///
-  /// Strong Schwarz BC specific
-  ///
-  for (auto i = 0; i < nodeSetIDs.size(); ++i) {
-    string ss = traits_type::constructSDBCName(nodeSetIDs[i], "StrongSchwarz");
-
-    if (BCparams.isSublist(ss)) {
-      use_sdbcs_ = true;
-
-      // grab the sublist
-      ParameterList& sub_list = BCparams.sublist(ss);
-
-      if (sub_list.get<string>("BC Function") == "StrongSchwarz") {
-        RCP<ParameterList> p = rcp(new ParameterList);
-
-        p->set<int>("Type", traits_type::typeSsw);
-
-        p->set<string>("Coupled Application", sub_list.get<string>("Coupled Application"));
-
-        p->set<string>("Coupled Block", sub_list.get<string>("Coupled Block", "NONE"));
-
-        // Get the application from the main parameters list above
-        // and pass it to the Schwarz BC evaluator.
-        Teuchos::RCP<Albany::Application> const& application = params->get<Teuchos::RCP<Albany::Application>>("Application");
-
-        p->set<Teuchos::RCP<Albany::Application>>("Application", application);
-
-        // Fill up ParameterList with things DirichletBase wants
-        p->set<RCP<DataLayout>>("Data Layout", dummy);
-        p->set<string>("Dirichlet Name", ss);
-        p->set<RealType>("Dirichlet Value", 0.0);
-        p->set<string>("Node Set ID", nodeSetIDs[i]);
-        p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) {
-          offsets_[i].push_back(j);
-        }
-        // if set to zero, the cubature degree of the side
-        // will be set to that of the element
-        p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));
-        p->set<RCP<ParamLib>>("Parameter Library", paramLib);
-
-        evaluators_to_build[evaluatorsToBuildName(ss)] = p;
-
-        bcs->push_back(ss);
-      }
-    }
-  }
+  // Schwarz and Strong Schwarz BC registrations were removed; the DBC
+  // DOF-elimination path drives Schwarz coupling directly. The
+  // "SDBC on NS X for DOF StrongSchwarz: ..." YAML key is parsed by
+  // Application::eliminateConstrainedDOFs (DBCDescriptor::Kind::Schwarz)
+  // and Application::injectConstrainedDOFValues drives DTK transfer + node
+  // value injection without a Phalanx evaluator.
 
   ///
   /// Kfield BC specific
@@ -1313,12 +1232,13 @@ Albany::DirichletTraits::getValidBCParameters(std::vector<std::string> const& no
   for (std::size_t i = 0; i < nodeSetIDs.size(); i++) {
     std::string ss = Albany::DirichletTraits::constructBCName(nodeSetIDs[i], "K");
     std::string tt = Albany::DirichletTraits::constructBCName(nodeSetIDs[i], "twist");
-    std::string ww = Albany::DirichletTraits::constructBCName(nodeSetIDs[i], "Schwarz");
     std::string sw = Albany::DirichletTraits::constructSDBCName(nodeSetIDs[i], "StrongSchwarz");
     std::string pd = Albany::DirichletTraits::constructBCName(nodeSetIDs[i], "lsfit");
     validPL->sublist(ss, false, "");
     validPL->sublist(tt, false, "");
-    validPL->sublist(ww, false, "");
+    // Schwarz overlap nodeset key (consumed by elimination's DBCDescriptor
+    // parser rather than a Phalanx evaluator) must still appear in the valid
+    // list so Teuchos parameter validation accepts user YAMLs.
     validPL->sublist(sw, false, "");
     validPL->sublist(pd, false, "");
   }

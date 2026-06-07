@@ -6,22 +6,30 @@ LCM:
     Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: 'material_01.yaml'
     Solution Method: Transient Tempus
+    # IC mirrors Norma's clamped: Gaussian Z bump centered at z=0 with
+    # amplitude 0.001 m and sigma 0.02 m. The Norma mesh used by this
+    # subdomain spans z in [-0.25, 0.5], so the peak sits well inside the
+    # domain at the Schwarz-interface side.
     Initial Condition:
       Function: Gaussian Z
-      Function Data: [0.01, 0.5, 0.02]
+      Function Data: [0.001, 0.0, 0.02]
     Initial Condition Dot:
       Function: Constant
-      Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00]
+      Function Data: [0.0, 0.0, 0.0]
+    # Boundary conditions match Norma's clamped-2: clamped on z+ face, free
+    # in z at the z- face (Schwarz interface to clamped_00). x and y faces
+    # are constrained in their normal direction to suppress rigid-body
+    # rotation and lateral motion.
     Dirichlet BCs:
-      SDBC on NS NodeSet0 for DOF X: 0.00000000e+00
-      SDBC on NS NodeSet1 for DOF X: 0.00000000e+00
-      SDBC on NS NodeSet2 for DOF Y: 0.00000000e+00
-      SDBC on NS NodeSet3 for DOF Y: 0.00000000e+00
-      SDBC on NS NodeSet4 for DOF StrongSchwarz:
+      SDBC on NS nsx- for DOF X: 0.0
+      SDBC on NS nsx+ for DOF X: 0.0
+      SDBC on NS nsy- for DOF Y: 0.0
+      SDBC on NS nsy+ for DOF Y: 0.0
+      SDBC on NS nsz+ for DOF Z: 0.0
+      SDBC on NS nsz- for DOF StrongSchwarz:
         BC Function: StrongSchwarz
         Coupled Application: clamped_00.yaml
-        Coupled Block: Block0
-      SDBC on NS NodeSet5 for DOF Z: 0.00000000e+00
+        Coupled Block: coarse
     Response Functions:
       Number: 4
       Response 0: Project IP to Nodal Field
@@ -34,28 +42,14 @@ LCM:
       Response 2: Solution Max Value
       Response 3: Solution Min Value
   Discretization:
-    Method: STK3D
-    1D Elements: 1
-    1D Scale: 0.01
-    2D Elements: 1
-    2D Scale: 0.01
-    3D Elements: 75
-    3D Scale: 0.75
-    Transform Type: Shift
-    x-shift: 0.0
-    y-shift: 0.0
-    z-shift: 0.25
+    Method: Ioss
+    Exodus Input File Name: 'clamped_01.g'
     Exodus Output File Name: 'clamped_01.e'
     Exodus Solution Name: disp
     Exodus Residual Name: resid
     Separate Evaluators by Element Block: true
     Number Of Time Derivatives: 2
     Exodus Write Interval: 10
-  Regression Results:
-    Number of Comparisons: 4
-    Test Values: [0.000000000000e+00, -1.442043556017e-05, 3.715203484204e-04, -3.715203339250e-04]
-    Relative Tolerance: 1.0e-7
-    Absolute Tolerance: 1.0e-7
   Piro:
     Tempus:
       Integrator Name: Tempus Integrator

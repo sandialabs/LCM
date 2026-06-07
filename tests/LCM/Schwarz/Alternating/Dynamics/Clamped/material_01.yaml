@@ -1,6 +1,6 @@
 LCM:
   ElementBlocks:
-    Block0:
+    fine:
       material: Clamped
   Materials:
     Clamped:

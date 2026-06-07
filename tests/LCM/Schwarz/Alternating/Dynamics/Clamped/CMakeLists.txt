@@ -23,6 +23,30 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material_00.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/material_00.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/material_01.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/material_01.yaml COPYONLY)
+# Norma-derived meshes (clamped-1.g and clamped-2.g from Norma.jl's
+# overlap/clamped example, renamed clamped_00.g and clamped_01.g for LCM
+# subdomain conventions). Parallel decompositions for np=4 are generated
+# via SEACAS decomp and live alongside the .g files.
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.g
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_00.g COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_01.g
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_01.g COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.g.4.0
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_00.g.4.0 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.g.4.1
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_00.g.4.1 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.g.4.2
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_00.g.4.2 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.g.4.3
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_00.g.4.3 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_01.g.4.0
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_01.g.4.0 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_01.g.4.1
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_01.g.4.1 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_01.g.4.2
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_01.g.4.2 COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_01.g.4.3
+               ${CMAKE_CURRENT_BINARY_DIR}/clamped_01.g.4.3 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.gold.e.4.0
                ${CMAKE_CURRENT_BINARY_DIR}/clamped_00.gold.e.4.0 COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/clamped_00.gold.e.4.1

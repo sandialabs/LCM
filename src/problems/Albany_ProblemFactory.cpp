@@ -22,7 +22,6 @@
 #include "Albany_ODEProblem.hpp"
 #include "Albany_PNPProblem.hpp"
 #include "Albany_ReactDiffSystem.hpp"
-#include "Albany_ThermoElectrostaticsProblem.hpp"
 #endif
 
 #include "LCM/problems/ACEThermalProblem.hpp"
@@ -119,12 +118,6 @@ Albany::ProblemFactory::create()
     strategy = rcp(new Albany::PNPProblem(problemParams, paramLib, 2));
   } else if (method == "PNP 3D") {
     strategy = rcp(new Albany::PNPProblem(problemParams, paramLib, 3));
-  } else if (method == "ThermoElectrostatics 1D") {
-    strategy = rcp(new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 1));
-  } else if (method == "ThermoElectrostatics 2D") {
-    strategy = rcp(new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 2));
-  } else if (method == "ThermoElectrostatics 3D") {
-    strategy = rcp(new Albany::ThermoElectrostaticsProblem(problemParams, paramLib, 3));
   }
 #endif
   else if (getName(method) == "Mechanics") {

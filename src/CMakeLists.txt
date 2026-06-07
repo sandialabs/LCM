@@ -137,8 +137,7 @@ set(PDE_SRCS
     problems/Albany_LinComprNSProblem.cpp
     problems/Albany_ODEProblem.cpp
     problems/Albany_NavierStokes.cpp
-    problems/Albany_PNPProblem.cpp
-    problems/Albany_ThermoElectrostaticsProblem.cpp)
+    problems/Albany_PNPProblem.cpp)
 set(HEADERS
     ${HEADERS}
     problems/Albany_AbstractProblem.hpp
@@ -166,8 +165,7 @@ set(PDE_HDRS
     problems/Albany_LinComprNSProblem.hpp
     problems/Albany_NavierStokes.hpp
     problems/Albany_ODEProblem.hpp
-    problems/Albany_PNPProblem.hpp
-    problems/Albany_ThermoElectrostaticsProblem.hpp)
+    problems/Albany_PNPProblem.hpp)
 
 # responses
 set(SOURCES
@@ -312,7 +310,6 @@ set(PDE_SRCS
     evaluators/pde/PHAL_ComprNSResid.cpp
     evaluators/pde/PHAL_ComprNSViscosity.cpp
     evaluators/pde/PHAL_HelmholtzResid.cpp
-    evaluators/pde/PHAL_JouleHeating.cpp
     evaluators/pde/PHAL_LinComprNSBodyForce.cpp
     evaluators/pde/PHAL_LinComprNSResid.cpp
     evaluators/pde/PHAL_NSBodyForce.cpp
@@ -473,8 +470,6 @@ set(PDE_HDRS
     evaluators/pde/PHAL_ComprNSViscosity_Def.hpp
     evaluators/pde/PHAL_HelmholtzResid.hpp
     evaluators/pde/PHAL_HelmholtzResid_Def.hpp
-    evaluators/pde/PHAL_JouleHeating.hpp
-    evaluators/pde/PHAL_JouleHeating_Def.hpp
     evaluators/pde/PHAL_LinComprNSBodyForce.hpp
     evaluators/pde/PHAL_LinComprNSBodyForce_Def.hpp
     evaluators/pde/PHAL_LinComprNSResid.hpp

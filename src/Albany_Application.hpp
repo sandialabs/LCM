@@ -17,6 +17,7 @@
 #include "PHAL_AlbanyTraits.hpp"
 #include "PHAL_Setup.hpp"
 #include "PHAL_Workset.hpp"
+#include "Thyra_LinearOpWithSolveBase.hpp"
 #include "Sacado_ParameterAccessor.hpp"
 #include "Sacado_ParameterRegistration.hpp"
 #include "Sacado_ScalarParameterLibrary.hpp"
@@ -133,6 +134,17 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   //! solution.
   Teuchos::RCP<Thyra_Vector const>
   expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, double time);
+
+  //! Advance the predictor x to the linear-elastic equilibrium for BCs at
+  //! `t_new` using the cached K_lin = J(x=0, t=0). The kernel is one Newton
+  //! step with K_lin as the tangent: solve K_lin · delta = -r(x, t_new) and
+  //! update x in place. Integrators (LOCA Predictor:Constant hook, Tempus
+  //! stepper takeStep entry, Schwarz Alternating subdomain solve entry)
+  //! call this before NOX iter 0 so the very first nonlinear-material
+  //! evaluation sees a smooth elastic field rather than the BC-injection
+  //! step jump. No-op when K_lin was never built (elimination inactive).
+  void
+  warmstartPredictor(Teuchos::RCP<Thyra_Vector>& x, double t_new);
 
   //! Create Jacobian operator
   Teuchos::RCP<Thyra_LinearOp>
@@ -735,6 +747,21 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
   // Reference configuration (update) manager
   Teuchos::RCP<AAdapt::rc::Manager> rc_mgr{Teuchos::null};
+
+  // Linear-elastic Jacobian J(x=0, t=0), built once at finalSetUp, plus a
+  // Stratimikos solver wrapped around it. Powers warmstartPredictor: at
+  // step entry, solve K_lin · delta = -r(x, t_new) once to land at the
+  // linear-elastic equilibrium before NOX iter 0. K_lin_solver_ is null
+  // (and warmstartPredictor is a no-op) when elimination is inactive or
+  // when no DBC descriptors exist.
+  Teuchos::RCP<Thyra_LinearOp>                          K_lin_{Teuchos::null};
+  Teuchos::RCP<Thyra::LinearOpWithSolveBase<ST>>        K_lin_solver_{Teuchos::null};
+
+  // Build K_lin_ + K_lin_solver_ at finalSetUp time. Factored out so it can
+  // also be re-invoked when the discretization mutates (e.g. ACE element
+  // death rewriting nodeset membership) and the cached operator goes stale.
+  void
+  buildWarmstartOperator();
 
   // Response functions
   Teuchos::Array<Teuchos::RCP<Albany::AbstractResponseFunction>> responses;

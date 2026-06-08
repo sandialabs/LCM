@@ -32,6 +32,8 @@
 #include "PHAL_Utilities.hpp"
 #include "SolutionSniffer.hpp"
 #include "Teuchos_TimeMonitor.hpp"
+#include "Stratimikos_DefaultLinearSolverBuilder.hpp"
+#include "Thyra_LinearOpWithSolveFactoryHelpers.hpp"
 #include "Thyra_MultiVectorStdOps.hpp"
 #include "Thyra_VectorBase.hpp"
 #include "Thyra_VectorStdOps.hpp"
@@ -1406,6 +1408,13 @@ Application::finalSetUp(const Teuchos::RCP<Teuchos::ParameterList>& params, Teuc
   for (int i = 0; i < responses.size(); ++i) {
     responses[i]->postRegSetup();
   }
+
+  // K_lin is built lazily on the first warmstartPredictor call: Phalanx
+  // postRegistrationSetup and the fill machinery's workset initialization
+  // need to have run at least once before computeGlobalJacobian works
+  // cleanly. The cheapest place to know that has happened is at the start
+  // of the first NOX/Tempus/LOCA step — which is exactly when the first
+  // warmstart hook fires anyway.
 }
 
 RCP<AbstractDiscretization>
@@ -1424,6 +1433,87 @@ RCP<Teuchos_Comm const>
 Application::getComm() const
 {
   return comm;
+}
+
+void
+Application::buildWarmstartOperator()
+{
+  // K_lin = J(x=0, t=0): linearise the residual fill about the undeformed
+  // reference state. For solid mechanics this is the small-strain elastic
+  // stiffness; for any well-posed nonlinear material whose tangent at the
+  // reference state equals its elastic tangent (J2, CrystalPlasticity,
+  // Ortiz-Pandolfi all qualify), it's the linear-elastic stiffness.
+  K_lin_ = createJacobianOp();
+  auto x_zero    = Thyra::createMember(getVectorSpace());
+  Thyra::assign(x_zero.ptr(), 0.0);
+  auto f_throwaway = Thyra::createMember(getVectorSpace());
+  Teuchos::Array<ParamVec> p_empty;
+  computeGlobalJacobian(
+      /*alpha=*/0.0, /*beta=*/1.0, /*omega=*/0.0, /*current_time=*/0.0,
+      x_zero, /*xdot=*/Teuchos::null, /*xdotdot=*/Teuchos::null,
+      p_empty, f_throwaway, K_lin_, /*dt=*/0.0);
+
+  // Stratimikos linear solver wrapped around K_lin_. The elastic stiffness
+  // is SPD and small relative to the full problem; pseudo-block CG with no
+  // preconditioner converges fast and the matrix is factored only once.
+  Stratimikos::DefaultLinearSolverBuilder builder;
+  auto                                     stratParams = Teuchos::parameterList();
+  stratParams->set("Linear Solver Type", "Belos");
+  auto& belos = stratParams->sublist("Linear Solver Types").sublist("Belos");
+  // GMRES (not CG) because some problems' K_lin isn't SPD — cohesive
+  // surface elements contribute a non-symmetric tangent even at the
+  // undeformed reference state. GMRES handles both.
+  belos.set("Solver Type", "Pseudo Block GMRES");
+  auto& gmres = belos.sublist("Solver Types").sublist("Pseudo Block GMRES");
+  gmres.set("Maximum Iterations", 500);
+  gmres.set("Convergence Tolerance", 1.0e-10);
+  gmres.set("Num Blocks", 50);
+  gmres.set("Verbosity", 0);
+  stratParams->set("Preconditioner Type", "None");
+  builder.setParameterList(stratParams);
+  auto lows_factory = builder.createLinearSolveStrategy("");
+  K_lin_solver_     = Thyra::linearOpWithSolve(*lows_factory, K_lin_.getConst());
+}
+
+void
+Application::warmstartPredictor(Teuchos::RCP<Thyra_Vector>& x, double t_new)
+{
+  // No-op when elimination is inactive (no DBC descriptors): without
+  // constrained slots there is no BC change to absorb.
+  if (dbc_descriptors_.empty()) return;
+
+  // Lazy K_lin build on first call. computeGlobalJacobian needs the fill
+  // machinery primed (Phalanx postRegistrationSetup, workset state), which
+  // we can only guarantee once a NOX/Tempus/LOCA step has fired the first
+  // real residual/Jacobian fill — i.e. exactly the first warmstart entry.
+  if (K_lin_solver_.is_null()) {
+    buildWarmstartOperator();
+  }
+
+  // Residual at the current predictor with BCs at t_new injected. Equals
+  //   r = R_nl(x, u_bc_new) = K_ff · x_free + K_fb · u_bc_new + f_nl(x)
+  // One Newton step using K_lin as the tangent then approximately solves
+  // R(x + delta) = 0 → delta = -K_lin^-1 · r. Updating x by delta lands at
+  // the linear-elastic equilibrium for the new BCs.
+  auto r = Thyra::createMember(x->space());
+  Thyra::assign(r.ptr(), 0.0);
+  Teuchos::Array<ParamVec> p_empty;
+  computeGlobalResidual(t_new, x.getConst(), Teuchos::null, Teuchos::null, p_empty, r);
+
+  // -r as the RHS.
+  Thyra::scale(-1.0, r.ptr());
+
+  auto delta = Thyra::createMember(x->space());
+  Thyra::assign(delta.ptr(), 0.0);
+  Thyra::SolveStatus<ST> const solveStatus = Thyra::solve<ST>(*K_lin_solver_, Thyra::NOTRANS, *r, delta.ptr());
+  if (solveStatus.solveStatus != Thyra::SOLVE_STATUS_CONVERGED) {
+    *out << "Warning: K_lin warmstart solve did not converge — leaving "
+            "predictor unchanged. The nonlinear iteration will absorb the "
+            "BC change unaided.\n";
+    return;
+  }
+
+  Thyra::Vp_V(x.ptr(), *delta);
 }
 
 Teuchos::RCP<Thyra_VectorSpace const>

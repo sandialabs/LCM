@@ -191,6 +191,11 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
 
   validPL->set<bool>("ACE Sequential Thermomechanical", false, "ACE Sequential Thermomechanical Problem");
   validPL->set<double>("ACE Thermomechanical Problem Current Time", 0.0, "Current Time in ACE Sequential Thermomechanical Problem");
+  validPL->set<bool>(
+      "Warmstart Predictor",
+      false,
+      "When true, the linear-elastic warmstart predictor fires at the entry of every NOX solve (LOCA step, Tempus stage, Schwarz subdomain). "
+      "Off by default — opt-in per problem since the warmer initial iterate can shift convergence paths for tests tuned against the dfm-style cold start.");
 
   return validPL;
 }

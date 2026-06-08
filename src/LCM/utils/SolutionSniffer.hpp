@@ -10,6 +10,10 @@
 #include "NOX_Abstract_Vector.H"
 #include "NOX_StatusTest_ModelEvaluatorFlag.hpp"
 
+namespace Albany {
+class Application;
+}
+
 namespace LCM {
 
 ///
@@ -19,6 +23,13 @@ class SolutionSniffer : public NOX::Abstract::PrePostOperator
 {
  public:
   SolutionSniffer();
+
+  //! Attach the owning Application so runPreSolve can drive the
+  //! linear-elastic warmstart predictor before NOX's first residual fill.
+  //! Optional — when unset (or when the Application has no DBC descriptors)
+  //! runPreSolve falls back to status-test reset only.
+  void
+  setApplication(Teuchos::RCP<Albany::Application> const& app);
 
   virtual ~SolutionSniffer();
 
@@ -50,6 +61,7 @@ class SolutionSniffer : public NOX::Abstract::PrePostOperator
   getLastSoln();
 
  private:
+  Teuchos::RCP<Albany::Application>                 app_{Teuchos::null};
   Teuchos::RCP<NOX::StatusTest::ModelEvaluatorFlag> status_test_{Teuchos::null};
   Teuchos::RCP<NOX::Abstract::Vector>               soln_init_{Teuchos::null};
   Teuchos::RCP<NOX::Abstract::Vector>               last_soln_{Teuchos::null};

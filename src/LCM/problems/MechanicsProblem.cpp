@@ -223,9 +223,6 @@ MechanicsProblem::applyProblemSpecificSolverSettings(Teuchos::RCP<Teuchos::Param
   auto status_test_op = Teuchos::rcp_dynamic_cast<LCM::SolutionSniffer>(ppo, throw_on_fail);
   auto status_test    = Teuchos::rcp_dynamic_cast<NOX::StatusTest::ModelEvaluatorFlag>(nox_status_test_);
   status_test_op->setStatusTest(status_test);
-  // Wire the owning Application through so SolutionSniffer's runPreSolve can
-  // drive the linear-elastic warmstart predictor before each NOX solve.
-  status_test_op->setApplication(getApplication());
 }
 
 void

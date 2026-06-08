@@ -4,7 +4,5 @@
 # in the file license.txt in the top-level Albany directory.
 #
 
-add_subdirectory(Cubes)
 add_subdirectory(CubesInelastic)
-add_subdirectory(Clamped)
 add_subdirectory(Torsion)

@@ -85,11 +85,7 @@ Albany::ThermalProblem::constructDirichletEvaluators(std::vector<std::string> co
   // Construct BC evaluators for all node sets and names
   std::vector<std::string> bcNames(neq);
   bcNames[0] = "T";
-  Albany::BCUtils<Albany::DirichletTraits> bcUtils;
-  dfm         = bcUtils.constructBCEvaluators(nodeSetIDs, bcNames, this->params, this->paramLib);
-  use_sdbcs_  = bcUtils.useSDBCs();
-  offsets_    = bcUtils.getOffsets();
-  nodeSetIDs_ = bcUtils.getNodeSetIDs();
+  nodeSetIDs_ = nodeSetIDs;
   bcNames_    = bcNames;
 }
 

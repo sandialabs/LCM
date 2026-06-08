@@ -463,19 +463,10 @@ Application::buildProblem()
 
   problem->buildProblem(meshSpecs, stateMgr);
 
-  if ((requires_sdbcs_ == true) && (problem->useSDBCs() == false) && (no_dir_bcs_ == false)) {
-    ALBANY_ABORT(
-        "Error in Albany::Application: you are using a "
-        "solver that requires SDBCs yet you are not "
-        "using SDBCs!  Explicit time-steppers require SDBCs.\n");
-  }
-
-  if ((requires_orig_dbcs_ == true) && (problem->useSDBCs() == true)) {
-    ALBANY_ABORT(
-        "Error in Albany::Application: you are using a "
-        "solver with SDBCs that does not work correctly "
-        "with them!\n");
-  }
+  // Strong-vs-weak DBC checks (requires_sdbcs_ / requires_orig_dbcs_) were
+  // load-bearing only when Application offered both BC paths. With dfm
+  // retired and DBC DOF elimination handling every DBC strongly by
+  // construction, both checks are inapplicable.
 
   if ((no_dir_bcs_ == true) && (scaleBCdofs == true)) {
     ALBANY_ABORT(
@@ -719,11 +710,10 @@ Application::eliminateConstrainedDOFs()
 {
 
   auto const& node_set_ids = problem->getNodeSetIDs();
-  auto const& offsets      = problem->getOffsets();
   auto const& bc_names     = problem->getDirichletBCNames();
 
   if (node_set_ids.empty()) return;
-  if (offsets.size() != static_cast<int>(node_set_ids.size())) return;
+  if (bc_names.empty()) return;
 
   auto* stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
   if (stk_disc == nullptr) return;
@@ -763,8 +753,11 @@ Application::eliminateConstrainedDOFs()
     auto coord_it = ns_coords_map.find(node_set_ids[i]);
     if (coord_it != ns_coords_map.end()) ns_coords = &coord_it->second;
 
-    for (int eq : offsets[i]) {
-      if (eq >= static_cast<int>(bc_names.size())) continue;
+    // Iterate every equation, not just an externally-supplied "offsets"
+    // hint: under DBC DOF elimination, BCUtils no longer populates an
+    // offsets_ table for us (it was a side effect of the dfm path). Scan
+    // every (ns, eq) and check whether any standard DBC YAML key matches.
+    for (int eq = 0; eq < static_cast<int>(bc_names.size()); ++eq) {
       std::string const& dof = bc_names[eq];
       std::string const& ns  = node_set_ids[i];
 
@@ -961,7 +954,8 @@ Application::eliminateConstrainedDOFs()
       // keeps Albany::computeSchwarzTransferDTK called consistently across
       // ranks (DTK MapOperator::setup/apply is collective on the MPI comm).
       schwarz_couplings_.emplace_back(coupled_name, schwarz_ns);
-      for (int eq : offsets[i]) {
+      int const neq_strong_schwarz = static_cast<int>(bc_names.size());
+      for (int eq = 0; eq < neq_strong_schwarz; ++eq) {
         for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
           GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], eq);
           DBCDescriptor desc;
@@ -1283,9 +1277,9 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
 
   if (scale == 1.0) scaleBCdofs = false;
 
-  if ((scale != 1.0) && (problem->useSDBCs() == true)) {
-    ALBANY_ABORT("'Scaling' sublist not recognized when using SDBCs.");
-  }
+  // The "Scaling sublist + SDBCs" abort was specific to dfm's weak-DBC path
+  // overwriting scaled rows. Under DBC DOF elimination the constrained rows
+  // are not in the matrix at all, so the conflict can't arise.
 }
 
 void

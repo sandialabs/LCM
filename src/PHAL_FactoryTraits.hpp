@@ -5,19 +5,13 @@
 #define PHAL_FACTORY_TRAITS_HPP
 
 #include "Albany_config.h"
-#include "LCM/evaluators/Time.hpp"
 #include "LCM/evaluators/bc/ACEWavePressureBC.hpp"
 #include "LCM/evaluators/bc/TimeTracBC.hpp"
-#include "PHAL_Dirichlet.hpp"
-#include "PHAL_ExprEvalSDBC.hpp"
 #include "PHAL_GatherCoordinateVector.hpp"
 #include "PHAL_GatherScalarNodalParameter.hpp"
 #include "PHAL_GatherSolution.hpp"
 #include "PHAL_LoadStateField.hpp"
 #include "PHAL_Neumann.hpp"
-#include "PHAL_SDirichlet.hpp"
-#include "PHAL_TimeDepDBC.hpp"
-#include "PHAL_TimeDepSDBC.hpp"
 #include "Sacado_mpl_placeholders.hpp"
 
 // \cond  Have doxygern ignore this namespace
@@ -35,33 +29,13 @@ namespace PHAL {
 
 */
 
-template <typename Traits>
-struct DirichletFactoryTraits
-{
-  static int const id_dirichlet            = 0;
-  static int const id_dirichlet_aggregator = 1;
-  static int const id_timedep_bc           = 2;
-  static int const id_timedep_sdbc         = 3;
-  static int const id_sdbc                 = 4;
-  static int const id_expreval_sdbc        = 5;
-  static int const id_time                 = 6;
-
-  // Schwarz, StrongSchwarz, Torsion, Kfield, and EquilibriumConcentration
-  // BC evaluators were retired: the DBC DOF-elimination path in
-  // Application::eliminateConstrainedDOFs and
-  // Application::injectConstrainedDOFValues drives DTK transfer and value
-  // injection directly without going through a Phalanx evaluator.
-  typedef Sacado::mpl::vector<
-      PHAL::Dirichlet<_, Traits>,            //  0
-      PHAL::DirichletAggregator<_, Traits>,  //  1
-      PHAL::TimeDepDBC<_, Traits>,           //  2
-      PHAL::TimeDepSDBC<_, Traits>,          //  3
-      PHAL::SDirichlet<_, Traits>,           //  4
-      PHAL::ExprEvalSDBC<_, Traits>,         //  5
-      LCM::Time<_, Traits>                   //  6
-      >
-      EvaluatorTypes;
-};
+// DirichletFactoryTraits was retired alongside the dfm pipeline: all the
+// Phalanx weak-DBC evaluators (Dirichlet, SDirichlet, ExprEvalSDBC,
+// TimeDepDBC, TimeDepSDBC, DirichletAggregator) plus the LCM-specific
+// Kfield/Torsion/EquilibriumConcentration/Schwarz/StrongSchwarz BCs and
+// the LCM Time parameter-library shim are gone. DBC enforcement is now
+// the sole responsibility of Application::eliminateConstrainedDOFs +
+// injectConstrainedDOFValues.
 
 template <typename Traits>
 struct NeumannFactoryTraits

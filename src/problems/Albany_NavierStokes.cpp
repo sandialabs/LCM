@@ -158,11 +158,7 @@ Albany::NavierStokes::constructDirichletEvaluators(std::vector<std::string> cons
   }
   if (haveHeatEq) dirichletNames[index++] = "T";
   if (haveNeutEq) dirichletNames[index++] = "phi";
-  Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm         = dirUtils.constructBCEvaluators(nodeSetIDs, dirichletNames, this->params, this->paramLib);
-  use_sdbcs_  = dirUtils.useSDBCs();
-  offsets_    = dirUtils.getOffsets();
-  nodeSetIDs_ = dirUtils.getNodeSetIDs();
+  nodeSetIDs_ = nodeSetIDs;
   bcNames_    = dirichletNames;
 }
 

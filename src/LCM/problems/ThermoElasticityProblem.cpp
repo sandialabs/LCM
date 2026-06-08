@@ -87,11 +87,7 @@ Albany::ThermoElasticityProblem::constructDirichletEvaluators(Albany::MeshSpecsS
   if (numDim > 1) dirichletNames[X_offset + 1] = "Y";
   if (numDim > 2) dirichletNames[X_offset + 2] = "Z";
   dirichletNames[T_offset] = "T";
-  Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
-  use_sdbcs_  = dirUtils.useSDBCs();
-  offsets_    = dirUtils.getOffsets();
-  nodeSetIDs_ = dirUtils.getNodeSetIDs();
+  nodeSetIDs_ = meshSpecs.nsNames;
   bcNames_    = dirichletNames;
 }
 

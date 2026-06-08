@@ -74,16 +74,6 @@ set(OUTFILE0 "cuboid_00.e")
 set(REF_FILE0 "cuboid_00.gold.e")
 set(OUTFILE1 "cuboid_01.e")
 set(REF_FILE1 "cuboid_01.gold.e")
-add_test(NAME Schwarz_Alternating_Dynamics_${testName}
-  COMMAND
-  ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=CubesInelastic
-    -DTEST_ARGS=cuboids.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-    -DREF_FILENAME0=${REF_FILE0} -DOUTPUT_FILENAME0=${OUTFILE0}
-    -DREF_FILENAME1=${REF_FILE1} -DOUTPUT_FILENAME1=${OUTFILE1}
-    -P ${runtest_serial_exodiff.cmake})
-set_tests_properties(Schwarz_Alternating_Dynamics_${testName}
-                   PROPERTIES LABELS "LCM;Tpetra;Forward")
-
 add_test(NAME Schwarz_Alternating_Dynamics_${testName}_Parallel
   COMMAND
   ${CMAKE_COMMAND} "-DTEST_PROG=${Albany.exe}" -DTEST_NAME=CubesInelasticParallel

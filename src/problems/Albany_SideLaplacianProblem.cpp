@@ -132,11 +132,7 @@ SideLaplacian::constructDirichletEvaluators(Albany::MeshSpecsStruct const& meshS
   // Construct Dirichlet evaluators for all nodesets and names
   std::vector<std::string> dirichletNames(1, "U");
 
-  Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm        = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
-  use_sdbcs_ = dirUtils.useSDBCs();
-  offsets_    = dirUtils.getOffsets();
-  nodeSetIDs_ = dirUtils.getNodeSetIDs();
+  nodeSetIDs_ = meshSpecs.nsNames;
   bcNames_    = dirichletNames;
 }
 

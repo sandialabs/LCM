@@ -58,11 +58,7 @@ Albany::CahnHillProblem::constructDirichletEvaluators(std::vector<std::string> c
   // Construct BC evaluators for all node sets and names
   std::vector<std::string> bcNames(neq);
   bcNames[0] = "rho";
-  Albany::BCUtils<Albany::DirichletTraits> bcUtils;
-  dfm         = bcUtils.constructBCEvaluators(nodeSetIDs, bcNames, this->params, this->paramLib);
-  use_sdbcs_  = bcUtils.useSDBCs();
-  offsets_    = bcUtils.getOffsets();
-  nodeSetIDs_ = bcUtils.getNodeSetIDs();
+  nodeSetIDs_ = nodeSetIDs;
   bcNames_    = bcNames;
 }
 

@@ -238,11 +238,6 @@ endif()
 # evaluators
 set(SOURCES
     ${SOURCES}
-    evaluators/bc/PHAL_Dirichlet.cpp
-    evaluators/bc/PHAL_ExprEvalSDBC.cpp
-    evaluators/bc/PHAL_TimeDepDBC.cpp
-    evaluators/bc/PHAL_TimeDepSDBC.cpp
-    evaluators/bc/PHAL_SDirichlet.cpp
     evaluators/bc/PHAL_Neumann.cpp
     evaluators/gather/PHAL_GatherAuxData.cpp
     evaluators/gather/PHAL_GatherCoordinateVector.cpp
@@ -332,16 +327,6 @@ set(PDE_SRCS
 
 set(HEADERS
     ${HEADERS}
-    evaluators/bc/PHAL_Dirichlet.hpp
-    evaluators/bc/PHAL_ExprEvalSDBC.hpp
-    evaluators/bc/PHAL_TimeDepDBC.hpp
-    evaluators/bc/PHAL_TimeDepSDBC.hpp
-    evaluators/bc/PHAL_SDirichlet.hpp
-    evaluators/bc/PHAL_Dirichlet_Def.hpp
-    evaluators/bc/PHAL_ExprEvalSDBC_Def.hpp
-    evaluators/bc/PHAL_TimeDepDBC_Def.hpp
-    evaluators/bc/PHAL_TimeDepSDBC_Def.hpp
-    evaluators/bc/PHAL_SDirichlet_Def.hpp
     evaluators/bc/PHAL_Neumann.hpp
     evaluators/bc/PHAL_Neumann_Def.hpp
     evaluators/gather/PHAL_GatherAuxData.hpp

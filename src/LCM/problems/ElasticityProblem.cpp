@@ -101,11 +101,7 @@ Albany::ElasticityProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct 
   dirichletNames[0] = "X";
   if (neq > 1) dirichletNames[1] = "Y";
   if (neq > 2) dirichletNames[2] = "Z";
-  Albany::BCUtils<Albany::DirichletTraits> dirUtils;
-  dfm         = dirUtils.constructBCEvaluators(meshSpecs.nsNames, dirichletNames, this->params, this->paramLib);
-  use_sdbcs_  = dirUtils.useSDBCs();
-  offsets_    = dirUtils.getOffsets();
-  nodeSetIDs_ = dirUtils.getNodeSetIDs();
+  nodeSetIDs_ = meshSpecs.nsNames;
   bcNames_    = dirichletNames;
 }
 

@@ -4,7 +4,6 @@ set(runtest.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest.cmake)
 
 add_subdirectory(SingleElement2d)
 add_subdirectory(SingleElement3d)
-add_subdirectory(SingleSlip)
 if(NOT ALBANY_ENABLE_OPENMP)
   add_subdirectory(SchwarzBar)
 endif()

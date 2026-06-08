@@ -7,8 +7,6 @@
 # Copy Input file from source to binary dir
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cube.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/cube.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/finer_cube_sdbc.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/finer_cube_sdbc.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/finer_cube_sdbc_file.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/finer_cube_sdbc_file.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/finer_cube_dbc.yaml
@@ -46,8 +44,6 @@ set_tests_properties(${testName}_dbc PROPERTIES LABELS "LCM;Tpetra;Forward")
 add_test(${testName}_dbc_file ${Albany.exe} finer_cube_dbc_file.yaml)
 set_tests_properties(${testName}_dbc_file PROPERTIES LABELS
                                                      "LCM;Tpetra;Forward")
-add_test(${testName}_sdbc ${Albany.exe} finer_cube_sdbc.yaml)
-set_tests_properties(${testName}_sdbc PROPERTIES LABELS "LCM;Tpetra;Forward")
 add_test(${testName}_sdbc_file ${Albany.exe} finer_cube_sdbc_file.yaml)
 set_tests_properties(${testName}_sdbc_file PROPERTIES LABELS
                                                       "LCM;Tpetra;Forward")

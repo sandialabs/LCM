@@ -93,10 +93,6 @@ class AbstractProblem
   virtual int
   spatialDimension() const = 0;
 
-  //! Get boolean telling code if SDBCs are utilized
-  virtual bool
-  useSDBCs() const = 0;
-
   //! Get boolean telling code if Adaptation is utilized
   virtual bool
   haveAdaptation() const = 0;

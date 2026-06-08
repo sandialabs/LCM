@@ -14,7 +14,7 @@
 #include "Shards_CellTopology.hpp"
 
 Albany::ReactDiffSystem::ReactDiffSystem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
-    : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_), use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_)
 {
   neq = 3;
 }

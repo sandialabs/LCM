@@ -15,7 +15,7 @@
 namespace Albany {
 
 SideLaplacian::SideLaplacian(const Teuchos::RCP<Teuchos::ParameterList>& params, const Teuchos::RCP<ParamLib>& paramLib, int const numEq)
-    : Albany::AbstractProblem(params, paramLib, numEq), use_sdbcs_(false)
+    : Albany::AbstractProblem(params, paramLib, numEq)
 {
   bool solve_as_ss_eqn = params->get<bool>("Solve As Side Set Equation");
   numDim               = solve_as_ss_eqn ? 3 : 2;

@@ -21,8 +21,7 @@ Albany::HeatProblem::HeatProblem(
       haveSource(false),
       haveAbsorption(false),
       numDim(numDim_),
-      commT(commT_),
-      use_sdbcs_(false)
+      commT(commT_)
 {
   this->setNumEquations(1);
 

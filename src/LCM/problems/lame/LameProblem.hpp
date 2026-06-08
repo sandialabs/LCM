@@ -38,13 +38,6 @@ class LameProblem : public Albany::AbstractProblem
     return numDim;
   }
 
-  //! Get boolean telling code if SDBCs are utilized
-  virtual bool
-  useSDBCs() const
-  {
-    return use_sdbcs_;
-  }
-
   ///
   /// Get boolean telling code if Adaptation is utilized
   ///
@@ -103,7 +96,6 @@ class LameProblem : public Albany::AbstractProblem
   Teuchos::RCP<Albany::MaterialDatabase> materialDB;
 
   /// Boolean marking whether SDBCs are used
-  bool use_sdbcs_;
 };
 
 }  // namespace Albany

@@ -16,7 +16,7 @@ PopulateMesh::PopulateMesh(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<Teuchos::ParameterList>& discParams_,
     const Teuchos::RCP<ParamLib>&               paramLib_)
-    : AbstractProblem(params_, paramLib_), discParams(discParams_), use_sdbcs_(false)
+    : AbstractProblem(params_, paramLib_), discParams(discParams_)
 {
   neq = 1;
 

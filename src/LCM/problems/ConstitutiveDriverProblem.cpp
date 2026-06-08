@@ -13,7 +13,7 @@ Albany::ConstitutiveDriverProblem::ConstitutiveDriverProblem(
     const Teuchos::RCP<ParamLib>&               param_lib,
     int const                                   num_dims,
     Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
-    : Albany::AbstractProblem(params, param_lib), have_temperature_(false), use_sdbcs_(false), num_dims_(num_dims)
+    : Albany::AbstractProblem(params, param_lib), have_temperature_(false), num_dims_(num_dims)
 {
   std::string& method = params->get("Name", "ConstitutiveDriver");
   *out << "Problem Name = " << method << '\n';

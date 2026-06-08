@@ -16,7 +16,7 @@ Albany::ThermalProblem::ThermalProblem(
     // const Teuchos::RCP<DistributedParameterLibrary>& distParamLib_,
     int const                               numDim_,
     Teuchos::RCP<Teuchos::Comm<int> const>& commT_)
-    : Albany::AbstractProblem(params_, paramLib_ /*, distParamLib_*/), params(params_), numDim(numDim_), commT(commT_), use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_ /*, distParamLib_*/), params(params_), numDim(numDim_), commT(commT_)
 {
   this->setNumEquations(1);
   // We just have 1 PDE/node

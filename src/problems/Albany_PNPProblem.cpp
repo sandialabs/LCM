@@ -12,7 +12,7 @@
 #include "Shards_CellTopology.hpp"
 
 Albany::PNPProblem::PNPProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
-    : Albany::AbstractProblem(params_, paramLib_), params(params_), numDim(numDim_), use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_), params(params_), numDim(numDim_)
 {
   // Compute number of equations
   numSpecies = params->get<int>("Number of Species", 1);

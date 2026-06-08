@@ -41,13 +41,6 @@ class ACEThermalProblem : public AbstractProblem
     return num_dim_;
   }
 
-  //! Get boolean telling code if SDBCs are utilized
-  virtual bool
-  useSDBCs() const
-  {
-    return use_sdbcs_;
-  }
-
   ///
   /// Get boolean telling code if Adaptation is utilized
   ///
@@ -113,8 +106,6 @@ class ACEThermalProblem : public AbstractProblem
   Teuchos::RCP<Albany::Layouts> dl_;
 
   /// Boolean marking whether SDBCs are used
-  bool use_sdbcs_;
-
   /// Boolean marking whether adaptation is used
   bool have_adaptation_;
 

@@ -9,7 +9,7 @@
 #include "Albany_Utils.hpp"
 
 Albany::Helmholtz2DProblem::Helmholtz2DProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_)
-    : Albany::AbstractProblem(params_, paramLib_, 2), use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_, 2)
 {
   std::string& method = params->get("Name", "Helmholtz 2D Problem");
   *out << "Problem Name = " << method << std::endl;

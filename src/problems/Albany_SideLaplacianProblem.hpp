@@ -39,13 +39,6 @@ class SideLaplacian : public Albany::AbstractProblem
     return numDim;
   }
 
-  //! Get boolean telling code if SDBCs are utilized
-  virtual bool
-  useSDBCs() const
-  {
-    return use_sdbcs_;
-  }
-
   ///
   /// Get boolean telling code if Adaptation is utilized
   ///
@@ -126,7 +119,6 @@ class SideLaplacian : public Albany::AbstractProblem
   std::string sideEBName;
 
   /// Boolean marking whether SDBCs are used
-  bool use_sdbcs_;
 };
 
 // ===================================== IMPLEMENTATION

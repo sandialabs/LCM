@@ -14,7 +14,7 @@
 #include "Shards_CellTopology.hpp"
 
 Albany::AdvDiffProblem::AdvDiffProblem(const Teuchos::RCP<Teuchos::ParameterList>& params_, const Teuchos::RCP<ParamLib>& paramLib_, int const numDim_)
-    : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_), use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_), numDim(numDim_)
 {
   // Get number of species equations from Problem specifications
   neq             = params_->get("Number of PDE Equations", numDim);

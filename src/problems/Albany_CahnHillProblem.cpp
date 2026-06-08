@@ -15,7 +15,7 @@ Albany::CahnHillProblem::CahnHillProblem(
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_,
     Teuchos::RCP<Teuchos::Comm<int> const>&     commT_)
-    : Albany::AbstractProblem(params_, paramLib_, 2), numDim(numDim_), haveNoise(false), commT(commT_), use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_, 2), numDim(numDim_), haveNoise(false), commT(commT_)
 {
 }
 

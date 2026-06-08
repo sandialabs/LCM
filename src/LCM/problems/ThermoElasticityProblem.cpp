@@ -13,7 +13,7 @@ Albany::ThermoElasticityProblem::ThermoElasticityProblem(
     const Teuchos::RCP<Teuchos::ParameterList>& params_,
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_)
-    : Albany::AbstractProblem(params_, paramLib_, numDim_ + 1), haveSource(false), use_sdbcs_(false), numDim(numDim_)
+    : Albany::AbstractProblem(params_, paramLib_, numDim_ + 1), haveSource(false), numDim(numDim_)
 {
   std::string& method = params->get("Name", "ThermoElasticity ");
   *out << "Problem Name = " << method << std::endl;

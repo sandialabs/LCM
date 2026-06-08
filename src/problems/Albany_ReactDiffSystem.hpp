@@ -33,13 +33,6 @@ class ReactDiffSystem : public AbstractProblem
     return numDim;
   }
 
-  //! Get boolean telling code if SDBCs are utilized
-  virtual bool
-  useSDBCs() const
-  {
-    return use_sdbcs_;
-  }
-
   ///
   /// Get boolean telling code if Adaptation is utilized
   ///
@@ -93,7 +86,6 @@ class ReactDiffSystem : public AbstractProblem
   int numDim;
 
   /// Boolean marking whether SDBCs are used
-  bool use_sdbcs_;
 };
 
 }  // namespace Albany

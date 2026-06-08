@@ -43,12 +43,6 @@ class MechanicsProblem : public AbstractProblem
   }
 
   virtual bool
-  useSDBCs() const
-  {
-    return use_sdbcs_;
-  }
-
-  virtual bool
   haveAdaptation() const
   {
     return have_adaptation_;
@@ -122,8 +116,6 @@ class MechanicsProblem : public AbstractProblem
   bool have_source_;
 
   /// Boolean marking whether SDBCs are used
-  bool use_sdbcs_;
-
   /// Boolean marking whether adaptation is used
   bool have_adaptation_;
 

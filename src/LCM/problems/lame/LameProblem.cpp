@@ -11,7 +11,7 @@ Albany::LameProblem::LameProblem(
     const Teuchos::RCP<ParamLib>&               paramLib_,
     int const                                   numDim_,
     Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
-    : Albany::AbstractProblem(params_, paramLib_, numDim_), haveSource(false), haveMatDB(false), use_sdbcs_(false)
+    : Albany::AbstractProblem(params_, paramLib_, numDim_), haveSource(false), haveMatDB(false)
 {
   std::string& method = params->get("Name", "Library of Advanced Materials for Engineering (LAME) ");
   *out << "Problem Name = " << method << std::endl;
@@ -92,7 +92,6 @@ Albany::LameProblem::constructDirichletEvaluators(Albany::MeshSpecsStruct const&
   if (neq > 2) dirichletNames[2] = "Z";
   nodeSetIDs_ = meshSpecs.nsNames;
   bcNames_    = dirichletNames;
-  use_sdbcs_  = dirUtils.useSDBCs();
 }
 
 Teuchos::RCP<Teuchos::ParameterList const>

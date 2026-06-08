@@ -33,13 +33,6 @@ class Helmholtz2DProblem : public Albany::AbstractProblem
     return 2;
   }
 
-  //! Get boolean telling code if SDBCs are utilized
-  virtual bool
-  useSDBCs() const
-  {
-    return use_sdbcs_;
-  }
-
   ///
   /// Get boolean telling code if Adaptation is utilized
   ///
@@ -95,7 +88,6 @@ class Helmholtz2DProblem : public Albany::AbstractProblem
   bool   haveSource;
 
   /// Boolean marking whether SDBCs are used
-  bool use_sdbcs_;
 };
 
 }  // namespace Albany

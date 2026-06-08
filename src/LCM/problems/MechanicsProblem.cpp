@@ -17,7 +17,6 @@ MechanicsProblem::MechanicsProblem(
     Teuchos::RCP<Teuchos::Comm<int> const>&     commT)
     : AbstractProblem(params, param_lib),
       have_source_(false),
-      use_sdbcs_(false),
       thermal_source_(SOURCE_TYPE_NONE),
       thermal_source_evaluated_(false),
       num_dims_(num_dims),

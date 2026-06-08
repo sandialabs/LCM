@@ -191,7 +191,6 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
 
   validPL->set<bool>("ACE Sequential Thermomechanical", false, "ACE Sequential Thermomechanical Problem");
   validPL->set<double>("ACE Thermomechanical Problem Current Time", 0.0, "Current Time in ACE Sequential Thermomechanical Problem");
-  validPL->set<bool>("Skip DOF Elimination", false, "Opt out of DBC DOF elimination for this problem (stay on weak row-zeroing path)");
 
   return validPL;
 }

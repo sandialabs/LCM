@@ -242,15 +242,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       Teuchos::RCP<Thyra_Vector> const&      f,
       double const                           dt = 0.0);
 
-  PHAL::Workset
-  set_dfm_workset(
-      double const                            current_time,
-      Teuchos::RCP<Thyra_Vector const> const  x,
-      Teuchos::RCP<Thyra_Vector const> const  x_dot,
-      Teuchos::RCP<Thyra_Vector const> const  x_dotdot,
-      Teuchos::RCP<Thyra_Vector> const&       f,
-      Teuchos::RCP<Thyra_Vector const> const& x_post_SDBCs = Teuchos::null);
-
  public:
   //! Compute global Jacobian
   /*!
@@ -388,9 +379,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   loadBasicWorksetInfo(PHAL::Workset& workset, double current_time);
 
   void
-  loadBasicWorksetInfoSDBCs(PHAL::Workset& workset, Teuchos::RCP<Thyra_Vector const> const& owned_sol, double const current_time);
-
-  void
   loadWorksetJacobianInfo(PHAL::Workset& workset, double const alpha, double const beta, double const omega);
 
   Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>>
@@ -399,10 +387,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     return meshSpecs;
   }
 
-  //! Routine to load common nodeset info into workset
-  void
-  loadWorksetNodesetInfo(PHAL::Workset& workset);
-
   //! Routine to load common sideset info into workset
   void
   loadWorksetSidesetInfo(PHAL::Workset& workset, int const ws);
@@ -410,8 +394,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   //! Routines for setting a scaling to be applied to the Jacobian/resdiual
   void
   setScale(Teuchos::RCP<const Thyra_LinearOp> jac = Teuchos::null);
-  void
-  setScaleBCDofs(PHAL::Workset& workset, Teuchos::RCP<const Thyra_LinearOp> jac = Teuchos::null);
 
   void
   setupBasicWorksetInfo(
@@ -759,9 +741,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
   // Phalanx Field Manager for volumetric fills
   Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>> fm;
-
-  // Phalanx Field Manager for Dirichlet Boundary Conditions
-  Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> dfm;
 
   // Phalanx Field Manager for Neumann Boundary Conditions
   Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>> nfm;

@@ -728,13 +728,6 @@ Application::eliminateConstrainedDOFs()
   auto* stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
   if (stk_disc == nullptr) return;
 
-  // Explicit opt-out: some problem types have coupled residual structure
-  // (e.g. poromechanics backward-Euler pressure updates) that the strong-DBC
-  // reduced-space assembly does not reproduce bit-for-bit against the weak
-  // row-zeroing path. Such problems set this flag to stay on the weak path.
-  if (problemParams->isParameter("Skip DOF Elimination") &&
-      problemParams->get<bool>("Skip DOF Elimination")) return;
-
   // Skip for ACE Sequential Thermo-Mechanical problems: element death
   // dynamically changes nodeset membership after initialization, so a
   // statically-computed elimination set would become stale.
@@ -1379,7 +1372,6 @@ Application::finalSetUp(const Teuchos::RCP<Teuchos::ParameterList>& params, Teuc
   // Set up memory for workset
   fm = problem->getFieldManager();
   ALBANY_PANIC(fm == Teuchos::null, "getFieldManager not implemented!!!");
-  dfm = problem->getDirichletFieldManager();
 
   offsets_    = problem->getOffsets();
   nodeSetIDs_ = problem->getNodeSetIDs();
@@ -1512,22 +1504,6 @@ deref_nfm(Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>>
              nfm[0] :               // ... hence this is the intended behavior ...
              nfm[wsPhysIndex[ws]];  // ... and this is not, but may one day be
                                     // again.
-}
-
-// Convenience routine for setting dfm workset data. Cut down on redundant code.
-void
-dfm_set(
-    PHAL::Workset&                          workset,
-    Teuchos::RCP<Thyra_Vector const> const& x,
-    Teuchos::RCP<Thyra_Vector const> const& xd,
-    Teuchos::RCP<Thyra_Vector const> const& xdd,
-    Teuchos::RCP<AAdapt::rc::Manager>&      rc_mgr)
-{
-  workset.x                 = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(x) : x;
-  workset.xdot              = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(xd) : xd;
-  workset.xdotdot           = Teuchos::nonnull(rc_mgr) ? rc_mgr->add_x(xdd) : xdd;
-  workset.transientTerms    = Teuchos::nonnull(xd);
-  workset.accelerationTerms = Teuchos::nonnull(xdd);
 }
 
 // For the perturbation xd,
@@ -1674,45 +1650,6 @@ checkDerivatives(
 }
 }  // namespace
 
-PHAL::Workset
-Application::set_dfm_workset(
-    double const                            current_time,
-    Teuchos::RCP<Thyra_Vector const> const  x,
-    Teuchos::RCP<Thyra_Vector const> const  x_dot,
-    Teuchos::RCP<Thyra_Vector const> const  x_dotdot,
-    Teuchos::RCP<Thyra_Vector> const&       f,
-    Teuchos::RCP<Thyra_Vector const> const& x_post_SDBCs)
-{
-  PHAL::Workset workset;
-
-  workset.f = f;
-
-  loadWorksetNodesetInfo(workset);
-
-  if (scaleBCdofs == true) {
-    setScaleBCDofs(workset);
-    countScale++;
-  }
-
-  if (x_post_SDBCs == Teuchos::null) {
-    dfm_set(workset, x, x_dot, x_dotdot, rc_mgr);
-  } else {
-    dfm_set(workset, x_post_SDBCs, x_dot, x_dotdot, rc_mgr);
-  }
-
-  double const this_time = fixTime(current_time);
-
-  workset.current_time       = this_time;
-  workset.apps_              = apps_;
-  workset.current_app_       = Teuchos::rcp(this, false);
-  workset.distParamLib       = distParamLib;
-  workset.disc               = disc;
-  workset.spatial_dimension_ = getSpatialDimension();
-  workset.numEqs             = neq;
-
-  return workset;
-}
-
 template <>
 void
 Application::postRegSetup<PHAL::AlbanyTraits::Residual>()
@@ -1733,18 +1670,6 @@ Application::postRegSetup<PHAL::AlbanyTraits::Residual>()
     phxSetup->update_fields();
 
     writePhalanxGraph<EvalT>(fm[ps], evalName, phxGraphVisDetail);
-  }
-  if (dfm != Teuchos::null) {
-    evalName = PHAL::evalName<EvalT>("DFM", 0);
-    phxSetup->insert_eval(evalName);
-
-    dfm->postRegistrationSetupForType<EvalT>(*phxSetup);
-
-    // Update phalanx saved/unsaved fields based on field dependencies
-    phxSetup->check_fields(dfm->getFieldTagsForSizing<EvalT>());
-    phxSetup->update_fields();
-
-    writePhalanxGraph<EvalT>(dfm, evalName, phxGraphVisDetail);
   }
   if (nfm != Teuchos::null)
     for (int ps = 0; ps < nfm.size(); ps++) {
@@ -1803,23 +1728,6 @@ Application::postRegSetupDImpl()
 
       writePhalanxGraph<EvalT>(nfm[ps], evalName, phxGraphVisDetail);
     }
-  }
-  if (dfm != Teuchos::null) {
-    evalName = PHAL::evalName<EvalT>("DFM", 0);
-    phxSetup->insert_eval(evalName);
-
-    // amb Need to look into this. What happens with DBCs in meshes having
-    // different element types?
-    std::vector<PHX::index_size_type> derivative_dimensions;
-    derivative_dimensions.push_back(PHAL::getDerivativeDimensions<EvalT>(this, 0));
-    dfm->setKokkosExtendedDataTypeDimensions<EvalT>(derivative_dimensions);
-    dfm->postRegistrationSetupForType<EvalT>(*phxSetup);
-
-    // Update phalanx saved/unsaved fields based on field dependencies
-    phxSetup->check_fields(dfm->getFieldTagsForSizing<EvalT>());
-    phxSetup->update_fields();
-
-    writePhalanxGraph<EvalT>(dfm, evalName, phxGraphVisDetail);
   }
 }
 
@@ -2088,16 +1996,6 @@ Application::computeGlobalResidualImpl(
 
     loadBasicWorksetInfo(workset, this_time);
 
-    Teuchos::RCP<Thyra_Vector> x_post_SDBCs;
-    if ((dfm != Teuchos::null) && (problem->useSDBCs() == true)) {
-      workset = set_dfm_workset(current_time, x, x_dot, x_dotdot, f);
-
-      // FillType template argument used to specialize Sacado
-      dfm->preEvaluate<EvalT>(workset);
-      x_post_SDBCs = workset.x->clone_v();
-      loadBasicWorksetInfoSDBCs(workset, x_post_SDBCs, this_time);
-    }
-
     workset.time_step = dt;
 
     workset.f = overlapped_f;
@@ -2163,14 +2061,6 @@ Application::computeGlobalResidualImpl(
   // Write the residual to the discretization, which will later (optionally)
   // be written to the output file
   disc->setResidualField(*overlapped_f);
-
-  // Apply Dirichlet conditions using dfm (Dirichlet Field Manager).
-  if (dfm != Teuchos::null) {
-    PHAL::Workset workset = set_dfm_workset(current_time, x, x_dot, x_dotdot, f);
-
-    // FillType template argument used to specialize Sacado
-    dfm->evaluateFields<EvalT>(workset);
-  }
 
   // scale residual by scaleVec_ if scaleBCdofs is on
   if (scaleBCdofs == true) {
@@ -2369,41 +2259,6 @@ Application::computeGlobalJacobianImpl(
     countScale++;
   }
 
-  // Apply Dirichlet conditions using dfm (Dirichlet Field Manager).
-  if (Teuchos::nonnull(dfm)) {
-    PHAL::Workset workset;
-
-    workset.f       = f;
-    workset.Jac     = jac;
-    workset.m_coeff = alpha;
-    workset.n_coeff = omega;
-    workset.j_coeff = beta;
-
-    double const this_time = fixTime(current_time);
-
-    workset.current_time = this_time;
-
-    if (beta == 0.0 && perturbBetaForDirichlets > 0.0) workset.j_coeff = perturbBetaForDirichlets;
-
-    dfm_set(workset, x, xdot, xdotdot, rc_mgr);
-
-    loadWorksetNodesetInfo(workset);
-
-    if (scaleBCdofs == true) {
-      setScaleBCDofs(workset, jac);
-      countScale++;
-    }
-
-    workset.distParamLib = distParamLib;
-    workset.disc         = disc;
-
-    // Needed for more specialized Dirichlet BCs (e.g. Schwarz coupling)
-    workset.apps_        = apps_;
-    workset.current_app_ = Teuchos::rcp(this, false);
-
-    // FillType template argument used to specialize Sacado
-    dfm->evaluateFields<EvalT>(workset);
-  }
   fillComplete(jac);
 
   // Apply scaling to residual and Jacobian
@@ -2666,36 +2521,6 @@ Application::loadBasicWorksetInfo(PHAL::Workset& workset, double current_time)
 }
 
 void
-Application::loadBasicWorksetInfoSDBCs(PHAL::Workset& workset, Teuchos::RCP<Thyra_Vector const> const& owned_sol, double const current_time)
-{
-  // Scatter owned solution into the overlapped one
-  auto overlapped_MV  = solMgr->getOverlappedSolution();
-  auto overlapped_sol = Thyra::createMember(overlapped_MV->range());
-  overlapped_sol->assign(0.0);
-  solMgr->get_cas_manager()->scatter(owned_sol, overlapped_sol, CombineMode::INSERT);
-
-  // Inject prescribed DBC values into constrained overlap DOF slots.
-  if (!dbc_descriptors_.empty()) {
-    auto x_data = Albany::getNonconstLocalData(overlapped_sol);
-    for (auto const& desc : dbc_descriptors_) {
-      x_data[desc.overlap_lid] = desc.eval(current_time);
-    }
-  }
-
-  auto numVectors = overlapped_MV->domain()->dim();
-  workset.x       = overlapped_sol;
-  workset.xdot    = numVectors > 1 ? overlapped_MV->col(1) : Teuchos::null;
-  workset.xdotdot = numVectors > 2 ? overlapped_MV->col(2) : Teuchos::null;
-
-  workset.numEqs            = neq;
-  workset.current_time      = current_time;
-  workset.distParamLib      = distParamLib;
-  workset.disc              = disc;
-  workset.transientTerms    = Teuchos::nonnull(workset.xdot);
-  workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot);
-}
-
-void
 Application::loadWorksetJacobianInfo(PHAL::Workset& workset, double const alpha, double const beta, double const omega)
 {
   workset.m_coeff         = alpha;
@@ -2703,14 +2528,6 @@ Application::loadWorksetJacobianInfo(PHAL::Workset& workset, double const alpha,
   workset.j_coeff         = beta;
   workset.ignore_residual = ignore_residual_in_jacobian;
   workset.is_adjoint      = is_adjoint;
-}
-
-void
-Application::loadWorksetNodesetInfo(PHAL::Workset& workset)
-{
-  workset.nodeSets      = Teuchos::rcpFromRef(disc->getNodeSets());
-  workset.nodeSetCoords = Teuchos::rcpFromRef(disc->getNodeSetCoords());
-  workset.nodeSetGIDs   = Teuchos::rcpFromRef(disc->getNodeSetGIDs());
 }
 
 void
@@ -2744,58 +2561,6 @@ Application::setScale(Teuchos::RCP<const Thyra_LinearOp> jac)
       // Compute the inverse of the absolute row sum
       jac_row_stat->getRowStat(Thyra::RowStatLinearOpBaseUtils::ROW_STAT_INV_ROW_SUM, scaleVec_.ptr());
     }
-  }
-}
-
-void
-Application::setScaleBCDofs(PHAL::Workset& workset, Teuchos::RCP<const Thyra_LinearOp> jac)
-{
-  // First step: set scaleVec_ to all 1.0s if it is all 0s
-  if (scaleVec_->norm_2() == 0) {
-    scaleVec_->assign(1.0);
-  }
-
-  // If calling setScaleBCDofs with null Jacobian, don't recompute the scaling
-  if (jac == Teuchos::null) {
-    return;
-  }
-
-  // For diagonal or abs row sum scaling, set the scale equal to the maximum
-  // magnitude value of the diagonal / abs row sum (inf-norm).  This way,
-  // scaling adjusts throughout the simulation based on the Jacobian.
-  Teuchos::RCP<Thyra_Vector> tmp = Thyra::createMember(scaleVec_->space());
-  if (scale_type == DIAG) {
-    getDiagonalCopy(jac, tmp);
-    scale = tmp->norm_inf();
-  } else if (scale_type == ABSROWSUM) {
-    // We MUST be able to cast the linear op to RowStatLinearOpBase, in order to
-    // get row informations
-    auto jac_row_stat = Teuchos::rcp_dynamic_cast<const Thyra::RowStatLinearOpBase<ST>>(jac, true);
-
-    // Compute the absolute row sum
-    jac_row_stat->getRowStat(Thyra::RowStatLinearOpBaseUtils::ROW_STAT_ROW_SUM, tmp.ptr());
-    scale = tmp->norm_inf();
-  }
-
-  if (scale == 0.0) {
-    scale = 1.0;
-  }
-
-  auto scaleVecLocalData = getNonconstLocalData(scaleVec_);
-  for (size_t ns = 0; ns < nodeSetIDs_.size(); ns++) {
-    std::string key = nodeSetIDs_[ns];
-
-    std::vector<std::vector<int>> const& nsNodes = workset.nodeSets->find(key)->second;
-    for (unsigned int i = 0; i < nsNodes.size(); i++) {
-      for (unsigned j = 0; j < offsets_[ns].size(); j++) {
-        int lunk                = nsNodes[i][offsets_[ns][j]];
-        scaleVecLocalData[lunk] = scale;
-      }
-    }
-  }
-
-  if (problem->getSideSetEquations().size() > 0) {
-    ALBANY_ABORT("Application::setScaleBCDofs is not yet implemented for" << " sideset equations!\n");
   }
 }
 

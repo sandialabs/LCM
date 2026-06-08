@@ -735,6 +735,11 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   // resolves them to overlap LIDs once disc->updateMesh has fired.
   std::map<GO, DBCDescriptor>                     pending_local_gid_desc_map_;
   std::map<GO, DBCDescriptor>                     pending_global_gid_desc_map_;
+  // True when every owned DOF is constrained. NOX runs against the full
+  // disc-owned space but the residual fill is post-processed to make every
+  // constrained row read (u - u_bc), so NOX converges in iter 1. Used by
+  // computeGlobalResidualImpl / computeGlobalJacobianImpl.
+  bool                                            fully_constrained_injection_only_{false};
   bool no_dir_bcs_{false};
   bool requires_sdbcs_{false};
   bool requires_orig_dbcs_{false};

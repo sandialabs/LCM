@@ -1035,15 +1035,44 @@ Application::eliminateConstrainedDOFs()
   // Capture the full (pre-elimination) owned vector space before disc reduces it.
   full_owned_vs_ = disc->getVectorSpace();
 
-  // Skip elimination if it would remove every DOF (fully-constrained mesh).
-  // A 0-dimensional reduced owned space makes the linear solver (Belos)
-  // throw on empty block size; weak Dirichlet enforcement handles these
-  // degenerate cases correctly without elimination.
+  // Fully-constrained mesh: 0 free DOFs. The linear solver can't run with an
+  // empty block size, but the test still has work to do — the residual fill
+  // must update internal state from the BC-prescribed u, and the output
+  // expansion must read u_bc into the constrained slots. Take the injection-
+  // only path: build descriptors, leave the disc's vector space intact (so
+  // NOX still has owned space = full space and converges on the first iter
+  // with u = u_bc), and skip the disc-level reduction.
   {
     GO const n_constrained_global = static_cast<GO>(global_gid_desc_map.size());
     GO const n_owned_global       = full_owned_vs_->dim();
     if (n_constrained_global >= n_owned_global) {
-      dbc_descriptors_.clear();
+      // ACE doesn't get the fully-constrained injection-only path:
+      // sub-apps already have their own injection-only handling, and ACE's
+      // transient dynamics make the SDirichlet residual rewrite (which
+      // assumes the residual is purely (u - u_bc)) wrong for the thermal
+      // sub-app's dx/dt-coupled rows.
+      if (is_ace) return;
+      auto const overlap_vs         = disc->getOverlapVectorSpace();
+      auto const overlap_vs_indexer = Albany::createGlobalLocalIndexer(overlap_vs);
+      auto const owned_vs_indexer   = Albany::createGlobalLocalIndexer(full_owned_vs_);
+      for (auto const& [gid, desc] : global_gid_desc_map) {
+        LO const overlap_lid = overlap_vs_indexer->getLocalElement(gid);
+        if (overlap_lid >= 0 && local_gid_desc_map.count(gid)) {
+          DBCDescriptor d  = local_gid_desc_map.at(gid);
+          d.overlap_lid    = overlap_lid;
+          d.full_owned_lid = owned_vs_indexer->getLocalElement(gid);
+          dbc_descriptors_.push_back(d);
+        }
+      }
+      // Mark this as the "fully constrained" injection-only path: NOX sees
+      // the full disc-owned space (no reduction), and after each fill we
+      // overwrite f and zero Jacobian rows at constrained owned LIDs so NOX
+      // converges in one iteration with u = u_bc. injectConstrainedDOFValues
+      // still writes u_bc into the overlap each fill so the material model
+      // sees the prescribed state.
+      fully_constrained_injection_only_ = true;
+      // Don't set full_owned_vs_ to a reduced one; don't call
+      // setConstrainedDOFs.
       return;
     }
   }
@@ -2157,8 +2186,11 @@ Application::computeGlobalResidualImpl(
   // parallel diverge at shared constrained nodes (parallel shows a fraction of
   // the full reaction). Zero those slots to restore the pre-elimination
   // behavior (residual ≈ 0 at constrained DOFs after BC enforcement) and
-  // preserve serial/parallel reproducibility in exodus output.
-  if (!dbc_descriptors_.empty()) {
+  // preserve serial/parallel reproducibility in exodus output. Skip for the
+  // fully-constrained injection-only path: there, the residual at constrained
+  // overlap slots IS the reaction force (= K_internal * u - f_external), and
+  // it's the only output the test sees for those nodes — zeroing erases it.
+  if (!dbc_descriptors_.empty() && !fully_constrained_injection_only_) {
     auto overlap_data = Albany::getNonconstLocalData(overlapped_f);
     for (auto const& desc : dbc_descriptors_) {
       overlap_data[desc.overlap_lid] = 0.0;
@@ -2168,6 +2200,28 @@ Application::computeGlobalResidualImpl(
   // Write the residual to the discretization, which will later (optionally)
   // be written to the output file
   disc->setResidualField(*overlapped_f);
+
+  // Fully-constrained injection-only path (every owned DOF is BC-prescribed,
+  // e.g. single-element CrystalPlasticity / SurfaceElement / cohesive tests):
+  // NOX runs against the full disc-owned space, but the actual residual at
+  // constrained rows is K*u_bc - f_ext and can be arbitrarily large. Force
+  // the owned residual to (u - u_bc) = 0 at every constrained owned LID so
+  // NOX sees |F| = 0 and exits in iter 1 with u = u_bc, while the residual
+  // fill above still updates the per-quadrature-point internal state from
+  // the prescribed displacement.
+  if (fully_constrained_injection_only_) {
+    auto owned_f = Albany::getNonconstLocalData(f);
+    auto owned_x = Albany::getLocalData(x);
+    double const this_time = fixTime(current_time);
+    for (auto const& desc : dbc_descriptors_) {
+      if (desc.full_owned_lid >= 0) {
+        // dfm SDirichlet trick: residual at constrained rows is the BC
+        // mismatch (x - u_bc), so NOX's J*Δ = -r solve drives x → u_bc in
+        // one Newton step with our identity-row Jacobian below.
+        owned_f[desc.full_owned_lid] = owned_x[desc.full_owned_lid] - desc.eval(this_time);
+      }
+    }
+  }
 
   // scale residual by scaleVec_ if scaleBCdofs is on
   if (scaleBCdofs == true) {
@@ -2367,6 +2421,29 @@ Application::computeGlobalJacobianImpl(
   }
 
   fillComplete(jac);
+
+  // Fully-constrained injection-only path: after the fill, zero the rows
+  // and columns of the Jacobian at constrained owned LIDs and put 1 on the
+  // diagonal so the linear solve has J*Δ = -f → Δ = -f. Since the residual
+  // is zeroed above, Δ = 0 and NOX exits in iter 1. Mirrors the dfm
+  // SDirichlet trick for problems that elimination's reduced path can't
+  // shrink to.
+  if (fully_constrained_injection_only_) {
+    resumeFill(jac);
+    for (auto const& desc : dbc_descriptors_) {
+      LO const row = desc.full_owned_lid;
+      if (row < 0) continue;
+      Teuchos::Array<LO> indices;
+      Teuchos::Array<ST> values;
+      Albany::getLocalRowValues(jac, row, indices, values);
+      Teuchos::Array<ST> new_values(indices.size(), 0.0);
+      for (int k = 0; k < indices.size(); ++k) {
+        if (indices[k] == row) new_values[k] = 1.0;
+      }
+      Albany::setLocalRowValues(jac, row, indices(), new_values());
+    }
+    fillComplete(jac);
+  }
 
   // Apply scaling to residual and Jacobian
   if (scaleBCdofs == true) {

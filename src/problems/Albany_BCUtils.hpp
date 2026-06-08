@@ -13,11 +13,9 @@
 
 namespace Albany {
 
-// Dirichlet-side BC utilities were retired alongside the dfm pipeline. The
-// DBC DOF-elimination path in Application::eliminateConstrainedDOFs and
-// injectConstrainedDOFValues now parses YAML DBC keys directly and owns
-// all Dirichlet enforcement. Only Neumann-side BCs still flow through this
-// utility.
+// Neumann-only BC utility. The Dirichlet side is handled directly by
+// Application::eliminateConstrainedDOFs + injectConstrainedDOFValues,
+// which parse YAML DBC keys themselves and don't go through BCUtils.
 
 struct NeumannTraits
 {

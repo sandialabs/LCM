@@ -29,13 +29,9 @@ namespace PHAL {
 
 */
 
-// DirichletFactoryTraits was retired alongside the dfm pipeline: all the
-// Phalanx weak-DBC evaluators (Dirichlet, SDirichlet, ExprEvalSDBC,
-// TimeDepDBC, TimeDepSDBC, DirichletAggregator) plus the LCM-specific
-// Kfield/Torsion/EquilibriumConcentration/Schwarz/StrongSchwarz BCs and
-// the LCM Time parameter-library shim are gone. DBC enforcement is now
-// the sole responsibility of Application::eliminateConstrainedDOFs +
-// injectConstrainedDOFValues.
+// Only NeumannFactoryTraits is defined here. Dirichlet BCs are handled
+// directly by Application::eliminateConstrainedDOFs +
+// injectConstrainedDOFValues — no Phalanx factory for the Dirichlet side.
 
 template <typename Traits>
 struct NeumannFactoryTraits

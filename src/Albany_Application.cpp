@@ -689,10 +689,8 @@ Application::eliminateConstrainedDOFs()
     auto coord_it = ns_coords_map.find(node_set_ids[i]);
     if (coord_it != ns_coords_map.end()) ns_coords = &coord_it->second;
 
-    // Iterate every equation, not just an externally-supplied "offsets"
-    // hint: under DBC DOF elimination, BCUtils no longer populates an
-    // offsets_ table for us (it was a side effect of the dfm path). Scan
-    // every (ns, eq) and check whether any standard DBC YAML key matches.
+    // Iterate every equation in bc_names and check each (ns, eq) pair
+    // against the standard DBC YAML key forms.
     for (int eq = 0; eq < static_cast<int>(bc_names.size()); ++eq) {
       std::string const& dof = bc_names[eq];
       std::string const& ns  = node_set_ids[i];
@@ -1247,10 +1245,6 @@ Application::setScaling(const Teuchos::RCP<Teuchos::ParameterList>& params)
   }
 
   if (scale == 1.0) scaleBCdofs = false;
-
-  // The "Scaling sublist + SDBCs" abort was specific to dfm's weak-DBC path
-  // overwriting scaled rows. Under DBC DOF elimination the constrained rows
-  // are not in the matrix at all, so the conflict can't arise.
 }
 
 void
@@ -1453,16 +1447,9 @@ Application::suppliesPreconditioner() const
 }
 
 namespace {
-// amb-nfm I think right now there is some confusion about nfm. Long ago, nfm
-// was
-// like dfm, just a single field manager. Then it became an array like fm. At
-// that time, it may have been true that nfm was indexed just like fm, using
-// wsPhysIndex. However, it is clear at present (7 Nov 2014) that nfm is
-// definitely not indexed like fm. As an example, compare nfm in
-// Albany::MechanicsProblem::constructNeumannEvaluators and fm in
-// Albany::MechanicsProblem::buildProblem. For now, I'm going to keep nfm as an
-// array, but this this new function is a wrapper around the unclear intended
-// behavior.
+// nfm is an ArrayRCP indexed by physics set in some problems and length-1
+// in others. This wrapper hides the difference: most problems hit the
+// length-1 case and the wsPhysIndex lookup is the fallback.
 inline Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>&
 deref_nfm(Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>>& nfm, const WorksetArray<int>::type& wsPhysIndex, int ws)
 {
@@ -2045,9 +2032,9 @@ Application::computeGlobalResidualImpl(
     double const this_time = fixTime(current_time);
     for (auto const& desc : dbc_descriptors_) {
       if (desc.full_owned_lid >= 0) {
-        // dfm SDirichlet trick: residual at constrained rows is the BC
-        // mismatch (x - u_bc), so NOX's J*Δ = -r solve drives x → u_bc in
-        // one Newton step with our identity-row Jacobian below.
+        // SDirichlet residual rewrite: residual at constrained rows is the
+        // BC mismatch (x - u_bc), so NOX's J·Δ = -r solve drives x → u_bc
+        // in one Newton step paired with the identity-row Jacobian below.
         owned_f[desc.full_owned_lid] = owned_x[desc.full_owned_lid] - desc.eval(this_time);
       }
     }
@@ -2253,11 +2240,11 @@ Application::computeGlobalJacobianImpl(
   fillComplete(jac);
 
   // Fully-constrained injection-only path: after the fill, zero the rows
-  // and columns of the Jacobian at constrained owned LIDs and put 1 on the
-  // diagonal so the linear solve has J*Δ = -f → Δ = -f. Since the residual
-  // is zeroed above, Δ = 0 and NOX exits in iter 1. Mirrors the dfm
-  // SDirichlet trick for problems that elimination's reduced path can't
-  // shrink to.
+  // of the Jacobian at constrained owned LIDs and put 1 on the diagonal so
+  // the linear solve becomes J·Δ = -r → Δ = u_bc - x. NOX exits in one
+  // Newton step with x = u_bc — the SDirichlet residual rewrite above
+  // turns this into the BC mismatch and the identity row turns the solve
+  // into a pure substitution.
   if (fully_constrained_injection_only_) {
     resumeFill(jac);
     for (auto const& desc : dbc_descriptors_) {

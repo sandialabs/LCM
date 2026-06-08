@@ -108,8 +108,6 @@ class AbstractProblem
 
   Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>>
   getFieldManager();
-  Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>
-  getDirichletFieldManager();
   Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>>
   getNeumannFieldManager();
 
@@ -207,9 +205,6 @@ class AbstractProblem
 
   //! Field manager for Volumetric Fill
   Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>> fm;
-
-  //! Field manager for Dirchlet Conditions Fill
-  Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>> dfm;
 
   //! Field manager for Neumann Conditions Fill
   Teuchos::ArrayRCP<Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>> nfm;

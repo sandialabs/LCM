@@ -617,7 +617,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   //! prescribed value given the current time (and, for expressions, node coords).
   struct DBCDescriptor
   {
-    enum class Kind { Constant, TimeArray, Expression, Schwarz };
+    enum class Kind { Constant, TimeArray, Expression, Schwarz, Torsion, Kfield, EquilibriumConcentration };
     Kind              kind           = Kind::Constant;
     LO                overlap_lid    = -1;
     LO                full_owned_lid = -1;  // LID in full (pre-elimination) owned VS; -1 if this rank does not own this DOF
@@ -644,6 +644,44 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     mutable double schwarz_cached_value        = 0.0;
     mutable double schwarz_cached_velocity     = 0.0;
     mutable double schwarz_cached_acceleration = 0.0;
+    // Torsion: rotation by angle theta = theta_dot * time about (X0, Y0)
+    // in the xy-plane. The descriptor stores the node's (X, Y) coordinates
+    // and which displacement component (0 = ux, 1 = uy) it represents, so
+    // eval() returns just the scalar for this DOF.
+    double torsion_theta_dot = 0.0;
+    double torsion_x0        = 0.0;
+    double torsion_y0        = 0.0;
+    double torsion_node_x    = 0.0;
+    double torsion_node_y    = 0.0;
+    int    torsion_component = 0;  // 0 → ux, 1 → uy
+    // Kfield: plane-strain crack-tip Williams' solution with time-varying
+    // KI(t) and KII(t) interpolated from piecewise-linear time series. The
+    // descriptor stores (r, theta) for the node, the elastic constants
+    // (shear modulus, Poisson's ratio), the two time series, and which
+    // displacement component (0 = ux, 1 = uy) it represents.
+    std::vector<double> kfield_time_values;
+    std::vector<double> kfield_ki_values;
+    std::vector<double> kfield_kii_values;
+    double              kfield_mu        = 0.0;
+    double              kfield_nu        = 0.0;
+    double              kfield_r         = 0.0;
+    double              kfield_theta     = 0.0;
+    double              kfield_ki_scale  = 1.0;  // YAML "Kfield KI" scalar (LOCA parameter handle in legacy path)
+    double              kfield_kii_scale = 1.0;  // YAML "Kfield KII" scalar
+    int                 kfield_component = 0;  // 0 → ux, 1 → uy
+    // EquilibriumConcentration: c_bc = applied * exp(pressure_factor * P_node),
+    // where P_node is the pressure DOF value at the same node read from
+    // the overlap solution. The descriptor stores the constants and the
+    // overlap LID of the pressure DOF for this node.
+    double eqconc_applied              = 0.0;
+    double eqconc_pressure_factor      = 0.0;
+    LO     eqconc_pressure_overlap_lid = -1;
+    // Cached Cval = applied * exp(pressure_factor * P_node), updated by the
+    // injection loop each residual fill from the current overlap pressure.
+    // eval() returns this so the expand-to-full path used by response
+    // functions sees a consistent value at this DOF (the inject loop is the
+    // only place that can read the overlap pressure).
+    mutable double eqconc_cached_value = 0.0;
 
     // Prescribed BC value at `time`.
     double

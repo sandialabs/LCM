@@ -7,10 +7,7 @@
 #include "Albany_config.h"
 #include "LCM/evaluators/Time.hpp"
 #include "LCM/evaluators/bc/ACEWavePressureBC.hpp"
-#include "LCM/evaluators/bc/EquilibriumConcentrationBC.hpp"
-#include "LCM/evaluators/bc/KfieldBC.hpp"
 #include "LCM/evaluators/bc/TimeTracBC.hpp"
-#include "LCM/evaluators/bc/TorsionBC.hpp"
 #include "PHAL_Dirichlet.hpp"
 #include "PHAL_ExprEvalSDBC.hpp"
 #include "PHAL_GatherCoordinateVector.hpp"
@@ -47,26 +44,21 @@ struct DirichletFactoryTraits
   static int const id_timedep_sdbc         = 3;
   static int const id_sdbc                 = 4;
   static int const id_expreval_sdbc        = 5;
-  static int const id_kfield_bc            = 6;
-  static int const id_eq_concentration_bc  = 7;
-  static int const id_time                 = 8;
-  static int const id_torsion_bc           = 9;
+  static int const id_time                 = 6;
 
-  // Schwarz and StrongSchwarz BC evaluators were retired: the DBC
-  // DOF-elimination path in Application::eliminateConstrainedDOFs and
+  // Schwarz, StrongSchwarz, Torsion, Kfield, and EquilibriumConcentration
+  // BC evaluators were retired: the DBC DOF-elimination path in
+  // Application::eliminateConstrainedDOFs and
   // Application::injectConstrainedDOFValues drives DTK transfer and value
   // injection directly without going through a Phalanx evaluator.
   typedef Sacado::mpl::vector<
-      PHAL::Dirichlet<_, Traits>,                  //  0
-      PHAL::DirichletAggregator<_, Traits>,        //  1
-      PHAL::TimeDepDBC<_, Traits>,                 //  2
-      PHAL::TimeDepSDBC<_, Traits>,                //  3
-      PHAL::SDirichlet<_, Traits>,                 //  4
-      PHAL::ExprEvalSDBC<_, Traits>,               //  5
-      LCM::KfieldBC<_, Traits>,                    //  6
-      LCM::EquilibriumConcentrationBC<_, Traits>,  //  7
-      LCM::Time<_, Traits>,                        //  8
-      LCM::TorsionBC<_, Traits>                    //  9
+      PHAL::Dirichlet<_, Traits>,            //  0
+      PHAL::DirichletAggregator<_, Traits>,  //  1
+      PHAL::TimeDepDBC<_, Traits>,           //  2
+      PHAL::TimeDepSDBC<_, Traits>,          //  3
+      PHAL::SDirichlet<_, Traits>,           //  4
+      PHAL::ExprEvalSDBC<_, Traits>,         //  5
+      LCM::Time<_, Traits>                   //  6
       >
       EvaluatorTypes;
 };

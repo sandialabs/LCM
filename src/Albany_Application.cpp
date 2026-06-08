@@ -567,6 +567,71 @@ Application::DBCDescriptor::eval(double time) const
     }
 
     case Kind::Schwarz: return schwarz_cached_value;
+
+    case Kind::Torsion: {
+      double const theta = torsion_theta_dot * time;
+      double const dx    = torsion_node_x - torsion_x0;
+      double const dy    = torsion_node_y - torsion_y0;
+      double const c     = std::cos(theta);
+      double const s     = std::sin(theta);
+      if (torsion_component == 0) {
+        return torsion_x0 + dx * c - dy * s - torsion_node_x;
+      }
+      return torsion_y0 + dx * s + dy * c - torsion_node_y;
+    }
+
+    case Kind::Kfield: {
+      // Linearly interpolate KI(t) and KII(t) from the time series and
+      // multiply by the YAML "Kfield KI" / "Kfield KII" scalars (which the
+      // legacy evaluator registered as Sacado parameters so LOCA could
+      // continuation-sweep them; elimination treats them as fixed scalars).
+      auto const n = kfield_time_values.size();
+      double     ki_t, kii_t;
+      if (n == 0) {
+        ki_t = 0.0; kii_t = 0.0;
+      } else if (time <= kfield_time_values[0]) {
+        ki_t = kfield_ki_values[0]; kii_t = kfield_kii_values[0];
+      } else if (time >= kfield_time_values[n - 1]) {
+        ki_t = kfield_ki_values[n - 1]; kii_t = kfield_kii_values[n - 1];
+      } else {
+        std::size_t i = 1;
+        while (i < n && kfield_time_values[i] < time) ++i;
+        double const dt    = kfield_time_values[i] - kfield_time_values[i - 1];
+        double const alpha = (time - kfield_time_values[i - 1]) / dt;
+        ki_t  = kfield_ki_values[i - 1]  + alpha * (kfield_ki_values[i]  - kfield_ki_values[i - 1]);
+        kii_t = kfield_kii_values[i - 1] + alpha * (kfield_kii_values[i] - kfield_kii_values[i - 1]);
+      }
+      double const ki  = kfield_ki_scale  * ki_t;
+      double const kii = kfield_kii_scale * kii_t;
+      // Williams' plane-strain crack-tip displacement field, in the
+      // arrangement the legacy LCM evaluator used:
+      //   coeff_1 = KI / mu * sqrt(R / 2π)
+      //   coeff_2 = KII / mu * sqrt(R / 2π)
+      //   ux = coeff_1 (1 - 2 nu + sin^2(θ/2)) cos(θ/2)
+      //      + coeff_2 (2 - 2 nu + cos^2(θ/2)) sin(θ/2)
+      //   uy = coeff_1 (2 - 2 nu - cos^2(θ/2)) sin(θ/2)
+      //      + coeff_2 (-1 + 2 nu + sin^2(θ/2)) cos(θ/2)
+      double const tau     = 2.0 * M_PI;
+      double const half_th = kfield_theta * 0.5;
+      double const c_half  = std::cos(half_th);
+      double const s_half  = std::sin(half_th);
+      double const coeff_1 = (ki  / kfield_mu) * std::sqrt(kfield_r / tau);
+      double const coeff_2 = (kii / kfield_mu) * std::sqrt(kfield_r / tau);
+      double const ki_x  = coeff_1 * (1.0 - 2.0 * kfield_nu + s_half * s_half) * c_half;
+      double const ki_y  = coeff_1 * (2.0 - 2.0 * kfield_nu - c_half * c_half) * s_half;
+      double const kii_x = coeff_2 * (2.0 - 2.0 * kfield_nu + c_half * c_half) * s_half;
+      double const kii_y = coeff_2 * (-1.0 + 2.0 * kfield_nu + s_half * s_half) * c_half;
+      if (kfield_component == 0) return ki_x + kii_x;
+      return ki_y + kii_y;
+    }
+
+    case Kind::EquilibriumConcentration:
+      // Coupled-injection BC: the value depends on the overlap pressure DOF
+      // at the same node. The injection loop reads the pressure each fill
+      // and caches the resulting c_bc here. eval() returns the cached value
+      // so callers like expandToFullSolution / response evaluation see the
+      // same value the linear solve used.
+      return eqconc_cached_value;
   }
   return 0.0;
 }
@@ -610,6 +675,41 @@ Application::DBCDescriptor::derivs_at(double time) const
     }
 
     case Kind::Schwarz: return {schwarz_cached_velocity, schwarz_cached_acceleration};
+
+    case Kind::Torsion: {
+      // u(t) = (X - X0) cos(theta_dot t) - (Y - Y0) sin(theta_dot t) - X
+      //      = ... after expanding cos / sin around the moving angle.
+      // Time derivative of the affine offset terms is zero, so v reduces
+      // to the chain rule applied to cos/sin:
+      double const theta = torsion_theta_dot * time;
+      double const dx    = torsion_node_x - torsion_x0;
+      double const dy    = torsion_node_y - torsion_y0;
+      double const c     = std::cos(theta);
+      double const s     = std::sin(theta);
+      double const omega = torsion_theta_dot;
+      double v, a;
+      if (torsion_component == 0) {
+        v = -dx * s * omega - dy * c * omega;
+        a = -dx * c * omega * omega + dy * s * omega * omega;
+      } else {
+        v = dx * c * omega - dy * s * omega;
+        a = -dx * s * omega * omega - dy * c * omega * omega;
+      }
+      return {v, a};
+    }
+
+    case Kind::Kfield: {
+      double const h_max = 1.0e-6;
+      double const h     = (time > h_max) ? h_max : (time > 0.0 ? time : h_max);
+      double const f0    = eval(time);
+      double const fp    = eval(time + h);
+      double const fm    = eval(time - h);
+      return {(fp - fm) / (2.0 * h), (fp - 2.0 * f0 + fm) / (h * h)};
+    }
+
+    case Kind::EquilibriumConcentration:
+      // Quasistatic concentration BC — no inherent time derivative.
+      return {0.0, 0.0};
   }
   return {0.0, 0.0};
 }
@@ -736,8 +836,128 @@ Application::eliminateConstrainedDOFs()
       }
     }
 
+    std::string const& schwarz_ns = node_set_ids[i];
+
+    // Check for Torsion SDBC: rotation BC on a single nodeset that writes
+    // both x and y displacement DOFs. YAML key form:
+    //   "DBC on NS <ns> for DOF twist":
+    //     BC Function: Torsion
+    //     Theta Dot:  <double>
+    //     X0:         <double>
+    //     Y0:         <double>
+    std::string const torsion_key = "DBC on NS " + schwarz_ns + " for DOF twist";
+    if (bc_params.isSublist(torsion_key) && ns_coords != nullptr) {
+      auto const& torsion_sub = bc_params.sublist(torsion_key);
+      if (torsion_sub.get<std::string>("BC Function") == "Torsion") {
+        double const theta_dot = torsion_sub.get<double>("Theta Dot");
+        double const x0        = torsion_sub.get<double>("X0");
+        double const y0        = torsion_sub.get<double>("Y0");
+        for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
+          double* c = (*ns_coords)[ni];
+          for (int comp = 0; comp < 2; ++comp) {
+            GO const      dof_gid       = stk_disc->getGlobalDOF(node_gids[ni], comp);
+            DBCDescriptor desc;
+            desc.kind              = DBCDescriptor::Kind::Torsion;
+            desc.torsion_theta_dot = theta_dot;
+            desc.torsion_x0        = x0;
+            desc.torsion_y0        = y0;
+            desc.torsion_node_x    = c[0];
+            desc.torsion_node_y    = c[1];
+            desc.torsion_component = comp;
+            local_gid_desc_map[dof_gid] = desc;
+          }
+        }
+      }
+    }
+
+    // Check for Kfield BC: plane-strain crack-tip Williams' solution on a
+    // single nodeset that writes both x and y displacement DOFs. YAML key
+    // form:
+    //   "DBC on NS <ns> for DOF K":
+    //     BC Function: Kfield
+    //     Number of points: <int>
+    //     Time Values: [...]
+    //     KI Values:   [...]
+    //     KII Values:  [...]
+    //     Shear Modulus: <double>
+    //     Poissons Ratio: <double>
+    std::string const kfield_key = "DBC on NS " + schwarz_ns + " for DOF K";
+    if (bc_params.isSublist(kfield_key) && ns_coords != nullptr) {
+      auto const& k_sub = bc_params.sublist(kfield_key);
+      if (k_sub.get<std::string>("BC Function") == "Kfield") {
+        auto const& ttv   = k_sub.get<Teuchos::Array<double>>("Time Values");
+        auto const& kiv   = k_sub.get<Teuchos::Array<double>>("KI Values");
+        auto const& kiiv  = k_sub.get<Teuchos::Array<double>>("KII Values");
+        double const mu        = k_sub.get<double>("Shear Modulus");
+        double const nu        = k_sub.get<double>("Poissons Ratio");
+        double const ki_scale  = k_sub.get<double>("Kfield KI");
+        double const kii_scale = k_sub.get<double>("Kfield KII");
+        for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
+          double* c = (*ns_coords)[ni];
+          double const r     = std::sqrt(c[0] * c[0] + c[1] * c[1]);
+          double const th    = std::atan2(c[1], c[0]);
+          for (int comp = 0; comp < 2; ++comp) {
+            GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], comp);
+            DBCDescriptor desc;
+            desc.kind               = DBCDescriptor::Kind::Kfield;
+            desc.kfield_time_values = ttv.toVector();
+            desc.kfield_ki_values   = kiv.toVector();
+            desc.kfield_kii_values  = kiiv.toVector();
+            desc.kfield_mu          = mu;
+            desc.kfield_nu          = nu;
+            desc.kfield_ki_scale    = ki_scale;
+            desc.kfield_kii_scale   = kii_scale;
+            desc.kfield_r           = r;
+            desc.kfield_theta       = th;
+            desc.kfield_component   = comp;
+            local_gid_desc_map[dof_gid] = desc;
+          }
+        }
+      }
+    }
+
+    // Check for Equilibrium Concentration BC: coupled BC where the
+    // concentration at each node depends on the local pressure DOF value
+    // through c_bc = applied * exp(pressure_factor * P). YAML key form:
+    //   "Pressure Dependent DBC on NS <ns> for DOF C":
+    //     BC Function: Equilibrium Concentration
+    //     Applied Concentration: <double>
+    //     Pressure Factor:       <double>
+    // The descriptor identifies the local pressure DOF by its equation
+    // offset (the "TAU" entry in bc_names_); injection reads the pressure
+    // value from the overlap solution and computes the concentration.
+    {
+      int c_eq = -1;
+      int p_eq = -1;
+      for (std::size_t e = 0; e < bc_names.size(); ++e) {
+        if (bc_names[e] == "C")   c_eq = static_cast<int>(e);
+        if (bc_names[e] == "TAU") p_eq = static_cast<int>(e);
+      }
+      if (c_eq >= 0 && p_eq >= 0) {
+        std::string const eqconc_key = "Pressure Dependent DBC on NS " + schwarz_ns + " for DOF " + bc_names[c_eq];
+        if (bc_params.isSublist(eqconc_key)) {
+          auto const& ec_sub = bc_params.sublist(eqconc_key);
+          if (ec_sub.get<std::string>("BC Function") == "Equilibrium Concentration") {
+            double const applied = ec_sub.get<double>("Applied Concentration");
+            double const pf      = ec_sub.get<double>("Pressure Factor");
+            for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
+              GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], c_eq);
+              DBCDescriptor desc;
+              desc.kind                   = DBCDescriptor::Kind::EquilibriumConcentration;
+              desc.eqconc_applied         = applied;
+              desc.eqconc_pressure_factor = pf;
+              // Overlap LID of the pressure DOF at this node — resolved
+              // at descriptor finalization by adding (p_eq - c_eq) to the
+              // concentration overlap LID. Stride is +/- per DOF here:
+              desc.eqconc_pressure_overlap_lid = p_eq - c_eq;
+              local_gid_desc_map[dof_gid]      = desc;
+            }
+          }
+        }
+      }
+    }
+
     // Check for StrongSchwarz SDBC (one sublist entry covers all equations).
-    std::string const& schwarz_ns  = node_set_ids[i];
     std::string const  schwarz_key = "SDBC on NS " + schwarz_ns + " for DOF StrongSchwarz";
     if (bc_params.isSublist(schwarz_key)) {
       auto const& schwarz_sub        = bc_params.sublist(schwarz_key);
@@ -834,6 +1054,14 @@ Application::eliminateConstrainedDOFs()
       DBCDescriptor d   = local_gid_desc_map.at(gid);
       d.overlap_lid     = overlap_lid;
       d.full_owned_lid  = full_owned_vs_indexer->getLocalElement(gid);
+      // For Equilibrium Concentration BCs the parser stored a stride
+      // (delta-eq from the concentration DOF to the pressure DOF); now that
+      // we know overlap_lid we can resolve it to the pressure DOF's overlap
+      // LID. Overlap LIDs are laid out so DOFs at the same node are stride
+      // 1 apart per equation (LID = node_lid * neq + eq).
+      if (d.kind == DBCDescriptor::Kind::EquilibriumConcentration) {
+        d.eqconc_pressure_overlap_lid = overlap_lid + d.eqconc_pressure_overlap_lid;
+      }
       dbc_descriptors_.push_back(d);
     }
   }
@@ -970,8 +1198,17 @@ Application::injectConstrainedDOFValues(double time)
   auto const full_owned_vs_indexer = full_owned_vs_.is_null() ? Teuchos::null : Albany::createGlobalLocalIndexer(full_owned_vs_);
 
   for (auto const& desc : dbc_descriptors_) {
-    auto const derivs        = desc.derivs_at(time);
-    double const u           = desc.eval(time);
+    auto const derivs = desc.derivs_at(time);
+    double     u      = desc.eval(time);
+    // EquilibriumConcentration is the one BC kind whose value depends on
+    // another DOF at the same node: c_bc = applied * exp(pressure_factor *
+    // P_overlap). Read the pressure from the overlap solution here (after
+    // scatterX has populated it for free DOFs) and compute c_bc inline.
+    if (desc.kind == DBCDescriptor::Kind::EquilibriumConcentration) {
+      double const pressure   = x_data[desc.eqconc_pressure_overlap_lid];
+      u                       = desc.eqconc_applied * std::exp(desc.eqconc_pressure_factor * pressure);
+      desc.eqconc_cached_value = u;
+    }
     x_data[desc.overlap_lid] = u;
     if (num_time_deriv >= 1) {
       xdot_data[desc.overlap_lid] = derivs.v;

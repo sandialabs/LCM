@@ -53,7 +53,14 @@ imposeOrder(Teuchos::ParameterList const& bc_pl, std::map<std::string, Teuchos::
   S2int order;
   int   ne = 0;
   for (ParameterList::ConstIterator it = bc_pl.begin(); it != bc_pl.end(); ++it) {
-    if (it->first.find("StrongSchwarz") != std::string::npos) continue;
+    // Skip BC entries that are consumed by the DBC DOF-elimination path
+    // rather than by a Phalanx evaluator: StrongSchwarz, Torsion ("twist"),
+    // Kfield ("K"), and EquilibriumConcentration ("lsfit") all skip the
+    // "all dependencies satisfied" check below.
+    if (it->first.find("StrongSchwarz")    != std::string::npos) continue;
+    if (it->first.find(" for DOF twist")   != std::string::npos) continue;
+    if (it->first.find(" for DOF K")       != std::string::npos) continue;
+    if (it->first.find("Pressure Dependent DBC") != std::string::npos) continue;
     order[it->first] = ne++;
   }
 
@@ -445,90 +452,12 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
     }
   }
 
-  ///
-  /// Torsion BC specific
-  ////
-  for (std::size_t i = 0; i < nodeSetIDs.size(); i++) {
-    string ss = traits_type::constructBCName(nodeSetIDs[i], "twist");
-
-    if (BCparams.isSublist(ss)) {
-      // grab the sublist
-      ParameterList& sub_list = BCparams.sublist(ss);
-
-      if (sub_list.get<string>("BC Function") == "Torsion") {
-        RCP<ParameterList> p = rcp(new ParameterList);
-        p->set<int>("Type", traits_type::typeTo);
-
-        p->set<RealType>("Theta Dot", sub_list.get<RealType>("Theta Dot"));
-        p->set<RealType>("X0", sub_list.get<RealType>("X0"));
-        p->set<RealType>("Y0", sub_list.get<RealType>("Y0"));
-
-        // Fill up ParameterList with things DirichletBase wants
-        p->set<RCP<DataLayout>>("Data Layout", dummy);
-        p->set<string>("Dirichlet Name", ss);
-        p->set<RealType>("Dirichlet Value", 0.0);
-        p->set<string>("Node Set ID", nodeSetIDs[i]);
-        // p->set< int >     ("Number of Equations", dirichletNames.size());
-        p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) {
-          offsets_[i].push_back(j);
-        }
-        p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));  // if set to zero, the
-                                                                             // cubature degree of the side
-                                                                             // will be set to that of the
-                                                                             // element
-        p->set<RCP<ParamLib>>("Parameter Library", paramLib);
-        evaluators_to_build[evaluatorsToBuildName(ss)] = p;
-
-        bcs->push_back(ss);
-        use_dbcs_ = true;
-      }
-    }
-  }
-
-  ///
-  /// Equilibrium Concentration BC specific
-  ///
-  for (std::size_t i = 0; i < nodeSetIDs.size(); i++) {
-    for (std::size_t j = 0; j < bcNames.size(); j++) {
-      string ss = traits_type::constructPressureDepBCName(nodeSetIDs[i], bcNames[j]);
-      if (BCparams.isSublist(ss)) {
-        // grab the sublist
-        ParameterList& sub_list = BCparams.sublist(ss);
-
-        // get the pressure offset
-        int pressure_offset;
-        for (std::size_t k = 0; k < bcNames.size(); k++) {
-          if (bcNames[k] == "TAU") {
-            pressure_offset = k;
-            continue;
-          }
-        }
-
-        if (sub_list.get<string>("BC Function") == "Equilibrium Concentration") {
-          RCP<ParameterList> p = rcp(new ParameterList);
-          p->set<int>("Type", traits_type::typeEq);
-
-          p->set<RealType>("Applied Concentration", sub_list.get<RealType>("Applied Concentration"));
-          p->set<RealType>("Pressure Factor", sub_list.get<RealType>("Pressure Factor"));
-
-          // Fill up ParameterList with things DirichletBase wants
-          p->set<RCP<DataLayout>>("Data Layout", dummy);
-          p->set<string>("Dirichlet Name", ss);
-          p->set<RealType>("Dirichlet Value", 0.0);
-          p->set<string>("Node Set ID", nodeSetIDs[i]);
-          p->set<int>("Equation Offset", j);
-          offsets_[i].push_back(j);
-          p->set<int>("Pressure Offset", pressure_offset);
-
-          evaluators_to_build[evaluatorsToBuildName(ss)] = p;
-
-          bcs->push_back(ss);
-          use_dbcs_ = true;
-        }
-      }
-    }
-  }
+  // Torsion / Equilibrium Concentration BC registrations were removed
+  // alongside the LCM weak-DBC evaluators they fed. The DBC DOF-elimination
+  // path now reads these YAML keys (BC Function: Torsion / Equilibrium
+  // Concentration) directly in Application::eliminateConstrainedDOFs and
+  // populates DBCDescriptor::Kind::Torsion / EquilibriumConcentration
+  // entries — Phalanx isn't involved.
 
   ///
   /// SDBC (S = "Symmetric", f.k.a. "Strong")
@@ -614,53 +543,10 @@ Albany::BCUtils<Albany::DirichletTraits>::buildEvaluatorsList(
   // and Application::injectConstrainedDOFValues drives DTK transfer + node
   // value injection without a Phalanx evaluator.
 
-  ///
-  /// Kfield BC specific
-  ///
-  for (std::size_t i = 0; i < nodeSetIDs.size(); i++) {
-    string ss = traits_type::constructBCName(nodeSetIDs[i], "K");
-
-    if (BCparams.isSublist(ss)) {
-      // grab the sublist
-      ParameterList& sub_list = BCparams.sublist(ss);
-
-      if (sub_list.get<string>("BC Function") == "Kfield") {
-        RCP<ParameterList> p = rcp(new ParameterList);
-        p->set<int>("Type", traits_type::typeKf);
-
-        p->set<Teuchos::Array<RealType>>("Time Values", sub_list.get<Teuchos::Array<RealType>>("Time Values"));
-        p->set<Teuchos::Array<RealType>>("KI Values", sub_list.get<Teuchos::Array<RealType>>("KI Values"));
-        p->set<Teuchos::Array<RealType>>("KII Values", sub_list.get<Teuchos::Array<RealType>>("KII Values"));
-
-        // Extract BC parameters
-        p->set<string>("Kfield KI Name", "Kfield KI");
-        p->set<string>("Kfield KII Name", "Kfield KII");
-        p->set<RealType>("KI Value", sub_list.get<double>("Kfield KI"));
-        p->set<RealType>("KII Value", sub_list.get<double>("Kfield KII"));
-        p->set<RealType>("Shear Modulus", sub_list.get<double>("Shear Modulus"));
-        p->set<RealType>("Poissons Ratio", sub_list.get<double>("Poissons Ratio"));
-        // p->set<int>("Cubature Degree", BCparams.get("Cubature Degree", 0));
-        // //if set to zero, the cubature degree of the side will be set to that
-        // of the element
-
-        // Fill up ParameterList with things DirichletBase wants
-        p->set<RCP<DataLayout>>("Data Layout", dummy);
-        p->set<string>("Dirichlet Name", ss);
-        p->set<RealType>("Dirichlet Value", 0.0);
-        p->set<string>("Node Set ID", nodeSetIDs[i]);
-        // p->set< int >     ("Number of Equations", dirichletNames.size());
-        p->set<int>("Equation Offset", 0);
-        for (std::size_t j = 0; j < bcNames.size(); j++) {
-          offsets_[i].push_back(j);
-        }
-        p->set<RCP<ParamLib>>("Parameter Library", paramLib);
-        evaluators_to_build[evaluatorsToBuildName(ss)] = p;
-
-        bcs->push_back(ss);
-        use_dbcs_ = true;
-      }
-    }
-  }
+  // Kfield BC registration was removed alongside its Phalanx evaluator.
+  // The elimination parser reads the "DBC on NS X for DOF K" sublist
+  // directly and populates a DBCDescriptor::Kind::Kfield entry per
+  // constrained DOF.
 
   if ((use_dbcs_ == true) && (use_sdbcs_ == true)) {
     ALBANY_ABORT(

@@ -69,25 +69,16 @@ set(model-eval-headers
 
 # LCM special boundary conditions
 set(bc-sources
-    "${LCM_DIR}/evaluators/bc/EquilibriumConcentrationBC.cpp"
-    "${LCM_DIR}/evaluators/bc/KfieldBC.cpp"
     "${LCM_DIR}/evaluators/bc/RigidContactBC.cpp"
     "${LCM_DIR}/evaluators/bc/TimeTracBC.cpp"
-    "${LCM_DIR}/evaluators/bc/ACEWavePressureBC.cpp"
-    "${LCM_DIR}/evaluators/bc/TorsionBC.cpp")
+    "${LCM_DIR}/evaluators/bc/ACEWavePressureBC.cpp")
 set(bc-headers
-    "${LCM_DIR}/evaluators/bc/EquilibriumConcentrationBC_Def.hpp"
-    "${LCM_DIR}/evaluators/bc/EquilibriumConcentrationBC.hpp"
-    "${LCM_DIR}/evaluators/bc/KfieldBC_Def.hpp"
-    "${LCM_DIR}/evaluators/bc/KfieldBC.hpp"
     "${LCM_DIR}/evaluators/bc/RigidContactBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/RigidContactBC.hpp"
     "${LCM_DIR}/evaluators/bc/TimeTracBC_Def.hpp"
     "${LCM_DIR}/evaluators/bc/TimeTracBC.hpp"
     "${LCM_DIR}/evaluators/bc/ACEWavePressureBC_Def.hpp"
-    "${LCM_DIR}/evaluators/bc/ACEWavePressureBC.hpp"
-    "${LCM_DIR}/evaluators/bc/TorsionBC_Def.hpp"
-    "${LCM_DIR}/evaluators/bc/TorsionBC.hpp")
+    "${LCM_DIR}/evaluators/bc/ACEWavePressureBC.hpp")
 
 
 # LCM kinematics evaluators

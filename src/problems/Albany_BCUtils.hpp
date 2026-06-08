@@ -38,18 +38,9 @@ struct DirichletTraits
   {
     typeTs = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_timedep_sdbc
   };
-  enum
-  {
-    typeKf = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_kfield_bc
-  };
-  enum
-  {
-    typeEq = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_eq_concentration_bc
-  };
-  enum
-  {
-    typeTo = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_torsion_bc
-  };
+  // Kfield, Equilibrium Concentration, and Torsion BC ids (typeKf / typeEq
+  // / typeTo) were removed alongside their Phalanx evaluators; the
+  // DBC DOF-elimination path consumes those YAML keys directly.
   enum
   {
     typeSt = PHAL::DirichletFactoryTraits<PHAL::AlbanyTraits>::id_sdbc

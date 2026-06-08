@@ -81,9 +81,6 @@ Application::Application(
     RCP<Thyra_Vector const> const&     initial_guess,
     bool const                         schwarz)
     : is_schwarz_{schwarz},
-      no_dir_bcs_(false),
-      requires_sdbcs_(false),
-      requires_orig_dbcs_(false),
       comm(comm_),
       out(Teuchos::VerboseObjectBase::getDefaultOStream()),
       params_(params),
@@ -91,8 +88,7 @@ Application::Application(
       shapeParamsHaveBeenReset(false),
       phxGraphVisDetail(0),
       stateGraphVisDetail(0),
-      morphFromInit(true),
-      perturbBetaForDirichlets(0.0)
+      morphFromInit(true)
 {
   initialSetUp(params);
   createMeshSpecs();
@@ -102,17 +98,13 @@ Application::Application(
 }
 
 Application::Application(const RCP<Teuchos_Comm const>& comm_)
-    : no_dir_bcs_(false),
-      requires_sdbcs_(false),
-      requires_orig_dbcs_(false),
-      comm(comm_),
+    : comm(comm_),
       out(Teuchos::VerboseObjectBase::getDefaultOStream()),
       physicsBasedPreconditioner(false),
       shapeParamsHaveBeenReset(false),
       phxGraphVisDetail(0),
       stateGraphVisDetail(0),
-      morphFromInit(true),
-      perturbBetaForDirichlets(0.0)
+      morphFromInit(true)
 {
   // Nothing to be done here
 }
@@ -125,9 +117,6 @@ Application::Application(
     RCP<Thyra_Vector const> const&                     initial_guess,
     bool const                                         schwarz)
     : is_schwarz_{schwarz},
-      no_dir_bcs_(false),
-      requires_sdbcs_(false),
-      requires_orig_dbcs_(false),
       comm(comm_),
       out(Teuchos::VerboseObjectBase::getDefaultOStream()),
       params_(params),
@@ -135,8 +124,7 @@ Application::Application(
       shapeParamsHaveBeenReset(false),
       phxGraphVisDetail(0),
       stateGraphVisDetail(0),
-      morphFromInit(true),
-      perturbBetaForDirichlets(0.0)
+      morphFromInit(true)
 {
   initialSetUp(params);
 
@@ -274,76 +262,24 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
       ALBANY_ASSERT(false, "Error! You are attempting to run with Tempus and Adaptation, which does not currently work in the code!\n");
     }
 
-    // Add NOX pre-post-operator for debugging.
-    bool const have_piro = params->isSublist("Piro");
-    ALBANY_ASSERT(have_piro == true, "Error! Piro sublist not found.\n");
-    Teuchos::ParameterList& piro_params = params->sublist("Piro");
-    bool const              have_dbcs   = problemParams->isSublist("Dirichlet BCs");
-    if (have_dbcs == false) no_dir_bcs_ = true;
-    bool const have_tempus = piro_params.isSublist("Tempus");
-    ALBANY_ASSERT(have_tempus == true, "Error! Tempus sublist not found.\n");
-    Teuchos::ParameterList& tempus_params       = piro_params.sublist("Tempus");
-    bool const              have_tempus_stepper = tempus_params.isSublist("Tempus Stepper");
-
-    ALBANY_ASSERT(have_tempus_stepper == true, "Error! Tempus stepper sublist not found.\n");
-
-    Teuchos::ParameterList& tempus_stepper_params = tempus_params.sublist("Tempus Stepper");
-
-    std::string stepper_type = tempus_stepper_params.get<std::string>("Stepper Type");
-
-    Teuchos::ParameterList nox_params;
-
-    // The following code checks if we are using an Explicit stepper in Tempus, so as
-    // to do appropriate error checking (e.g., disallow DBCs, which do not work with explicit steppers).
-    // IKT, 8/13/2020: warning - the logic here may not encompass all explicit steppers
-    // in Tempus!
-    std::string const expl_str           = "Explicit";
-    std::string const forward_eul        = "Forward Euler";
-    bool              is_explicit_scheme = false;
-    std::size_t       found              = stepper_type.find(expl_str);
-    std::size_t       found2             = stepper_type.find(forward_eul);
-    if ((found != std::string::npos) || (found2 != std::string::npos)) {
-      is_explicit_scheme = true;
-    }
-    if ((stepper_type == "General ERK") || (stepper_type == "RK1")) {
-      is_explicit_scheme = true;
-    }
-
-    if ((stepper_type == "Newmark Implicit d-Form") || (stepper_type == "Newmark Implicit a-Form")) {
-      bool const have_solver_name = tempus_stepper_params.isType<std::string>("Solver Name");
-
-      ALBANY_ASSERT(have_solver_name == true, "Error! Implicit solver sublist not found.\n");
-
-      std::string const solver_name = tempus_stepper_params.get<std::string>("Solver Name");
-
+    // Sanity check on Tempus + d-Form Newmark: it needs Line Search Based.
+    Teuchos::ParameterList& piro_params           = params->sublist("Piro", true);
+    Teuchos::ParameterList& tempus_params         = piro_params.sublist("Tempus", true);
+    Teuchos::ParameterList& tempus_stepper_params = tempus_params.sublist("Tempus Stepper", true);
+    std::string const       stepper_type          = tempus_stepper_params.get<std::string>("Stepper Type");
+    if (stepper_type == "Newmark Implicit d-Form") {
+      std::string const       solver_name        = tempus_stepper_params.get<std::string>("Solver Name");
       Teuchos::ParameterList& solver_name_params = tempus_stepper_params.sublist(solver_name);
-
-      bool const have_nox = solver_name_params.isSublist("NOX");
-      ALBANY_ASSERT(have_nox == true, "Error! Nox sublist not found.\n");
-      nox_params                   = solver_name_params.sublist("NOX");
-      std::string nonlinear_solver = nox_params.get<std::string>("Nonlinear Solver");
-
-      // Set flag marking that we are running with Tempus + d-Form Newmark +
-      // SDBCs.
-      if (stepper_type == "Newmark Implicit d-Form") {
-        if (nonlinear_solver != "Line Search Based") {
-          ALBANY_ABORT(
-              "Newmark Implicit d-Form Stepper Type will not work correctly "
-              "with 'Nonlinear Solver' = "
+      Teuchos::ParameterList& nox_params         = solver_name_params.sublist("NOX", true);
+      std::string const       nonlinear_solver   = nox_params.get<std::string>("Nonlinear Solver");
+      ALBANY_PANIC(
+          nonlinear_solver != "Line Search Based",
+          "Newmark Implicit d-Form Stepper Type will not work correctly "
+          "with 'Nonlinear Solver' = "
               << nonlinear_solver
               << "!  The valid Nonlinear Solver for this scheme is 'Line "
                  "Search Based'.");
-        }
-      }
-      if (stepper_type == "Newmark Implicit a-Form") {
-        requires_orig_dbcs_ = true;
-      }
     }
-    // Explicit steppers require SDBCs
-    if (is_explicit_scheme == true) {
-      requires_sdbcs_ = true;
-    }
-
   } else {
     ALBANY_ABORT(
         "Solution Method must be Steady, Transient, Transient Tempus, "
@@ -472,19 +408,6 @@ Application::buildProblem()
   problem->setApplication(Teuchos::rcp(this, false));
 
   problem->buildProblem(meshSpecs, stateMgr);
-
-  // Strong-vs-weak DBC checks (requires_sdbcs_ / requires_orig_dbcs_) were
-  // load-bearing only when Application offered both BC paths. With dfm
-  // retired and DBC DOF elimination handling every DBC strongly by
-  // construction, both checks are inapplicable.
-
-  if ((no_dir_bcs_ == true) && (scaleBCdofs == true)) {
-    ALBANY_ABORT(
-        "Error in Albany::Application: you are attempting "
-        "to set 'Scale DOF BCs = true' for a problem with no  "
-        "Dirichlet BCs!  Scaling will do nothing.  Re-run "
-        "with 'Scale DOF BCs = false'\n");
-  }
 
   neq               = problem->numEquations();
   spatial_dimension = problem->spatialDimension();
@@ -1438,7 +1361,6 @@ Application::finalSetUp(const Teuchos::RCP<Teuchos::ParameterList>& params, Teuc
 
   ignore_residual_in_jacobian = problemParams->get("Ignore Residual In Jacobian", false);
 
-  perturbBetaForDirichlets = problemParams->get("Perturb Dirichlet", 0.0);
 
   is_adjoint = problemParams->get("Solve Adjoint", false);
 

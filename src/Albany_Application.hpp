@@ -728,9 +728,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   // constrained row read (u - u_bc), so NOX converges in iter 1. Used by
   // computeGlobalResidualImpl / computeGlobalJacobianImpl.
   bool                                            fully_constrained_injection_only_{false};
-  bool no_dir_bcs_{false};
-  bool requires_sdbcs_{false};
-  bool requires_orig_dbcs_{false};
 
   Teuchos::RCP<Teuchos_Comm const>                         comm{Teuchos::null};
   Teuchos::RCP<Teuchos::FancyOStream>                      out{Teuchos::null};
@@ -815,7 +812,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
 
   // To prevent a singular mass matrix associated with Dirichlet
   //  conditions, optionally add a small perturbation to the diag
-  double perturbBetaForDirichlets{0.0};
 
   void
   determinePiroSolver(const Teuchos::RCP<Teuchos::ParameterList>& topLevelParams);

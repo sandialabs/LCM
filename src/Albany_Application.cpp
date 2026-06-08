@@ -155,14 +155,18 @@ Application::Application(
     // still runs setFieldAndBulkData (which declares this app's fields
     // on the shared metaData but skips commit when deferCommit is set
     // on the mesh).
+    // Mark the deferred state BEFORE createDiscretization so the
+    // eliminateConstrainedDOFs called from createDiscretization's tail
+    // takes the ACE early-exit path (overlap vector space isn't a
+    // concrete Thyra type until commitAndPopulate has run).
+    deferred_post_commit_pending_ = true;
+    deferred_params_              = params;
+    deferred_shared_mesh_         = sharedMesh;
+
     discFactory->deferUpdateMesh = true;
     createDiscretization();
     discFactory->deferUpdateMesh = false;  // restore for any later calls
 
-    // Stash state finalizePostCommit needs.
-    deferred_post_commit_pending_ = true;
-    deferred_params_              = params;
-    deferred_shared_mesh_         = sharedMesh;
     // initial_guess is captured by finalizePostCommit's parameter.
     (void)initial_guess;
   } else {
@@ -182,9 +186,15 @@ Application::finalizePostCommit(RCP<Thyra_Vector const> const& initial_guess)
   // shared-mesh ACE coupling we always have STK.
   auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(disc, true);
   stk_disc->updateMesh();
-  finalSetUp(deferred_params_, initial_guess);
 
+  // ACE-deferred elimination: now that the shared mesh is committed and the
+  // discretization's nodesets + overlap vector space are concrete, parse the
+  // DBCs and build descriptors. Clear the deferred flag first so the early-
+  // exit guard in eliminateConstrainedDOFs lets this call through.
   deferred_post_commit_pending_ = false;
+  eliminateConstrainedDOFs();
+
+  finalSetUp(deferred_params_, initial_guess);
   deferred_params_              = Teuchos::null;
   deferred_shared_mesh_         = Teuchos::null;
 }
@@ -720,11 +730,18 @@ Application::eliminateConstrainedDOFs()
   auto* stk_disc = dynamic_cast<Albany::STKDiscretization*>(disc.get());
   if (stk_disc == nullptr) return;
 
-  // Skip for ACE Sequential Thermo-Mechanical problems: element death
-  // dynamically changes nodeset membership after initialization, so a
-  // statically-computed elimination set would become stale.
-  if (problemParams->isParameter("ACE Sequential Thermomechanical") &&
-      problemParams->get<bool>("ACE Sequential Thermomechanical")) return;
+  // ACE Sequential Thermo-Mechanical: this method runs twice for ACE sub-
+  // apps — once early from the shared-mesh ctor (when the discretization's
+  // nodesets and overlap vector space are NOT yet ready, so parsing returns
+  // nothing useful) and once later from finalizePostCommit (when they are).
+  // The early-call exit below avoids wasting a parse pass; the late call
+  // does the real work but takes the injection-only path: dbc_descriptors_
+  // are populated for overlap-slot writes but the disc's vector space stays
+  // full-size so element death can keep mutating nodeset membership without
+  // invalidating a frozen reduced space.
+  bool const is_ace = problemParams->isParameter("ACE Sequential Thermomechanical") &&
+                      problemParams->get<bool>("ACE Sequential Thermomechanical");
+  if (is_ace && deferred_post_commit_pending_) return;
 
   // Use overlap-scope nodesets (includes ghosted nodes) so each rank has
   // descriptors for every constrained DOF in its overlap — not just those it
@@ -1008,6 +1025,12 @@ Application::eliminateConstrainedDOFs()
         global_gid_desc_map[gid] = DBCDescriptor{};  // placeholder — not on this rank
     }
   }
+
+  // ACE: defer the entire parse + injection-LID build to finalizePostCommit,
+  // which fires after disc->updateMesh has populated the nodesets and made
+  // the overlap vector space concrete. The early entry into this function
+  // (from the shared-mesh ctor) sees empty nodesets, so nothing useful would
+  // be parsed here anyway.
 
   // Capture the full (pre-elimination) owned vector space before disc reduces it.
   full_owned_vs_ = disc->getVectorSpace();

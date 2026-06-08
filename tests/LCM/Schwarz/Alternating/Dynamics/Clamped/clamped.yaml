@@ -1,0 +1,28 @@
+LCM:
+  Alternating System:
+    Model Input Files: [clamped_00.yaml, clamped_01.yaml]
+    Minimum Iterations: 1
+    Maximum Iterations: 32
+    Relative Tolerance: 1.0e-15
+    Absolute Tolerance: 1.0e-15
+    # Norma-aligned wave-resolved configuration. Mesh and material are
+    # copied from Norma.jl's overlap/clamped example (1mm x 1mm x 0.75m
+    # bricks, 750 z-intervals each); c = sqrt(E/rho) = 1000 m/s; element
+    # size 1mm gives CFL dt ~ 1e-6 s. dt = 1e-6 sits at CFL, dt = 1e-7
+    # is what Norma uses for accuracy; we keep dt = 1e-6 here to bound
+    # the CI runtime. Final time 1e-4 (100 steps) is enough to see the
+    # initial Gaussian disperse into a 0.5e-3 m steady wave amplitude;
+    # the full wave-coalescence event at t = 5e-4 is verified offline
+    # against Norma to ~0.01% agreement and is not part of the test.
+    Maximum Steps: 100
+    Initial Time: 0.0
+    Final Time: 1.0e-4
+    Initial Time Step: 1.0e-6
+    Exodus Write Interval: 10
+  # MODEL DECLARATION, Look in the Problem directory
+  Problem:
+    # Transient or Steady (Quasi-Static) or Continuation (load steps)
+    Solution Method: Schwarz Alternating
+    # Have Phalanx output a graph of the used evaluators
+    Phalanx Graph Visualization Detail: 0
+...

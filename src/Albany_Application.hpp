@@ -729,6 +729,12 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   bool                                            deferred_post_commit_pending_{false};
   Teuchos::RCP<Teuchos::ParameterList>            deferred_params_;
   Teuchos::RCP<Albany::AbstractMeshStruct>        deferred_shared_mesh_;
+  // For ACE sub-apps with deferred shared-mesh commit, the disc's overlap
+  // vector space isn't ready when eliminateConstrainedDOFs first runs.
+  // The DBC parser stashes the partial maps here; finalizePostCommit
+  // resolves them to overlap LIDs once disc->updateMesh has fired.
+  std::map<GO, DBCDescriptor>                     pending_local_gid_desc_map_;
+  std::map<GO, DBCDescriptor>                     pending_global_gid_desc_map_;
   bool no_dir_bcs_{false};
   bool requires_sdbcs_{false};
   bool requires_orig_dbcs_{false};

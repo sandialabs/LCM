@@ -98,16 +98,6 @@ class BCUtils
   {
     return nodeSetIDs_;
   }
-
-  ///
-  /// Get boolean telling code if Adaptation is utilized
-  ///
-  virtual bool
-  haveAdaptation() const
-  {
-    return false;
-  }
-
   Teuchos::RCP<PHX::FieldManager<PHAL::AlbanyTraits>>
   constructBCEvaluators(
       const Teuchos::RCP<Albany::MeshSpecsStruct>&  meshSpecs,

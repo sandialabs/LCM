@@ -112,13 +112,6 @@ MechanicsProblem::MechanicsProblem(
   }
   rigidBodyModes->setParameters(num_PDEs, num_eq_mech, num_eq_aux, null_space_dim);
 
-  have_adaptation_ = params->isSublist("Adaptation");
-  if (have_adaptation_) {
-    Teuchos::ParameterList const& adapt_params         = params->sublist("Adaptation");
-    std::string const&            adaptation_method    = adapt_params.get<std::string>("Method");
-    have_sizefield_adaptation_                         = (adaptation_method == "RPI Albany Size");
-  }
-
   // User-defined NOX status test that can be passed to the ModelEvaluators.
   // This allows a ModelEvaluator to indicate to NOX that something has failed,
   // which is useful for adaptive step size reduction.

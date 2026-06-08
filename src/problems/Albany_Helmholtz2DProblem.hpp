@@ -32,16 +32,6 @@ class Helmholtz2DProblem : public Albany::AbstractProblem
   {
     return 2;
   }
-
-  ///
-  /// Get boolean telling code if Adaptation is utilized
-  ///
-  virtual bool
-  haveAdaptation() const
-  {
-    return false;
-  }
-
   //! Build the PDE instantiations, boundary conditions, and initial solution
   virtual void
   buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<Albany::MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);

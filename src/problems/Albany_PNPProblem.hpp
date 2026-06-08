@@ -36,16 +36,6 @@ class PNPProblem : public Albany::AbstractProblem
   {
     return numDim;
   }
-
-  ///
-  /// Get boolean telling code if Adaptation is utilized
-  ///
-  virtual bool
-  haveAdaptation() const
-  {
-    return false;
-  }
-
   // Build evaluators
   virtual Teuchos::Array<Teuchos::RCP<const PHX::FieldTag>>
   buildEvaluators(

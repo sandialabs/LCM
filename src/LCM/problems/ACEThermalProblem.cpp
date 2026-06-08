@@ -53,8 +53,6 @@ Albany::ACEThermalProblem::ACEThermalProblem(
     tau_type_   = "None";
     stab_value_ = 0.0;
   }
-  // Check whether we are doing mesh adaptation
-  have_adaptation_ = params->isSublist("Adaptation");
 }
 
 Albany::ACEThermalProblem::~ACEThermalProblem() {}

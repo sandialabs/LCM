@@ -64,16 +64,6 @@ class PopulateMesh : public Albany::AbstractProblem
   //! Each problem must generate it's list of valide parameters
   Teuchos::RCP<Teuchos::ParameterList const>
   getValidProblemParameters() const;
-
-  ///
-  /// Get boolean telling code if Adaptation is utilized
-  ///
-  virtual bool
-  haveAdaptation() const
-  {
-    return false;
-  }
-
  private:
   //! Private to prohibit copying
   PopulateMesh(const PopulateMesh&);

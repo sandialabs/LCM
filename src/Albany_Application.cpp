@@ -258,10 +258,6 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   } else if (solutionMethod == "Transient Tempus" || "Transient Tempus No Piro") {
     solMethod = TransientTempus;
 
-    if ((solMethod == TransientTempus) && (problem->haveAdaptation() == true)) {
-      ALBANY_ASSERT(false, "Error! You are attempting to run with Tempus and Adaptation, which does not currently work in the code!\n");
-    }
-
     // Sanity check on Tempus + d-Form Newmark: it needs Line Search Based.
     Teuchos::ParameterList& piro_params           = params->sublist("Piro", true);
     Teuchos::ParameterList& tempus_params         = piro_params.sublist("Tempus", true);

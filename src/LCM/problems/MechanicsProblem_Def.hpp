@@ -613,28 +613,6 @@ MechanicsProblem::constructEvaluators(
     fm0.template registerEvaluator<EvalT>(ev);
   }
 
-  if ((have_mech_eq_) && (have_sizefield_adaptation_)) {
-    Teuchos::RCP<Teuchos::ParameterList> p = Teuchos::rcp(new Teuchos::ParameterList("Isotropic Mesh Size Field"));
-
-    p->set<std::string>("IsoTropic MeshSizeField Name", "IsoMeshSizeField");
-    p->set<std::string>("Current Coordinates Name", "Current Coordinates");
-    p->set<Teuchos::RCP<Intrepid2::Cubature<PHX::Device>>>("Cubature", cubature);
-
-    // Get the Adaptation list and send to the evaluator
-    Teuchos::ParameterList& paramList = params->sublist("Adaptation");
-
-    p->set<Teuchos::ParameterList*>("Parameter List", &paramList);
-    p->set<Intrepid2Basis const>("Intrepid2 Basis", intrepidBasis);
-    ev = Teuchos::rcp(new LCM::IsoMeshSizeField<EvalT, PHAL::AlbanyTraits>(*p, dl_));
-    fm0.template registerEvaluator<EvalT>(ev);
-
-    bool output_flag{true};
-
-    p  = stateMgr.registerStateVariable("IsoMeshSizeField", dl_->qp_scalar, dl_->dummy, eb_name, "scalar", 1.0, true, output_flag);
-    ev = Teuchos::rcp(new PHAL::SaveStateField<EvalT, PHAL::AlbanyTraits>(*p));
-    fm0.template registerEvaluator<EvalT>(ev);
-  }
-
   if ((have_temperature_eq_) || (have_temperature_)) {
     RealType const temp = material_db_->getElementBlockParam<RealType>(eb_name, "Initial Temperature", 0.0);
 

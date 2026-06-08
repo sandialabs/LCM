@@ -41,13 +41,6 @@ class MechanicsProblem : public AbstractProblem
   {
     return num_dims_;
   }
-
-  virtual bool
-  haveAdaptation() const
-  {
-    return have_adaptation_;
-  }
-
   virtual void
   buildProblem(Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> meshSpecs, StateManager& stateMgr);
 
@@ -117,8 +110,6 @@ class MechanicsProblem : public AbstractProblem
 
   /// Boolean marking whether SDBCs are used
   /// Boolean marking whether adaptation is used
-  bool have_adaptation_;
-
   /// Type of thermal source that is in effect
   SOURCE_TYPE thermal_source_;
 
@@ -184,8 +175,6 @@ class MechanicsProblem : public AbstractProblem
 
   /// Mesh adaptation: "Adaptation" sublist exists and the method is
   /// "RPI Albany Size".
-  bool have_sizefield_adaptation_{false};
-
   /// Dynamic tempus solution method
   bool dynamic_tempus_{false};
 

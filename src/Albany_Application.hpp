@@ -688,19 +688,67 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     derivs_at(double time) const;
   };
 
-  std::vector<DBCDescriptor> dbc_descriptors_;
+  //! Aggregated DBC elimination state. One of four modes is in effect:
+  //!
+  //!   Disabled         — no DBCs to enforce. descriptors is empty,
+  //!                      full_owned_vs is null. Nothing in
+  //!                      injectConstrainedDOFValues / expandToFullSolution /
+  //!                      the fill post-processing fires.
+  //!
+  //!   Reduced          — standard path. The disc's vector space has been
+  //!                      shrunk to the free DOFs; full_owned_vs holds the
+  //!                      pre-shrink space so expandToFullSolution can
+  //!                      reconstitute it for output / response eval.
+  //!                      descriptors carry overlap_lid + full_owned_lid.
+  //!
+  //!   FullyConstrained — every owned DOF is BC-prescribed; the reduced
+  //!                      vector space would be 0-dimensional. The disc is
+  //!                      left full-size and the residual fill is
+  //!                      post-processed to make every constrained owned
+  //!                      row read (u - u_bc) with a 1-on-diagonal Jacobian,
+  //!                      so NOX converges in one Newton step.
+  //!
+  //!   DeferredAce      — ACE sub-app under shared-mesh commit deferral:
+  //!                      the disc's overlap vector space isn't a concrete
+  //!                      Thyra type yet, so the BC parse + LID resolve is
+  //!                      stashed in pending_*_gid_desc_map and replayed
+  //!                      from finalizePostCommit after disc->updateMesh.
+  //!                      At that point we transition to either Reduced or
+  //!                      FullyConstrained.
+  struct DBCEliminationState
+  {
+    enum class Mode
+    {
+      Disabled,
+      Reduced,
+      FullyConstrained,
+      DeferredAce,
+    };
 
-  //! Unique (coupled_app_name, nodeset_id) pairs that Schwarz DBCs in this
-  //! application's YAML couple to. Populated at BC parse time (every rank reads
-  //! the same YAML, so the set is the same on every rank). Used in
-  //! injectConstrainedDOFValues to drive Albany::computeSchwarzTransferDTK
-  //! collectively across ranks: every rank iterates this set and participates
-  //! in the DTK MapOperator setup/apply for every pair, even when no local
-  //! descriptor lands there.
-  std::vector<std::pair<std::string, std::string>> schwarz_couplings_;
+    Mode                                  mode = Mode::Disabled;
+    std::vector<DBCDescriptor>            descriptors;
 
-  //! Full (pre-elimination) owned vector space; null when no elimination active.
-  Teuchos::RCP<Thyra_VectorSpace const> full_owned_vs_;
+    //! Full (pre-elimination) owned vector space — set in Reduced mode so
+    //! expandToFullSolution can lift the reduced x back to the original
+    //! discretization-owned layout. Null in all other modes.
+    Teuchos::RCP<Thyra_VectorSpace const> full_owned_vs;
+
+    //! Unique (coupled_app_name, nodeset_id) pairs that Schwarz DBCs in
+    //! this application's YAML couple to. Populated at BC parse time
+    //! (every rank reads the same YAML, so the set is the same on every
+    //! rank). Used in injectConstrainedDOFValues to drive
+    //! Albany::computeSchwarzTransferDTK collectively across ranks: every
+    //! rank iterates this set and participates in the DTK MapOperator
+    //! setup/apply for every pair, even when no local descriptor lands
+    //! there.
+    std::vector<std::pair<std::string, std::string>> schwarz_couplings;
+
+    //! Parse output stashed during DeferredAce; replayed from
+    //! finalizePostCommit once the disc's overlap vector space is concrete.
+    std::map<GO, DBCDescriptor>           pending_local_gid_desc_map;
+    std::map<GO, DBCDescriptor>           pending_global_gid_desc_map;
+  };
+  DBCEliminationState dbc_state_;
 
   //! Last time at which a residual/Jacobian was computed; used as fallback in
   //! response evaluation when the model evaluator sees is_dynamic==false (e.g.
@@ -717,17 +765,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   bool                                            deferred_post_commit_pending_{false};
   Teuchos::RCP<Teuchos::ParameterList>            deferred_params_;
   Teuchos::RCP<Albany::AbstractMeshStruct>        deferred_shared_mesh_;
-  // For ACE sub-apps with deferred shared-mesh commit, the disc's overlap
-  // vector space isn't ready when eliminateConstrainedDOFs first runs.
-  // The DBC parser stashes the partial maps here; finalizePostCommit
-  // resolves them to overlap LIDs once disc->updateMesh has fired.
-  std::map<GO, DBCDescriptor>                     pending_local_gid_desc_map_;
-  std::map<GO, DBCDescriptor>                     pending_global_gid_desc_map_;
-  // True when every owned DOF is constrained. NOX runs against the full
-  // disc-owned space but the residual fill is post-processed to make every
-  // constrained row read (u - u_bc), so NOX converges in iter 1. Used by
-  // computeGlobalResidualImpl / computeGlobalJacobianImpl.
-  bool                                            fully_constrained_injection_only_{false};
 
   Teuchos::RCP<Teuchos_Comm const>                         comm{Teuchos::null};
   Teuchos::RCP<Teuchos::FancyOStream>                      out{Teuchos::null};

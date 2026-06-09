@@ -652,13 +652,16 @@ Application::eliminateConstrainedDOFs()
   // nodesets and overlap vector space are NOT yet ready, so parsing returns
   // nothing useful) and once later from finalizePostCommit (when they are).
   // The early-call exit below avoids wasting a parse pass; the late call
-  // does the real work but takes the injection-only path: dbc_descriptors_
+  // does the real work but takes the injection-only path: dbc_state_.descriptors
   // are populated for overlap-slot writes but the disc's vector space stays
   // full-size so element death can keep mutating nodeset membership without
   // invalidating a frozen reduced space.
   bool const is_ace = problemParams->isParameter("ACE Sequential Thermomechanical") &&
                       problemParams->get<bool>("ACE Sequential Thermomechanical");
-  if (is_ace && deferred_post_commit_pending_) return;
+  if (is_ace && deferred_post_commit_pending_) {
+    dbc_state_.mode = DBCEliminationState::Mode::DeferredAce;
+    return;
+  }
 
   // Use overlap-scope nodesets (includes ghosted nodes) so each rank has
   // descriptors for every constrained DOF in its overlap — not just those it
@@ -887,7 +890,7 @@ Application::eliminateConstrainedDOFs()
       // here — even ranks whose local mesh slice ghosts no Schwarz DOFs. This
       // keeps Albany::computeSchwarzTransferDTK called consistently across
       // ranks (DTK MapOperator::setup/apply is collective on the MPI comm).
-      schwarz_couplings_.emplace_back(coupled_name, schwarz_ns);
+      dbc_state_.schwarz_couplings.emplace_back(coupled_name, schwarz_ns);
       int const neq_strong_schwarz = static_cast<int>(bc_names.size());
       for (int eq = 0; eq < neq_strong_schwarz; ++eq) {
         for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
@@ -947,8 +950,11 @@ Application::eliminateConstrainedDOFs()
   // (from the shared-mesh ctor) sees empty nodesets, so nothing useful would
   // be parsed here anyway.
 
-  // Capture the full (pre-elimination) owned vector space before disc reduces it.
-  full_owned_vs_ = disc->getVectorSpace();
+  // Pre-elimination owned vector space. Captured here so the Reduced branch
+  // below can hand it to expandToFullSolution; in FullyConstrained mode the
+  // disc isn't reduced and we clear it back to null before returning.
+  auto const pre_elim_owned_vs = disc->getVectorSpace();
+  dbc_state_.full_owned_vs     = pre_elim_owned_vs;
 
   // Fully-constrained mesh: 0 free DOFs. The linear solver can't run with an
   // empty block size, but the test still has work to do — the residual fill
@@ -959,48 +965,50 @@ Application::eliminateConstrainedDOFs()
   // with u = u_bc), and skip the disc-level reduction.
   {
     GO const n_constrained_global = static_cast<GO>(global_gid_desc_map.size());
-    GO const n_owned_global       = full_owned_vs_->dim();
+    GO const n_owned_global       = pre_elim_owned_vs->dim();
     if (n_constrained_global >= n_owned_global) {
       // ACE doesn't get the fully-constrained injection-only path:
       // sub-apps already have their own injection-only handling, and ACE's
       // transient dynamics make the SDirichlet residual rewrite (which
       // assumes the residual is purely (u - u_bc)) wrong for the thermal
       // sub-app's dx/dt-coupled rows.
-      if (is_ace) return;
+      if (is_ace) {
+        dbc_state_.full_owned_vs = Teuchos::null;
+        return;
+      }
       auto const overlap_vs         = disc->getOverlapVectorSpace();
       auto const overlap_vs_indexer = Albany::createGlobalLocalIndexer(overlap_vs);
-      auto const owned_vs_indexer   = Albany::createGlobalLocalIndexer(full_owned_vs_);
+      auto const owned_vs_indexer   = Albany::createGlobalLocalIndexer(pre_elim_owned_vs);
       for (auto const& [gid, desc] : global_gid_desc_map) {
         LO const overlap_lid = overlap_vs_indexer->getLocalElement(gid);
         if (overlap_lid >= 0 && local_gid_desc_map.count(gid)) {
           DBCDescriptor d  = local_gid_desc_map.at(gid);
           d.overlap_lid    = overlap_lid;
           d.full_owned_lid = owned_vs_indexer->getLocalElement(gid);
-          dbc_descriptors_.push_back(d);
+          dbc_state_.descriptors.push_back(d);
         }
       }
-      // Mark this as the "fully constrained" injection-only path: NOX sees
-      // the full disc-owned space (no reduction), and after each fill we
-      // overwrite f and zero Jacobian rows at constrained owned LIDs so NOX
-      // converges in one iteration with u = u_bc. injectConstrainedDOFValues
-      // still writes u_bc into the overlap each fill so the material model
-      // sees the prescribed state.
-      fully_constrained_injection_only_ = true;
-      // Don't set full_owned_vs_ to a reduced one; don't call
-      // setConstrainedDOFs.
+      // FullyConstrained injection-only path: NOX sees the full disc-owned
+      // space (no reduction), and after each fill we overwrite f and the
+      // Jacobian rows at constrained owned LIDs so NOX converges in one
+      // iteration with u = u_bc. injectConstrainedDOFValues still writes
+      // u_bc into the overlap each fill so the material model sees the
+      // prescribed state.
+      dbc_state_.mode          = DBCEliminationState::Mode::FullyConstrained;
+      dbc_state_.full_owned_vs = Teuchos::null;
       return;
     }
   }
 
   // Step 3: Build the constrained GID set for the discretization and
-  // populate dbc_descriptors_ for overlap-slot injection.
+  // populate dbc_state_.descriptors for overlap-slot injection.
   std::set<GO> constrained_gids;
   // For setConstrainedDOFs we still need a GID→initial_value map (used to
   // initialize the reduced solution on first scatter); use t=0 evaluation.
   std::map<GO, double> gid_value_map;
   auto const   overlap_vs           = disc->getOverlapVectorSpace();
   auto const   overlap_vs_indexer   = Albany::createGlobalLocalIndexer(overlap_vs);
-  auto const   full_owned_vs_indexer = Albany::createGlobalLocalIndexer(full_owned_vs_);
+  auto const   full_owned_vs_indexer = Albany::createGlobalLocalIndexer(dbc_state_.full_owned_vs);
 
   for (auto const& [gid, desc] : global_gid_desc_map) {
     constrained_gids.insert(gid);
@@ -1018,11 +1026,12 @@ Application::eliminateConstrainedDOFs()
       if (d.kind == DBCDescriptor::Kind::EquilibriumConcentration) {
         d.eqconc_pressure_overlap_lid = overlap_lid + d.eqconc_pressure_overlap_lid;
       }
-      dbc_descriptors_.push_back(d);
+      dbc_state_.descriptors.push_back(d);
     }
   }
 
   disc->setConstrainedDOFs(constrained_gids, gid_value_map);
+  dbc_state_.mode = DBCEliminationState::Mode::Reduced;
 
   // Retranslate nodeSets LIDs to the new (post-elimination) owned vector space.
   // Eliminated DOFs get LID = -1; free DOFs get their new contiguous LID.
@@ -1030,7 +1039,7 @@ Application::eliminateConstrainedDOFs()
   {
     auto const new_vs          = disc->getVectorSpace();
     auto const new_vs_indexer  = Albany::createGlobalLocalIndexer(new_vs);
-    auto const full_vs_indexer = Albany::createGlobalLocalIndexer(full_owned_vs_);
+    auto const full_vs_indexer = Albany::createGlobalLocalIndexer(dbc_state_.full_owned_vs);
     auto&      ns_map          = disc->getNodeSets();
     for (auto& [ns_id, ns_nodes] : ns_map) {
       for (auto& dofs : ns_nodes) {
@@ -1048,11 +1057,11 @@ void
 Application::injectConstrainedDOFValues(double time)
 {
   // Gate on the GLOBAL elimination state, not the per-rank descriptor count.
-  // A rank may legitimately have an empty dbc_descriptors_ in parallel (e.g.
+  // A rank may legitimately have an empty dbc_state_.descriptors in parallel (e.g.
   // when all constrained DOFs are owned/ghosted by other ranks) while other
   // ranks need it to participate in the Schwarz DTK collectives below. An
   // early return here on emptiness alone deadlocks the parallel solve.
-  if (full_owned_vs_.is_null() && schwarz_couplings_.empty()) return;
+  if (dbc_state_.full_owned_vs.is_null() && dbc_state_.schwarz_couplings.empty()) return;
 
   last_transient_time_ = time;
 
@@ -1060,7 +1069,7 @@ Application::injectConstrainedDOFValues(double time)
   // No coordinate matching is needed because the DTK transfer below does
   // spatial interpolation — the Schwarz interface meshes can be non-aligned.
   if (!apps_.is_null() && !app_name_index_map_.is_null()) {
-    for (auto& desc : dbc_descriptors_) {
+    for (auto& desc : dbc_state_.descriptors) {
       if (desc.kind != DBCDescriptor::Kind::Schwarz || desc.schwarz_initialized) continue;
       auto const name_it = app_name_index_map_->find(desc.schwarz_coupled_app_name);
       if (name_it == app_name_index_map_->end()) continue;
@@ -1082,13 +1091,13 @@ Application::injectConstrainedDOFValues(double time)
   std::map<std::pair<int, std::string>,
            Teuchos::Array<Teuchos::RCP<Tpetra::MultiVector<double, int, DataTransferKit::SupportId>>>>
       schwarz_xfer;
-  // Drive DTK calls from the rank-invariant schwarz_couplings_ set so that
+  // Drive DTK calls from the rank-invariant dbc_state_.schwarz_couplings set so that
   // every MPI rank participates in computeSchwarzTransferDTK for every
   // (coupled_app, nodeset) pair, even ranks with no local descriptor on that
   // pair. DTK::MapOperator::setup is a collective on the MPI comm; asymmetric
   // participation across ranks deadlocks the parallel solve.
   if (!apps_.is_null() && !app_name_index_map_.is_null()) {
-    for (auto const& [coupled_name, ns_id] : schwarz_couplings_) {
+    for (auto const& [coupled_name, ns_id] : dbc_state_.schwarz_couplings) {
       auto const name_it = app_name_index_map_->find(coupled_name);
       if (name_it == app_name_index_map_->end()) continue;
       int const coupled_idx = name_it->second;
@@ -1098,7 +1107,7 @@ Application::injectConstrainedDOFValues(double time)
       schwarz_xfer[key]         = Albany::computeSchwarzTransferDTK(*this, coupled_app, ns_id);
     }
   }
-  for (auto& desc : dbc_descriptors_) {
+  for (auto& desc : dbc_state_.descriptors) {
     if (desc.kind != DBCDescriptor::Kind::Schwarz || !desc.schwarz_initialized) continue;
     auto const key = std::make_pair(desc.schwarz_coupled_app_idx, desc.schwarz_nodeset_id);
     auto       it  = schwarz_xfer.find(key);
@@ -1151,9 +1160,9 @@ Application::injectConstrainedDOFValues(double time)
   std::map<GO, double> u_map;
   std::map<GO, double> v_map;
   std::map<GO, double> a_map;
-  auto const full_owned_vs_indexer = full_owned_vs_.is_null() ? Teuchos::null : Albany::createGlobalLocalIndexer(full_owned_vs_);
+  auto const full_owned_vs_indexer = dbc_state_.full_owned_vs.is_null() ? Teuchos::null : Albany::createGlobalLocalIndexer(dbc_state_.full_owned_vs);
 
-  for (auto const& desc : dbc_descriptors_) {
+  for (auto const& desc : dbc_state_.descriptors) {
     auto const derivs = desc.derivs_at(time);
     double     u      = desc.eval(time);
     // EquilibriumConcentration is the one BC kind whose value depends on
@@ -1180,7 +1189,7 @@ Application::injectConstrainedDOFValues(double time)
     }
   }
 
-  if (!full_owned_vs_.is_null()) {
+  if (!dbc_state_.full_owned_vs.is_null()) {
     disc->setConstrainedDOFValues(u_map, v_map, a_map);
   }
 }
@@ -1188,28 +1197,28 @@ Application::injectConstrainedDOFValues(double time)
 Teuchos::RCP<Thyra_Vector const>
 Application::expandToFullSolution(Teuchos::RCP<Thyra_Vector const> const& x, double time)
 {
-  // Check on full_owned_vs_ (not dbc_descriptors_) — elimination is a global
+  // Check on dbc_state_.full_owned_vs (not dbc_state_.descriptors) — elimination is a global
   // property of the application. A rank that owns zero constrained DOFs in its
-  // overlap still has an empty dbc_descriptors_, but it must still return the
+  // overlap still has an empty dbc_state_.descriptors, but it must still return the
   // FULL (pre-elimination) owned vector like other ranks, because response
   // functions invoke collectives (e.g. Allreduce in one->dot(x)) that deadlock
   // if ranks use different-sized vector spaces.
-  if (full_owned_vs_.is_null()) return x;
+  if (dbc_state_.full_owned_vs.is_null()) return x;
 
   // Build the full (pre-elimination) owned vector directly without going through
-  // the overlap space. full_owned_vs_ is 1-to-1 (same as disc->getVectorSpace()
+  // the overlap space. dbc_state_.full_owned_vs is 1-to-1 (same as disc->getVectorSpace()
   // pre-elimination), so Tpetra Import from reduced→full_owned routes each free
   // GID to exactly one target rank. Constrained slots stay at 0 after the import
   // (their GIDs don't exist in the reduced source) and are then filled in per
   // rank from each descriptor's cached full_owned_lid.
-  auto full_x = Thyra::createMember(full_owned_vs_);
+  auto full_x = Thyra::createMember(dbc_state_.full_owned_vs);
   full_x->assign(0.0);
   auto cas_red_to_full =
-      Albany::createCombineAndScatterManager(disc->getVectorSpace(), full_owned_vs_);
+      Albany::createCombineAndScatterManager(disc->getVectorSpace(), dbc_state_.full_owned_vs);
   cas_red_to_full->scatter(*x, *full_x, Albany::CombineMode::INSERT);
 
   auto full_data = Albany::getNonconstLocalData(full_x);
-  for (auto const& desc : dbc_descriptors_) {
+  for (auto const& desc : dbc_state_.descriptors) {
     if (desc.full_owned_lid >= 0) {
       full_data[desc.full_owned_lid] = desc.eval(time);
     }
@@ -1401,7 +1410,7 @@ Application::getVectorSpace() const
 Teuchos::RCP<Thyra_VectorSpace const>
 Application::getFullVectorSpace() const
 {
-  return full_owned_vs_.is_null() ? disc->getVectorSpace() : full_owned_vs_;
+  return dbc_state_.full_owned_vs.is_null() ? disc->getVectorSpace() : dbc_state_.full_owned_vs;
 }
 
 RCP<Thyra_LinearOp>
@@ -2007,9 +2016,9 @@ Application::computeGlobalResidualImpl(
   // fully-constrained injection-only path: there, the residual at constrained
   // overlap slots IS the reaction force (= K_internal * u - f_external), and
   // it's the only output the test sees for those nodes — zeroing erases it.
-  if (!dbc_descriptors_.empty() && !fully_constrained_injection_only_) {
+  if (!dbc_state_.descriptors.empty() && dbc_state_.mode != DBCEliminationState::Mode::FullyConstrained) {
     auto overlap_data = Albany::getNonconstLocalData(overlapped_f);
-    for (auto const& desc : dbc_descriptors_) {
+    for (auto const& desc : dbc_state_.descriptors) {
       overlap_data[desc.overlap_lid] = 0.0;
     }
   }
@@ -2026,11 +2035,11 @@ Application::computeGlobalResidualImpl(
   // NOX sees |F| = 0 and exits in iter 1 with u = u_bc, while the residual
   // fill above still updates the per-quadrature-point internal state from
   // the prescribed displacement.
-  if (fully_constrained_injection_only_) {
+  if (dbc_state_.mode == DBCEliminationState::Mode::FullyConstrained) {
     auto owned_f = Albany::getNonconstLocalData(f);
     auto owned_x = Albany::getLocalData(x);
     double const this_time = fixTime(current_time);
-    for (auto const& desc : dbc_descriptors_) {
+    for (auto const& desc : dbc_state_.descriptors) {
       if (desc.full_owned_lid >= 0) {
         // SDirichlet residual rewrite: residual at constrained rows is the
         // BC mismatch (x - u_bc), so NOX's J·Δ = -r solve drives x → u_bc
@@ -2245,9 +2254,9 @@ Application::computeGlobalJacobianImpl(
   // Newton step with x = u_bc — the SDirichlet residual rewrite above
   // turns this into the BC mismatch and the identity row turns the solve
   // into a pure substitution.
-  if (fully_constrained_injection_only_) {
+  if (dbc_state_.mode == DBCEliminationState::Mode::FullyConstrained) {
     resumeFill(jac);
-    for (auto const& desc : dbc_descriptors_) {
+    for (auto const& desc : dbc_state_.descriptors) {
       LO const row = desc.full_owned_lid;
       if (row < 0) continue;
       Teuchos::Array<LO> indices;
@@ -2342,7 +2351,7 @@ Application::evaluateResponse(
   // For DBC elimination, the expansion needs the correct transient time.
   // During the post-integration response pass, x_dot is null so is_dynamic=false
   // and curr_time=getCurrentTime()=0; use last_transient_time_ as fallback.
-  double const expand_time = (dbc_descriptors_.empty() || this_time != 0.0) ? this_time : last_transient_time_;
+  double const expand_time = (dbc_state_.descriptors.empty() || this_time != 0.0) ? this_time : last_transient_time_;
   auto const   x_full      = expandToFullSolution(x, expand_time);
   responses[response_index]->evaluateResponse(this_time, x_full, xdot, xdotdot, p, g);
 }

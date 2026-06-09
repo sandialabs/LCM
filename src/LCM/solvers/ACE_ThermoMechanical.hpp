@@ -201,6 +201,11 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<bool> do_outputs_init_;
 
   bool std_init_guess_{false};
+  // Start the mechanical subproblem from static equilibrium under its
+  // body force (solve K x = f once at t0; v = a = 0) instead of Piro's
+  // initial-acceleration heuristic. See Piro::TrapezoidRuleSolver::
+  // enableStaticInitSolve.
+  bool static_equilibrium_init_{false};
 
   enum PROB_TYPE
   {

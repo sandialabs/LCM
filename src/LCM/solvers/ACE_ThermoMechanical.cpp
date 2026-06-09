@@ -126,6 +126,7 @@ ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> co
   increase_factor_  = alt_system_params_->get<ST>("Amplification Factor", 1.0);
   output_interval_  = alt_system_params_->get<int>("Exodus Write Interval", 1);
   std_init_guess_   = alt_system_params_->get<bool>("Standard Initial Guess", false);
+  static_equilibrium_init_ = alt_system_params_->get<bool>("Static Equilibrium Initialization", false);
 
   // Check for existence of time intervals for events, and if so, read them.
   auto const have_event_initial_times = alt_system_params_->isParameter("Event Initial Times File");
@@ -1010,6 +1011,12 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     // This should speed up code by ~2x.
     if (current_time != initial_time_) {
       piro_tr_solver.disableCalcInitAccel();
+      piro_tr_solver.disableStaticInitSolve();
+    } else if (static_equilibrium_init_ == true) {
+      // Replace the initial-acceleration heuristic with a static solve:
+      // start from K x = f equilibrium with v = a = 0. First coupling
+      // step only — subsequent steps must propagate the dynamics.
+      piro_tr_solver.enableStaticInitSolve();
     }
 
     Thyra_ModelEvaluator::InArgs<ST>  in_args  = solver.createInArgs();

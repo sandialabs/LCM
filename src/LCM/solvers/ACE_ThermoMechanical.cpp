@@ -948,6 +948,24 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
 
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
+    // Seed Tempus with the previous coupling step's converged state. On
+    // step 0 this_x_[subdomain] is null, so we let Tempus's evalModelImpl
+    // fall back to the model's nominal values (the simulation IC). On
+    // subsequent steps we override that fallback via setInitialState,
+    // which both initializes Tempus's solution history at current_time
+    // and flips initial_state_reset_ so the nominal-values re-read is
+    // skipped. Going through this_*_ (not STK / setICVecs) keeps the
+    // handoff format-agnostic — we own the vectors directly.
+    if (Teuchos::nonnull(this_x_[subdomain])) {
+      auto ic_x       = Thyra::createMember(me.get_x_space());
+      auto ic_xdot    = Thyra::createMember(me.get_x_space());
+      auto ic_xdotdot = Thyra::createMember(me.get_x_space());
+      Thyra::copy(*this_x_[subdomain],       ic_x.ptr());
+      Thyra::copy(*this_xdot_[subdomain],    ic_xdot.ptr());
+      Thyra::copy(*this_xdotdot_[subdomain], ic_xdotdot.ptr());
+      piro_tempus_solver.setInitialState(current_time, ic_x, ic_xdot, ic_xdotdot);
+    }
+
     Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
     Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
@@ -975,6 +993,10 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
     Thyra::copy(*current_state->getXDotDot(), this_xdotdot_[subdomain].ptr());
 
+    // Match Piro::TrapezoidRuleSolver's "Initial Velocity = " print so the
+    // external monitoring tooling sees the same string from both paths.
+    *fos_ << "Initial Velocity = " << Thyra::norm_2(*this_xdot_[subdomain]) << '\n';
+
   } else if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
     auto&             piro_tr_solver = dynamic_cast<Piro::TrapezoidRuleSolver<ST>&>(solver);
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
@@ -999,7 +1021,17 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto       gx_out = Thyra::createMember(solver.get_g_space(num_g));
     out_args.set_g(num_g, gx_out);
 
-    solver.evalModel(in_args, out_args);
+    // Wrap evalModel so that a thrown NOX runtime error (e.g.
+    // "NOX::Direction::Newton::compute - Unable to solve Newton system"
+    // when Rescue Bad Newton Solve is off and GMRES diverges) maps to a
+    // graceful step-cut instead of an MPI-wide std::terminate.
+    try {
+      solver.evalModel(in_args, out_args);
+    } catch (std::exception const& e) {
+      *fos_ << "\nINFO: Mechanical solver threw — treating as failed: " << e.what() << '\n';
+      failed_ = true;
+      return;
+    }
 
     // Check whether solver did OK.
     auto&      tr_nox_solver              = *(piro_tr_solver.getNOXSolver());

@@ -242,10 +242,17 @@ OrtizPandolfiModel<EvalT, Traits>::computeState(typename Traits::EvalData workse
       mdf_jump_normal(cell, pt) = jump_n;
       mdf_jump_shear(cell, pt)  = jump_s;
 
-      // only true state variable is mdf_jump_max
-      if (jump_eff > jump_m) {
-        mdf_jump_max(cell, pt) = jump_eff;
-      }
+      // Update mdf_jump_max — the one true history variable. Read jump_m
+      // from "Max_Jump_old" (last converged step), not from the new MDField
+      // itself, so intermediate Newton iterates within this step can't
+      // monotone-bump δ_max past what the converged solution warrants.
+      // Always assign (not just when jump_eff > jump_m): Phalanx doesn't
+      // reset MDFields between fills, so omitting the else branch would
+      // either leave the field uninitialised (no prior fill in this step
+      // wrote it) or carry a stale value from a prior fill (which under
+      // path-dependent / unloading load histories can persist as a
+      // spurious damage ratchet).
+      mdf_jump_max(cell, pt) = (jump_eff > jump_m) ? jump_eff : jump_m;
     }
   }
 }

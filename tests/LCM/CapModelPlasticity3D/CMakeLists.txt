@@ -12,11 +12,15 @@
 #                 limit surface.
 #   triaxial    - psi = 0.8 (Lode-angle terms active) + fully
 #                 non-associative parameters (L, phi, Q distinct).
+#   confined_coarse - confined path with 20 global steps: increments
+#                 large enough that the adaptive substepping engages
+#                 (~150 substep evaluations across the history).
 #
 # The comparisons require python3 with numpy and netCDF4; the tests are
 # skipped (with a status message) when unavailable.
 
 foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
+          input_confined_coarse.yaml
           materials.yaml materials_triaxial.yaml
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
@@ -40,13 +44,18 @@ if (CAP_PY_OK)
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   set_tests_properties(CapModel_Oracle_SelfCheck PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-  foreach(case hydrostatic confined triaxial)
+  foreach(case hydrostatic confined triaxial confined_coarse)
+    if (case STREQUAL "confined_coarse")
+      set(_cap_pathmode confined)
+    else()
+      set(_cap_pathmode ${case})
+    endif()
     add_test(NAME CapModel_Verify_${case}
              COMMAND ${CMAKE_COMMAND}
                      "-DTEST_PROG=${SerialAlbany.exe}"
                      "-DINPUT=input_${case}.yaml"
                      "-DEXO=cap_${case}.exo"
-                     "-DPATHMODE=${case}"
+                     "-DPATHMODE=${_cap_pathmode}"
                      "-DPYTHON=${PYTHON3_FOR_CAP}"
                      -P runverify.cmake
              WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

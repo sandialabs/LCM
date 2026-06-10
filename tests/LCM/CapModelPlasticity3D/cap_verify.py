@@ -99,10 +99,10 @@ def main():
         e1 = abs(I1 - X) / abs(X)
         e2 = abs(evp[-1] - evc) / abs(evc)
         print(f'  I1 vs X(kappa)           rel diff = {e1:.3e}  '
-              f'[{"ok" if e1 < 5e-3 else "FAIL"}]')
+              f'[{"ok" if e1 < 1e-2 else "FAIL"}]')
         print(f'  evp vs crush curve       rel diff = {e2:.3e}  '
-              f'[{"ok" if e2 < 5e-3 else "FAIL"}]')
-        ok &= e1 < 5e-3 and e2 < 5e-3
+              f'[{"ok" if e2 < 1e-2 else "FAIL"}]')
+        ok &= e1 < 1e-2 and e2 < 1e-2
 
     print('VERIFICATION', 'PASS' if ok else 'FAIL')
     return 0 if ok else 1

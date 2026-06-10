@@ -48,7 +48,11 @@ CapModelKernel<EvalT, Traits>::CapModelKernel(
       N_(p->get<RealType>("N")),
       L_(p->get<RealType>("L")),
       phi_(p->get<RealType>("phi")),
-      Q_(p->get<RealType>("Q"))
+      Q_(p->get<RealType>("Q")),
+      // Sloan-style adaptive substepping of the explicit integration:
+      // modified-Euler (RK1/RK2) pairs with relative stress-error control.
+      substep_tolerance_(p->get<RealType>("Substep Tolerance", 1.0e-4)),
+      max_substeps_(p->get<int>("Maximum Substeps", 200))
 {
   // The finite-deformation extension that used to live here was removed:
   // it had no validating source (the model's references are small-strain
@@ -189,136 +193,193 @@ CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // convergence check is invariant to the unit system.
   ScalarT const f_tolerance = 1.0e-12 * E * E;
 
-  // Plastic correction
+  // Plastic correction with Sloan-style adaptive substepping: the strain
+  // increment is integrated by modified-Euler (RK1/RK2) pairs; the relative
+  // stress error between the two estimates controls the substep size
+  // (Sloan, Abbo & Sheng 2001). Each accepted substep is followed by the
+  // drift correction of Algorithm 2 of [3]. With a single substep and a
+  // loose tolerance this reduces to the published Algorithm 1 (with the
+  // second-order average improving on the bare forward-Euler predictor).
   if (f > 0.0) {
-    Tensor dfdsigma_loc(num_dims_);
-    Tensor dgdsigma_loc(num_dims_);
-    Tensor dfdalpha_loc(num_dims_);
-    Tensor halpha_loc(num_dims_);
-    Tensor dfdotCe(num_dims_);
+    // Rate evaluation: forward-Euler increments at the given state for a
+    // substrain deps_sub. dgamma is clamped at zero (elastic unloading
+    // within a substep), dkappa at zero from above (no cap contraction,
+    // LAME reference).
+    auto rates = [&](Tensor const& sig, Tensor const& alp, ScalarT const& kap,
+                     Tensor const& deps_sub,
+                     Tensor& dsig, Tensor& dalp, ScalarT& dkap) {
+      Tensor sig_m(sig), alp_m(alp);
+      ScalarT kap_m = kap;
+      Tensor dfds = compute_dfdsigma(sig_m, alp_m, kap_m);
+      Tensor dgds = compute_dgdsigma(sig_m, alp_m, kap_m);
+      Tensor dfda = -dfds;
+      ScalarT dfdk = compute_dfdkappa(sig_m, alp_m, kap_m);
+      ScalarT J2a = 0.5 * minitensor::dotdot(alp_m, alp_m);
+      Tensor ha = compute_halpha(dgds, J2a);
+      ScalarT I1dg = minitensor::trace(dgds);
+      ScalarT dedk = compute_dedkappa(kap_m);
 
-    // Explicit predictor (Algorithm 1 of [3]): all derivatives evaluated
-    // at the converged state (sigma_n, alpha_n, kappa_n).
-    dfdsigma_loc = compute_dfdsigma(sigmaN, alphaVal, kappaVal);
-    dgdsigma_loc = compute_dgdsigma(sigmaN, alphaVal, kappaVal);
-    dfdalpha_loc = -dfdsigma_loc;
-    ScalarT dfdkappa = compute_dfdkappa(sigmaN, alphaVal, kappaVal);
-    ScalarT J2_alpha = 0.5 * minitensor::dotdot(alphaVal, alphaVal);
-    halpha_loc = compute_halpha(dgdsigma_loc, J2_alpha);
-    ScalarT I1_dgdsigma = minitensor::trace(dgdsigma_loc);
-    ScalarT dedkappa = compute_dedkappa(kappaVal);
+      ScalarT hk;
+      if (dedk != 0.0)
+        hk = I1dg / dedk;
+      else
+        hk = 0.0;
 
-    ScalarT hkappa;
-    if (dedkappa != 0.0)
-      hkappa = I1_dgdsigma / dedkappa;
-    else
-      hkappa = 0.0;
+      // Cap-lock saturation (LAME GeoModel reference): once the crush
+      // curve is exhausted the cap must stop evolving.
+      ScalarT evp_now = compute_evp(kap_m);
+      if (std::abs(evp_now) >= std::abs(W_))
+        hk = -0.01 * bulkModulus * bulkModulus;
 
-    // Cap-lock saturation (LAME GeoModel reference): once the crush curve
-    // is exhausted (|eps_v^p| -> W, all pores crushed) the cap must stop
-    // evolving; drive kappa hard toward compaction so pore-collapse
-    // plasticity shuts off instead of stalling on a frozen cap.
-    ScalarT evp_now = compute_evp(kappaVal);
-    if (std::abs(evp_now) >= std::abs(W_))
-      hkappa = -0.01 * bulkModulus * bulkModulus;
+      ScalarT kai = minitensor::dotdot(dfds, minitensor::dotdot(Celastic, dgds))
+                    - minitensor::dotdot(dfda, ha) - dfdk * hk;
 
-    ScalarT kai = minitensor::dotdot(dfdsigma_loc, minitensor::dotdot(Celastic, dgdsigma_loc))
-                  - minitensor::dotdot(dfdalpha_loc, halpha_loc) - dfdkappa * hkappa;
+      ScalarT dgam;
+      if (kai != 0.0)
+        dgam = minitensor::dotdot(minitensor::dotdot(dfds, Celastic), deps_sub) / kai;
+      else
+        dgam = 0.0;
+      if (dgam < 0.0) dgam = 0.0;
 
-    dfdotCe = minitensor::dotdot(dfdsigma_loc, Celastic);
-
-    ScalarT dgamma;
-    if (kai != 0.0)
-      dgamma = minitensor::dotdot(dfdotCe, depsilon) / kai;
-    else
-      dgamma = 0.0;
-
-
-    // initial update
-    sigmaVal -= dgamma * minitensor::dotdot(Celastic, dgdsigma_loc);
-    alphaVal += dgamma * halpha_loc;
-
-    // prevent cap contraction (kappa may only move toward compaction), as
-    // in the LAME GeoModel reference (HK = MIN(HK,0), "prevents cap
-    // contraction"); the published algorithm [3] omits this restriction.
-    ScalarT dkappa = dgamma * hkappa;
-    if (dkappa > 0.0) dkappa = 0.0;
-    kappaVal += dkappa;
+      dsig = minitensor::dotdot(Celastic, deps_sub) - dgam * minitensor::dotdot(Celastic, dgds);
+      dalp = dgam * ha;
+      dkap = dgam * hk;
+      if (dkap > 0.0) dkap = 0.0;
+    };
 
     // Drift correction (Algorithm 2 of [3]): consistent correction with a
     // fallback to the Sloan et al. (2001) normal correction when the
     // consistent step fails to reduce |f|.
-    int      iteration     = 0;
-    int const max_iteration = 20;
+    auto drift_correct = [&](Tensor& sig, Tensor& alp, ScalarT& kap) {
+      int       iteration     = 0;
+      int const max_iteration = 20;
+      while (true) {
+        ScalarT fd = compute_f(sig, alp, kap);
+        if (std::abs(fd) < f_tolerance) break;
+        if (iteration > max_iteration) break;
 
-    while (true) {
-      f = compute_f(sigmaVal, alphaVal, kappaVal);
-      if (std::abs(f) < f_tolerance) break;
-      if (iteration > max_iteration) break;
+        Tensor dfds = compute_dfdsigma(sig, alp, kap);
+        Tensor dgds = compute_dgdsigma(sig, alp, kap);
+        Tensor dfda = -dfds;
+        ScalarT dfdk = compute_dfdkappa(sig, alp, kap);
+        ScalarT J2a = 0.5 * minitensor::dotdot(alp, alp);
+        Tensor ha = compute_halpha(dgds, J2a);
+        ScalarT I1dg = minitensor::trace(dgds);
+        ScalarT dedk = compute_dedkappa(kap);
 
-      dfdsigma_loc = compute_dfdsigma(sigmaVal, alphaVal, kappaVal);
-      dgdsigma_loc = compute_dgdsigma(sigmaVal, alphaVal, kappaVal);
-      dfdalpha_loc = -dfdsigma_loc;
-      dfdkappa = compute_dfdkappa(sigmaVal, alphaVal, kappaVal);
-      J2_alpha = 0.5 * minitensor::dotdot(alphaVal, alphaVal);
-      halpha_loc = compute_halpha(dgdsigma_loc, J2_alpha);
-      I1_dgdsigma = minitensor::trace(dgdsigma_loc);
-      dedkappa = compute_dedkappa(kappaVal);
-
-      if (dedkappa != 0.0)
-        hkappa = I1_dgdsigma / dedkappa;
-      else
-        hkappa = 0.0;
-
-      // Cap-lock saturation, as in the predictor above.
-      evp_now = compute_evp(kappaVal);
-      if (std::abs(evp_now) >= std::abs(W_))
-        hkappa = -0.01 * bulkModulus * bulkModulus;
-
-      kai = minitensor::dotdot(dfdsigma_loc, minitensor::dotdot(Celastic, dgdsigma_loc));
-      kai = kai - minitensor::dotdot(dfdalpha_loc, halpha_loc) - dfdkappa * hkappa;
-
-      ScalarT delta_gamma;
-      if (kai != 0.0)
-        delta_gamma = f / kai;
-      else
-        delta_gamma = 0.0;
-
-      // prevent cap contraction, as above
-      dkappa = delta_gamma * hkappa;
-      if (dkappa > 0.0) dkappa = 0.0;
-
-      // trial consistent correction
-      Tensor sigmaK = sigmaVal - delta_gamma * minitensor::dotdot(Celastic, dgdsigma_loc);
-      Tensor alphaK = alphaVal + delta_gamma * halpha_loc;
-      ScalarT kappaK = kappaVal + dkappa;
-
-      // If the consistent correction does not reduce |f|, fall back to the
-      // normal correction: a pure geometric projection along df/dsigma
-      // with no elastic tangent and frozen internal variables. (The
-      // as-printed Algorithm 2 of [3] mixes C^e into the update while
-      // omitting it from chi-tilde, which is dimensionally inconsistent;
-      // this is the Sloan et al. form.)
-      ScalarT fK = compute_f(sigmaK, alphaK, kappaK);
-
-      if (std::abs(fK) > std::abs(f)) {
-        ScalarT dfdotdf = minitensor::dotdot(dfdsigma_loc, dfdsigma_loc);
-        if (dfdotdf != 0.0)
-          delta_gamma = f / dfdotdf;
+        ScalarT hk;
+        if (dedk != 0.0)
+          hk = I1dg / dedk;
         else
-          delta_gamma = 0.0;
+          hk = 0.0;
 
-        sigmaK = sigmaVal - delta_gamma * dfdsigma_loc;
-        alphaK = alphaVal;
-        kappaK = kappaVal;
+        ScalarT evp_now = compute_evp(kap);
+        if (std::abs(evp_now) >= std::abs(W_))
+          hk = -0.01 * bulkModulus * bulkModulus;
+
+        ScalarT kai = minitensor::dotdot(dfds, minitensor::dotdot(Celastic, dgds));
+        kai = kai - minitensor::dotdot(dfda, ha) - dfdk * hk;
+
+        ScalarT dg;
+        if (kai != 0.0)
+          dg = fd / kai;
+        else
+          dg = 0.0;
+
+        ScalarT dkap = dg * hk;
+        if (dkap > 0.0) dkap = 0.0;
+
+        Tensor sigK = sig - dg * minitensor::dotdot(Celastic, dgds);
+        Tensor alpK = alp + dg * ha;
+        ScalarT kapK = kap + dkap;
+
+        ScalarT fK = compute_f(sigK, alpK, kapK);
+
+        if (std::abs(fK) > std::abs(fd)) {
+          // Normal correction: pure geometric projection along df/dsigma
+          // with frozen internal variables. (The as-printed Algorithm 2 of
+          // [3] mixes C^e into the update while omitting it from chi-tilde,
+          // which is dimensionally inconsistent; this is the Sloan form.)
+          ScalarT dfdotdf = minitensor::dotdot(dfds, dfds);
+          if (dfdotdf != 0.0)
+            dg = fd / dfdotdf;
+          else
+            dg = 0.0;
+
+          sigK = sig - dg * dfds;
+          alpK = alp;
+          kapK = kap;
+        }
+
+        sig = sigK;
+        alp = alpK;
+        kap = kapK;
+        iteration++;
+      }
+    };
+
+    // Substepping driver. Control variables are plain RealType (Sacado
+    // values) so the Residual and Jacobian evaluations take identical
+    // branch sequences.
+    RealType const STOL   = substep_tolerance_;
+    RealType const dT_min = 1.0 / static_cast<RealType>(max_substeps_);
+
+    sigmaVal = sigmaN;  // integrate from the converged state, not the trial
+    RealType T  = 0.0;
+    RealType dT = 1.0;
+    int      nsub = 0;
+    int const nsub_max = 4 * max_substeps_;  // rejected attempts included
+
+    while (T < 1.0 && nsub < nsub_max) {
+      Tensor const deps_sub = dT * depsilon;
+
+      // RK1 increments at the current state
+      Tensor dsig1(num_dims_), dalp1(num_dims_);
+      ScalarT dkap1;
+      rates(sigmaVal, alphaVal, kappaVal, deps_sub, dsig1, dalp1, dkap1);
+
+      // RK2 increments at the RK1-advanced state
+      Tensor const sig1 = sigmaVal + dsig1;
+      Tensor const alp1 = alphaVal + dalp1;
+      ScalarT const kap1 = kappaVal + dkap1;
+      Tensor dsig2(num_dims_), dalp2(num_dims_);
+      ScalarT dkap2;
+      rates(sig1, alp1, kap1, deps_sub, dsig2, dalp2, dkap2);
+
+      // Modified-Euler state and relative stress-error estimate
+      Tensor const sig_new = sigmaVal + 0.5 * (dsig1 + dsig2);
+      Tensor const alp_new = alphaVal + 0.5 * (dalp1 + dalp2);
+      ScalarT const kap_new = kappaVal + 0.5 * (dkap1 + dkap2);
+
+      RealType const err_abs = Sacado::ScalarValue<ScalarT>::eval(
+          minitensor::norm(minitensor::Tensor<ScalarT>(dsig2 - dsig1)));
+      RealType const sig_scale = std::max(
+          Sacado::ScalarValue<ScalarT>::eval(minitensor::norm(sig_new)),
+          1.0e-12);
+      RealType const R = 0.5 * err_abs / sig_scale;
+
+      if (R > STOL && dT > dT_min) {
+        // reject: shrink the substep and retry
+        RealType q = 0.9 * std::sqrt(STOL / R);
+        if (q < 0.1) q = 0.1;
+        dT = std::max(q * dT, dT_min);
+        nsub++;
+        continue;
       }
 
-      sigmaVal = sigmaK;
-      alphaVal = alphaK;
-      kappaVal = kappaK;
+      // accept: drift-correct, advance pseudo-time, grow the substep
+      sigmaVal = sig_new;
+      alphaVal = alp_new;
+      kappaVal = kap_new;
+      drift_correct(sigmaVal, alphaVal, kappaVal);
 
-      iteration++;
-    }  // end drift correction loop
+      T += dT;
+      RealType q = 0.9 * std::sqrt(STOL / std::max(R, 1.0e-30));
+      if (q > 1.1) q = 1.1;
+      dT = std::min(q * dT, 1.0 - T);
+      if (dT < dT_min) dT = std::min(dT_min, 1.0 - T);
+      nsub++;
+    }
 
     // Compute plastic strain increment from the stress correction
     Tensor dsigma       = sigmaTr - sigmaVal;

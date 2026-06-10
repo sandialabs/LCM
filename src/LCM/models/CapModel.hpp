@@ -82,6 +82,8 @@ struct CapModelKernel : public ParallelKernel<EvalT, Traits>
   RealType L_;
   RealType phi_;
   RealType Q_;
+  RealType substep_tolerance_;
+  int      max_substeps_;
 
   void
   init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields);

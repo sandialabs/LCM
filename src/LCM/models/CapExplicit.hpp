@@ -47,31 +47,24 @@ struct CapExplicitKernel : public ParallelKernel<EvalT, Traits>
   using BaseKernel::nox_status_test_;
 
   // Dependent MDFields
-  ConstScalarField def_grad_;
-  ConstScalarField J_;
   ConstScalarField strain_;
   ConstScalarField elastic_modulus_;
   ConstScalarField poissons_ratio_;
 
   // Evaluated MDFields
   ScalarField stress_;
-  ScalarField Fp_;
   ScalarField backStress_;
   ScalarField capParameter_;
   ScalarField eqps_;
   ScalarField volPlasticStrain_;
 
   // Old state arrays
-  Albany::MDArray Fp_old_;
   Albany::MDArray stress_old_;
   Albany::MDArray strain_old_;
   Albany::MDArray backStress_old_;
   Albany::MDArray capParameter_old_;
   Albany::MDArray eqps_old_;
   Albany::MDArray volPlasticStrain_old_;
-
-  // Finite deformation flag
-  bool finite_deformation_;
 
   // Material parameters
   RealType A_;
@@ -132,6 +125,9 @@ struct CapExplicitKernel : public ParallelKernel<EvalT, Traits>
 
   ScalarT
   compute_dedkappa(ScalarT& kappa) const;
+
+  ScalarT
+  compute_evp(ScalarT& kappa) const;
 };
 
 template <typename EvalT, typename Traits>

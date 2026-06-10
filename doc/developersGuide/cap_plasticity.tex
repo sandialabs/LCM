@@ -780,6 +780,146 @@ i.e.\ pore collapse under pure pressure begins near
 $p \approx 153$~MPa, while the cap branch point sits at only
 $8$~MPa --- a long, flat cap, typical for porous rock.
 
+\section{Calibration}
+\label{sec:calibration}
+
+The parameters of Section~\ref{sec:parameters} are obtained from a
+small suite of standard rock-mechanics experiments. The groups below
+are listed in the order in which they should be calibrated, because
+later groups depend on earlier ones; the definitive fitting
+procedures are documented in \citet[Section~4]{Fossum.Brannon:2004}.
+All stress-like parameters must be supplied in one consistent unit
+system ($D$, $L$, $D_1$ carry units of 1/stress, $D_2$ of
+1/stress$^2$, $c^\alpha$ of stress; $W$, $\psi$, $R$, $Q$ are
+dimensionless).
+
+\paragraph{1.\ Elasticity ($E$, $\nu$).}
+From \emph{unload--reload loops}, not initial loading slopes: first
+loading of a geomaterial includes crack closure and seating, which
+read as artificially soft moduli. The bulk modulus comes from
+unloading slopes of the hydrostatic test (pressure vs.\ volumetric
+strain), the shear modulus from unloading slopes of the triaxial
+shear leg. Note that the original GeoModel uses pressure-dependent
+elastic moduli while this implementation is linear elastic: calibrate
+$(E,\nu)$ at the pressure range of the intended application, and do
+not expect a single pair to span both the low- and high-confinement
+regimes of the same rock.
+
+\paragraph{2.\ Shear failure envelope ($A$, $C$, $D$, $\theta$).}
+From \emph{triaxial compression (TXC) tests at several confining
+pressures}: each test contributes one peak stress point
+$(I_1, \sqrt{J_2})$, and the collection across pressures traces the
+envelope \eqref{eq:Ff} for a least-squares fit. The parameters have
+distinct anchors, which is what makes the fit well posed: $A - C$ is
+the intercept at $I_1 = 0$, anchored by the unconfined compression
+strength ($\sqrt{J_2} = \sigma_c/\sqrt{3}$ at $I_1 = -\sigma_c$);
+$A$ is the high-pressure asymptote, anchored by the
+highest-confinement tests; $1/D$ is the $I_1$ scale of the transition
+between the two, requiring tests that span the curved part of the
+envelope; and $\theta$ is a residual linear slope at high pressure
+that should be held at zero unless the high-pressure data clearly
+keep climbing --- it is strongly correlated with $A$ and $D$ when the
+tested pressure range is narrow.
+
+\paragraph{3.\ Lode strength ratio ($\psi$).}
+The ratio of triaxial-extension to triaxial-compression strength at
+the same mean stress, requiring \emph{triaxial extension} tests
+(axial stress reduced below the confinement). These are harder to
+run, so $\psi$ is often the first parameter sacrificed; $\psi = 1$
+switches the Lode dependence off entirely. Convexity of the
+Gudehus-type $\Gamma(\beta)$ in Eq.~\eqref{eq:Gamma} requires
+$\psi \ge 7/9 \approx 0.778$; do not fit below that bound.
+
+\paragraph{4.\ Cap and crush curve
+($\kappa_0$, $W$, $D_1$, $D_2$, $R$).}
+One \emph{hydrostatic crush test}, pressurized well past the elastic
+limit with periodic unload--reload loops to separate elastic from
+plastic volumetric strain, supplies most of this group. The
+elastic-limit point gives $X_0$ ($I_1 = -3p$ at the first departure
+from elastic response: the onset of pore collapse). Beyond it, the
+stress state sits at $I_1 = X(\kappa)$ whenever it yields, so the
+plot of plastic volumetric strain against $I_1$ \emph{is} the crush
+curve of Eq.~\eqref{eq:kappa}: $W$ is its plateau --- the total
+crushable volume fraction, which should agree with independently
+measured porosity (for Salem limestone, $W = 0.08$ matches
+$8\,\%$ porosity); $D_1$ sets the initial compaction rate; and $D_2$
+is unidentifiable unless the measured curve is strongly
+non-exponential --- keep it at zero otherwise.
+
+The cap aspect ratio $R$ requires yield points on the cap \emph{away}
+from the hydrostat: TXC tests at high confinement in which the
+specimen compacts during shear (shear-enhanced compaction). The
+locus of compaction-onset points in the $(I_1, \sqrt{J_2})$ plane
+traces the cap ellipse, and $R$ is its width-to-height ratio.
+Without such data, $R$ is commonly carried over from similar rock
+(it varies less than the other parameters; roughly 15--30 for porous
+rocks).
+
+$\kappa_0$ is then \emph{derived, not measured}: invert
+$X(\kappa_0) = \kappa_0 - R\,F_f(\kappa_0)$ for $\kappa_0$ given the
+measured $X_0$ and the fitted $R$ and $F_f$. A common input error is
+to place the measured crush pressure directly into \texttt{kappa0};
+for Salem limestone the two differ by a factor of about 57
+($\kappa_0 = -8.05$ vs.\ $X_0 \approx -460$~MPa).
+
+\paragraph{5.\ Hardening ($N$, $c^\alpha$).}
+Both come from the \emph{pre-peak portion} of the TXC stress--strain
+curves --- the same tests as group~2, using the curve shape rather
+than the peak. $N$ is the offset in $\sqrt{J_2}$ between initial
+yield (departure from linearity, onset of acoustic emission, or first
+unload--reload hysteresis) and peak; the model assumes this offset is
+pressure independent, which should be checked across the test suite.
+$c^\alpha$ is fit to the curvature of the hardening branch between
+initial yield and peak: large values (Salem's $10^5$~MPa) drive the
+yield surface to the failure envelope almost immediately, so the
+response is nearly elastic--perfectly-plastic; small values give
+gradual hardening. From monotonic data alone $N$ and $c^\alpha$ are
+partially degenerate (a larger offset traversed faster resembles a
+smaller offset traversed slower); they separate cleanly only with
+load-reversal (cyclic) data, where the back stress reveals itself
+through the reduced reverse-yield stress. If the application never
+reverses the loading, the degeneracy is harmless.
+
+\paragraph{6.\ Non-associative flow ($L$, $\phi$, $Q$).}
+These parameters do not affect where yield occurs, only the direction
+of plastic flow, so they are calibrated from \emph{plastic strain
+ratios} rather than stress states. $L$ and $\phi$ control the
+volumetric component of flow on the shear branch --- dilatancy:
+measure the dilation rate
+$\mathrm{d}\varepsilon_v^p/\mathrm{d}\varepsilon_q^p$ during
+post-yield shear at several pressures and fit $L < D$,
+$\phi < \theta$ so that $\trace(\partial g/\partial\stress)$ matches.
+$Q$ does the same on the cap, from the ratio of compactive volumetric
+to deviatoric plastic strain during shear-enhanced compaction. If
+volumetric plastic-strain data are unavailable, set the flow
+associative ($L = D$, $\phi = \theta$, $Q = R$) with the
+understanding that dilatancy will be overpredicted. Recall from
+Eq.~\eqref{eq:Xg} that $X^g = \kappa - Q\,F_f(\kappa)$ uses the
+\emph{yield} $F_f$, so $Q$ is a pure aspect-ratio parameter --- it
+does not pull $L$ or $\phi$ into the cap position.
+
+\paragraph{Workflow and checks.}
+The dependency order is: elasticity $\to$ failure envelope and $\psi$
+$\to$ crush curve $\to$ $R$ $\to$ $\kappa_0$ (derived) $\to$
+$N, c^\alpha$ $\to$ $L, \phi, Q$. Constraints worth verifying on any
+fitted set: $A - C > N > 0$ (positive initial strength at zero
+pressure); $D, D_1, W, R, Q > 0$; $\kappa_0 < 0$; and
+$7/9 \le \psi \le 1$.
+
+Two practical points for carrying this out in LCM. First, the
+verification decks of Section~\ref{sec:verification} are
+single-element, fully strain-controlled drivers:
+\texttt{input\_hydrostatic.yaml} \emph{is} a hydrostatic crush
+simulation and \texttt{input\_confined.yaml} \emph{is} an oedometer
+test, so copying one and editing the boundary-condition ramp yields a
+calibration driver that can be compared against each laboratory curve
+directly, with no structural effects in the way. Second,
+\texttt{Substep Tolerance} and \texttt{Maximum Substeps} are
+numerical parameters that require no calibration and should be left
+at their defaults; if results change when the tolerance is
+tightened, the global time step was too coarse --- the remedy is not
+in the material parameters.
+
 \appendix
 
 \section{Revision History of the Formulation}

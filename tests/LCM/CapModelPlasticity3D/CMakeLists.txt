@@ -15,13 +15,18 @@
 #   confined_coarse - confined path with 20 global steps: increments
 #                 large enough that the adaptive substepping engages
 #                 (~150 substep evaluations across the history).
+#   confined_fd, triaxial_fd - the same paths under finite-deformation
+#                 (exponential/logarithmic map) kinematics; the
+#                 reference mirrors the kinematics exactly.
 #
 # The comparisons require python3 with numpy and netCDF4; the tests are
 # skipped (with a status message) when unavailable.
 
 foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
-          input_confined_coarse.yaml
-          materials.yaml materials_triaxial.yaml
+          input_confined_coarse.yaml input_confined_fd.yaml
+          input_triaxial_fd.yaml
+          materials.yaml materials_triaxial.yaml materials_fd.yaml
+          materials_triaxial_fd.yaml
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
                  ${CMAKE_CURRENT_BINARY_DIR}/${f} COPYONLY)
@@ -44,7 +49,7 @@ if (CAP_PY_OK)
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   set_tests_properties(CapModel_Oracle_SelfCheck PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-  foreach(case hydrostatic confined triaxial confined_coarse)
+  foreach(case hydrostatic confined triaxial confined_coarse confined_fd triaxial_fd)
     if (case STREQUAL "confined_coarse")
       set(_cap_pathmode confined)
     else()

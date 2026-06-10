@@ -295,6 +295,61 @@ def drive(eps_of_t, nsteps, p):
     return out
 
 
+def _logm_sym(A):
+    w, V = np.linalg.eigh(A)
+    return (V * np.log(w)) @ V.T
+
+
+def _expm_sym(A):
+    w, V = np.linalg.eigh(A)
+    return (V * np.exp(w)) @ V.T
+
+
+def _sqrtm_sym(A):
+    w, V = np.linalg.eigh(A)
+    return (V * np.sqrt(w)) @ V.T
+
+
+def compliance(tau, p):
+    """C^-1 : tau for the isotropic elastic tangent."""
+    lam, mu = p.lame, p.mu
+    return tau / (2 * mu) - lam / (2 * mu * (3 * lam + 2 * mu)) * np.trace(tau) * I3
+
+
+def drive_fd(F_of_t, nsteps, p):
+    """Finite-deformation driver mirroring the kernel's exp/log-map
+    kinematics: the small-strain integrator runs unchanged in logarithmic
+    elastic strain / Kirchhoff stress space. Returns (t, cauchy, kappa,
+    evp) tuples."""
+    alpha = np.zeros((3, 3))
+    kappa = p.kappa0
+    Fp = np.eye(3)
+    F_prev = F_of_t(0.0)
+    out = [(0.0, np.zeros((3, 3)), kappa, 0.0)]
+    evp = 0.0
+    Cinv_vol = 1.0 / (3 * p.lame + 2 * p.mu)
+    for n in range(1, nsteps + 1):
+        t = n / nsteps
+        F = F_of_t(t)
+        Fpinv = np.linalg.inv(Fp)
+        Cpinv = Fpinv @ Fpinv.T
+        eps_tr = 0.5 * _logm_sym(F @ Cpinv @ F.T)
+        eps_e_n = 0.5 * _logm_sym(F_prev @ Cpinv @ F_prev.T)
+        deps = eps_tr - eps_e_n
+        tau_n = p.Ce(eps_e_n)
+        tau_tr = tau_n + p.Ce(deps)
+        tau, alpha, kappa = integrate_step(tau_n, alpha, kappa, deps, p)
+        evp += Cinv_vol * np.trace(tau_tr - tau)
+        # plastic update: elastic log strain consistent with tau
+        be_new = _expm_sym(2.0 * compliance(tau, p))
+        Finv = np.linalg.inv(F)
+        Cpinv_new = Finv @ be_new @ Finv.T
+        Fp = _sqrtm_sym(np.linalg.inv(Cpinv_new))
+        out.append((t, tau / np.linalg.det(F), kappa, evp))
+        F_prev = F
+    return out
+
+
 def selfcheck():
     p = CapParams()
     ok = True

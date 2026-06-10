@@ -48,11 +48,14 @@ struct CapModelKernel : public ParallelKernel<EvalT, Traits>
 
   // Dependent MDFields
   ConstScalarField strain_;
+  ConstScalarField def_grad_;
+  ConstScalarField J_;
   ConstScalarField elastic_modulus_;
   ConstScalarField poissons_ratio_;
 
   // Evaluated MDFields
   ScalarField stress_;
+  ScalarField Fp_;
   ScalarField backStress_;
   ScalarField capParameter_;
   ScalarField eqps_;
@@ -61,10 +64,15 @@ struct CapModelKernel : public ParallelKernel<EvalT, Traits>
   // Old state arrays
   Albany::MDArray stress_old_;
   Albany::MDArray strain_old_;
+  Albany::MDArray def_grad_old_;
+  Albany::MDArray Fp_old_;
   Albany::MDArray backStress_old_;
   Albany::MDArray capParameter_old_;
   Albany::MDArray eqps_old_;
   Albany::MDArray volPlasticStrain_old_;
+
+  // Finite-deformation (exponential/logarithmic map) kinematics flag
+  bool finite_deformation_;
 
   // Material parameters
   RealType A_;

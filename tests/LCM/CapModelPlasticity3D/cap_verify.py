@@ -47,12 +47,21 @@ def main():
     elif path == 'triaxial':
         eps = lambda t: np.diag([-0.025 * t, -0.008 * t, -0.012 * t])
         p = ref.CapParams(psi=0.8, L=3.5e-4, phi=0.085, theta=0.1, Q=20.0)
+    elif path == 'confined_fd':
+        # u = h(t) x  =>  F = I + diag(h)
+        F_of_t = lambda t: np.diag([1.0 - 0.04 * t, 1.0, 1.0])
+    elif path == 'triaxial_fd':
+        F_of_t = lambda t: np.diag([1.0 - 0.025 * t, 1.0 - 0.008 * t, 1.0 - 0.012 * t])
+        p = ref.CapParams(psi=0.8, L=3.5e-4, phi=0.085, theta=0.1, Q=20.0)
     else:
         sys.exit(f'unknown path {path}')
 
     t, sxx, syy, szz, sxy, kappa, evp = exo_series(exo)
     nsteps = len(t) - 1
-    hist = ref.drive(eps, nsteps, p)
+    if path.endswith('_fd'):
+        hist = ref.drive_fd(F_of_t, nsteps, p)
+    else:
+        hist = ref.drive(eps, nsteps, p)
 
     # LOCA's observer writes a stale duplicate of the initial state into
     # the first post-initial output slot (index 1); mask it out.

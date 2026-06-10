@@ -54,13 +54,7 @@ CapModelKernel<EvalT, Traits>::CapModelKernel(
       substep_tolerance_(p->get<RealType>("Substep Tolerance", 1.0e-4)),
       max_substeps_(p->get<int>("Maximum Substeps", 200))
 {
-  // The finite-deformation extension that used to live here was removed:
-  // it had no validating source (the model's references are small-strain
-  // only), no test coverage, and it complicated the integrator.
-  ALBANY_ASSERT(
-      p->get<bool>("Finite Deformation", false) == false,
-      "The Cap model is small-strain; finite-deformation support "
-      "was removed. Re-run with 'Finite Deformation: false'.");
+  finite_deformation_ = p->get<bool>("Finite Deformation", false);
 
   // retrieve appropriate field name strings
   std::string const cauchy_string           = field_name_map_["Cauchy_Stress"];
@@ -69,14 +63,32 @@ CapModelKernel<EvalT, Traits>::CapModelKernel(
   std::string const eqps_string             = field_name_map_["eqps"];
   std::string const volPlasticStrain_string = field_name_map_["volPlastic_Strain"];
   std::string const strain_string           = field_name_map_["Strain"];
+  std::string const F_string                = field_name_map_["F"];
+  std::string const J_string                = field_name_map_["J"];
+  std::string const Fp_string               = field_name_map_["Fp"];
 
   // define the dependent fields
   setDependentField("Poissons Ratio", dl->qp_scalar);
   setDependentField("Elastic Modulus", dl->qp_scalar);
-  setDependentField("Strain", dl->qp_tensor);
 
-  // strain is a state variable (old state needed)
-  addStateVariable(strain_string, dl->qp_tensor, "scalar", 0.0, true, true);
+  if (finite_deformation_) {
+    // Exponential/logarithmic-map kinematics: the verified small-strain
+    // integrator runs unchanged in logarithmic elastic strain /
+    // Kirchhoff stress space; only the kinematics wrap around it.
+    setDependentField(F_string, dl->qp_tensor);
+    setDependentField(J_string, dl->qp_scalar);
+    // F_old (needed to recover the elastic log strain at t_n) is already
+    // registered as a state with history by MechanicsProblem.
+
+    // plastic deformation gradient
+    setEvaluatedField(Fp_string, dl->qp_tensor);
+    addStateVariable(Fp_string, dl->qp_tensor, "identity", 0.0, true, true);
+  } else {
+    setDependentField("Strain", dl->qp_tensor);
+
+    // strain is a state variable (old state needed)
+    addStateVariable(strain_string, dl->qp_tensor, "scalar", 0.0, true, true);
+  }
 
   // define the evaluated fields
   setEvaluatedField(cauchy_string, dl->qp_tensor);
@@ -115,11 +127,19 @@ CapModelKernel<EvalT, Traits>::init(
   std::string eqps_string             = field_name_map_["eqps"];
   std::string volPlasticStrain_string = field_name_map_["volPlastic_Strain"];
   std::string strain_string           = field_name_map_["Strain"];
+  std::string F_string                = field_name_map_["F"];
+  std::string J_string                = field_name_map_["J"];
+  std::string Fp_string               = field_name_map_["Fp"];
 
   // extract dependent MDFields
   elastic_modulus_ = *dep_fields["Elastic Modulus"];
   poissons_ratio_  = *dep_fields["Poissons Ratio"];
-  strain_          = *dep_fields["Strain"];
+  if (finite_deformation_) {
+    def_grad_ = *dep_fields[F_string];
+    J_        = *dep_fields[J_string];
+  } else {
+    strain_ = *dep_fields["Strain"];
+  }
 
   // extract evaluated MDFields
   stress_           = *eval_fields[cauchy_string];
@@ -127,9 +147,15 @@ CapModelKernel<EvalT, Traits>::init(
   capParameter_     = *eval_fields[capParameter_string];
   eqps_             = *eval_fields[eqps_string];
   volPlasticStrain_ = *eval_fields[volPlasticStrain_string];
+  if (finite_deformation_) Fp_ = *eval_fields[Fp_string];
 
   // get old state variables
-  strain_old_           = (*workset.stateArrayPtr)[strain_string + "_old"];
+  if (finite_deformation_) {
+    def_grad_old_ = (*workset.stateArrayPtr)[F_string + "_old"];
+    Fp_old_       = (*workset.stateArrayPtr)[Fp_string + "_old"];
+  } else {
+    strain_old_ = (*workset.stateArrayPtr)[strain_string + "_old"];
+  }
   stress_old_           = (*workset.stateArrayPtr)[cauchy_string + "_old"];
   backStress_old_       = (*workset.stateArrayPtr)[backStress_string + "_old"];
   capParameter_old_     = (*workset.stateArrayPtr)[capParameter_string + "_old"];
@@ -170,13 +196,67 @@ CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   ScalarT kappaVal = capParameter_old_(cell, pt);
 
-  // Trial elastic state: sigma_tr = sigma_n + C : deps
+  // Spectral functions of symmetric tensors, for the exp/log kinematics.
+  auto fun_sym = [&](Tensor const& Asym, ScalarT (*fun)(ScalarT const&)) {
+    Tensor V(num_dims_), Dg(num_dims_);
+    std::tie(V, Dg) = minitensor::eig_sym(Asym);
+    Tensor B(num_dims_);
+    B.fill(minitensor::Filler::ZEROS);
+    for (int k = 0; k < num_dims_; ++k) {
+      ScalarT const fk = fun(Dg(k, k));
+      for (int i = 0; i < num_dims_; ++i)
+        for (int j = 0; j < num_dims_; ++j)
+          B(i, j) += fk * V(i, k) * V(j, k);
+    }
+    return B;
+  };
+  auto log_sym  = [&](Tensor const& A) { return fun_sym(A, +[](ScalarT const& x) { return ScalarT(std::log(x)); }); };
+  auto exp_sym  = [&](Tensor const& A) { return fun_sym(A, +[](ScalarT const& x) { return ScalarT(std::exp(x)); }); };
+  auto sqrt_sym = [&](Tensor const& A) { return fun_sym(A, +[](ScalarT const& x) { return ScalarT(std::sqrt(x)); }); };
+
+  // Kinematics: sigmaN and depsilon feed the (small-strain) integrator.
+  // In finite deformation they are the Kirchhoff stress and the increment
+  // of logarithmic elastic strain (exponential/logarithmic-map approach):
+  // the verified integrator is reused unchanged in that space.
   Tensor sigmaN(num_dims_);
   Tensor depsilon(num_dims_);
-  for (int i = 0; i < num_dims_; ++i) {
-    for (int j = 0; j < num_dims_; ++j) {
-      depsilon(i, j) = strain_(cell, pt, i, j) - strain_old_(cell, pt, i, j);
-      sigmaN(i, j)   = stress_old_(cell, pt, i, j);
+  Tensor Fval(num_dims_);
+  ScalarT Jdet = 1.0;
+
+  if (finite_deformation_) {
+    Tensor F_n(num_dims_), Fp_n(num_dims_);
+    for (int i = 0; i < num_dims_; ++i) {
+      for (int j = 0; j < num_dims_; ++j) {
+        Fval(i, j) = def_grad_(cell, pt, i, j);
+        F_n(i, j)  = def_grad_old_(cell, pt, i, j);
+        Fp_n(i, j) = Fp_old_(cell, pt, i, j);
+      }
+    }
+    Jdet = J_(cell, pt);
+
+    Tensor const Fpinv  = minitensor::inverse(Fp_n);
+    Tensor const Cpinv  = minitensor::dot(Fpinv, minitensor::transpose(Fpinv));
+
+    // Trial elastic logarithmic strain from be_tr = F Cp^-1 F^T
+    Tensor const be_tr  = minitensor::dot(Fval, minitensor::dot(Cpinv, minitensor::transpose(Fval)));
+    Tensor const eps_tr = 0.5 * log_sym(be_tr);
+
+    // Elastic logarithmic strain at t_n (same Cp^-1, old F); the
+    // corresponding Kirchhoff stress tau_n = C : eps_e_n is the stress
+    // the integrator starts from, so that the trial state
+    // tau_n + C : (eps_tr - eps_e_n) = C : eps_tr is exact for the
+    // hyperelastic logarithmic model.
+    Tensor const be_n    = minitensor::dot(F_n, minitensor::dot(Cpinv, minitensor::transpose(F_n)));
+    Tensor const eps_e_n = 0.5 * log_sym(be_n);
+
+    depsilon = eps_tr - eps_e_n;
+    sigmaN   = minitensor::dotdot(Celastic, eps_e_n);
+  } else {
+    for (int i = 0; i < num_dims_; ++i) {
+      for (int j = 0; j < num_dims_; ++j) {
+        depsilon(i, j) = strain_(cell, pt, i, j) - strain_old_(cell, pt, i, j);
+        sigmaN(i, j)   = stress_old_(cell, pt, i, j);
+      }
     }
   }
 
@@ -387,6 +467,25 @@ CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
     devolps             = minitensor::trace(deps_plastic);
     Tensor dev_plastic  = deps_plastic - (1.0 / 3.0) * devolps * I;
     deqps = std::sqrt(2.0 / 3.0) * minitensor::norm(dev_plastic);
+  }
+
+  // Finite deformation: update the plastic deformation gradient from the
+  // returned Kirchhoff stress (elastic log strain = compliance : tau),
+  // and convert the stored stress to Cauchy.
+  if (finite_deformation_) {
+    Tensor const eps_e_new  = minitensor::dotdot(compliance, sigmaVal);
+    Tensor const be_new     = exp_sym(ScalarT(2.0) * eps_e_new);
+    Tensor const Finv       = minitensor::inverse(Fval);
+    Tensor const Cpinv_new  = minitensor::dot(Finv, minitensor::dot(be_new, minitensor::transpose(Finv)));
+    // Fp is taken as the unique symmetric positive-definite root; the
+    // rotational part of Fp is irrelevant for an isotropic model.
+    Tensor const Fp_new = sqrt_sym(minitensor::inverse(Cpinv_new));
+
+    for (int i = 0; i < num_dims_; ++i)
+      for (int j = 0; j < num_dims_; ++j)
+        Fp_(cell, pt, i, j) = Fp_new(i, j);
+
+    sigmaVal = (1.0 / Jdet) * sigmaVal;
   }
 
   // Store results

@@ -182,7 +182,7 @@ Albany::ElasticityProblem::getValidProblemParameters() const
 
   validPL->set<bool>("Compute Error", false, "");
 
-  if (matModel == "CapExplicit" || matModel == "CapImplicit") {
+  if (matModel == "CapModel") {
     validPL->set<double>("A", false, "");
     validPL->set<double>("B", false, "");
     validPL->set<double>("C", false, "");

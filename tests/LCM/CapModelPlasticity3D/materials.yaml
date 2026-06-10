@@ -1,75 +1,13 @@
 LCM:
   ElementBlocks:
     Block0:
-      material: CapExplicit
+      material: CapModel
   Materials:
-    CapExplicit:
+    # Salem limestone, associative parameter set: Table 1 of Sun, Chen &
+    # Ostien, Acta Geotechnica 9 (2014) 903-934. Units: MPa.
+    CapModel:
       Material Model:
-        Model Name: Cap Explicit
-      Finite Deformation: false
-      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
-      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
-      A: 689.2
-      D: 0.000394
-      C: 675.2
-      theta: 0.0
-      R: 28.0
-      kappa0: -8.05
-      W: 0.08
-      D1: 0.00147
-      D2: 0.0
-      calpha: 100000.0
-      psi: 1.0
-      N: 6.0
-      L: 0.000394
-      phi: 0.0
-      Q: 28.0
-    CapImplicit:
-      Material Model:
-        Model Name: Cap Implicit
-      Finite Deformation: false
-      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
-      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
-      A: 689.2
-      D: 0.000394
-      C: 675.2
-      theta: 0.0
-      R: 28.0
-      kappa0: -8.05
-      W: 0.08
-      D1: 0.00147
-      D2: 0.0
-      calpha: 100000.0
-      psi: 1.0
-      N: 6.0
-      L: 0.000394
-      phi: 0.0
-      Q: 28.0
-    CapExplicitFD:
-      Material Model:
-        Model Name: Cap Explicit
-      Finite Deformation: true
-      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
-      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
-      A: 689.2
-      D: 0.000394
-      C: 675.2
-      theta: 0.0
-      R: 28.0
-      kappa0: -8.05
-      W: 0.08
-      D1: 0.00147
-      D2: 0.0
-      calpha: 100000.0
-      psi: 1.0
-      N: 6.0
-      L: 0.000394
-      phi: 0.0
-      Q: 28.0
-    CapImplicitFD:
-      Material Model:
-        Model Name: Cap Implicit
-      Finite Deformation: true
+        Model Name: Cap
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
       A: 689.2

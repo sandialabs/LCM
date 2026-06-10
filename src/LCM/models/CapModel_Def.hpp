@@ -24,12 +24,12 @@
 #include <MiniTensor.h>
 
 #include "Albany_Utils.hpp"
-#include "CapExplicit.hpp"
+#include "CapModel.hpp"
 
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-CapExplicitKernel<EvalT, Traits>::CapExplicitKernel(
+CapModelKernel<EvalT, Traits>::CapModelKernel(
     ConstitutiveModel<EvalT, Traits>& model,
     Teuchos::ParameterList*           p,
     Teuchos::RCP<Albany::Layouts> const& dl)
@@ -55,7 +55,7 @@ CapExplicitKernel<EvalT, Traits>::CapExplicitKernel(
   // only), no test coverage, and it complicated the integrator.
   ALBANY_ASSERT(
       p->get<bool>("Finite Deformation", false) == false,
-      "Cap Explicit is a small-strain model; finite-deformation support "
+      "The Cap model is small-strain; finite-deformation support "
       "was removed. Re-run with 'Finite Deformation: false'.");
 
   // retrieve appropriate field name strings
@@ -100,7 +100,7 @@ CapExplicitKernel<EvalT, Traits>::CapExplicitKernel(
 
 template <typename EvalT, typename Traits>
 void
-CapExplicitKernel<EvalT, Traits>::init(
+CapModelKernel<EvalT, Traits>::init(
     Workset&                workset,
     FieldMap<ScalarT const>& dep_fields,
     FieldMap<ScalarT>&       eval_fields)
@@ -135,7 +135,7 @@ CapExplicitKernel<EvalT, Traits>::init(
 
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-CapExplicitKernel<EvalT, Traits>::operator()(int cell, int pt) const
+CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
 {
   using Tensor  = minitensor::Tensor<ScalarT>;
   using Tensor4 = minitensor::Tensor4<ScalarT>;
@@ -344,8 +344,8 @@ CapExplicitKernel<EvalT, Traits>::operator()(int cell, int pt) const
 // Helper functions
 //
 template <typename EvalT, typename Traits>
-typename CapExplicitKernel<EvalT, Traits>::ScalarT
-CapExplicitKernel<EvalT, Traits>::compute_f(
+typename CapModelKernel<EvalT, Traits>::ScalarT
+CapModelKernel<EvalT, Traits>::compute_f(
     minitensor::Tensor<ScalarT>& sigma,
     minitensor::Tensor<ScalarT>& alpha,
     ScalarT& kappa) const
@@ -380,8 +380,8 @@ CapExplicitKernel<EvalT, Traits>::compute_f(
 }
 
 template <typename EvalT, typename Traits>
-minitensor::Tensor<typename CapExplicitKernel<EvalT, Traits>::ScalarT>
-CapExplicitKernel<EvalT, Traits>::compute_dfdsigma(
+minitensor::Tensor<typename CapModelKernel<EvalT, Traits>::ScalarT>
+CapModelKernel<EvalT, Traits>::compute_dfdsigma(
     minitensor::Tensor<ScalarT>& sigma,
     minitensor::Tensor<ScalarT>& alpha,
     ScalarT& kappa) const
@@ -447,8 +447,8 @@ CapExplicitKernel<EvalT, Traits>::compute_dfdsigma(
 }
 
 template <typename EvalT, typename Traits>
-minitensor::Tensor<typename CapExplicitKernel<EvalT, Traits>::ScalarT>
-CapExplicitKernel<EvalT, Traits>::compute_dgdsigma(
+minitensor::Tensor<typename CapModelKernel<EvalT, Traits>::ScalarT>
+CapModelKernel<EvalT, Traits>::compute_dgdsigma(
     minitensor::Tensor<ScalarT>& sigma,
     minitensor::Tensor<ScalarT>& alpha,
     ScalarT& kappa) const
@@ -519,8 +519,8 @@ CapExplicitKernel<EvalT, Traits>::compute_dgdsigma(
 }
 
 template <typename EvalT, typename Traits>
-typename CapExplicitKernel<EvalT, Traits>::ScalarT
-CapExplicitKernel<EvalT, Traits>::compute_dfdkappa(
+typename CapModelKernel<EvalT, Traits>::ScalarT
+CapModelKernel<EvalT, Traits>::compute_dfdkappa(
     minitensor::Tensor<ScalarT>& sigma,
     minitensor::Tensor<ScalarT>& alpha,
     ScalarT& kappa) const
@@ -547,8 +547,8 @@ CapExplicitKernel<EvalT, Traits>::compute_dfdkappa(
 }
 
 template <typename EvalT, typename Traits>
-typename CapExplicitKernel<EvalT, Traits>::ScalarT
-CapExplicitKernel<EvalT, Traits>::compute_Galpha(ScalarT& J2_alpha) const
+typename CapModelKernel<EvalT, Traits>::ScalarT
+CapModelKernel<EvalT, Traits>::compute_Galpha(ScalarT& J2_alpha) const
 {
   if (N_ != 0)
     return 1.0 - std::pow(J2_alpha, 0.5) / N_;
@@ -557,8 +557,8 @@ CapExplicitKernel<EvalT, Traits>::compute_Galpha(ScalarT& J2_alpha) const
 }
 
 template <typename EvalT, typename Traits>
-minitensor::Tensor<typename CapExplicitKernel<EvalT, Traits>::ScalarT>
-CapExplicitKernel<EvalT, Traits>::compute_halpha(
+minitensor::Tensor<typename CapModelKernel<EvalT, Traits>::ScalarT>
+CapModelKernel<EvalT, Traits>::compute_halpha(
     minitensor::Tensor<ScalarT>& dgdsigma,
     ScalarT& J2_alpha) const
 {
@@ -579,8 +579,8 @@ CapExplicitKernel<EvalT, Traits>::compute_halpha(
 }
 
 template <typename EvalT, typename Traits>
-typename CapExplicitKernel<EvalT, Traits>::ScalarT
-CapExplicitKernel<EvalT, Traits>::compute_dedkappa(ScalarT& kappa) const
+typename CapModelKernel<EvalT, Traits>::ScalarT
+CapModelKernel<EvalT, Traits>::compute_dedkappa(ScalarT& kappa) const
 {
   // The crush curve eps_v^p(X) is calibrated against the YIELD cap
   // position X(kappa) = kappa - R*F_f(kappa) (parameters R, D, theta),
@@ -603,8 +603,8 @@ CapExplicitKernel<EvalT, Traits>::compute_dedkappa(ScalarT& kappa) const
 }
 
 template <typename EvalT, typename Traits>
-typename CapExplicitKernel<EvalT, Traits>::ScalarT
-CapExplicitKernel<EvalT, Traits>::compute_evp(ScalarT& kappa) const
+typename CapModelKernel<EvalT, Traits>::ScalarT
+CapModelKernel<EvalT, Traits>::compute_evp(ScalarT& kappa) const
 {
   // Plastic volumetric strain on the crush curve,
   //   eps_v^p = W (exp[D1 (X - X0) - D2 (X - X0)^2] - 1),

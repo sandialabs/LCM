@@ -2,8 +2,8 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#if !defined(LCM_CapExplicit_hpp)
-#define LCM_CapExplicit_hpp
+#if !defined(LCM_CapModel_hpp)
+#define LCM_CapModel_hpp
 
 #include <MiniTensor.h>
 
@@ -12,23 +12,23 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-struct CapExplicitKernel : public ParallelKernel<EvalT, Traits>
+struct CapModelKernel : public ParallelKernel<EvalT, Traits>
 {
   ///
   /// Constructor
   ///
-  CapExplicitKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
+  CapModelKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// No copy constructor
   ///
-  CapExplicitKernel(CapExplicitKernel const&) = delete;
+  CapModelKernel(CapModelKernel const&) = delete;
 
   ///
   /// No copy assignment
   ///
-  CapExplicitKernel&
-  operator=(CapExplicitKernel const&) = delete;
+  CapModelKernel&
+  operator=(CapModelKernel const&) = delete;
 
   using ScalarT          = typename EvalT::ScalarT;
   using ScalarField      = PHX::MDField<ScalarT>;
@@ -131,12 +131,12 @@ struct CapExplicitKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class CapExplicit : public LCM::KernelConstitutiveModel<EvalT, Traits, CapExplicitKernel<EvalT, Traits>>
+class CapModel : public LCM::KernelConstitutiveModel<EvalT, Traits, CapModelKernel<EvalT, Traits>>
 {
  public:
-  CapExplicit(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
+  CapModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 };
 
 }  // namespace LCM
 
-#endif  // LCM_CapExplicit_hpp
+#endif  // LCM_CapModel_hpp

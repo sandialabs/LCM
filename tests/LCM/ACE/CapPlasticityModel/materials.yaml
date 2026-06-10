@@ -5,7 +5,7 @@ LCM:
   Materials:
     CapExplicit:
       Material Model:
-        Model Name: Cap Explicit
+        Model Name: Cap
       Finite Deformation: false
       Elastic Modulus:
         Elastic Modulus Type: Constant

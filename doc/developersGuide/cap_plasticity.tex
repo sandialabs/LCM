@@ -25,7 +25,7 @@
 \usepackage{microtype}
 
 % Allow line breaks inside \texttt{...} at underscores and after "::"
-% so long code identifiers (e.g. CapExplicit_Def.hpp, PHAL::AlbanyTraits::Jacobian)
+% so long code identifiers (e.g. CapModel_Def.hpp, PHAL::AlbanyTraits::Jacobian)
 % do not overrun the right margin.
 \setlength{\emergencystretch}{3em}
 \makeatletter
@@ -57,8 +57,6 @@
 \newcommand{\ident}{~I}
 \newcommand{\sdev}{~s}
 \newcommand{\halpha}{~h^{\alpha}}
-\newcommand{\unkvec}{~X}
-\newcommand{\resvec}{~R}
 
 \begin{document}
 
@@ -76,7 +74,7 @@
 
 \title{
   Cap Plasticity in LCM:\\
-  Reference Formulation}
+  Reference Formulation, Integration, and Verification}
 
 \author{
   Alejandro Mota$^1$\thanks{Email: amota@sandia.gov}\\
@@ -92,49 +90,112 @@
 
 \begin{abstract}
 
-  LCM implements two Cap-plasticity constitutive models,
-  \texttt{CapExplicit} and \texttt{CapImplicit}, as specializations
-  of the three-invariant isotropic/kinematic hardening cap model of
-  \citet{Fossum.Fredrich:2000} as presented in Section~3 of
-  \citet{Sun.Chen.Ostien:2014}. This document restates the
-  formulation in that paper's notation, documents the two integration
-  algorithms as coded in LCM, describes the logarithmic-strain /
-  Kirchhoff-stress kinematic extension used in LCM for finite
-  deformation (an LCM-specific extension not covered by the
-  reference), and summarizes why the consistent tangent is never
-  formed explicitly: all derivatives needed by the global nonlinear
-  solve and by sensitivity analysis are produced by Sacado automatic
-  differentiation.
+  LCM implements a single cap-plasticity constitutive model,
+  \texttt{CapModel} (material-database name \texttt{Cap}): the
+  three-invariant isotropic/kinematic hardening cap model of the
+  Sandia GeoModel lineage
+  \citep{Fossum.Fredrich:2000,Fossum.Brannon:2004,Foster.etal:2005},
+  in the form presented in Section~3 of \citet{Sun.Chen.Ostien:2014}.
+  This document states the formulation as implemented, including the
+  conventions that the published papers leave ambiguous and that were
+  settled against the original sources and the LAME GeoModel reference
+  implementation; documents the adaptive substepped explicit
+  integration; describes the logarithmic-strain / Kirchhoff-stress
+  kinematics used for finite deformation; summarizes why no
+  algorithmic tangent is ever hand-coded (Sacado automatic
+  differentiation produces all of them); and describes the
+  verification of the implementation against an independent reference
+  implementation, which reproduces the kernel to machine precision
+  over full load histories.
   \\
   \\
   Keywords: Cap plasticity, three-invariant yield surface, kinematic
-  hardening, logarithmic strain, Kirchhoff stress, automatic
-  differentiation, LCM.
+  hardening, pore collapse, adaptive substepping, logarithmic strain,
+  Kirchhoff stress, automatic differentiation, verification, LCM.
 
 \end{abstract}
 
-\section{Scope and Reference}
+\section{Scope, Sources, and Conventions}
 \label{sec:scope}
 
-LCM provides two Cap-plasticity constitutive models:
-\begin{itemize}
-\item \textbf{\texttt{CapExplicit}} --- refined explicit integration
-      with an initial plastic predictor followed by a drift-correction
-      sub-iteration (\citealt{Sun.Chen.Ostien:2014}, Algorithms~1--2).
-\item \textbf{\texttt{CapImplicit}} --- fully implicit backward-Euler
-      integration of the same yield and plastic-potential functions
-      via a 13-unknown local Newton residual, with the local Jacobian
-      formed by forward-mode automatic differentiation
-      (\texttt{Sacado\bcc Fad\bcc DFad}).
-\end{itemize}
-Both models share \texttt{compute\_f}, \texttt{compute\_g}, their
-first derivatives with respect to the invariants, the kinematic
-hardening rule $\halpha$, and the cap hardening function
-$\varepsilon_v^p(\kappa)$ verbatim; they differ only in the return
-mapping and, through a \texttt{Finite Deformation} input flag,
-in kinematics. The paper itself is restricted to small strain;
-the extension in Section~\ref{sec:finite} is implemented in LCM but
-not documented in \citet{Sun.Chen.Ostien:2014}.
+\texttt{CapModel} lives in
+\texttt{src/LCM/models/CapModel.\{hpp,cpp\}} and
+\texttt{CapModel\_Def.hpp} and is selected in the material database
+with \texttt{Model Name: Cap}. It supports small-strain and
+finite-deformation kinematics through the boolean material parameter
+\texttt{Finite Deformation} (Section~\ref{sec:finite}); the
+constitutive integrator is identical in both cases.
+
+A fully implicit variant (\texttt{CapImplicit}, a 13-unknown local
+backward-Euler solve following \citealt{Foster.etal:2005}) existed in
+LCM until 2026 and was removed: it was unmaintained, had no test
+coverage, and its principal classical advantage --- the consistent
+algorithmic tangent --- carries little weight in LCM, where automatic
+differentiation produces the exact tangent of whatever integrator
+actually runs (Section~\ref{sec:ad}). The accuracy concern that
+remains for an explicit scheme, large strain increments, is addressed
+by adaptive substepping (Section~\ref{sec:integration}). The model's
+own authors made the same choice, moving from the implicit
+formulation of \citet{Foster.etal:2005} to the refined explicit
+scheme of \citet{Sun.Chen.Ostien:2014} for production work.
+
+\paragraph{Sources and their precedence.}
+The implementation follows
+\citet[Section~3]{Sun.Chen.Ostien:2014}. Where that paper is
+ambiguous, in error, or silent, the conventions are settled by, in
+order: the original model papers
+\citep{Foster.etal:2005,Regueiro.Foster:2011}, and the LAME GeoModel
+reference implementation (\texttt{iso\_geomodel\_model.F}, the
+production Sandia code documented in \citealt{Fossum.Brannon:2004}).
+Each such arbitration is called out where it appears below. Two
+errata in \citet{Sun.Chen.Ostien:2014} as printed are relevant:
+\begin{enumerate}
+\item Algorithm~1, Step~2 prints the stress update as
+      $\stress_{n+1} = \stress^{\mathrm{tr}}
+       - \Delta\gamma\,\partial g/\partial\stress$, omitting the
+      elastic tangent. The $\Delta\gamma$ derivation in the same
+      paper, and Algorithm~2, both require
+      $\stress_{n+1} = \stress^{\mathrm{tr}}
+       - \Delta\gamma\,\Celast\!:\!\partial g/\partial\stress$,
+      which is what LCM implements.
+\item Algorithm~2's normal-correction fallback mixes $\Celast$ into
+      the stress update while omitting it from the denominator
+      $\tilde\chi = \partial_\sigma f : \partial_\sigma f$, which is
+      dimensionally inconsistent. LCM implements the consistent
+      \citet{Sloan.Abbo.Sheng:2001} form: a pure geometric projection
+      with no elastic tangent in either place
+      (Section~\ref{sec:integration}).
+\end{enumerate}
+
+\paragraph{Sign convention.}
+Tension positive, compression negative, throughout. Under
+confinement $I_1 = \trace\stress < 0$; the cap sits on the
+compressive (negative-$I_1$) side, and ``the cap expands'' means its
+hydrostat intercept moves toward $-\infty$.
+
+\section{Physical Overview}
+\label{sec:physics}
+
+Geomaterials exhibit two inelastic mechanisms that the yield surface
+must represent simultaneously. At low to moderate pressure the
+dominant mechanism is frictional sliding and growth of microcracks:
+shear resistance grows with confinement, producing a pressure-dependent
+\emph{shear failure envelope} that, unlike a Drucker--Prager cone,
+saturates once the cracks are squeezed shut. At high pressure a
+porous material yields under hydrostatic load alone by irreversible
+\emph{pore collapse}; representing this requires closing the yield
+surface on the compressive end with a \emph{cap}, which moves outward
+as porosity is crushed away --- the isotropic hardening of the model.
+Shear stress assists pore collapse, so the cap is an ellipse rather
+than a flat cutoff. Directionality of frictional sliding produces a
+strong Bauschinger effect, represented by a deviatoric back stress
+that translates the yield surface up to, but never beyond, the fixed
+failure envelope. Finally, geomaterials are weaker in triaxial
+extension than in triaxial compression, which brings the third stress
+invariant into the yield function. The classical two-surface cap
+models \citep[e.g.][]{Fossum.Fredrich:2000} join envelope and cap at
+a corner; the present formulation is a single $C^1$ surface, which is
+the property that makes the explicit integration well behaved.
 
 \section{Kinematics in the Small-Strain Path}
 \label{sec:smallstrain}
@@ -155,7 +216,7 @@ and uses isotropic linear elasticity
 with $\lambda,\mu$ the Lam\'e constants and $~{\mathbb I}$ the
 symmetric fourth-order identity. Given state
 $\{\stress_n, \backstress_n, \kappa_n\}$ and strain increment
-$\strainincr$ from the surrounding Newton iteration, the trial
+$\strainincr$ from the surrounding global Newton iteration, the trial
 elastic stress is
 \begin{equation}
   \stress^{\mathrm{tr}} \;=\; \stress_n + \Celast : \strainincr .
@@ -166,12 +227,11 @@ elastic stress is
 \label{sec:yield}
 
 Kinematic hardening is introduced through the deviatoric back stress
-$\backstress$ \citep[Section~3.1]{Sun.Chen.Ostien:2014} via the
-relative stress
+$\backstress$ via the relative stress
 \begin{equation}
-  \relstress \;:=\; \stress - \backstress.
+  \relstress \;:=\; \stress - \backstress,
 \end{equation}
-Its invariants are
+with invariants
 \begin{align}
   I_1        &= \trace \relstress, \\
   J_2^{\xi}  &= \tfrac{1}{2}\, \sdev : \sdev,
@@ -183,32 +243,34 @@ $\trace\relstress = \trace\stress$, so the $\xi$ superscript is used
 on $J_2, J_3$ only.
 
 \paragraph{Lode coefficient.}
-To capture the difference in strength between triaxial compression
-and extension \citep[Eqs.~34--36]{Sun.Chen.Ostien:2014},
+The difference in strength between triaxial compression and triaxial
+extension enters through
+\citep[Eqs.~34--36]{Sun.Chen.Ostien:2014}
 \begin{equation}
-  \beta \;=\; -\tfrac{1}{3}\,
-      \sin^{-1}\!\left(
-        \frac{3\sqrt{3}\,J_3^\xi}{2\,(J_2^\xi)^{3/2}}
-      \right),
-  \qquad
   \Gamma(\beta) \;=\;
     \tfrac{1}{2}\left[
-      1 - \frac{3\sqrt{3}\,J_3^\xi}{2(J_2^\xi)^{3/2}}
-    + \frac{1}{\psi}\!\left(
-        1 + \frac{3\sqrt{3}\,J_3^\xi}{2(J_2^\xi)^{3/2}}
-      \right)
+      1 - \sin 3\beta
+    + \frac{1}{\psi}\left(1 + \sin 3\beta\right)
     \right],
+  \qquad
+  \sin 3\beta \;=\; -\frac{3\sqrt{3}\,J_3^\xi}{2\,(J_2^\xi)^{3/2}},
   \label{eq:Gamma}
 \end{equation}
-with $\psi$ the ratio of triaxial-extension to -compression strength.
-Both LCM models use the second form of \eqref{eq:Gamma} directly.
-They set $\Gamma \equiv 1$ when $\psi = 0$ or $J_2^\xi = 0$ to avoid
-the singularity.
+where $\psi \le 1$ is the ratio of triaxial-extension to
+triaxial-compression strength. In triaxial compression $\Gamma = 1$;
+in triaxial extension $\Gamma = 1/\psi$, and since $\Gamma^2$
+multiplies $J_2^\xi$ in the yield function, yield in extension occurs
+at $\psi$ times the compressive strength. The code sets
+$\Gamma \equiv 1$ when $\psi = 0$ or $J_2^\xi = 0$ to avoid the
+singularity on the hydrostat. With $\psi = 1$ the Lode dependence is
+inactive and all $J_3$ terms drop out of the stress gradients ---
+a fact relevant to the implementation history
+(Appendix~\ref{sec:history}).
 
-\paragraph{Shear failure surface, cap, and hardening.}
+\paragraph{Shear failure surface, cap, and cap position.}
 The pressure-dependent shear failure surface and the smooth
-elliptical hardening cap of
-\citet[Eqs.~32, 37--38]{Sun.Chen.Ostien:2014} are
+elliptical hardening cap
+\citep[Eqs.~32, 37--38]{Sun.Chen.Ostien:2014} are
 \begin{align}
   F_f(I_1) &= A - C \exp(D\,I_1) - \theta\,I_1,
              \label{eq:Ff}\\
@@ -218,32 +280,51 @@ elliptical hardening cap of
   X(\kappa) &= \kappa - R\,F_f(\kappa),
              \label{eq:X}
 \end{align}
-where $H$ is the Heaviside function, so $F_c \equiv 1$ on the shear
-branch $I_1 > \kappa$ and $F_c < 1$ on the compactive cap
-$I_1 \le \kappa$. Sign convention follows the reference: tension
-positive, compression negative; the cap sits on the compressive side.
-The material parameters are $A, C, D, \theta$ for the shear surface,
-$R$ for the cap aspect ratio, and $N$ for the offset of the yield
-surface from $F_f$.
+where $H$ is the Heaviside function. The internal variable $\kappa$
+is the \emph{branch point} where the cap begins, and $X(\kappa)$ is
+the \emph{hydrostat intercept}: the current hydrostatic crush
+strength. On the shear branch $I_1 > \kappa$, $F_c \equiv 1$; on the
+compactive cap $X < I_1 \le \kappa$, $F_c$ falls quadratically from
+one to zero, closing the surface at $I_1 = X$. At $I_1 = \kappa$
+both $F_c = 1$ and $\partial F_c/\partial I_1 = 0$, so the surface is
+$C^1$ across the branch point: there is no corner where cap meets
+envelope. The strength at zero pressure is $A - C$; as compression
+grows the exponential dies and strength saturates toward
+$A - \theta I_1$. $R$ is the cap aspect ratio (its extent in $I_1$
+per unit of $F_f$), and $N$ offsets the initial yield surface below
+the failure envelope, leaving room for kinematic hardening.
 
 \paragraph{Yield function and plastic potential.}
-\citet{Sun.Chen.Ostien:2014} handle non-associativity by using a
-separate copy of $F_f, F_c, X$ for the plastic potential, with
-parameters $(L, \phi, Q)$ replacing $(D, \theta, R)$
-\citep[Eqs.~30--33, 39--40]{Sun.Chen.Ostien:2014}:
 \begin{align}
   f(I_1, J_2^\xi, J_3^\xi, \backstress, \kappa)
-    &= \Gamma^2 J_2^\xi - F_c(\kappa)\,(F_f(I_1) - N)^2,
+    &= \Gamma^2 J_2^\xi - F_c(I_1,\kappa)\,\bigl(F_f(I_1) - N\bigr)^2,
     \label{eq:f}\\
   g(I_1, J_2^\xi, J_3^\xi, \backstress, \kappa)
-    &= \Gamma^2 J_2^\xi - F_c^g(\kappa)\,(F_f^g(I_1) - N)^2,
-    \label{eq:g}\\
-  F_f^g(I_1)  &= A - C \exp(L\,I_1) - \phi\,I_1, \\
-  F_c^g(I_1,\kappa) &=
-    1 - H(\kappa - I_1)\,\frac{(I_1 - \kappa)^2}{[X^g(\kappa) - \kappa]^2}, \\
-  X^g(\kappa) &= \kappa - Q\,F_f^g(\kappa).
+    &= \Gamma^2 J_2^\xi - F_c^g(I_1,\kappa)\,\bigl(F_f^g(I_1) - N\bigr)^2,
+    \label{eq:g}
 \end{align}
-Associative flow corresponds to $L = D$, $\phi = \theta$, $Q = R$.
+with the plastic-potential analogues
+\begin{align}
+  F_f^g(I_1)  &= A - C \exp(L\,I_1) - \phi\,I_1, \label{eq:Ffg}\\
+  F_c^g(I_1,\kappa) &=
+    1 - H(\kappa - I_1)\,\frac{(I_1 - \kappa)^2}{[X^g(\kappa) - \kappa]^2},\\
+  X^g(\kappa) &= \kappa - Q\,F_f(\kappa). \label{eq:Xg}
+\end{align}
+Non-associativity ($L \ne D$, $\phi \ne \theta$, $Q \ne R$) exists
+because associated flow on a frictional envelope grossly
+over-predicts dilatancy; flattening the potential's pressure
+dependence ($\phi < \theta$, $L < D$) reduces the predicted plastic
+volume expansion to measured levels. Associative flow corresponds to
+$L = D$, $\phi = \theta$, $Q = R$.
+
+\emph{Convention note.} In Eq.~\eqref{eq:Xg} the potential cap
+position $X^g$ is built from the \emph{yield} failure function $F_f$
+(parameters $D, \theta$), not from $F_f^g$: only the aspect ratio
+$Q$ distinguishes the potential cap from the yield cap. This follows
+\citet[Eq.~14]{Regueiro.Foster:2011} and the LAME reference
+implementation. The distinction is invisible for associative
+parameters and matters otherwise; the pre-2026 LCM code had it wrong
+(Appendix~\ref{sec:history}).
 
 \section{Flow Rule and Hardening Evolution}
 \label{sec:flow}
@@ -254,20 +335,42 @@ potential \citep[Eq.~48]{Sun.Chen.Ostien:2014},
   \dot{\pstrain} \;=\; \dot\gamma\,\frac{\partial g}{\partial \stress},
   \label{eq:flow}
 \end{equation}
-where $\dot\gamma$ is the consistency parameter. The deviatoric back
-stress evolves along the deviator of the flow direction
-\citep[Eqs.~41--43]{Sun.Chen.Ostien:2014},
+where $\dot\gamma \ge 0$ is the consistency parameter.
+
+\paragraph{Kinematic hardening.}
+The deviatoric back stress evolves along the deviator of the flow
+direction \citep[Eqs.~41--43]{Sun.Chen.Ostien:2014},
 \begin{equation}
-  \dot{\backstress} \;=\; \dot\gamma\,\halpha(\backstress),
+  \dot{\backstress} \;=\; \dot\gamma\,\halpha,
   \qquad
   \halpha \;=\; c^{\alpha}\,G^{\alpha}(\backstress)\,
                \dev\!\left(\frac{\partial g}{\partial \stress}\right),
   \qquad
-  G^{\alpha}(\backstress) \;=\; 1 - \frac{\sqrt{J_2^{\alpha}}}{N},
+  G^{\alpha} \;=\;
+    \max\!\left(0,\; 1 - \frac{\sqrt{J_2^{\alpha}}}{N}\right),
   \label{eq:halpha}
 \end{equation}
-with $J_2^{\alpha} = \tfrac{1}{2}\backstress:\backstress$.
-Isotropic cap hardening is driven by volumetric plastic strain
+with $J_2^{\alpha} = \tfrac{1}{2}\backstress:\backstress$. The
+limiter $G^\alpha$ drives the hardening rate to zero as the
+translating yield surface approaches the fixed failure envelope,
+which it reaches when $\sqrt{J_2^\alpha} = N$.
+
+\emph{The clamp at zero in Eq.~\eqref{eq:halpha} is essential and
+absent from the published papers.} The explicit update can overshoot
+$\sqrt{J_2^\alpha}$ slightly past $N$; without the clamp,
+$G^\alpha < 0$ \emph{reverses} the direction of kinematic hardening.
+At a material point this is a small error, but at the structural
+level it destabilizes the homogeneous solution: in LCM's verification
+study a uniform-property confined-compression problem on a
+$2 \times 2 \times 2$ mesh demonstrably bifurcated to a
+non-homogeneous Newton solution at exactly the step where the back
+stress reached its limit surface. The LAME reference implementation
+has always floored its equivalent quantity (\texttt{GFUN}) at zero.
+See Appendix~\ref{sec:history}.
+
+\paragraph{Isotropic (cap) hardening.}
+The cap position is driven by volumetric plastic strain through the
+experimentally measured crush curve
 \citep[Eqs.~44--46]{Sun.Chen.Ostien:2014},
 \begin{equation}
   \dot\kappa \;=\; \dot\gamma\,h^{\kappa},
@@ -277,264 +380,463 @@ Isotropic cap hardening is driven by volumetric plastic strain
          {\partial \varepsilon_v^p/\partial \kappa},
   \qquad
   \varepsilon_v^p(\kappa)
-    = W \bigl[
-        \exp\!\bigl(D_1(X - X_0) - D_2(X - X_0)^2\bigr) - 1
-      \bigr],
+    = W \Bigl[
+        e^{\,D_1 \bar X - D_2 \bar X^2} - 1
+      \Bigr],
+  \quad \bar X = X(\kappa) - X(\kappa_0),
   \label{eq:kappa}
 \end{equation}
-where $X_0 = X(\kappa_0)$ and $W, D_1, D_2, c^\alpha$ are material
-parameters. In LCM the denominator in $h^{\kappa}$ is evaluated as
-$\partial \varepsilon_v^p/\partial X \cdot \mathrm{d}X/\mathrm{d}\kappa$
-(function \texttt{compute\_dedkappa}), matching the chain rule
-implicit in \eqref{eq:kappa}.
+where $\kappa_0$ is the initial cap branch point and
+$W, D_1, D_2$ are material parameters. $W$ is the maximum
+compactive volumetric plastic strain, essentially the initial
+porosity: as $X \to -\infty$, $\varepsilon_v^p \to -W$ and all
+porosity has been crushed out. The denominator in $h^\kappa$ is
+evaluated by the chain rule
+$(\partial\varepsilon_v^p/\partial X)(\mathrm{d}X/\mathrm{d}\kappa)$
+in \texttt{compute\_dedkappa}.
 
-\section{Explicit Integration --- \texttt{CapExplicit}}
-\label{sec:explicit}
+\emph{Convention note.} The crush curve in Eq.~\eqref{eq:kappa} is
+parametrized by the \emph{yield} cap position $X(\kappa)$ of
+Eq.~\eqref{eq:X} --- parameters $R, D, \theta$ --- because $X$ is the
+measurable hydrostatic elastic limit against which the curve is
+calibrated. The LAME reference computes
+$\mathrm{d}X/\mathrm{d}\kappa = 1 - R\,\mathrm{d}F_f/\mathrm{d}\kappa$
+accordingly. The pre-2026 LCM code used the potential-surface
+quantities ($Q, L, \phi$) here, which is wrong for non-associative
+parameters (Appendix~\ref{sec:history}).
 
-\texttt{CapExplicit} implements Algorithms~1--2 of
-\citet{Sun.Chen.Ostien:2014} at a single quadrature point with
-input state $\{\stress_n, \backstress_n, \kappa_n\}$ and strain
-increment $\strainincr$.
+Two safeguards from the LAME reference, absent from the papers,
+apply wherever $\kappa$ is updated:
+\begin{itemize}
+\item \emph{No cap contraction:} increments of $\kappa$ are clamped
+      to $\Delta\kappa \le 0$ (LAME:
+      \texttt{HK = MIN(HK,0)}, comment ``prevents cap
+      contraction''). Dilation never re-opens porosity.
+\item \emph{Cap lock at full compaction:} when
+      $|\varepsilon_v^p(\kappa)| \ge W$ the crush curve is exhausted,
+      its slope vanishes, and $h^\kappa$ as written diverges.
+      Following the reference, $h^\kappa$ is then set to
+      $-0.01\,K^2$ ($K$ the bulk modulus), which races the cap toward
+      $-\infty$ so that pore-collapse plasticity shuts off rather
+      than stalling against an immobile cap.
+\end{itemize}
 
+\section{Integration: Substepped Explicit Scheme}
+\label{sec:integration}
+
+The integrator is the refined explicit scheme of
+\citet[Algorithms~1--2]{Sun.Chen.Ostien:2014}, upgraded with the
+adaptive substepping of \citet{Sloan.Abbo.Sheng:2001}: within the
+plastic part of a strain increment, modified-Euler (RK1/RK2) pairs
+advance the state, the difference between the two estimates supplies
+a local error measure that controls substep size, and every accepted
+substep is followed by a drift correction back to the yield surface.
+
+\paragraph{Rate evaluation.}
+At state $\{\stress, \backstress, \kappa\}$, for a substrain
+$\strainincr_{\mathrm{sub}}$, the consistency condition
+$\dot f = 0$ gives
+\begin{equation}
+  \Delta\gamma \;=\;
+  \frac{(\partial f/\partial \stress) : \Celast :
+        \strainincr_{\mathrm{sub}}}{\chi},
+  \qquad
+  \chi \;=\; \tfrac{\partial f}{\partial \stress}
+            :\Celast:\tfrac{\partial g}{\partial \stress}
+          - \tfrac{\partial f}{\partial \backstress}:\halpha
+          - \tfrac{\partial f}{\partial \kappa}\,h^{\kappa},
+  \label{eq:dgamma}
+\end{equation}
+with $\partial f/\partial\backstress = -\partial f/\partial\stress$.
+$\Delta\gamma$ is clamped at zero (elastic unloading within a
+substep), and the increments are
+\begin{equation}
+  \Delta\stress = \Celast : \strainincr_{\mathrm{sub}}
+                - \Delta\gamma\,\Celast : \tfrac{\partial g}{\partial\stress},
+  \qquad
+  \Delta\backstress = \Delta\gamma\,\halpha,
+  \qquad
+  \Delta\kappa = \min(0,\,\Delta\gamma\,h^{\kappa}).
+  \label{eq:rates}
+\end{equation}
+
+\paragraph{Algorithm.}
+With input state $\{\stress_n, \backstress_n, \kappa_n\}$ and strain
+increment $\strainincr$:
 \begin{enumerate}
-\item \emph{Elastic trial} via~\eqref{eq:trial_small};
-      $\backstress^{\mathrm{tr}} = \backstress_n$,
-      $\kappa^{\mathrm{tr}} = \kappa_n$.
-\item Evaluate $f^{\mathrm{tr}} =
-      f(\stress^{\mathrm{tr}}, \backstress^{\mathrm{tr}},
-        \kappa^{\mathrm{tr}})$. If $f^{\mathrm{tr}} \le 0$, accept
-      the elastic trial and stop.
-\item \emph{Initial plastic predictor} with derivatives evaluated at
-      $\stress_n$ (the pre-trial stress),
-      \begin{equation}
-        \Delta\gamma \;=\;
-        \frac{(\partial f/\partial \stress) : \Celast : \strainincr}
-             {\chi},
-        \qquad
-        \chi \;=\; \tfrac{\partial f}{\partial \stress}
-                  :\Celast:\tfrac{\partial g}{\partial \stress}
-                - \tfrac{\partial f}{\partial \backstress}:\halpha
-                - \tfrac{\partial f}{\partial \kappa}\,h^{\kappa}.
-        \label{eq:dgamma_pred}
-      \end{equation}
-      Update
-      $\stress \gets \stress^{\mathrm{tr}}
-        - \Delta\gamma\,\Celast:\partial g/\partial \stress$,
-      $\backstress \gets \backstress^{\mathrm{tr}}
-        + \Delta\gamma\,\halpha$,
-      $\kappa \gets \kappa^{\mathrm{tr}}
-        + \min(0,\,\Delta\gamma\,h^{\kappa})$;
-      the $\min$ enforces the monotonicity requirement that the cap
-      hardens only toward the origin.
-\item \emph{Stress-drift correction} (Algorithm~2). Repeat while
-      $|f| > $ tol and iter $<$ max$_{\mathrm{iter}}$:
+\item \emph{Elastic trial} via~\eqref{eq:trial_small}. If
+      $f(\stress^{\mathrm{tr}}, \backstress_n, \kappa_n) \le 0$,
+      accept the trial and stop.
+\item \emph{Substepping}, starting from the converged state (not the
+      trial), with pseudo-time $T \in [0,1]$, $\Delta T = 1$
+      initially, and $\Delta T_{\min} = 1/\texttt{Maximum Substeps}$.
+      While $T < 1$:
       \begin{enumerate}
-      \item $\delta\gamma \gets f/\chi$ with $\chi$ re-evaluated at
-            the current $\{\stress, \backstress, \kappa\}$.
-      \item Form the trial update $\{\stress^k, \backstress^k,
-            \kappa^k\}$ via the same rules as Step~3.
-      \item If the trial increases $|f|$, fall back to a pure
-            \emph{normal correction}:
-            $\delta\gamma = f/\|\partial f/\partial \stress\|^2$,
-            update only $\stress \gets \stress - \delta\gamma\,
-            \partial f/\partial \stress$, hold
-            $\backstress, \kappa$ fixed.
-      \item Commit the update; accumulate $\Delta\gamma$.
+      \item Evaluate the increments \eqref{eq:rates} at the current
+            state for $\strainincr_{\mathrm{sub}}
+            = \Delta T\,\strainincr$ (RK1), and again at the
+            RK1-advanced state (RK2).
+      \item Form the modified-Euler state from the average of the two
+            increment sets, and the relative error estimate
+            \begin{equation}
+              R \;=\; \frac{\|\Delta\stress_2 - \Delta\stress_1\|}
+                           {2\,\max(\|\stress_{\mathrm{new}}\|,\,
+                            \epsilon)} .
+            \end{equation}
+      \item If $R > \texttt{Substep Tolerance}$ and
+            $\Delta T > \Delta T_{\min}$: reject, set
+            $\Delta T \leftarrow
+            \max\bigl(0.9\sqrt{\mathrm{STOL}/R},\,0.1\bigr)\,\Delta T$
+            (floored at $\Delta T_{\min}$), retry.
+      \item Otherwise accept: apply the drift correction below,
+            advance $T \leftarrow T + \Delta T$, and grow
+            $\Delta T \leftarrow
+            \min\bigl(0.9\sqrt{\mathrm{STOL}/R},\,1.1\bigr)\,\Delta T$,
+            capped at $1 - T$.
       \end{enumerate}
-\item Recover the plastic strain increment through elastic compliance,
+\item \emph{Plastic strain increment} recovered through elastic
+      compliance,
       \begin{equation}
         \Delta\pstrain \;=\; (\Celast)^{-1} : (\stress^{\mathrm{tr}}
                                               - \stress_{n+1}),
       \end{equation}
-      and update the history variables
+      from which the outputs
       $\varepsilon_v^p \mathrel{+}= \trace\Delta\pstrain$ and
       $\varepsilon_{\mathrm{eqps}} \mathrel{+}=
-      \sqrt{\tfrac{2}{3}}\,\|\dev\Delta\pstrain\|$.
+      \sqrt{\tfrac{2}{3}}\,\|\dev\Delta\pstrain\|$ are accumulated.
 \end{enumerate}
 
-The derivatives $\partial f/\partial \stress$,
-$\partial g/\partial \stress$, $\partial f/\partial \kappa$, and
-$\halpha$ needed by the corrector are provided in closed form
-in \texttt{CapExplicit\_Def.hpp}
-(\texttt{compute\_dfdsigma}, \texttt{compute\_dgdsigma},
-\texttt{compute\_dfdkappa}, \texttt{compute\_halpha}). These are the
-only hand-coded derivatives in the explicit path.
-
-\section{Implicit Integration --- \texttt{CapImplicit}}
-\label{sec:implicit}
-
-\texttt{CapImplicit} replaces the explicit corrector by a fully
-implicit backward-Euler step. The unknown vector packs the symmetric
-stress (6 components), the deviatoric back stress (5 independent
-components; $\alpha_{33} = -\alpha_{11} - \alpha_{22}$), the cap
-parameter, and the plastic multiplier:
+\paragraph{Drift correction.}
+Explicit updates do not satisfy $f = 0$ exactly. After each accepted
+substep, while $|f| > f_{\mathrm{tol}}$ and fewer than 20 iterations:
+\begin{enumerate}
+\item \emph{Consistent correction:} $\delta\gamma = f/\chi$ with all
+      quantities at the current state; update
+      $\stress \leftarrow \stress
+       - \delta\gamma\,\Celast:\partial g/\partial\stress$,
+      $\backstress \leftarrow \backstress + \delta\gamma\,\halpha$,
+      $\kappa \leftarrow \kappa + \min(0, \delta\gamma\,h^\kappa)$.
+\item \emph{Normal-correction fallback:} if the consistent correction
+      increases $|f|$, discard it and instead project geometrically,
+      \begin{equation}
+        \delta\gamma \;=\;
+          \frac{f}{\partial_\sigma f : \partial_\sigma f},
+        \qquad
+        \stress \leftarrow \stress
+          - \delta\gamma\,\frac{\partial f}{\partial\stress},
+      \end{equation}
+      holding $\backstress, \kappa$ fixed. This is the
+      \citet{Sloan.Abbo.Sheng:2001} form; the version printed in
+      \citet{Sun.Chen.Ostien:2014} is dimensionally inconsistent
+      (Section~\ref{sec:scope}).
+\end{enumerate}
+The yield function has units of stress squared, so the drift
+tolerance is scaled to make the convergence test independent of the
+unit system:
 \begin{equation}
-  \unkvec \;=\;
-  \bigl(\sigma_{11}, \sigma_{22}, \sigma_{33},
-        \sigma_{23}, \sigma_{13}, \sigma_{12},
-        \alpha_{11}, \alpha_{22},
-        \alpha_{23}, \alpha_{13}, \alpha_{12},
-        \kappa, \Delta\gamma\bigr), \qquad \dim \unkvec = 13.
+  f_{\mathrm{tol}} \;=\; 10^{-12}\,E^2 .
 \end{equation}
-The backward-Euler residual $\resvec(\unkvec) = ~0$ reads
-\begin{align}
-  \resvec_\sigma&\!: \ \
-    \stress - \stress^{\mathrm{tr}}
-    + \Delta\gamma\,\Celast : \frac{\partial g}{\partial \stress}
-    \;=\; ~0, \label{eq:R_sigma}\\
-  \resvec_\alpha&\!: \ \
-    \backstress - \backstress_n
-    - \Delta\gamma\,\halpha \;=\; ~0, \label{eq:R_alpha}\\
-  R_\kappa&\!: \ \
-    \kappa - \kappa_n - \Delta\gamma\,h^{\kappa} \;=\; 0,
-    \label{eq:R_kappa}\\
-  R_\gamma&\!: \ \
-    f(\stress, \backstress, \kappa) \;=\; 0. \label{eq:R_gamma}
-\end{align}
-Equations \eqref{eq:R_sigma}--\eqref{eq:R_gamma} are solved by local
-Newton iteration. A monotonicity guard $\Delta\kappa \le 0$ is applied
-at each step (reject the Newton step and hold $\kappa$ fixed if it
-would increase).
+(The historical absolute tolerance of $10^{-10}$ was unreachable in
+Pa-based unit systems, so the corrector always ran to its iteration
+cap.)
 
-\paragraph{Local Jacobian via automatic differentiation.}
-Inside \texttt{compute\_ResidJacobian} the 13 unknowns are promoted
-to \texttt{Sacado\bcc Fad\bcc DFad} dual numbers, and the residual
-\eqref{eq:R_sigma}--\eqref{eq:R_gamma} is evaluated in a single pass
-with $f$, $g$, and $\partial g/\partial \stress$ computed from the
-templated kernels \texttt{compute\_f}, \texttt{compute\_g},
-\texttt{compute\_dgdsigma}. The $13 \times 13$ local Jacobian
-$\partial \resvec/\partial \unkvec$ is read directly off the Fad
-partial derivatives. No closed-form derivatives of the residual are
-written in the implicit path.
+\paragraph{Branch consistency under AD.}
+The substep control flow (acceptance, rejection, step growth)
+branches on Sacado \emph{values}, so the Residual and Jacobian
+evaluations of the same state take identical branch sequences and the
+AD tangent differentiates exactly the code path that produced the
+stress.
 
-\section{Finite-Deformation Extension}
+\paragraph{Material parameters of the integrator.}
+\texttt{Substep Tolerance} (STOL, default $10^{-4}$) and
+\texttt{Maximum Substeps} (default 200). A rejected attempt counts
+toward an overall attempt cap of $4\times$\texttt{Maximum Substeps}.
+
+\paragraph{Hand-coded derivatives.}
+The closed-form constitutive derivatives
+$\partial f/\partial \stress$, $\partial g/\partial \stress$,
+$\partial f/\partial \kappa$, $\halpha$, and
+$\partial\varepsilon_v^p/\partial\kappa$ are provided in
+\texttt{CapModel\_Def.hpp} (\texttt{compute\_dfdsigma},
+\texttt{compute\_dgdsigma}, \texttt{compute\_dfdkappa},
+\texttt{compute\_halpha}, \texttt{compute\_dedkappa}). The only
+nontrivial tensor derivative among them is
+\begin{equation}
+  \frac{\partial J_3}{\partial \stress}
+  \;=\; \sdev\cdot\sdev - \tfrac{2}{3} J_2\,\ident ,
+  \label{eq:dJ3}
+\end{equation}
+a matrix product, \emph{not} the elementwise square of $\sdev$; the
+two coincide only in principal axes (Appendix~\ref{sec:history}).
+Every one of these closed forms is checked against complex-step
+differentiation by the verification suite
+(Section~\ref{sec:verification}).
+
+\section{Finite-Deformation Kinematics}
 \label{sec:finite}
 
-\citet{Sun.Chen.Ostien:2014} state the constitutive model in the
-small-strain regime. LCM extends both \texttt{CapExplicit} and
-\texttt{CapImplicit} to finite deformation by a multiplicative
-elastic/plastic split combined with a logarithmic-strain /
-Kirchhoff-stress representation,
-\begin{equation}
-  \Fdef \;=\; ~F^e\,\Fplas,
-  \qquad
-  \bee \;=\; \Fdef\,\Fplas^{-1}\,(\Fplas^{-1})^{\mathrm{T}}\,\transpose{\Fdef},
-\end{equation}
-so that the algorithm of Sections~\ref{sec:explicit}
-and~\ref{sec:implicit} is run verbatim on the Kirchhoff stress
-$\kirch$. At each quadrature point with incoming $\Fdef$ and stored
-$\Fplas_n$:
+With \texttt{Finite Deformation: true} the model uses the
+multiplicative split and the isotropic logarithmic-strain /
+Kirchhoff-stress framework
+\citep{Simo:1992}: because every constitutive function in
+Sections~\ref{sec:yield}--\ref{sec:flow} is an isotropic function of
+its tensor arguments, the small-strain integrator of
+Section~\ref{sec:integration} runs \emph{unchanged} with the
+Kirchhoff stress $\kirch$ and the logarithmic elastic strain in the
+slots that otherwise hold $\stress$ and $~\varepsilon$. Only the
+kinematic pre- and post-processing differ. At each quadrature point,
+with incoming $\Fdef$, stored $\Fplas_n$, and the deformation
+gradient $\Fdef_n$ of the previous converged step:
 \begin{enumerate}
 \item \emph{Trial elastic left Cauchy--Green tensor} from the stored
-      plastic configuration,
+      plastic configuration
+      ($~C_p^{-1} = (\Fplas_n)^{-1}(\Fplas_n)^{-\mathrm{T}}$),
       \begin{equation}
-        \bee^{\mathrm{tr}} \;=\;
-        \Fdef\,(\Fplas)_n^{-1}\,((\Fplas)_n^{-1})^{\mathrm{T}}\,\transpose{\Fdef}.
-      \end{equation}
-\item \emph{Trial logarithmic elastic strain},
-      \begin{equation}
+        \bee^{\mathrm{tr}} \;=\; \Fdef\,~C_p^{-1}\,\transpose{\Fdef},
+        \qquad
         \estrain^{\mathrm{tr}} \;=\;
         \tfrac{1}{2}\,\log_{\mathrm{sym}}\bee^{\mathrm{tr}},
-        \label{eq:logstrain}
       \end{equation}
-      with $\log_{\mathrm{sym}}$ the symmetric principal logarithm.
-\item \emph{Trial Kirchhoff stress},
+      with $\log_{\mathrm{sym}}$ the principal (spectral) logarithm.
+\item \emph{Starting stress and strain increment.} The elastic
+      logarithmic strain at $t_n$ is recovered from the same plastic
+      configuration and the old deformation gradient,
       \begin{equation}
-        \kirch^{\mathrm{tr}} \;=\;
-        \lambda\,\trace(\estrain^{\mathrm{tr}})\,~I
-        + 2\mu\,\estrain^{\mathrm{tr}}.
+        \estrain_n \;=\;
+        \tfrac{1}{2}\,\log_{\mathrm{sym}}
+        \bigl(\Fdef_n\,~C_p^{-1}\,\transpose{(\Fdef_n)}\bigr),
+        \qquad
+        \kirch_n = \Celast : \estrain_n,
+        \qquad
+        \strainincr = \estrain^{\mathrm{tr}} - \estrain_n .
       \end{equation}
-\item \emph{Run the small-strain return mapping of
-      Section~\ref{sec:explicit} or~\ref{sec:implicit} on} $\kirch$.
-      Because the invariants $I_1, J_2^\xi, J_3^\xi$, the Lode
-      coefficient $\Gamma$, the surfaces $F_f, F_c, X$, the flow
-      direction $\partial g/\partial \stress$, and the hardening
-      functions $\halpha, h^{\kappa}$ are all isotropic functions of
-      the stress tensor, the return-mapping-in-principal-log-strain
-      result of \citet{Simo:1992} applies: the integrator of
-      Section~\ref{sec:explicit} (or the implicit residual
-      \eqref{eq:R_sigma}--\eqref{eq:R_gamma}) is run with
-      $\kirch, \estrain$ in the slots that previously held
-      $\stress, ~\varepsilon$, without any change to the return map
-      or hardening code.
-\item \emph{Plastic deformation-gradient update} by the exponential
-      map of the converged flow direction,
+      The integrator then starts from $\kirch_n$ with increment
+      $\strainincr$, so its trial stress
+      $\kirch_n + \Celast:\strainincr = \Celast:\estrain^{\mathrm{tr}}$
+      is \emph{exact} for the hyperelastic logarithmic model: the
+      incremental form introduces no approximation in the elastic
+      relation.
+\item \emph{Return mapping} of Section~\ref{sec:integration} on
+      $\kirch$, yielding $\kirch_{n+1}, \backstress_{n+1},
+      \kappa_{n+1}$.
+\item \emph{Plastic configuration update.} The new elastic
+      logarithmic strain follows from the returned stress,
+      $\estrain_{n+1} = (\Celast)^{-1}:\kirch_{n+1}$, whence
       \begin{equation}
-        \Fplas_{n+1} \;=\;
-        \exp\!\left(
-          \Delta\gamma\,\frac{\partial g}{\partial \kirch}\bigg|_{n+1}
-        \right) \Fplas_n .
-        \label{eq:Fp_update}
+        \bee_{n+1} = \exp_{\mathrm{sym}}(2\,\estrain_{n+1}),
+        \qquad
+        ~C_{p,n+1}^{-1} = \Fdef^{-1}\,\bee_{n+1}\,\Fdef^{-\mathrm{T}},
+        \qquad
+        \Fplas_{n+1} = \bigl(~C_{p,n+1}\bigr)^{1/2},
       \end{equation}
-\item \emph{Cauchy stress} recovered for assembly,
-      \begin{equation}
-        \stress_{n+1} \;=\; \kirch_{n+1} / J,
-        \qquad J \;=\; \det\Fdef.
-      \end{equation}
+      where the last expression is the symmetric positive-definite
+      square root. The rotational part of $\Fplas$ is unobservable in
+      an isotropic model, so the symmetric root is a legitimate
+      representative; no exponential map of the flow direction is
+      formed explicitly --- it is absorbed in the spectral
+      $\log$/$\exp$ of $\bee$.
+\item \emph{Cauchy stress} for assembly,
+      $\stress_{n+1} = \kirch_{n+1}/J$ with $J = \det\Fdef$.
 \end{enumerate}
+The stored state in this mode is $\Fplas$ (identity-initialized)
+plus the deformation gradient history that
+\texttt{MechanicsProblem} already maintains; the small-strain mode
+stores the strain tensor instead. All other state (stress, back
+stress, $\kappa$, $\varepsilon_{\mathrm{eqps}}$, $\varepsilon_v^p$)
+is common.
 
-\noindent
-The small-strain and finite-deformation branches share
-\texttt{compute\_f}, \texttt{compute\_g}, \texttt{compute\_dfdsigma},
-\texttt{compute\_dgdsigma}, \texttt{compute\_halpha},
-\texttt{compute\_dedkappa}, and \texttt{compute\_dfdkappa} without
-modification; only the kinematic pre/post-processing
-(Steps~1--3, 5--6 above) and the stored state variables
-(\texttt{Strain}/\texttt{Strain\_old} vs.\ \texttt{F}/\texttt{Fp}
-plus \texttt{Fp\_old}) differ.
+This wrapper is independent of how the inner return mapping is
+integrated, which is why the desire for finite-deformation support
+had no bearing on the decision to remove the implicit integrator.
 
-\section{Tangents Are Not Needed: Automatic Differentiation}
+\section{Tangents Are Not Hand-Coded: Automatic Differentiation}
 \label{sec:ad}
 
-\citet{Sun.Chen.Ostien:2014} present the constitutive equations but
-do not document the consistent algorithmic tangent
-$\partial \stress_{n+1}/\partial ~\varepsilon_{n+1}$, nor the
-finite-deformation counterpart $\partial \kirch/\partial \Fdef$.
-\textbf{LCM does not need either tangent}, for three related reasons.
+\citet{Sun.Chen.Ostien:2014} do not document a consistent algorithmic
+tangent $\partial \stress_{n+1}/\partial ~\varepsilon_{n+1}$, nor a
+finite-deformation counterpart. LCM does not need either. LCM's
+evaluators are templated on an evaluation trait; for
+\texttt{PHAL\bcc AlbanyTraits\bcc Jacobian} every field entering the
+kernel --- strain or deformation gradient, stored state, every
+intermediate of the return mapping --- carries a Sacado forward-mode
+AD type whose active directions are the element-level global degrees
+of freedom. The entire integrator (trial, substepping, drift
+correction, finite-deformation pre/post-processing) executes in AD
+arithmetic, and the derivative of the output stress with respect to
+every element DOF emerges as a by-product. Because the substep
+control flow branches on Sacado values
+(Section~\ref{sec:integration}), the differentiated path is exactly
+the primal path. Sensitivities with respect to material parameters
+(for calibration and inverse problems) are generated by the same
+mechanism. The only hand-coded derivatives in the model are the
+\emph{constitutive} ones listed in Section~\ref{sec:integration} ---
+part of the model's definition, not of its integrator.
 
-First, LCM's evaluators are templated on an evaluation trait. For
-the \texttt{PHAL\bcc AlbanyTraits\bcc Jacobian} trait, all fields --- the
-deformation gradient $\Fdef$, the strain tensor, the stored state
-inputs, and every intermediate quantity in the return mapping ---
-carry a Sacado forward-mode AD type whose active directions are the
-element-level global degrees of freedom. When the Cap kernels execute
-under this trait, the entire return-mapping code path (elastic
-trial, yield check, corrector iterations, $\Fplas$ update, Cauchy
-conversion) is run in AD arithmetic. The derivative of the output
-stress with respect to every element DOF is produced as a by-product
-of the primal evaluation. This is the global analogue of an
-algorithmic consistent tangent, generated without any tangent-
-specific code path.
+\section{Verification}
+\label{sec:verification}
 
-Second, inside \texttt{CapImplicit} the local 13-equation
-backward-Euler solve \eqref{eq:R_sigma}--\eqref{eq:R_gamma} requires
-the local Jacobian $\partial \resvec/\partial \unkvec$. LCM runs
-the residual assembly in a nested inner AD (\texttt{DFadType}) of
-dimension 13 and harvests the local Jacobian directly from the Fad
-partials. Global sensitivities are then propagated through the
-converged local solution by
-\texttt{LocalNonlinearSolver\bcc computeFadInfo}, which applies the
-implicit-function theorem automatically so that the outer (global)
-Fad seeds are recovered correctly.
+The implementation is verified, not merely regression-tested, by the
+infrastructure in \texttt{tests/LCM/CapModelPlasticity3D}:
 
-Third, sensitivities with respect to material parameters (for
-calibration or inverse problems) are generated by the same
-mechanism: material parameters registered through Albany's
-distributed parameter library are promoted to AD active directions,
-and their derivatives flow through the Cap kernels verbatim.
+\paragraph{Independent reference implementation.}
+\texttt{cap\_reference.py} is a deliberately separate transcription
+of the model from the publications --- not a port of the C++. It
+evaluates all stress gradients by complex-step differentiation
+(machine-exact for the analytic branches), so the C++ closed-form
+derivatives and the reference share no code and no derivation. Its
+self-check verifies, among other identities, the $J_3$ derivative
+\eqref{eq:dJ3} against complex step at a generic (non-principal-axes)
+state, where the elementwise-square error would be $O(10^2)$ in
+stress-squared units.
 
-The only derivatives that are hand-coded in either Cap model are the
-physical ones: the flow direction $\partial g/\partial \stress$, the
-hardening slopes $\halpha, h^{\kappa},
-\partial \varepsilon_v^p/\partial \kappa$, and (in the explicit
-path only) $\partial f/\partial \stress$ and
-$\partial f/\partial \kappa$. These are \emph{constitutive
-derivatives} --- part of the definition of the model --- not
-\emph{algorithmic} derivatives of the integrator. All algorithmic
-tangents (local, global, consistent, parameter-sensitivity) are
-produced by AD.
+\paragraph{Material-point exactness of the test problems.}
+Each verification problem is a single hexahedral element whose 24
+degrees of freedom are all prescribed by face boundary conditions.
+With no free degrees of freedom, the finite-element problem \emph{is}
+the material point: no equilibrium iteration intervenes between the
+prescribed strain history and the constitutive response, and the
+comparison with the reference is exact rather than approximate. (The
+importance of this is not academic: on a $2\times2\times2$ mesh the
+same problem bifurcated away from the homogeneous solution when the
+unclamped $G^\alpha$ defect of Appendix~\ref{sec:history} was
+present.)
+
+\paragraph{Load paths and results.}
+Five paths are compared state-by-state (stress components, $\kappa$,
+$\varepsilon_v^p$) over their full histories against the reference,
+which runs the identical substepping algorithm:
+\begin{center}
+\small
+\begin{tabular}{lp{3.4cm}p{4.4cm}l}
+\toprule
+Test & Path & Exercises & Max.\ rel.\ diff. \\
+\midrule
+\texttt{hydrostatic} & $~\varepsilon = -0.02\,t\,\ident$ &
+  cap only; analytic identities & $\sim 10^{-14}$ \\
+\texttt{confined} & $\varepsilon_{xx} = -0.04\,t$, 200 steps &
+  shear--cap interaction, $\backstress$ to limit & $\sim 10^{-15}$ \\
+\texttt{triaxial} & unequal normal strains &
+  $\psi = 0.8$ (Lode), non-associative & $\sim 10^{-15}$ \\
+\texttt{confined\_coarse} & confined, 20 steps &
+  substep rejection/regrowth & $\sim 10^{-15}$ \\
+\texttt{confined\_fd}, \texttt{triaxial\_fd} & as above, finite deformation &
+  $\log$/$\exp$ kinematics & $\sim 10^{-12}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The hydrostatic path additionally checks two analytic identities: on
+the hydrostat the converged stress must satisfy $I_1 = X(\kappa)$
+(observed to $\sim 10^{-13}$), and the accumulated
+$\varepsilon_v^p$ must follow the crush curve of
+Eq.~\eqref{eq:kappa} (observed to the per-step consistency error of
+the discretization). The finite-deformation comparisons carry the
+slightly larger $\sim 10^{-12}$ floor of the eigendecomposition
+round-trips. The comparisons require \texttt{python3} with
+\texttt{numpy} and \texttt{netCDF4} and are skipped with a status
+message when these are unavailable.
+
+\section{Material Parameters}
+\label{sec:parameters}
+
+All parameters are read from the material database with the names
+below. The Salem limestone values are the associative set of
+\citet[Table~1]{Sun.Chen.Ostien:2014}; stress-like quantities in MPa.
+
+\begin{center}
+\small
+\begin{tabular}{llrp{6.4cm}}
+\toprule
+Input name & Symbol & Salem & Meaning \\
+\midrule
+\texttt{A}       & $A$        & 689.2    & saturated shear strength \\
+\texttt{C}       & $C$        & 675.2    & strength deficit at zero pressure ($A{-}C$ = cohesion-like intercept) \\
+\texttt{D}       & $D$        & 3.94e-4  & pressure scale of the exponential, yield surface \\
+\texttt{theta}   & $\theta$   & 0.0      & linear pressure slope, yield surface \\
+\texttt{N}       & $N$        & 6.0      & offset of initial yield below failure envelope \\
+\texttt{R}       & $R$        & 28.0     & cap aspect ratio, yield surface \\
+\texttt{kappa0}  & $\kappa_0$ & $-8.05$  & initial cap branch point \\
+\texttt{W}       & $W$        & 0.08     & maximum compactive volumetric plastic strain ($\approx$ porosity) \\
+\texttt{D1}      & $D_1$      & 1.47e-3  & crush-curve shape (linear) \\
+\texttt{D2}      & $D_2$      & 0.0      & crush-curve shape (quadratic) \\
+\texttt{calpha}  & $c^\alpha$ & 1.0e5    & kinematic hardening rate \\
+\texttt{psi}     & $\psi$     & 1.0      & triaxial extension/compression strength ratio \\
+\texttt{L}       & $L$        & 3.94e-4  & pressure scale, plastic potential \\
+\texttt{phi}     & $\phi$     & 0.0      & linear pressure slope, plastic potential \\
+\texttt{Q}       & $Q$        & 28.0     & cap aspect ratio, plastic potential \\
+\midrule
+\texttt{Substep Tolerance} & STOL & $10^{-4}$ &
+  relative stress-error target per substep \\
+\texttt{Maximum Substeps}  & ---  & 200 &
+  smallest substep is $1/$this fraction of the increment \\
+\texttt{Finite Deformation} & --- & false &
+  $\log$/Kirchhoff kinematics of Section~\ref{sec:finite} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For orientation with the Salem values: the initial hydrostatic crush
+strength is $X_0 = \kappa_0 - R\,F_f(\kappa_0) \approx -460$~MPa,
+i.e.\ pore collapse under pure pressure begins near
+$p \approx 153$~MPa, while the cap branch point sits at only
+$8$~MPa --- a long, flat cap, typical for porous rock.
+
+\appendix
+
+\section{Revision History of the Formulation}
+\label{sec:history}
+
+In 2026 the implementation was audited line-by-line against the
+sources listed in Section~\ref{sec:scope}, treating the code as
+unreliable, and then verified against the independent reference of
+Section~\ref{sec:verification}. Results produced with the pre-audit
+code differ from the current model in the following ways; all four
+defects are absent from every published validation case, which is
+why they survived.
+
+\begin{enumerate}
+\item \emph{$\partial J_3/\partial\stress$ used the elementwise
+      square} $s_{ij} s_{ij}$ (no sum) instead of the matrix product
+      $(\sdev\cdot\sdev)_{ij}$ in Eq.~\eqref{eq:dJ3}. The two agree
+      in principal axes and the term is multiplied by
+      $\mathrm{d}\Gamma/\mathrm{d}J_3 \propto (1 - 1/\psi)$, so any
+      run with $\psi = 1$ --- including all of
+      \citet{Sun.Chen.Ostien:2014} --- never exercised it. Runs with
+      $\psi \ne 1$ received wrong plastic flow directions off the
+      principal axes.
+\item \emph{$X^g$ was built from $F_f^g$} ($L, \phi$) instead of the
+      yield $F_f$ ($D, \theta$) required by
+      \citet[Eq.~14]{Regueiro.Foster:2011}; see Eq.~\eqref{eq:Xg}.
+      Invisible for associative parameters.
+\item \emph{The crush-curve derivative used the potential-surface
+      cap position} ($Q, L, \phi$) instead of the yield $X(\kappa)$
+      ($R, D, \theta$); see Eq.~\eqref{eq:kappa}. Invisible for
+      associative parameters.
+\item \emph{$G^\alpha$ was unclamped}, allowing hardening reversal
+      after overshoot of the back-stress limit surface; see
+      Eq.~\eqref{eq:halpha}. This is the likely root cause of the
+      Newton divergence that led to the disabling of the original
+      \texttt{CapModelPlasticity3D} regression tests years earlier.
+\end{enumerate}
+
+In the same effort: the drift tolerance was made unit-system
+invariant ($10^{-12} E^2$); the $\Delta\kappa \le 0$ clamp, present
+in the code but undocumented, was confirmed against the LAME
+reference and documented; the cap lock at full compaction was added
+from the reference; adaptive substepping was added; the implicit
+variant (\texttt{CapImplicit}) was removed; the model was renamed
+from \texttt{CapExplicit} to \texttt{CapModel} with material-database
+name \texttt{Cap}; and the earlier finite-deformation path (which
+skipped the predictor, disabled the normal-correction fallback, and
+updated $\Fplas$ by an exponential map of the final flow direction)
+was replaced by the formulation of Section~\ref{sec:finite}.
 
 \begin{thebibliography}{9}
+
+\bibitem[Fossum and Brannon(2004)]{Fossum.Brannon:2004}
+A.~F. Fossum and R.~M. Brannon.
+\newblock {\em The Sandia GeoModel: Theory and User's Guide}.
+\newblock Sandia Technical Report SAND2004-3226. Sandia National Laboratories,
+  2004.
 
 \bibitem[Fossum and Fredrich(2000)]{Fossum.Fredrich:2000}
 A.~F. Fossum and J.~T. Fredrich.
@@ -543,12 +845,34 @@ A.~F. Fossum and J.~T. Fredrich.
 \newblock Sandia Technical Report SAND2000-1056. Sandia National Laboratories,
   2000.
 
+\bibitem[Foster et~al.(2005)Foster, Regueiro, Fossum, and
+  Borja]{Foster.etal:2005}
+C.~D. Foster, R.~A. Regueiro, A.~F. Fossum, and R.~I. Borja.
+\newblock Implicit numerical integration of a three-invariant,
+  isotropic/kinematic hardening cap plasticity model for geomaterials.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  194:5109--5138, 2005.
+
+\bibitem[Regueiro and Foster(2011)]{Regueiro.Foster:2011}
+R.~A. Regueiro and C.~D. Foster.
+\newblock Bifurcation analysis for a rate-sensitive, non-associative,
+  three-invariant, isotropic/kinematic hardening cap plasticity model for
+  geomaterials: Part I. Small strain.
+\newblock {\em International Journal for Numerical and Analytical Methods in
+  Geomechanics}, 35:201--225, 2011.
+
 \bibitem[Simo(1992)]{Simo:1992}
 J.~C. Simo.
 \newblock Algorithms for static and dynamic multiplicative plasticity that
   preserve the classical return mapping schemes of the infinitesimal theory.
 \newblock {\em Computer Methods in Applied Mechanics and Engineering},
   99(1):61--112, 1992.
+
+\bibitem[Sloan et~al.(2001)Sloan, Abbo, and Sheng]{Sloan.Abbo.Sheng:2001}
+S.~W. Sloan, A.~J. Abbo, and D.~Sheng.
+\newblock Refined explicit integration of elastoplastic models with automatic
+  error control.
+\newblock {\em Engineering Computations}, 18(1/2):121--154, 2001.
 
 \bibitem[Sun et~al.(2014)Sun, Chen, and Ostien]{Sun.Chen.Ostien:2014}
 W.~Sun, Q.~Chen, and J.~T. Ostien.

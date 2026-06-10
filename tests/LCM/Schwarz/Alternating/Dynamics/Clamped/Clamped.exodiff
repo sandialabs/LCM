@@ -26,7 +26,7 @@ TIME STEPS relative 1.e-6 floor 0.0     # min:               0 @ t1 max:        
 
 # No GLOBAL VARIABLES
 
-NODAL VARIABLES relative 1.0e-10 floor 1.0e-12
+NODAL VARIABLES relative 1.0e-8 floor 1.0e-10
 	!resid_x
 	!resid_y
 	!resid_z

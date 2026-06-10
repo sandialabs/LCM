@@ -1,0 +1,9 @@
+group, site, buildname 
+Nightly, proxima.ca.sandia.gov, proxima.ca.sandia.gov-lcm-gcc-release
+Nightly, proxima.ca.sandia.gov, proxima.ca.sandia.gov-lcm-clang-release
+Nightly, proxima.ca.sandia.gov, proxima.ca.sandia.gov-trilinos-gcc-release
+Nightly, proxima.ca.sandia.gov, proxima.ca.sandia.gov-trilinos-clang-release
+Nightly, algol.ca.sandia.gov, algol.ca.sandia.gov-lcm-gcc-release
+Nightly, algol.ca.sandia.gov, algol.ca.sandia.gov-lcm-clang-release
+Nightly, algol.ca.sandia.gov, algol.ca.sandia.gov-trilinos-gcc-release
+Nightly, algol.ca.sandia.gov, algol.ca.sandia.gov-trilinos-clang-release

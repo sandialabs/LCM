@@ -247,9 +247,7 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
     model = rcp(new AnisotropicHyperelasticDamageModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Viscoplastic") {
     model = rcp(new AnisotropicViscoplasticModel<EvalT, Traits>(p, dl));
-  } else if (model_name == "Cap" || model_name == "Cap Explicit") {
-    // "Cap Explicit" accepted for backward compatibility: the implicit
-    // variant was removed, leaving a single cap plasticity model.
+  } else if (model_name == "Cap") {
     model = rcp(new CapModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Creep") {
     model = rcp(new CreepModel<EvalT, Traits>(p, dl));

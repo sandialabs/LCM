@@ -1,11 +1,15 @@
 LCM:
   ElementBlocks:
     Block0:
-      material: CapModel
+      material: CapModelTriaxial
   Materials:
-    # Salem limestone, associative parameter set: Table 1 of Sun, Chen &
-    # Ostien, Acta Geotechnica 9 (2014) 903-934. Units: MPa.
-    CapModel:
+    # Salem limestone variant for verification of the Lode-angle and
+    # non-associative terms: psi=0.8 (Regueiro & Foster 2011 Table I)
+    # activates Gamma(beta) and its J2/J3 derivatives; L != D, phi !=
+    # theta and Q != R activate the non-associative plastic potential,
+    # the X^g(kappa) = kappa - Q*F_f(kappa) convention, and the
+    # yield-X crush curve. Units: MPa.
+    CapModelTriaxial:
       Material Model:
         Model Name: Cap
       # Small-strain model: this flag routes MechanicsProblem to compute
@@ -16,15 +20,15 @@ LCM:
       A: 689.2
       D: 0.000394
       C: 675.2
-      theta: 0.0
+      theta: 0.1
       R: 28.0
       kappa0: -8.05
       W: 0.08
       D1: 0.00147
       D2: 0.0
       calpha: 100000.0
-      psi: 1.0
+      psi: 0.8
       N: 6.0
-      L: 0.000394
-      phi: 0.0
-      Q: 28.0
+      L: 0.00035
+      phi: 0.085
+      Q: 20.0

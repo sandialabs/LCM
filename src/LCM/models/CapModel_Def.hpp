@@ -233,6 +233,7 @@ CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
     else
       dgamma = 0.0;
 
+
     // initial update
     sigmaVal -= dgamma * minitensor::dotdot(Celastic, dgdsigma_loc);
     alphaVal += dgamma * halpha_loc;
@@ -550,9 +551,18 @@ template <typename EvalT, typename Traits>
 typename CapModelKernel<EvalT, Traits>::ScalarT
 CapModelKernel<EvalT, Traits>::compute_Galpha(ScalarT& J2_alpha) const
 {
-  if (N_ != 0)
-    return 1.0 - std::pow(J2_alpha, 0.5) / N_;
-  else
+  // Clamped at zero, as in the LAME GeoModel reference (GFUN is floored
+  // at 0): once the backstress reaches its limit surface, kinematic
+  // hardening stops. Without the clamp, explicit-integration overshoot
+  // (sqrt(J2_alpha) slightly > N) makes Galpha negative, REVERSING the
+  // hardening direction -- which destabilizes the homogeneous solution
+  // of multi-element problems (observed as a bifurcation in the
+  // verification study). The papers omit the clamp.
+  if (N_ != 0) {
+    ScalarT Galpha = 1.0 - std::pow(J2_alpha, 0.5) / N_;
+    if (Galpha < 0.0) Galpha = 0.0;
+    return Galpha;
+  } else
     return 0.0;
 }
 

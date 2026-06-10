@@ -1,31 +1,57 @@
-# Copy Input files from source to binary dir
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_explicit.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/input_explicit.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input_explicit_fd.yaml
-               ${CMAKE_CURRENT_BINARY_DIR}/input_explicit_fd.yaml COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials.yaml
-	       ${CMAKE_CURRENT_BINARY_DIR}/materials.yaml COPYONLY)
+# Cap plasticity model verification tests.
+#
+# The model response (single element, all DOFs prescribed -> true material
+# point) is compared time-step by time-step against an independent
+# reference implementation (cap_reference.py) transcribed directly from
+# the publications, with complex-step derivatives. Three load paths:
+#
+#   hydrostatic - cap-only response; additionally checks the analytic
+#                 identities I1 = X(kappa) and the crush curve.
+#   confined    - 1D compression (Sun, Chen & Ostien 2014, Sec. 5.1):
+#                 shear + cap interaction, kinematic hardening to its
+#                 limit surface.
+#   triaxial    - psi = 0.8 (Lode-angle terms active) + fully
+#                 non-associative parameters (L, phi, Q distinct).
+#
+# The comparisons require python3 with numpy and netCDF4; the tests are
+# skipped (with a status message) when unavailable.
 
-# All four CapModelPlasticity3D tests are temporarily disabled while the
-#
-# The Explicit variants (1, 2) hit a Newton divergence at LOCA continuation
-# step ~35 (load time ~0.4375): both rigel (Zen 4) and algol (Haswell)
-# arrive at the same state (||F|| = 2.420e+00) bit-for-bit identical up to
-# that step, then Newton fails to recover in this regime. With the previous
-# Maximum Iterations: 10, the early exit happened to leave the solution at
-# a specific value on rigel that became the recorded gold response, but
-# the value is not a true converged solution; with Maximum Iterations: 30
-# both architectures produce different (and equally wrong vs gold) answers.
-# Re-enable once the Cap model handles this regime robustly.
-#
-# global Jacobian.
-#
-# 1. Cap Explicit
-# add_test(CapModelPlasticity3D_Explicit ${SerialAlbany.exe} input_explicit.yaml)
-# set_tests_properties(CapModelPlasticity3D_Explicit PROPERTIES LABELS "LCM;Tpetra;Forward")
-#
-# 2. Cap Explicit FD
-# add_test(CapModelPlasticity3D_ExplicitFD ${SerialAlbany.exe} input_explicit_fd.yaml)
-# set_tests_properties(CapModelPlasticity3D_ExplicitFD PROPERTIES LABELS "LCM;Tpetra;Forward")
-#
-#
+foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
+          materials.yaml materials_triaxial.yaml
+          cap_reference.py cap_verify.py runverify.cmake)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
+                 ${CMAKE_CURRENT_BINARY_DIR}/${f} COPYONLY)
+endforeach()
+
+find_program(PYTHON3_FOR_CAP python3)
+set(CAP_PY_OK FALSE)
+if (PYTHON3_FOR_CAP)
+  execute_process(COMMAND ${PYTHON3_FOR_CAP} -c "import numpy, netCDF4"
+                  RESULT_VARIABLE _cap_py_res
+                  OUTPUT_QUIET ERROR_QUIET)
+  if (_cap_py_res EQUAL 0)
+    set(CAP_PY_OK TRUE)
+  endif()
+endif()
+
+if (CAP_PY_OK)
+  add_test(NAME CapModel_Oracle_SelfCheck
+           COMMAND ${PYTHON3_FOR_CAP} cap_reference.py selfcheck
+           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set_tests_properties(CapModel_Oracle_SelfCheck PROPERTIES LABELS "LCM;Tpetra;Forward")
+
+  foreach(case hydrostatic confined triaxial)
+    add_test(NAME CapModel_Verify_${case}
+             COMMAND ${CMAKE_COMMAND}
+                     "-DTEST_PROG=${SerialAlbany.exe}"
+                     "-DINPUT=input_${case}.yaml"
+                     "-DEXO=cap_${case}.exo"
+                     "-DPATHMODE=${case}"
+                     "-DPYTHON=${PYTHON3_FOR_CAP}"
+                     -P runverify.cmake
+             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    set_tests_properties(CapModel_Verify_${case} PROPERTIES LABELS "LCM;Tpetra;Forward")
+  endforeach()
+else()
+  message(STATUS "CapModel verification tests skipped: python3 with numpy+netCDF4 not found")
+endif()

@@ -1,0 +1,27 @@
+digraph G {
+9 [fontcolor="", label="Scatter<Residual>\n   Evaluates:\n      Scatter:double:<Dummy>(0)\n   Contributes:\n   Dependencies:\n      Displacement Residual:double:<Cell,Node,Dim>(8,8,3)"]
+9->25
+25 [fontcolor="", label="MechanicsResidual<Residual>\n   Evaluates:\n      Displacement Residual:double:<Cell,Node,Dim>(8,8,3)\n   Contributes:\n   Dependencies:\n      FirstPK:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)\n      wGrad BF:double:<Cell,Node,QuadPoint,Dim>(8,8,8,3)\n      wBF:double:<Cell,Node,QuadPoint>(8,8,8)\n      Acceleration:double:<Cell,QuadPoint,Dim>(8,8,3)"]
+25->4
+4 [fontcolor="", label="DOFVecInterpolationBase<Residual>\n   Evaluates:\n      Acceleration:double:<Cell,QuadPoint,Dim>(8,8,3)\n   Contributes:\n   Dependencies:\n      Acceleration:double:<Cell,Node,Dim>(8,8,3)\n      BF:double:<Cell,Node,QuadPoint>(8,8,8)"]
+4->8
+8 [fontcolor="", label="ComputeBasisFunctions<Residual>\n   Evaluates:\n      Weights:double:<Cell,QuadPoint>(8,8)\n      Jacobian Det:double:<Cell,QuadPoint>(8,8)\n      BF:double:<Cell,Node,QuadPoint>(8,8,8)\n      wBF:double:<Cell,Node,QuadPoint>(8,8,8)\n      Grad BF:double:<Cell,Node,QuadPoint,Dim>(8,8,8,3)\n      wGrad BF:double:<Cell,Node,QuadPoint,Dim>(8,8,8,3)\n   Contributes:\n   Dependencies:\n      Coord Vec:double:<Cell,Vertex,Dim>(8,8,3)"]
+8->1
+1 [fontcolor="", label="Gather Coordinate Vector<Residual>\n   Evaluates:\n      Coord Vec:double:<Cell,Vertex,Dim>(8,8,3)\n   Contributes:\n   Dependencies:"]
+4->0
+0 [fontcolor="", label="Gather Solution<Residual>\n   Evaluates:\n      Displacement:double:<Cell,Node,Dim>(8,8,3)\n      Velocity:double:<Cell,Node,Dim>(8,8,3)\n      Acceleration:double:<Cell,Node,Dim>(8,8,3)\n   Contributes:\n   Dependencies:"]
+25->8
+25->26
+26 [fontcolor="", label="FirstPK<Residual>\n   Evaluates:\n      FirstPK:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)\n   Contributes:\n   Dependencies:\n      Cauchy_Stress:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)\n      F:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)"]
+26->21
+21 [fontcolor="", label="Kinematics<Residual>\n   Evaluates:\n      F:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)\n      J:double:<Cell,QuadPoint>(8,8)\n   Contributes:\n   Dependencies:\n      Displacement Gradient:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)\n      Weights:double:<Cell,QuadPoint>(8,8)"]
+21->8
+21->5
+5 [fontcolor="", label="DOFVecGradInterpolationBase<Residual>\n   Evaluates:\n      Displacement Gradient:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)\n   Contributes:\n   Dependencies:\n      Displacement:double:<Cell,Node,Dim>(8,8,3)\n      Grad BF:double:<Cell,Node,QuadPoint,Dim>(8,8,8,3)"]
+5->8
+5->0
+26->14
+14 [fontcolor="red", label="ConstitutiveModelInterface<Residual>\n   Evaluates:\n      Back_Stress:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)\n      Cap_Parameter:double:<Cell,QuadPoint>(8,8)\n      Cauchy_Stress:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)\n      eqps:double:<Cell,QuadPoint>(8,8)\n      volPlastic_Strain:double:<Cell,QuadPoint>(8,8)\n   Contributes:\n   Dependencies:\n      Elastic Modulus:double:<Cell,QuadPoint>(8,8)\n      Poissons Ratio:double:<Cell,QuadPoint>(8,8)\n      Strain:double:<Cell,QuadPoint,Dim,Dim>(8,8,3,3)    **** MISSING ****"]
+14->13
+13 [fontcolor="", label="Constitutive Model Parameters<Residual>\n   Evaluates:\n      Elastic Modulus:double:<Cell,QuadPoint>(8,8)\n      Poissons Ratio:double:<Cell,QuadPoint>(8,8)\n   Contributes:\n   Dependencies:"]
+}

@@ -968,6 +968,64 @@ should be structured as two calibrated end-member parameter sets ---
 frozen ($f = 1$) and thawed ($f = 0$) --- with one interpolation rule
 per mechanism, replacing the scattered polynomial fits.
 
+\paragraph{Elasticity and ice saturation.}
+\texttt{J2Erosion} scales the Young's modulus with ice saturation at
+fixed Poisson's ratio, which scales $K$ and $G$ together. The
+underlying mechanism is sound --- permafrost stiffness is governed by
+what fills the pores and whether it bonds the grains, so the moduli
+are properly functions of $f$ (temperature acts only through the
+freezing curve) --- but the partition between the elastic constants
+should change. The thaw transition replaces pore ice
+($G \approx 3.5$~GPa, $K \approx 9$~GPa) with pore water ($G = 0$,
+$K \approx 2.2$~GPa) inside a mineral skeleton
+($K_s \approx 36$~GPa for quartz), and the two moduli respond
+entirely differently:
+\begin{itemize}
+\item \emph{Shear modulus:} the dominant, order-of-magnitude
+      dependence. Frozen, ice welds the grain contacts and the
+      composite $G$ is GPa-scale; thawed, water carries no shear and
+      the unbonded skeleton's contact stiffness is tens of MPa --- a
+      drop of roughly two orders of magnitude. This is why shear-wave
+      velocity collapse is the standard geophysical signature of
+      thaw.
+\item \emph{Bulk modulus:} weak dependence, bounded below by the
+      saturated mixture. While the pores remain water-filled, the
+      undrained bulk stiffness follows the Reuss/Wood mixture of
+      water and grains ($K \approx 5$~GPa at porosity $0.4$) --- a
+      factor-of-two drop from frozen, not orders of magnitude. This
+      is the classical Gassmann fluid-substitution result, with the
+      additional loss of $G$ because ice, unlike water, had shear
+      stiffness.
+\item \emph{Poisson's ratio is then a prediction, not an input:}
+      with $K \approx 5$~GPa and $G$ of tens of MPa, $\nu \to 0.499$
+      --- thawed saturated soil approaches the undrained
+      incompressible limit, up from $\nu \approx 0.3$ frozen.
+\end{itemize}
+Scaling $E$ at fixed $\nu$ instead predicts that the bulk stiffness
+of thawed saturated sediment collapses along with the shear
+stiffness, so thawed zones compact volumetrically under their own
+weight far more than the pore water permits --- a plausible
+contributor to the large displacements that motivated
+\texttt{J2Erosion}'s displacement-norm failure criterion.
+
+The replacement should therefore take two end-member pairs
+$(K, G)_{\mathrm{frozen}}$ and $(K, G)_{\mathrm{thawed}}$ in place of
+the modulus-multiplier fits, with $G(f)$ interpolated geometrically
+(log-linearly --- the range spans two orders of magnitude, so linear
+interpolation in $f$ overweights the frozen value) and $K(f)$
+interpolated linearly down to the Wood-mixture value computed from
+the ACE porosity profile. Above the water table or in gassy
+material the Wood bound disappears (a percent of pore air destroys
+it), for which the ACE air-fraction field is the natural switch.
+Because the kernel reads per-point $E$ and $\nu$ fields, this is an
+evaluator-level change with no impact on the integrator. One
+numerical caution: the thawed limit $\nu \to 0.499$ volumetrically
+locks low-order hexahedra, so the effective $\nu$ should be capped
+near $0.45$ unless mean-dilatation element technology is adopted.
+The $(K, G)$ split also makes elasticity consistent with the
+strength assumption above: thaw removes the shear-carrying ice phase
+from both.
+
 \emph{Design constraint:} environmental softening must not flow
 through the hardening variable. When ice melts the physical cap
 moves toward the origin, which would violate the

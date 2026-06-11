@@ -920,6 +920,109 @@ at their defaults; if results change when the tolerance is
 tightened, the global time step was too coarse --- the remedy is not
 in the material parameters.
 
+\section{Planned Extension: Permafrost and Erosion}
+\label{sec:permafrost}
+
+The purpose of this model in LCM is to eventually replace the
+\texttt{J2Erosion} model in the ACE permafrost-erosion application
+\citep{Frederick.etal:2021}. \texttt{J2Erosion} extends $J_2$
+plasticity with an ice-saturation--dependent yield stress
+($\sigma_0 = \sigma^{\mathrm{sed}} + f(T)\,
+\sigma^{\mathrm{ice-sed}}$, with $f(T) \in [0,1]$ the ice saturation
+from the sediment freezing curve) and, over time, has accumulated
+five failure criteria and several empirical adjustments (polynomial
+fits of stiffness and strength in ice saturation and porosity,
+ocean-exposure weakening factors, a peat-dependent strain limit).
+This section records the assessment and design decisions for the
+replacement, so the work can be resumed.
+
+\paragraph{Why the cap model fits permafrost.}
+The eroding material spans a continuum from ice-bonded (frozen) to
+thawed sediment, and the cap model contains both end members as
+parameter limits. With $D \to 0$ the failure envelope flattens to
+the pressure-insensitive strength $A - C$, and with $\psi = 1$ and
+the cap pushed far out the model degenerates to von Mises --- the
+current ice model. At the other extreme, thawed sediment is the
+material the cap model was designed for: frictional shear strength
+plus compaction of a porous skeleton, neither of which $J_2$
+represents (in \texttt{J2Erosion} the thawed state is a constant
+residual yield stress). Two further physical arguments: frozen soils
+exhibit a closed strength envelope (strength rises with confinement,
+peaks, and falls at high pressure through pressure melting of pore
+ice), which the cap closure can represent phenomenologically and a
+$J_2$ cylinder cannot; and thaw settlement is compaction --- crush-curve
+physics, with $W$ supplied by the effective-porosity profiles the
+ACE model already carries.
+
+\paragraph{Ice-saturation coupling.}
+The cap parameters separate the strength mechanisms that $J_2$
+lumps, and the ice saturation enters each by its mechanism:
+cohesion (ice cementation) through $A - C$ and $N$ as
+$c(f) = c^{\mathrm{sed}} + f\,c^{\mathrm{ice}}$, the direct analogue
+of the \texttt{J2Erosion} rule; friction ($\theta$, $D$) as a
+sediment property, approximately independent of $f$; pore-collapse
+resistance ($\kappa_0$, $D_1$) increasing with $f$ as ice fills the
+pores; crushable volume $W$ from the effective porosity; stiffness
+$E(f)$ from the existing experimental fits. The implementation
+should be structured as two calibrated end-member parameter sets ---
+frozen ($f = 1$) and thawed ($f = 0$) --- with one interpolation rule
+per mechanism, replacing the scattered polynomial fits.
+
+\emph{Design constraint:} environmental softening must not flow
+through the hardening variable. When ice melts the physical cap
+moves toward the origin, which would violate the
+$\Delta\kappa \le 0$ clamp if it were imposed on $\kappa$. As with
+temperature-dependent yield in metals, $\kappa$ must store only the
+plastic compaction history while the surfaces are built from
+$f$-dependent parameters evaluated fresh each step.
+
+\paragraph{Failure criteria.}
+The cap model supplies constitutive failure indicators that replace
+three of the five \texttt{J2Erosion} criteria with quantities that
+have model meaning: tensile failure as the stress state reaching the
+tensile apex of the surface ($F_f - N \to 0$), replacing the
+maximum-principal-stress check; shear exhaustion as back-stress
+saturation ($\sqrt{J_2^\alpha} \to N$, $G^\alpha = 0$: the yield
+surface has translated to the failure envelope), replacing the
+criterion that yield onset itself constitutes failure --- the cap
+model can distinguish yielded-but-hardening material from exhausted
+material, which $J_2$ cannot; compaction exhaustion as
+$|\varepsilon_v^p| \to W$ (full pore collapse, the cap-lock regime);
+and a plastic distortion limit on
+$\varepsilon_{\mathrm{eqps}}$ replacing the total-distortion limit.
+The two structural criteria --- tilt angle and displacement norm,
+which detect toppled or departed blocks --- are not constitutive and
+remain unchanged at the erosion layer, as does the element-death
+bookkeeping (per-point failure-mode bitmask, per-cell death
+threshold), which is model independent.
+
+\paragraph{Implementation plan.}
+(1)~A separate \texttt{CapErosion} kernel wrapping the verified
+integrator with the ACE plumbing (ice-saturation field,
+porosity/peat depth profiles, sea level, erodible cell sets, death
+infrastructure), leaving \texttt{CapModel} pure. (2)~Thermal
+stretch on $\Fdef$ (and optionally the $9\,\%$ freezing expansion),
+which the cap kernel currently lacks. (3)~The saturation-to-parameter
+map above. (4)~The failure indicators above. (5)~Later, in order of
+expected payoff: rate sensitivity by the Duvaut--Lions wrap of
+\citet{Regueiro.Foster:2011}, which regularizes any inviscid
+integrator and would represent storm-timescale ice creep; and
+pore-pressure/effective-stress coupling --- the source paper
+\citet{Sun.Chen.Ostien:2014} is itself a $u$--$p$ poromechanics
+formulation, so the model is built for that extension if ACE ever
+resolves pore fluid.
+
+\paragraph{Calibration.}
+Thawed end member from standard soil-mechanics cap parameters for
+silty/clay sediments plus the ACE porosity profiles ($W$); frozen
+end member by refitting the experimental data behind the existing
+\texttt{J2Erosion} stiffness/strength fits to cap parameters, with
+friction ($\theta$, $D$) taken from the thawed sediment so the
+frozen fit reduces to cohesion scaling --- the original
+\texttt{J2Erosion} assumption, now in its natural place. The
+single-element verification decks of Section~\ref{sec:verification}
+double as calibration drivers.
+
 \appendix
 
 \section{Revision History of the Formulation}
@@ -971,6 +1074,13 @@ updated $\Fplas$ by an exponential map of the final flow direction)
 was replaced by the formulation of Section~\ref{sec:finite}.
 
 \begin{thebibliography}{9}
+
+\bibitem[Frederick et~al.(2021)Frederick, Mota, Tezaur, and
+  Bull]{Frederick.etal:2021}
+J.~Frederick, A.~Mota, I.~Tezaur, and D.~Bull.
+\newblock A thermo-mechanical terrestrial model of {Arctic} coastal erosion.
+\newblock {\em Journal of Computational and Applied Mathematics}, 397:113533,
+  2021.
 
 \bibitem[Fossum and Brannon(2004)]{Fossum.Brannon:2004}
 A.~F. Fossum and R.~M. Brannon.

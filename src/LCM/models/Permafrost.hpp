@@ -57,6 +57,8 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   ConstScalarField ice_saturation_;
   ConstScalarField temperature_;
 
+  ConstScalarField displacement_;
+
   // Evaluated MDFields
   ScalarField stress_;
   ScalarField Fp_;
@@ -65,6 +67,18 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   ScalarField capParameter_;
   ScalarField eqps_;
   ScalarField volPlasticStrain_;
+
+  // Failure indicators (each normalized so 1 means exhaustion of the
+  // underlying mechanism) and the death bookkeeping fields.
+  ScalarField tension_indicator_;
+  ScalarField backstress_indicator_;
+  ScalarField crush_indicator_;
+  ScalarField eqps_indicator_;
+  ScalarField angle_indicator_;
+  ScalarField displacement_indicator_;
+  ScalarField tilt_angle_;
+  ScalarField failed_;
+  ScalarField dead_;
 
   // Old state arrays
   Albany::MDArray stress_old_;
@@ -76,6 +90,29 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray eqps_old_;
   Albany::MDArray volPlasticStrain_old_;
   Albany::MDArray ice_sat_state_old_;
+
+  // Per-(cell, pt) failure-mode bitmask, carried as an STK-backed element
+  // state so it follows each cell correctly when the discretization
+  // rebuilds its worksets (erosion re-buckets the mesh). Bits encode:
+  //   0x01 = tension (stress at the shear-surface apex, Ff - N -> 0)
+  //   0x02 = backstress saturation (sqrt(J2(alpha)) -> N, G^alpha = 0)
+  //   0x04 = crush exhaustion (|eps_v^p(kappa)| -> W, cap lock)
+  //   0x08 = tilt angle
+  //   0x10 = displacement norm
+  //   0x20 = equivalent plastic strain limit
+  // Once a bit is set at (cell, pt) it stays set. failure_modes_old_ holds
+  // the value converged at the previous step; failure_modes_ is this
+  // fill's updated value (old | newly tripped bits), saved back to the
+  // state. The mask is the source of truth for failure_state and the
+  // cell-death predicate.
+  Albany::MDArray failure_modes_old_;
+  ScalarField     failure_modes_;
+
+  // Live death-status signal shared with the assembly (scatter skips dead
+  // cells); populated by the ACE solver from the converged cell_death
+  // state, written here when a cell dies mid-fill.
+  Teuchos::RCP<std::vector<double>> death_status_vec_;
+  bool                              has_failed_old_{false};
 
   // Finite-deformation (exponential/logarithmic map) kinematics flag
   bool finite_deformation_;
@@ -125,6 +162,26 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
 
   RealType substep_tolerance_;
   int      max_substeps_;
+
+  // Failure criteria. Each indicator reaches 1 at exhaustion of its
+  // mechanism; a criterion is enabled by a positive threshold (or limit)
+  // and disabled at the default 0. The backstress and crush indicators
+  // approach 1 only asymptotically, so their thresholds must be < 1; the
+  // tension indicator must trip strictly below 1 because the yield
+  // function has a spurious branch beyond the apex (see the developers
+  // guide).
+  RealType tension_indicator_threshold_{0.0};
+  RealType backstress_indicator_threshold_{0.0};
+  RealType crush_indicator_threshold_{0.0};
+  RealType maximum_eqps_{0.0};
+  RealType critical_angle_{0.0};
+  RealType maximum_displacement_{0.0};
+  bool     disable_erosion_{false};
+
+  // Number of integration points whose failure_modes mask must be
+  // non-zero before the cell is declared dead. 0 means "all"
+  // (= num_pts_); other values are clamped into [1, num_pts_].
+  int num_failed_pts_for_death_{0};
 
   RealType current_time_{0.0};
 

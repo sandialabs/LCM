@@ -153,7 +153,10 @@ Albany::StateManager::registerStateVariable(
   StateStruct::MeshFieldEntity mfe_type;
   if (fieldEntity)
     mfe_type = *fieldEntity;
-  else if (dl->rank() == 1 && dl->size() == 1)
+  // A rank-1 Cell layout is per-element data even when the workset holds a
+  // single element (size 1, e.g. the single-element verification decks);
+  // only the Dummy-tagged workset_scalar layout is a workset value.
+  else if (dl->rank() == 1 && dl->size() == 1 && dl->name(0) != "Cell")
     mfe_type = StateStruct::WorksetValue;  // One value for the whole workset
                                            // (i.e., time)
   else if (dl->rank() == 1 && dl->name(0) == "Cell")

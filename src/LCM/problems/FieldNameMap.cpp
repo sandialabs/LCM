@@ -46,6 +46,12 @@ FieldNameMap::FieldNameMap(bool surface_flag)
   name_map->insert(std::make_pair("Displacement_Indicator", "Displacement_Indicator"));
   name_map->insert(std::make_pair("Elastic_Modulus_Used", "Elastic_Modulus_Used"));
 
+  // Permafrost (cap plasticity) failure indicators
+  name_map->insert(std::make_pair("Tension_Indicator", "Tension_Indicator"));
+  name_map->insert(std::make_pair("Backstress_Indicator", "Backstress_Indicator"));
+  name_map->insert(std::make_pair("Crush_Indicator", "Crush_Indicator"));
+  name_map->insert(std::make_pair("Eqps_Indicator", "Eqps_Indicator"));
+
   // Crystal plasticity model
   int const max_slip_systems = 48;
 

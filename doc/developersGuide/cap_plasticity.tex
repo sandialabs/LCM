@@ -1068,22 +1068,52 @@ $f$-dependent parameters evaluated fresh each step.
 \paragraph{Failure criteria.}
 The cap model supplies constitutive failure indicators that replace
 three of the five \texttt{J2Erosion} criteria with quantities that
-have model meaning: tensile failure as the stress state reaching the
-tensile apex of the surface ($F_f - N \to 0$), replacing the
-maximum-principal-stress check; shear exhaustion as back-stress
-saturation ($\sqrt{J_2^\alpha} \to N$, $G^\alpha = 0$: the yield
-surface has translated to the failure envelope), replacing the
-criterion that yield onset itself constitutes failure --- the cap
-model can distinguish yielded-but-hardening material from exhausted
-material, which $J_2$ cannot; compaction exhaustion as
-$|\varepsilon_v^p| \to W$ (full pore collapse, the cap-lock regime);
-and a plastic distortion limit on
-$\varepsilon_{\mathrm{eqps}}$ replacing the total-distortion limit.
-The two structural criteria --- tilt angle and displacement norm,
-which detect toppled or departed blocks --- are not constitutive and
-remain unchanged at the erosion layer, as does the element-death
-bookkeeping (per-point failure-mode bitmask, per-cell death
-threshold), which is model independent.
+have model meaning. Each indicator is normalized so that the value 1
+means exhaustion of its mechanism, and each criterion is enabled by
+a positive threshold (or limit) in the material input and disabled
+at the default 0:
+\begin{itemize}
+\item \emph{Tension} (bit 0x01): the fraction of the zero-pressure
+  shear capacity $F_f(0) - N$ lost to mean tension,
+  $[\,(A - C) - F_f(I_1)\,]/(A - C - N)$, which reaches 1 where the
+  shear surface pinches to the tensile apex $F_f(I_1) = N$ and the
+  material has no remaining strength. This replaces the
+  maximum-principal-stress check. The threshold \emph{must} be set
+  below 1: because the yield function squares $F_f - N$, it has a
+  spurious second branch beyond the apex on which the apparent
+  strength grows again with tension. The integrator never reaches
+  that branch in practice precisely because the element fails
+  first --- the criterion is part of the model's domain of validity,
+  not just an erosion trigger.
+\item \emph{Backstress saturation} (bit 0x02):
+  $\sqrt{J_2^\alpha}/N$, equal to 1 when the kinematic hardening is
+  exhausted ($G^\alpha = 0$: the yield surface has translated to the
+  failure envelope and the shear response is perfectly plastic).
+  This replaces the criterion that yield onset itself constitutes
+  failure --- the cap model can distinguish yielded-but-hardening
+  material from exhausted material, which $J_2$ cannot.
+\item \emph{Crush exhaustion} (bit 0x04):
+  $|\varepsilon_v^p(\kappa)|/W$ on the crush curve, the quantity
+  whose approach to 1 engages the cap lock (full pore collapse).
+\item \emph{Plastic distortion} (bit 0x20):
+  $\varepsilon_{\mathrm{eqps}}$ against a user limit, replacing the
+  total-distortion limit.
+\end{itemize}
+The backstress and crush indicators approach 1 only asymptotically,
+so their thresholds must also be below 1 (the implementation rejects
+thresholds $\ge 1$). The two structural criteria --- tilt angle
+(bit 0x08) and displacement norm (bit 0x10), which detect toppled or
+departed blocks --- are not constitutive and carry over from
+\texttt{J2Erosion} unchanged, as does the element-death bookkeeping:
+tripped modes accumulate in the per-point \texttt{failure\_modes}
+bitmask (an STK-backed element state), the per-cell
+\texttt{failure\_state} diagnostic encodes per-mode trip counts in
+decimal digits, and a cell dies (\texttt{cell\_death} = 1, with live
+propagation into the assembly's death-status vector so Newton stops
+assembling condemned cells mid-step) when a user-settable number of
+its integration points have failed, all points by default. All
+criteria branch on Sacado values so the residual and Jacobian
+evaluations take identical paths.
 
 \paragraph{Implementation plan.}
 (1)~A separate \texttt{CapErosion} kernel wrapping the verified
@@ -1113,9 +1143,19 @@ Section~\ref{sec:integration}, and thermal stretch in the
 finite-deformation path. Verification: equivalence with \texttt{Cap}
 at $f = 1$, the full map at constant $f = 0.5$, and thaw under load
 ($f: 1 \to 0.3$ during confined compression) all match the reference
-implementation at machine precision. Failure indicators and
-element-death plumbing (Phase 2) and ACE workflow integration
-(Phase 3) remain.
+implementation at machine precision. Phase 2 is implemented as well:
+the failure indicators and the element-death bookkeeping above, with
+per-mode single-element verification --- for each criterion the
+indicator series matches the reference at machine precision and the
+\texttt{failure\_modes}/\texttt{failure\_state}/\texttt{cell\_death}
+series match the reference-predicted trip step exactly (the
+displacement criterion additionally checks the per-point indicator
+multiset against the analytic Gauss-point displacements). The death
+states are consumed by the existing ACE solver and scatter machinery
+without modification; exercising the full erosion loop (part
+changes, workset rebuilds) under the ACE solver is part of the ACE
+workflow integration (Phase 3), which remains, along with the
+ocean-exposure weakening and depth profiles.
 
 \paragraph{Calibration.}
 Thawed end member from standard soil-mechanics cap parameters for

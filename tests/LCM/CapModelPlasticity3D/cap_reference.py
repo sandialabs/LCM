@@ -438,14 +438,16 @@ def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
     to the current one inside the integrator; the stored stress is
     re-expressed through the current stiffness before each step (the
     elastic strain, not the stress, is the state); the cap parameter
-    starts at the FROZEN kappa0."""
+    starts at the FROZEN kappa0. History entries are
+    (t, sigma, kappa, evp, alpha, eqps)."""
     sigma = np.zeros((3, 3))
     alpha = np.zeros((3, 3))
     kappa = frozen['kappa0']
     f_prev = f_of_t(0.0)
     eps_prev = eps_of_t(0.0)
-    out = [(0.0, sigma.copy(), kappa, 0.0)]
+    out = [(0.0, sigma.copy(), kappa, 0.0, alpha.copy(), 0.0)]
     evp = 0.0
+    eqps = 0.0
     for n in range(1, nsteps + 1):
         t = n / nsteps
         f = f_of_t(t)
@@ -465,11 +467,29 @@ def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
         tr_d = np.trace(dsig)
         deps_p = (tr_d / (9.0 * K1)) * I3 + (1.0 / (2.0 * P1.mu)) * (dsig - (tr_d / 3.0) * I3)
         evp += np.trace(deps_p)
+        dev_p = deps_p - np.trace(deps_p) / 3.0 * I3
+        eqps += np.sqrt(2.0 / 3.0) * np.linalg.norm(dev_p)
         sigma = sigma_new
         f_prev = f
         eps_prev = eps
-        out.append((t, sigma.copy(), kappa, evp))
+        out.append((t, sigma.copy(), kappa, evp, alpha.copy(), eqps))
     return out
+
+
+def indicators(sigma, alpha, kappa, eqps, P, maximum_eqps=0.0):
+    """Failure indicators mirroring the Permafrost kernel exactly: each
+    is normalized to reach 1 at exhaustion of its mechanism. Returns a
+    dict {tension, backstress, crush, eqps}."""
+    I1 = np.trace(sigma)
+    cap0 = P.A - P.C - P.N            # zero-pressure shear capacity Ff(0) - N
+    tension = ((P.A - P.C) - Ff(I1, P)) / cap0 if cap0 > 0.0 else 0.0
+    J2a = 0.5 * np.tensordot(alpha, alpha)
+    backstress = np.sqrt(J2a) / P.N if P.N > 0.0 else 0.0
+    evp = evp_of_kappa(kappa, P)
+    crush = max(0.0, -evp) / P.W if P.W > 0.0 else 0.0
+    eqps_ind = eqps / maximum_eqps if maximum_eqps > 0.0 else 0.0
+    return dict(tension=tension, backstress=backstress, crush=crush,
+                eqps=eqps_ind)
 
 
 def selfcheck():

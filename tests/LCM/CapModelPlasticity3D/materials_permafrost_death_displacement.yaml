@@ -1,0 +1,52 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: Permafrost
+  Materials:
+    # Failure/death verification deck (both end members = Salem
+    # limestone, constant ice saturation 1.0, so the trajectory is the
+    # already-verified CapModel path) -- structural displacement-norm criterion: the per-point
+    # indicator depends on the Gauss-point position, so the two groups of
+    # four points trip at different steps and the cell dies only when the
+    # near group (smallest |u|) exceeds the limit.
+    Permafrost:
+      Material Model:
+        Model Name: Permafrost
+      Finite Deformation: false
+      Maximum Displacement: 0.005
+      Output Failure Modes: true
+      Output Failure State: true
+      Output Cell Death: true
+      Output Tension Indicator: true
+      Output Backstress Indicator: true
+      Output Crush Indicator: true
+      Output Eqps Indicator: true
+      Output Displacement Indicator: true
+      Frozen Parameters:
+        K: 15177.03284868067
+        G: 9001.517087192591
+        A: 689.2
+        C: 675.2
+        N: 6.0
+        kappa0: -8.05
+        W: 0.08
+        D1: 0.00147
+        calpha: 100000.0
+      Thawed Parameters:
+        K: 15177.03284868067
+        G: 9001.517087192591
+        A: 689.2
+        C: 675.2
+        N: 6.0
+        kappa0: -8.05
+        W: 0.08
+        D1: 0.00147
+        calpha: 100000.0
+        D: 0.000394
+        theta: 0.0
+        L: 0.000394
+        phi: 0.0
+        R: 28.0
+        Q: 28.0
+        psi: 1.0
+        D2: 0.0

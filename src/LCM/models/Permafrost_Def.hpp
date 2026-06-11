@@ -27,8 +27,22 @@
 // state is initialized at the FROZEN kappa0: simulations are assumed to
 // start from the frozen state.
 //
-// Remaining phases per the documented plan: (2) failure indicators and
-// element-death plumbing; (3) ACE workflow integration.
+// Failure and element death (Phase 2): per-point indicators, each
+// normalized to reach 1 at exhaustion of its mechanism --
+//   tension      stress at the shear-surface apex, Ff(I1) - N -> 0
+//   backstress   kinematic-hardening saturation, sqrt(J2(alpha)) -> N
+//   crush        cap exhaustion, |eps_v^p(kappa)| -> W
+//   eqps         equivalent plastic strain against a user limit
+// plus the structural tilt-angle and displacement criteria carried over
+// from J2Erosion. Tripped modes accumulate in the failure_modes bitmask
+// (an STK-backed element state); a cell dies when enough integration
+// points have failed (default: all). The death bookkeeping
+// (failure_state, cell_death, death_status_vec live propagation) follows
+// J2Erosion exactly, so the ACE solver and the scatter evaluators
+// consume Permafrost cells without modification.
+//
+// Remaining phases per the documented plan: (3) ACE workflow
+// integration (porosity/peat profiles, sea level, ocean weakening).
 
 #include <MiniTensor.h>
 
@@ -115,6 +129,25 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   substep_tolerance_ = p->get<RealType>("Substep Tolerance", 1.0e-4);
   max_substeps_      = p->get<int>("Maximum Substeps", 200);
 
+  // Failure criteria: a positive threshold (or limit) enables each
+  // criterion; the default 0 disables it. The thresholds for the
+  // asymptotic indicators (tension, backstress, crush) must be < 1.
+  tension_indicator_threshold_    = p->get<RealType>("Tension Indicator Threshold", 0.0);
+  backstress_indicator_threshold_ = p->get<RealType>("Backstress Indicator Threshold", 0.0);
+  crush_indicator_threshold_      = p->get<RealType>("Crush Indicator Threshold", 0.0);
+  maximum_eqps_                   = p->get<RealType>("Maximum Equivalent Plastic Strain", 0.0);
+  critical_angle_                 = p->get<RealType>("Critical Angle", 0.0);
+  maximum_displacement_           = p->get<RealType>("Maximum Displacement", 0.0);
+  disable_erosion_                = p->get<bool>("Disable Erosion", false);
+  num_failed_pts_for_death_       = p->get<int>("Failed Integration Points For Death", 0);
+
+  ALBANY_ASSERT(
+      critical_angle_ <= 0.0 || finite_deformation_,
+      "Permafrost: the Critical Angle (tilt) criterion requires Finite Deformation");
+  ALBANY_ASSERT(
+      tension_indicator_threshold_ < 1.0 && backstress_indicator_threshold_ < 1.0 && crush_indicator_threshold_ < 1.0,
+      "Permafrost: indicator thresholds must be < 1 (the indicators reach 1 only asymptotically)");
+
   // retrieve appropriate field name strings
   std::string const cauchy_string           = field_name_map_["Cauchy_Stress"];
   std::string const backStress_string       = field_name_map_["Back_Stress"];
@@ -126,11 +159,20 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   std::string const J_string                = field_name_map_["J"];
   std::string const Fp_string               = field_name_map_["Fp"];
 
+  std::string const tension_indicator_string      = field_name_map_["Tension_Indicator"];
+  std::string const backstress_indicator_string   = field_name_map_["Backstress_Indicator"];
+  std::string const crush_indicator_string        = field_name_map_["Crush_Indicator"];
+  std::string const eqps_indicator_string         = field_name_map_["Eqps_Indicator"];
+  std::string const angle_indicator_string        = field_name_map_["Angle_Indicator"];
+  std::string const displacement_indicator_string = field_name_map_["Displacement_Indicator"];
+  std::string const tilt_angle_string             = field_name_map_["Tilt_Angle"];
+
   // define the dependent fields. Elasticity is computed internally from
   // the end-member (K, G) pairs, so there is no dependence on the
   // Elastic Modulus / Poissons Ratio fields.
   if (have_ice_field_) setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
   if (have_temperature_) setDependentField("Temperature", dl->qp_scalar);
+  if (maximum_displacement_ > 0.0) setDependentField("Displacement", dl->qp_vector);
 
   if (finite_deformation_) {
     setDependentField(F_string, dl->qp_tensor);
@@ -166,6 +208,17 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   setEvaluatedField(eqps_string, dl->qp_scalar);
   setEvaluatedField(volPlasticStrain_string, dl->qp_scalar);
 
+  setEvaluatedField(tension_indicator_string, dl->qp_scalar);
+  setEvaluatedField(backstress_indicator_string, dl->qp_scalar);
+  setEvaluatedField(crush_indicator_string, dl->qp_scalar);
+  setEvaluatedField(eqps_indicator_string, dl->qp_scalar);
+  setEvaluatedField(angle_indicator_string, dl->qp_scalar);
+  setEvaluatedField(displacement_indicator_string, dl->qp_scalar);
+  setEvaluatedField(tilt_angle_string, dl->qp_scalar);
+  setEvaluatedField("failure_modes", dl->qp_scalar);
+  setEvaluatedField("failure_state", dl->cell_scalar2);
+  setEvaluatedField("cell_death", dl->cell_scalar2);
+
   // define the state variables
   addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, true, true);
 
@@ -178,6 +231,19 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, true);
 
   addStateVariable(volPlasticStrain_string, dl->qp_scalar, "scalar", 0.0, true, true);
+
+  // Failure indicators (output-only) and the death bookkeeping states.
+  // The failure_modes bitmask is the only one that needs its old state.
+  addStateVariable(tension_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tension Indicator", false));
+  addStateVariable(backstress_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Backstress Indicator", false));
+  addStateVariable(crush_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Crush Indicator", false));
+  addStateVariable(eqps_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Eqps Indicator", false));
+  addStateVariable(angle_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
+  addStateVariable(displacement_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
+  addStateVariable(tilt_angle_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
+  addStateVariable("failure_modes", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Failure Modes", false));
+  addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
+  addStateVariable("cell_death", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Cell Death", false));
 }
 
 template <typename EvalT, typename Traits>
@@ -197,9 +263,18 @@ PermafrostKernel<EvalT, Traits>::init(
   std::string J_string                = field_name_map_["J"];
   std::string Fp_string               = field_name_map_["Fp"];
 
+  std::string tension_indicator_string      = field_name_map_["Tension_Indicator"];
+  std::string backstress_indicator_string   = field_name_map_["Backstress_Indicator"];
+  std::string crush_indicator_string        = field_name_map_["Crush_Indicator"];
+  std::string eqps_indicator_string         = field_name_map_["Eqps_Indicator"];
+  std::string angle_indicator_string        = field_name_map_["Angle_Indicator"];
+  std::string displacement_indicator_string = field_name_map_["Displacement_Indicator"];
+  std::string tilt_angle_string             = field_name_map_["Tilt_Angle"];
+
   // extract dependent MDFields
   if (have_ice_field_) ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
   if (have_temperature_) temperature_ = *dep_fields["Temperature"];
+  if (maximum_displacement_ > 0.0) displacement_ = *dep_fields["Displacement"];
   if (finite_deformation_) {
     def_grad_ = *dep_fields[F_string];
     J_        = *dep_fields[J_string];
@@ -216,6 +291,17 @@ PermafrostKernel<EvalT, Traits>::init(
   if (finite_deformation_) Fp_ = *eval_fields[Fp_string];
   ice_sat_state_ = *eval_fields["Ice_Saturation_State"];
 
+  tension_indicator_      = *eval_fields[tension_indicator_string];
+  backstress_indicator_   = *eval_fields[backstress_indicator_string];
+  crush_indicator_        = *eval_fields[crush_indicator_string];
+  eqps_indicator_         = *eval_fields[eqps_indicator_string];
+  angle_indicator_        = *eval_fields[angle_indicator_string];
+  displacement_indicator_ = *eval_fields[displacement_indicator_string];
+  tilt_angle_             = *eval_fields[tilt_angle_string];
+  failure_modes_          = *eval_fields["failure_modes"];
+  failed_                 = *eval_fields["failure_state"];
+  dead_                   = *eval_fields["cell_death"];
+
   // get old state variables
   if (finite_deformation_) {
     def_grad_old_ = (*workset.stateArrayPtr)[F_string + "_old"];
@@ -229,8 +315,54 @@ PermafrostKernel<EvalT, Traits>::init(
   eqps_old_             = (*workset.stateArrayPtr)[eqps_string + "_old"];
   volPlasticStrain_old_ = (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
   ice_sat_state_old_    = (*workset.stateArrayPtr)["Ice_Saturation_State_old"];
+  failure_modes_old_    = (*workset.stateArrayPtr)["failure_modes_old"];
+
+  // Read death status from the workset. The ACE solver populates this at
+  // the start of each step from the prior converged cell_death state, and
+  // operator() writes into it live when new failures occur during a
+  // Newton iteration. The scatter evaluator reads it to skip dead cells
+  // in assembly. In a plain mechanics run it is null: failure states are
+  // still tracked, but no cell is removed from assembly.
+  has_failed_old_ = false;
+  if (workset.death_status_vec != Teuchos::null) {
+    death_status_vec_ = workset.death_status_vec;
+    has_failed_old_   = true;
+  }
 
   current_time_ = workset.current_time;
+
+  // Resolve the death threshold against num_pts_. A 0 value (the
+  // default) means "all integration points must fail"; any other value
+  // is clamped into [1, num_pts_].
+  int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
+                        (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
+                                                                                  num_failed_pts_for_death_);
+
+  // Seed failed_ (diagnostic, decimal-encoded per-mode counts) and dead_
+  // (binary cell-death flag) from the per-(cell, pt) failure-mode bitmask
+  // converged at the previous step. Each set bit at (cell, pt)
+  // contributes a decimal magnitude (1, 10, ..., 100000) to
+  // failed_(cell, 0) so the encoded value decodes back to per-mode trip
+  // counts across all pts of the cell; operator() adds this fill's newly
+  // tripped bits on top. dead_(cell, 0) is the predicate the ACE solver
+  // consumes to populate death_status_vec.
+  auto const num_cells = workset.numCells;
+  for (auto cell = 0; cell < num_cells; ++cell) {
+    double seed           = 0.0;
+    int    num_failed_pts = 0;
+    for (auto pt = 0; pt < num_pts_; ++pt) {
+      uint8_t const m = static_cast<uint8_t>(failure_modes_old_(cell, pt));
+      if (m & 0x01) seed += 1.0;
+      if (m & 0x02) seed += 10.0;
+      if (m & 0x04) seed += 100.0;
+      if (m & 0x08) seed += 1000.0;
+      if (m & 0x10) seed += 10000.0;
+      if (m & 0x20) seed += 100000.0;
+      if (m != 0u) ++num_failed_pts;
+    }
+    failed_(cell, 0) = seed;
+    dead_(cell, 0)   = num_failed_pts >= threshold ? 1.0 : 0.0;
+  }
 }
 
 template <typename EvalT, typename Traits>
@@ -241,6 +373,36 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   using Tensor4 = minitensor::Tensor4<ScalarT>;
 
   Tensor const I(minitensor::eye<ScalarT>(num_dims_));
+
+  // Element death: if this cell was previously marked as failed, set the
+  // stress to zero and carry the internal state forward unchanged. The
+  // scatter evaluator skips the cell entirely, so the values written here
+  // are for output only.
+  if (has_failed_old_ && (*death_status_vec_)[cell] > 0.0) {
+    for (int i = 0; i < num_dims_; ++i) {
+      for (int j = 0; j < num_dims_; ++j) {
+        stress_(cell, pt, i, j)     = 0.0;
+        backStress_(cell, pt, i, j) = backStress_old_(cell, pt, i, j);
+        if (finite_deformation_) Fp_(cell, pt, i, j) = ScalarT(Fp_old_(cell, pt, i, j));
+      }
+    }
+    capParameter_(cell, pt)     = capParameter_old_(cell, pt);
+    eqps_(cell, pt)             = eqps_old_(cell, pt);
+    volPlasticStrain_(cell, pt) = volPlasticStrain_old_(cell, pt);
+    ice_sat_state_(cell, pt)    = ice_sat_state_old_(cell, pt);
+
+    tension_indicator_(cell, pt)      = 0.0;
+    backstress_indicator_(cell, pt)   = 0.0;
+    crush_indicator_(cell, pt)        = 0.0;
+    eqps_indicator_(cell, pt)         = 0.0;
+    angle_indicator_(cell, pt)        = 0.0;
+    displacement_indicator_(cell, pt) = 0.0;
+    tilt_angle_(cell, pt)             = 0.0;
+    // Carry the failure-mode bitmask forward unchanged: a dead cell never
+    // trips new bits, but the state must still be written every fill.
+    failure_modes_(cell, pt) = failure_modes_old_(cell, pt);
+    return;
+  }
 
   // Ice saturation at this integration point.
   ScalarT f_ice;
@@ -431,6 +593,147 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     devolps             = minitensor::trace(deps_plastic);
     Tensor dev_plastic  = deps_plastic - (1.0 / 3.0) * devolps * I;
     deqps = std::sqrt(2.0 / 3.0) * minitensor::norm(dev_plastic);
+  }
+
+  // ---- Failure indicators and element death ----
+  // All criteria branch on Sacado values so the Residual and Jacobian
+  // evaluations take identical paths; the indicators are output-only
+  // diagnostics. sigmaVal here is the integrator's stress (Kirchhoff in
+  // finite deformation), the space the yield surface lives in.
+  {
+    auto const     sig_v   = Sacado::Value<Tensor>::eval(sigmaVal);
+    auto const     alpha_v = Sacado::Value<Tensor>::eval(alphaVal);
+    RealType const kappa_v = Sacado::Value<ScalarT>::eval(kappaVal);
+
+    RealType const Av     = Sacado::Value<ScalarT>::eval(P1.A);
+    RealType const Cv     = Sacado::Value<ScalarT>::eval(P1.C);
+    RealType const Dv     = Sacado::Value<ScalarT>::eval(P1.D);
+    RealType const thetav = Sacado::Value<ScalarT>::eval(P1.theta);
+    RealType const Nv     = Sacado::Value<ScalarT>::eval(P1.N);
+    RealType const Rv     = Sacado::Value<ScalarT>::eval(P1.R);
+    RealType const k0v    = Sacado::Value<ScalarT>::eval(P1.kappa0);
+    RealType const Wv     = Sacado::Value<ScalarT>::eval(P1.W);
+    RealType const D1v    = Sacado::Value<ScalarT>::eval(P1.D1);
+    RealType const D2v    = Sacado::Value<ScalarT>::eval(P1.D2);
+
+    // Tension: fraction of the zero-pressure shear capacity Ff(0) - N
+    // already lost to mean tension; 1 where the shear surface pinches to
+    // the apex Ff(I1) = N and the material has no remaining strength.
+    // The backstress is deviatoric, so I1 of the relative stress equals
+    // I1 of the stress itself.
+    RealType const I1v    = minitensor::trace(sig_v);
+    RealType const Ff_I1  = Av - Cv * std::exp(Dv * I1v) - thetav * I1v;
+    RealType       tension_ind = 0.0;
+    if (Av - Cv - Nv > 0.0) tension_ind = ((Av - Cv) - Ff_I1) / (Av - Cv - Nv);
+
+    // Backstress saturation: sqrt(J2(alpha)) / N. At 1 the kinematic
+    // hardening is exhausted (G^alpha = 0) and the shear response is
+    // perfectly plastic -- the rational replacement for J2Erosion's
+    // yield-onset criterion.
+    RealType const J2a            = 0.5 * minitensor::dotdot(alpha_v, alpha_v);
+    RealType const backstress_ind = Nv > 0.0 ? std::sqrt(J2a) / Nv : 0.0;
+
+    // Crush exhaustion: |eps_v^p(kappa)| / W on the crush curve, the
+    // quantity whose approach to 1 engages the cap lock.
+    RealType const Ff_k0 = Av - Cv * std::exp(Dv * k0v) - thetav * k0v;
+    RealType const X0    = k0v - Rv * Ff_k0;
+    RealType const Ff_k  = Av - Cv * std::exp(Dv * kappa_v) - thetav * kappa_v;
+    RealType const Xv    = kappa_v - Rv * Ff_k;
+    RealType const dX    = Xv - X0;
+    RealType const evp_v = Wv * (std::exp(D1v * dX - D2v * dX * dX) - 1.0);
+    RealType const crush_ind = Wv > 0.0 ? std::max(0.0, -evp_v) / Wv : 0.0;
+
+    // Equivalent plastic strain against the user limit.
+    RealType const eqps_new = eqps_old_(cell, pt) + Sacado::Value<ScalarT>::eval(deqps);
+    RealType const eqps_ind = maximum_eqps_ > 0.0 ? eqps_new / maximum_eqps_ : 0.0;
+
+    // Structural criteria carried over from J2Erosion: tilt angle of the
+    // rotation part of F (finite deformation only; polar_rotation is
+    // SVD-based, so compute it only when the criterion is enabled), and
+    // displacement norm.
+    RealType theta_tilt = 0.0;
+    if (critical_angle_ > 0.0 && finite_deformation_) {
+      auto const Fv     = Sacado::Value<Tensor>::eval(Fval);
+      auto const Q      = minitensor::polar_rotation(Fv);
+      RealType   cosine = 0.5 * (minitensor::trace(Q) - 1.0);
+      cosine            = cosine > 1.0 ? 1.0 : (cosine < -1.0 ? -1.0 : cosine);
+      theta_tilt        = std::acos(cosine);
+    }
+    RealType const angle_ind = critical_angle_ > 0.0 ? std::abs(theta_tilt) / critical_angle_ : 0.0;
+
+    RealType disp_ind     = 0.0;
+    bool     disp_failure = false;
+    if (maximum_displacement_ > 0.0) {
+      minitensor::Vector<ScalarT> u(num_dims_);
+      u.fill(displacement_, cell, pt, 0);
+      auto const     u_v       = Sacado::Value<decltype(u)>::eval(u);
+      RealType const disp_norm = minitensor::norm(u_v);
+      disp_ind     = disp_norm / maximum_displacement_;
+      disp_failure = disp_norm > maximum_displacement_;
+    }
+
+    tension_indicator_(cell, pt)      = tension_ind;
+    backstress_indicator_(cell, pt)   = backstress_ind;
+    crush_indicator_(cell, pt)        = crush_ind;
+    eqps_indicator_(cell, pt)         = eqps_ind;
+    angle_indicator_(cell, pt)        = angle_ind;
+    displacement_indicator_(cell, pt) = disp_ind;
+    tilt_angle_(cell, pt)             = theta_tilt;
+
+    // Per-(cell, pt) OR-accumulation: add each mode's decimal magnitude
+    // to `failed` exactly the first time that mode trips at this
+    // integration point. `mask` starts from the bitmask converged at the
+    // previous step and is written back to failure_modes_ below, so a
+    // criterion that keeps tripping contributes its magnitude once and
+    // only once across the run. When disable_erosion_ is true the cell
+    // cannot die, so the bitmask and the accumulator are left untouched;
+    // the indicators above are still computed for diagnostics.
+    auto&&  failed = failed_(cell, 0);
+    uint8_t mask   = static_cast<uint8_t>(failure_modes_old_(cell, pt));
+    auto    trip   = [&](bool fired, uint8_t bit, double magnitude) {
+      if (fired == false) return;
+      if (disable_erosion_) return;
+      if ((mask & bit) != 0u) return;
+      mask = static_cast<uint8_t>(mask | bit);
+      failed += magnitude;
+    };
+
+    trip(tension_indicator_threshold_ > 0.0 && tension_ind >= tension_indicator_threshold_, 0x01, 1.0);
+    trip(backstress_indicator_threshold_ > 0.0 && backstress_ind >= backstress_indicator_threshold_, 0x02, 10.0);
+    trip(crush_indicator_threshold_ > 0.0 && crush_ind >= crush_indicator_threshold_, 0x04, 100.0);
+    trip(critical_angle_ > 0.0 && std::abs(theta_tilt) >= critical_angle_, 0x08, 1000.0);
+    trip(disp_failure, 0x10, 10000.0);
+    trip(maximum_eqps_ > 0.0 && eqps_ind >= 1.0, 0x20, 100000.0);
+
+    // Persist this fill's updated bitmask (old | newly tripped bits) to
+    // the STK-backed state, so it follows the cell across workset
+    // rebuilds.
+    failure_modes_(cell, pt) = static_cast<double>(mask);
+
+    // Live death propagation: when the last pt of a cell is processed,
+    // check whether enough pts now have at least one failure bit set to
+    // meet the death threshold. If so, mark the cell dead so the scatter
+    // evaluator sees it as dead in this same fill -- without this,
+    // Newton keeps assembling nonphysical stress for condemned cells
+    // through a death cascade. Points are processed in order, so at the
+    // last pt every failure_modes_(cell, p) is current. The threshold
+    // must match the one used by init() so the seed and the live update
+    // are consistent.
+    if (pt == num_pts_ - 1 && has_failed_old_) {
+      int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
+                            (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
+                                                                                      num_failed_pts_for_death_);
+      int num_failed_pts = 0;
+      for (auto p = 0; p < num_pts_; ++p) {
+        if (static_cast<uint8_t>(Sacado::Value<ScalarT>::eval(failure_modes_(cell, p))) != 0u) {
+          ++num_failed_pts;
+        }
+      }
+      if (num_failed_pts >= threshold && (*death_status_vec_)[cell] == 0.0) {
+        (*death_status_vec_)[cell] = 1.0;
+        dead_(cell, 0)             = 1.0;
+      }
+    }
   }
 
   // Finite deformation: update the plastic deformation gradient from the

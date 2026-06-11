@@ -26,9 +26,17 @@ foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           input_confined_coarse.yaml input_confined_fd.yaml
           input_triaxial_fd.yaml input_confined_permafrost.yaml
           input_confined_thaw.yaml input_confined_f05.yaml
+          input_death_tension.yaml input_death_backstress.yaml
+          input_death_crush.yaml input_death_eqps.yaml
+          input_death_displacement.yaml
           materials.yaml materials_triaxial.yaml materials_fd.yaml
           materials_triaxial_fd.yaml materials_permafrost.yaml
           materials_permafrost_thaw.yaml materials_permafrost_f05.yaml
+          materials_permafrost_death_tension.yaml
+          materials_permafrost_death_backstress.yaml
+          materials_permafrost_death_crush.yaml
+          materials_permafrost_death_eqps.yaml
+          materials_permafrost_death_displacement.yaml
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
                  ${CMAKE_CURRENT_BINARY_DIR}/${f} COPYONLY)
@@ -106,6 +114,24 @@ if (CAP_PY_OK)
                    -P runverify.cmake
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   set_tests_properties(Permafrost_Verify_f05 PROPERTIES LABELS "LCM;Tpetra;Forward")
+
+  # Per-mode failure/death verification: each deck enables exactly one
+  # failure criterion on an already-verified trajectory; the harness
+  # checks the indicator series against the reference (machine precision)
+  # and the failure_modes bitmask / failure_state / cell_death series
+  # against the oracle-predicted trip step (exact).
+  foreach(mode tension backstress crush eqps displacement)
+    add_test(NAME Permafrost_Death_${mode}
+             COMMAND ${CMAKE_COMMAND}
+                     "-DTEST_PROG=${SerialAlbany.exe}"
+                     "-DINPUT=input_death_${mode}.yaml"
+                     "-DEXO=permafrost_death_${mode}.exo"
+                     "-DPATHMODE=death_${mode}"
+                     "-DPYTHON=${PYTHON3_FOR_CAP}"
+                     -P runverify.cmake
+             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    set_tests_properties(Permafrost_Death_${mode} PROPERTIES LABELS "LCM;Tpetra;Forward")
+  endforeach()
 else()
   message(STATUS "CapModel verification tests skipped: python3 with numpy+netCDF4 not found")
 endif()

@@ -1,0 +1,122 @@
+#
+# Permafrost failure/death verification (displacement mode): the verified
+# confined-compression path (eps_xx = -0.04 t, 200 LOCA steps) with the
+# displacement failure criterion enabled; cap_verify.py checks the
+# indicator series, the failure_modes bitmask, failure_state, and
+# cell_death against the independent reference.
+#
+LCM:
+  Problem:
+    Name: Mechanics 3D
+    Solution Method: Continuation
+    Phalanx Graph Visualization Detail: 0
+    MaterialDB Filename: materials_permafrost_death_displacement.yaml
+    Dirichlet BCs:
+      DBC on NS NodeSet0 for DOF X: 0.00000000e+00
+      Time Dependent DBC on NS NodeSet1 for DOF X:
+        Number of points: 2
+        Time Values: [0.0, 1.0]
+        BC Values: [0.0, -4.00000000e-02]
+      DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
+      DBC on NS NodeSet3 for DOF Y: 0.00000000e+00
+      DBC on NS NodeSet4 for DOF Z: 0.00000000e+00
+      DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
+    Parameters:
+      Number: 1
+      Parameter 0: Time
+    Response Functions:
+      Number: 1
+      Response 0: Solution Average
+  Discretization:
+    # Single element: all 24 DOFs are prescribed by the face BCs (the
+    # 0-free-DOF injection path), so the FE problem IS the material point
+    # and cannot bifurcate away from the homogeneous solution.
+    1D Elements: 1
+    2D Elements: 1
+    3D Elements: 1
+    Method: STK3D
+    Interleaved Ordering: true
+    Exodus Output File Name: permafrost_death_displacement.exo
+  Piro:
+    LOCA:
+      Bifurcation: { }
+      Constraints: { }
+      Predictor:
+        First Step Predictor: { }
+        Last Step Predictor: { }
+      Step Size:
+        Initial Step Size: 5.00000000e-03
+        Method: Constant
+      Stepper:
+        Continuation Method: Natural
+        Initial Value: 0.00000000e+00
+        Continuation Parameter: Time
+        Max Steps: 200
+        Max Value: 1.00000000e+00
+        Return Failed on Reaching Max Steps: false
+        Min Value: 0.00000000e+00
+        Compute Eigenvalues: false
+        Eigensolver:
+          Method: Anasazi
+          Operator: Jacobian Inverse
+          Num Eigenvalues: 0
+    NOX:
+      Status Tests:
+        Test Type: Combo
+        Combo Type: OR
+        Number of Tests: 2
+        Test 0:
+          Test Type: NormF
+          Norm Type: Two Norm
+          Scale Type: Scaled
+          Tolerance: 1.0e-10
+        Test 1:
+          Test Type: MaxIters
+          Maximum Iterations: 20
+      Direction:
+        Method: Newton
+        Newton:
+          Forcing Term Method: Constant
+          Rescue Bad Newton Solve: true
+          Stratimikos Linear Solver:
+            NOX Stratimikos Options: { }
+            Stratimikos:
+              Linear Solver Type: Belos
+              Linear Solver Types:
+                Belos:
+                  Solver Type: Block GMRES
+                  Solver Types:
+                    Block GMRES:
+                      Convergence Tolerance: 1.0e-10
+                      Output Frequency: 10
+                      Output Style: 1
+                      Verbosity: 0
+                      Maximum Iterations: 200
+                      Block Size: 1
+                      Num Blocks: 200
+                      Flexible Gmres: false
+              Preconditioner Type: Ifpack2
+              Preconditioner Types:
+                Ifpack2:
+                  Overlap: 1
+                  Prec Type: ILUT
+      Line Search:
+        Full Step:
+          Full Step: 1.0
+        Method: Full Step
+      Nonlinear Solver: Line Search Based
+      Printing:
+        Output Precision: 3
+        Output Processor: 0
+        Output Information:
+          Error: true
+          Warning: false
+          Outer Iteration: true
+          Parameters: false
+          Details: false
+          Linear Solver Details: false
+          Stepper Iteration: true
+          Stepper Details: false
+          Stepper Parameters: false
+      Solver Options:
+        Status Test Check Type: Minimal

@@ -24,9 +24,9 @@
 
 foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           input_confined_coarse.yaml input_confined_fd.yaml
-          input_triaxial_fd.yaml
+          input_triaxial_fd.yaml input_confined_permafrost.yaml
           materials.yaml materials_triaxial.yaml materials_fd.yaml
-          materials_triaxial_fd.yaml
+          materials_triaxial_fd.yaml materials_permafrost.yaml
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
                  ${CMAKE_CURRENT_BINARY_DIR}/${f} COPYONLY)
@@ -66,6 +66,17 @@ if (CAP_PY_OK)
              WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     set_tests_properties(CapModel_Verify_${case} PROPERTIES LABELS "LCM;Tpetra;Forward")
   endforeach()
+  # Permafrost Phase-0 scaffold: must reproduce CapModel/reference exactly
+  add_test(NAME Permafrost_Equivalence_confined
+           COMMAND ${CMAKE_COMMAND}
+                   "-DTEST_PROG=${SerialAlbany.exe}"
+                   "-DINPUT=input_confined_permafrost.yaml"
+                   "-DEXO=permafrost_confined.exo"
+                   "-DPATHMODE=confined"
+                   "-DPYTHON=${PYTHON3_FOR_CAP}"
+                   -P runverify.cmake
+           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set_tests_properties(Permafrost_Equivalence_confined PROPERTIES LABELS "LCM;Tpetra;Forward")
 else()
   message(STATUS "CapModel verification tests skipped: python3 with numpy+netCDF4 not found")
 endif()

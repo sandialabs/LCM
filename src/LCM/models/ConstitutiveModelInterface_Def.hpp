@@ -8,6 +8,7 @@
 #include "AnisotropicHyperelasticDamageModel.hpp"
 #include "AnisotropicViscoplasticModel.hpp"
 #include "CapModel.hpp"
+#include "Permafrost.hpp"
 #include "CreepModel.hpp"
 #include "CrystalPlasticityModel.hpp"
 #include "DruckerPragerModel.hpp"
@@ -249,6 +250,8 @@ ConstitutiveModelInterface<EvalT, Traits>::initializeModel(Teuchos::ParameterLis
     model = rcp(new AnisotropicViscoplasticModel<EvalT, Traits>(p, dl));
   } else if (model_name == "Cap") {
     model = rcp(new CapModel<EvalT, Traits>(p, dl));
+  } else if (model_name == "Permafrost") {
+    model = rcp(new Permafrost<EvalT, Traits>(p, dl));
   } else if (model_name == "Creep") {
     model = rcp(new CreepModel<EvalT, Traits>(p, dl));
   } else if (model_name == "CrystalPlasticity") {

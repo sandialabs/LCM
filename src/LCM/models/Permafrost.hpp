@@ -2,8 +2,8 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 
-#if !defined(LCM_CapModel_hpp)
-#define LCM_CapModel_hpp
+#if !defined(LCM_Permafrost_hpp)
+#define LCM_Permafrost_hpp
 
 #include <MiniTensor.h>
 
@@ -12,23 +12,23 @@
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-struct CapModelKernel : public ParallelKernel<EvalT, Traits>
+struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
 {
   ///
   /// Constructor
   ///
-  CapModelKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
+  PermafrostKernel(ConstitutiveModel<EvalT, Traits>& model, Teuchos::ParameterList* p, Teuchos::RCP<Albany::Layouts> const& dl);
 
   ///
   /// No copy constructor
   ///
-  CapModelKernel(CapModelKernel const&) = delete;
+  PermafrostKernel(PermafrostKernel const&) = delete;
 
   ///
   /// No copy assignment
   ///
-  CapModelKernel&
-  operator=(CapModelKernel const&) = delete;
+  PermafrostKernel&
+  operator=(PermafrostKernel const&) = delete;
 
   using ScalarT          = typename EvalT::ScalarT;
   using ScalarField      = PHX::MDField<ScalarT>;
@@ -103,12 +103,12 @@ struct CapModelKernel : public ParallelKernel<EvalT, Traits>
 };
 
 template <typename EvalT, typename Traits>
-class CapModel : public LCM::KernelConstitutiveModel<EvalT, Traits, CapModelKernel<EvalT, Traits>>
+class Permafrost : public LCM::KernelConstitutiveModel<EvalT, Traits, PermafrostKernel<EvalT, Traits>>
 {
  public:
-  CapModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
+  Permafrost(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl);
 };
 
 }  // namespace LCM
 
-#endif  // LCM_CapModel_hpp
+#endif  // LCM_Permafrost_hpp

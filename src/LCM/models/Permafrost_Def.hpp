@@ -2,35 +2,32 @@
 // Sandia, LLC (NTESS). This Software is released under the BSD license detailed
 // in the file license.txt in the top-level Albany directory.
 //
-// Small-strain, three-invariant, isotropic/kinematic hardening cap
-// plasticity model with refined explicit integration and drift correction.
+// Permafrost constitutive model: the three-invariant cap plasticity
+// model specialized for frozen/thawing sediment in the ACE Arctic
+// coastal erosion application, intended to replace J2Erosion. The
+// integration and constitutive functions live in the shared
+// CapIntegrator (verified against an independent reference; see
+// doc/developersGuide/cap_plasticity.tex, including the section
+// "Planned Extension: Permafrost and Erosion" for the design recorded
+// for this model).
 //
-// References ("the sources"):
-//  [1] C.D. Foster, R.A. Regueiro, A.F. Fossum, R.I. Borja, "Implicit
-//      numerical integration of a three-invariant, isotropic/kinematic
-//      hardening cap plasticity model for geomaterials", CMAME 194 (2005)
-//      5109-5138.
-//  [2] R.A. Regueiro, C.D. Foster, "Bifurcation analysis for a
-//      rate-sensitive, non-associative, three-invariant, isotropic/kinematic
-//      hardening cap plasticity model for geomaterials: Part I. Small
-//      strain", IJNAMG 35 (2011) 201-225.
-//  [3] W. Sun, Q. Chen, J.T. Ostien, "Modeling the hydro-mechanical
-//      responses of strip and circular punch loadings on water-saturated
-//      collapsible geomaterials", Acta Geotechnica 9 (2014) 903-934.
-//  [4] A.F. Fossum, R.M. Brannon, "The Sandia GeoModel: Theory and User's
-//      Guide", SAND2004-3226 -- and its LAME reference implementation
-//      (sierra/code/lame/src/models/development/iso_geomodel_model.F),
-//      which arbitrates conventions the papers leave ambiguous.
+// PHASE 0 (current): scaffold. Behaves identically to CapModel with a
+// single parameter set; this is asserted by the equivalence test in
+// tests/LCM/CapModelPlasticity3D. Subsequent phases per the documented
+// plan: (1) frozen/thawed end-member parameter sets blended per
+// integration point by ice saturation, with the (K, G) elasticity
+// split; (2) failure indicators and element-death plumbing;
+// (3) ACE workflow integration.
 #include <MiniTensor.h>
 
 #include "Albany_Utils.hpp"
 #include "CapIntegrator.hpp"
-#include "CapModel.hpp"
+#include "Permafrost.hpp"
 
 namespace LCM {
 
 template <typename EvalT, typename Traits>
-CapModelKernel<EvalT, Traits>::CapModelKernel(
+PermafrostKernel<EvalT, Traits>::PermafrostKernel(
     ConstitutiveModel<EvalT, Traits>& model,
     Teuchos::ParameterList*           p,
     Teuchos::RCP<Albany::Layouts> const& dl)
@@ -117,7 +114,7 @@ CapModelKernel<EvalT, Traits>::CapModelKernel(
 
 template <typename EvalT, typename Traits>
 void
-CapModelKernel<EvalT, Traits>::init(
+PermafrostKernel<EvalT, Traits>::init(
     Workset&                workset,
     FieldMap<ScalarT const>& dep_fields,
     FieldMap<ScalarT>&       eval_fields)
@@ -166,7 +163,7 @@ CapModelKernel<EvalT, Traits>::init(
 
 template <typename EvalT, typename Traits>
 KOKKOS_INLINE_FUNCTION void
-CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
+PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
 {
   using Tensor  = minitensor::Tensor<ScalarT>;
   using Tensor4 = minitensor::Tensor4<ScalarT>;

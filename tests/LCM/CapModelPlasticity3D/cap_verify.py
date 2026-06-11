@@ -192,10 +192,70 @@ def death_main(exo, path):
     return 0 if ok else 1
 
 
+def porosity_main(exo):
+    """W overridden per integration point by the linear porosity(z)
+    profile (depth_test.txt / porosity_test.txt). With all DOFs
+    prescribed, each Gauss point is an independent material point: the
+    four points at each z-abscissa follow the reference run with
+    W = porosity(z) exactly, so the per-point value multisets (sorted,
+    integration-point numbering independent) match at machine precision."""
+    t, var = exo_open(exo)
+    nsteps = len(t) - 1
+    eps = lambda time: -0.02 * time * ref.I3
+
+    z_qp = (0.5 - 0.5 / np.sqrt(3.0), 0.5 + 0.5 / np.sqrt(3.0))
+    w_qp = [np.interp(z, [0.0, 1.0], [0.10, 0.04]) for z in z_qp]
+
+    mask = np.ones(len(t), dtype=bool)
+    if len(t) > 1:
+        mask[1] = False
+
+    ok = True
+
+    def check(name, a, b, scale, tol):
+        nonlocal ok
+        err = np.abs(np.asarray(a)[mask] - np.asarray(b)[mask]).max() / scale
+        status = 'ok' if err < tol else 'FAIL'
+        print(f'  {name:24s} max rel diff = {err:.3e}  [{status}]')
+        ok &= err < tol
+
+    print(f'== porosity_profile: Albany ({exo}) vs cap_reference, {nsteps} steps ==')
+    TOL = 1.0e-4
+
+    # Two reference runs, one per z-group.
+    series = {}
+    for w in w_qp:
+        end = dict(ref.SALEM_END, W=w)
+        hist = ref.drive_permafrost(eps, lambda time: 1.0, nsteps,
+                                    end, end, SALEM_SHARED)
+        P = ref.permafrost_map(1.0, end, end, SALEM_SHARED)
+        series[w] = dict(
+            sxx=np.array([h[1][0, 0] for h in hist]),
+            kappa=np.array([h[2] for h in hist]),
+            evp=np.array([h[3] for h in hist]),
+            crush=np.array([ref.indicators(h[1], h[4], h[2], h[5], P)['crush']
+                            for h in hist]))
+
+    for key, exo_name in (('sxx', 'Cauchy_Stress_1'), ('kappa', 'Cap_Parameter'),
+                          ('evp', 'volPlastic_Strain'), ('crush', 'Crush_Indicator')):
+        o_sorted = np.sort(np.array(
+            [[series[w][key][i] for w in w_qp for _ in range(4)]
+             for i in range(len(t))]), axis=1)
+        a_sorted = np.sort(np.array(
+            [var(f'{exo_name}_{p}') for p in range(1, NUM_PTS + 1)]).T, axis=1)
+        scale = max(np.abs(o_sorted).max(), 1.0e-12)
+        check(f'{key} (sorted per-pt)', a_sorted, o_sorted, scale, TOL)
+
+    print('VERIFICATION', 'PASS' if ok else 'FAIL')
+    return 0 if ok else 1
+
+
 def main():
     exo, path = sys.argv[1], sys.argv[2]
     if path in DEATH_MODES:
         return death_main(exo, path)
+    if path == 'porosity_profile':
+        return porosity_main(exo)
     p = ref.CapParams()
 
     if path == 'hydrostatic':

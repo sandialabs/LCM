@@ -1,0 +1,89 @@
+LCM:
+
+  ElementBlocks:
+    top_block:
+      material: Permafrost
+    bottom_block:
+      material: Permafrost
+
+  Materials:
+    # Permafrost (cap plasticity) replacement for the J2Erosion material
+    # of the MiniErosion test, in SI units (Pa). The end members mirror
+    # the J2Erosion constants: frozen elasticity is the (K, G) image of
+    # E = 1.0e9, nu = 0.2 and the frozen cohesion is the von Mises image
+    # of Y = 3.0e6 (zero-pressure shear strength A - C = Y/sqrt(3), with
+    # N at 20% of it for kinematic-hardening room); the thawed values are
+    # the images of the residual E = 1.0e4 and the soil strength 5.0e3.
+    # The cap branch point is identical in both end members and far
+    # outside the gravity stress range, so compaction is inactive and
+    # failure proceeds through the shear criteria, as in J2Erosion.
+    Permafrost:
+      Material Model:
+        Model Name: Permafrost
+      Finite Deformation: true
+      Have ACE Ice Saturation: true
+
+      Frozen Parameters:
+        K: 5.5555555555555556e+08
+        G: 4.1666666666666667e+08
+        A: 2.0e+06
+        C: 2.6794919243112305e+05
+        N: 3.4641016151377546e+05
+        kappa0: -1.0e+07
+        W: 0.60
+        D1: 1.0e-08
+        calpha: 1.0e+09
+      Thawed Parameters:
+        K: 5.5555555555555556e+03
+        G: 4.1666666666666667e+03
+        A: 3.5e+03
+        C: 6.1324973081037426e+02
+        N: 5.7735026918962584e+02
+        kappa0: -1.0e+07
+        W: 0.60
+        D1: 1.0e-08
+        calpha: 1.0e+06
+        D: 4.0e-10
+        theta: 0.10
+        L: 4.0e-10
+        phi: 0.08
+        R: 5.0
+        Q: 5.0
+        psi: 1.0
+        D2: 0.0
+
+      # The pore space is the crushable volume; constant porosity as in
+      # the J2Erosion deck (no depth profile in this test).
+      ACE Bulk Porosity: 0.60
+
+      # Failure criteria. The constitutive criteria mirror the J2Erosion
+      # deck's intent (the strain limit becomes an equivalent-plastic-
+      # strain limit; backstress saturation replaces the yield-onset
+      # criterion; tension trips approaching the surface apex). The
+      # displacement limit is deliberately TIGHT for this short test: the
+      # 20-step run stays frozen and elastic (as in MiniErosion, whose
+      # gold has no dead cells), so a limit below the gravity settlement
+      # of the upper cells is what exercises live death, the active-part
+      # update, and the workset rebuilds with this material. The
+      # production value would be on the order of the J2Erosion deck's
+      # 0.35 m.
+      Maximum Displacement: 2.5e-05
+      Critical Angle: 0.10
+      Maximum Equivalent Plastic Strain: 0.05
+      Backstress Indicator Threshold: 0.95
+      Tension Indicator Threshold: 0.90
+      Disable Erosion: false
+
+      Density: 1800.0
+      Body Force:
+        Body Force Type: Constant
+        Value: [0.0, 0.0, -18.00e+03]
+
+      Output Cauchy Stress: true
+      Output eqps: true
+      Output Failure State: true
+      Output Cell Death: true
+      Output Failure Modes: true
+      Output Backstress Indicator: true
+      Output Tension Indicator: true
+      Output Eqps Indicator: true

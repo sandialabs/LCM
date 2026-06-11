@@ -37,6 +37,8 @@ foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           materials_permafrost_death_crush.yaml
           materials_permafrost_death_eqps.yaml
           materials_permafrost_death_displacement.yaml
+          input_porosity.yaml materials_permafrost_porosity.yaml
+          depth_test.txt porosity_test.txt
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
                  ${CMAKE_CURRENT_BINARY_DIR}/${f} COPYONLY)
@@ -114,6 +116,20 @@ if (CAP_PY_OK)
                    -P runverify.cmake
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   set_tests_properties(Permafrost_Verify_f05 PROPERTIES LABELS "LCM;Tpetra;Forward")
+
+  # Porosity-profile override: W = porosity(z) per integration point; the
+  # two Gauss-point z-groups are independent material points verified
+  # against two reference runs.
+  add_test(NAME Permafrost_Verify_porosity
+           COMMAND ${CMAKE_COMMAND}
+                   "-DTEST_PROG=${SerialAlbany.exe}"
+                   "-DINPUT=input_porosity.yaml"
+                   "-DEXO=permafrost_porosity.exo"
+                   "-DPATHMODE=porosity_profile"
+                   "-DPYTHON=${PYTHON3_FOR_CAP}"
+                   -P runverify.cmake
+           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set_tests_properties(Permafrost_Verify_porosity PROPERTIES LABELS "LCM;Tpetra;Forward")
 
   # Per-mode failure/death verification: each deck enables exactly one
   # failure criterion on an already-verified trajectory; the harness

@@ -46,6 +46,7 @@
 
 #include <MiniTensor.h>
 
+#include "ACEcommon.hpp"
 #include "Albany_Utils.hpp"
 #include "CapIntegrator.hpp"
 #include "Permafrost.hpp"
@@ -147,6 +148,48 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   ALBANY_ASSERT(
       tension_indicator_threshold_ < 1.0 && backstress_indicator_threshold_ < 1.0 && crush_indicator_threshold_ < 1.0,
       "Permafrost: indicator thresholds must be < 1 (the indicators reach 1 only asymptotically)");
+
+  // ACE environment. Depth profiles are functions of z above mean sea
+  // level; when a porosity source is present (file or the constant
+  // ACE Bulk Porosity) it overrides the crushable volume W at each
+  // integration point -- the pore space is the crushable volume,
+  // independent of what fills it. Peat raises the eqps limit
+  // (peat is more ductile than mineral sediment; provisional parity rule
+  // pending calibration). Submerged cells of the erodible sets are
+  // weakened: the cohesion (the ice/cement bond, A - C and N) by the
+  // cohesion factor, the elastic moduli (uniformly, preserving nu) by
+  // the stiffness factor, and the eqps limit by its factor.
+  bulk_porosity_        = p->get<RealType>("ACE Bulk Porosity", 0.0);
+  cohesion_weakening_   = p->get<RealType>("ACE Cohesion Weakening Factor", 1.0);
+  stiffness_weakening_  = p->get<RealType>("ACE Stiffness Weakening Factor", 1.0);
+  eqps_limit_weakening_ = p->get<RealType>("ACE Eqps Limit Weakening Factor", 1.0);
+  if (p->isParameter("ACE Sea Level File")) {
+    sea_level_ = vectorFromFile(p->get<std::string>("ACE Sea Level File"));
+  }
+  if (p->isParameter("ACE Time File")) {
+    time_ = vectorFromFile(p->get<std::string>("ACE Time File"));
+  }
+  ALBANY_ASSERT(time_.size() == sea_level_.size(), "Permafrost: ACE Time File and ACE Sea Level File must have the same length");
+  if (p->isParameter("ACE Z Depth File")) {
+    z_above_mean_sea_level_ = vectorFromFile(p->get<std::string>("ACE Z Depth File"));
+  }
+  if (p->isParameter("ACE_Porosity File")) {
+    porosity_from_file_ = vectorFromFile(p->get<std::string>("ACE_Porosity File"));
+    ALBANY_ASSERT(
+        z_above_mean_sea_level_.size() == porosity_from_file_.size(),
+        "Permafrost: ACE Z Depth File and ACE_Porosity File must have the same length");
+  }
+  if (p->isParameter("ACE Peat File")) {
+    peat_from_file_ = vectorFromFile(p->get<std::string>("ACE Peat File"));
+    ALBANY_ASSERT(
+        z_above_mean_sea_level_.size() == peat_from_file_.size(),
+        "Permafrost: ACE Z Depth File and ACE Peat File must have the same length");
+  }
+
+  // Integration-point coordinates are needed only to evaluate the depth
+  // profiles and the submersion test.
+  have_height_ = z_above_mean_sea_level_.size() > 0 || sea_level_.size() > 0;
+  if (have_height_) this->setIntegrationPointLocationFlag(true);
 
   // retrieve appropriate field name strings
   std::string const cauchy_string           = field_name_map_["Cauchy_Stress"];
@@ -329,6 +372,8 @@ PermafrostKernel<EvalT, Traits>::init(
     has_failed_old_   = true;
   }
 
+  cell_is_erodible_ = workset.cell_is_erodible;
+
   current_time_ = workset.current_time;
 
   // Resolve the death threshold against num_pts_. A 0 value (the
@@ -422,6 +467,31 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT f_old = ice_sat_state_old_(cell, pt);
   ice_sat_state_(cell, pt) = f_ice;
 
+  // ACE environment at this integration point: depth profiles and the
+  // submersion test. All evaluated on values (the profiles are data).
+  RealType height = 0.0;
+  if (have_height_) {
+    auto const coords = this->model_.getCoordVecField();
+    height            = Sacado::Value<ScalarT>::eval(coords(cell, pt, 2));
+  }
+  RealType const sea_level = sea_level_.size() > 0 ? interpolateVectors(time_, sea_level_, current_time_) : -999.0;
+  RealType const porosity =
+      porosity_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, porosity_from_file_, height) : bulk_porosity_;
+  RealType const peat = peat_from_file_.size() > 0 ? interpolateVectors(z_above_mean_sea_level_, peat_from_file_, height) : 0.0;
+
+  // Ocean exposure: cells of the erodible sets at or below sea level are
+  // weakened. The weakening is instantaneous at the submersion flip (the
+  // J2Erosion convention); unlike the saturation, it is not ramped
+  // across the step, but it scales the moduli uniformly so the stored
+  // stress re-expression is unaffected.
+  bool const is_erodible = cell_is_erodible_.size() > 0 && cell_is_erodible_[cell] != 0;
+  bool const submerged   = is_erodible && have_height_ && height <= sea_level;
+
+  // Effective eqps limit: peat raises it, ocean exposure lowers it.
+  RealType max_eqps_eff = maximum_eqps_;
+  if (peat > 0.0) max_eqps_eff *= 1.0 + peat;
+  if (submerged) max_eqps_eff /= eqps_limit_weakening_;
+
   // Saturation-to-parameter map (see the file banner). Elasticity from
   // the (K, G) split: the shear modulus carries the order-of-magnitude
   // ice-bonding dependence (log-linear); the bulk modulus is bounded
@@ -455,6 +525,20 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     P.Q      = Q_;
     P.psi    = psi_;
     P.D2     = D2_;
+
+    // ACE overrides: the porosity profile sets the crushable volume (the
+    // pore space is what crushes, independent of what fills it), and
+    // ocean exposure knocks down the cohesion -- C rises toward A so the
+    // zero-pressure strength (A - C) and the offset N shrink by the
+    // factor, leaving the friction slope and asymptote intact -- and the
+    // moduli, uniformly (nu, and hence the nu cap, unaffected).
+    if (porosity > 0.0) P.W = porosity;
+    if (submerged) {
+      P.C    = P.A - (P.A - P.C) / cohesion_weakening_;
+      P.N    = P.N / cohesion_weakening_;
+      P.lame = P.lame / stiffness_weakening_;
+      P.mu   = P.mu / stiffness_weakening_;
+    }
     return P;
   };
 
@@ -643,9 +727,10 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     RealType const evp_v = Wv * (std::exp(D1v * dX - D2v * dX * dX) - 1.0);
     RealType const crush_ind = Wv > 0.0 ? std::max(0.0, -evp_v) / Wv : 0.0;
 
-    // Equivalent plastic strain against the user limit.
+    // Equivalent plastic strain against the effective limit (deck limit
+    // adjusted by peat and ocean exposure above).
     RealType const eqps_new = eqps_old_(cell, pt) + Sacado::Value<ScalarT>::eval(deqps);
-    RealType const eqps_ind = maximum_eqps_ > 0.0 ? eqps_new / maximum_eqps_ : 0.0;
+    RealType const eqps_ind = max_eqps_eff > 0.0 ? eqps_new / max_eqps_eff : 0.0;
 
     // Structural criteria carried over from J2Erosion: tilt angle of the
     // rotation part of F (finite deformation only; polar_rotation is
@@ -703,7 +788,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     trip(crush_indicator_threshold_ > 0.0 && crush_ind >= crush_indicator_threshold_, 0x04, 100.0);
     trip(critical_angle_ > 0.0 && std::abs(theta_tilt) >= critical_angle_, 0x08, 1000.0);
     trip(disp_failure, 0x10, 10000.0);
-    trip(maximum_eqps_ > 0.0 && eqps_ind >= 1.0, 0x20, 100000.0);
+    trip(max_eqps_eff > 0.0 && eqps_ind >= 1.0, 0x20, 100000.0);
 
     // Persist this fill's updated bitmask (old | newly tripped bits) to
     // the STK-backed state, so it follows the cell across workset

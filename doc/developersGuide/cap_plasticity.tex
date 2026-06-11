@@ -1152,10 +1152,40 @@ series match the reference-predicted trip step exactly (the
 displacement criterion additionally checks the per-point indicator
 multiset against the analytic Gauss-point displacements). The death
 states are consumed by the existing ACE solver and scatter machinery
-without modification; exercising the full erosion loop (part
-changes, workset rebuilds) under the ACE solver is part of the ACE
-workflow integration (Phase 3), which remains, along with the
-ocean-exposure weakening and depth profiles.
+without modification.
+
+Phase 3 (ACE workflow) is implemented: depth profiles of porosity and
+peat (\texttt{ACE Z Depth File}, \texttt{ACE\_Porosity File},
+\texttt{ACE Peat File}, or the constant \texttt{ACE Bulk Porosity}),
+sea level against time, and ocean-exposure weakening. The porosity
+overrides the crushable volume $W$ at each integration point --- the
+pore space is the crushable volume, independent of what fills it ---
+verified at machine precision against two reference runs through the
+two Gauss-point depth groups of a single-element deck. Peat raises
+the eqps limit by the factor $(1 + \mathrm{peat})$, a provisional
+parity rule pending calibration. Submerged cells of the erodible
+sets are weakened: the cohesion by its factor ($C$ rises toward $A$,
+shrinking the zero-pressure strength $A - C$ and the offset $N$
+while leaving the friction slope and asymptote intact), the moduli
+uniformly (so $\nu$, and the stored-stress re-expression, are
+unaffected), and the eqps limit by its factor. Unlike the
+saturation, the weakening switches on instantaneously when a cell
+submerges (the \texttt{J2Erosion} convention); if waterline flips
+ever destabilize the drift correction the way parameter jumps did in
+Phase 1, the submersion state should be ramped the same way. The
+full erosion loop --- live death, the active-part update, workset
+rebuilds on the shared ACE mesh --- runs with \texttt{Permafrost} in
+a MiniErosion-style coupled test in which a deliberately tight
+displacement limit kills the settled upper cells early and the run
+continues on the eroded mesh. One calibration note: because the cap
+position $\kappa$ is plastic memory while $\kappa_0(f)$ is a
+parameter, a state integrated under frozen parameters and then read
+under thawed ones sits far inside the thawed crush curve, i.e.\ it
+is reinterpreted as heavily precompacted; end members should be
+calibrated with a common $\kappa_0$ unless that reinterpretation is
+intended. Remaining for validation (Phase 4): frozen/thawed
+end-member calibration and the bluff-scale side-by-side against
+\texttt{J2Erosion}.
 
 \paragraph{Calibration.}
 Thawed end member from standard soil-mechanics cap parameters for

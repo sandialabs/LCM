@@ -160,6 +160,24 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   Teuchos::Array<RealType> ice_sat_values_;
   RealType                 ice_sat_constant_;
 
+  // ACE environment (Phase 3): depth profiles of porosity (overrides the
+  // crushable volume W) and peat (raises the eqps limit), sea level
+  // against time, and the ocean-exposure weakening factors applied to
+  // submerged cells of the erodible sets.
+  std::vector<RealType> z_above_mean_sea_level_;
+  std::vector<RealType> porosity_from_file_;
+  std::vector<RealType> peat_from_file_;
+  std::vector<RealType> sea_level_;
+  std::vector<RealType> time_;
+  RealType              bulk_porosity_{0.0};  // constant fallback; 0 = no W override
+  RealType              cohesion_weakening_{1.0};
+  RealType              stiffness_weakening_{1.0};
+  RealType              eqps_limit_weakening_{1.0};
+  bool                  have_height_{false};
+
+  // Per-cell flag for "*-erodible" side-set membership (ocean exposure).
+  Teuchos::ArrayRCP<std::uint8_t> cell_is_erodible_;
+
   RealType substep_tolerance_;
   int      max_substeps_;
 

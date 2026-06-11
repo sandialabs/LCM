@@ -1,0 +1,46 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: Permafrost
+  Materials:
+    # Porosity-profile verification: Salem-image end members with the
+    # crushable volume W overridden per integration point by the linear
+    # porosity(z) profile (0.10 at z = 0 to 0.04 at z = 1). The two
+    # Gauss-point z-groups of the unit cube integrate as independent
+    # material points (all DOFs prescribed) and are verified against two
+    # reference runs.
+    Permafrost:
+      Material Model:
+        Model Name: Permafrost
+      Finite Deformation: false
+      ACE Z Depth File: 'depth_test.txt'
+      ACE_Porosity File: 'porosity_test.txt'
+      Output Crush Indicator: true
+      Frozen Parameters:
+        K: 15177.03284868067
+        G: 9001.517087192591
+        A: 689.2
+        C: 675.2
+        N: 6.0
+        kappa0: -8.05
+        W: 0.08
+        D1: 0.00147
+        calpha: 100000.0
+      Thawed Parameters:
+        K: 15177.03284868067
+        G: 9001.517087192591
+        A: 689.2
+        C: 675.2
+        N: 6.0
+        kappa0: -8.05
+        W: 0.08
+        D1: 0.00147
+        calpha: 100000.0
+        D: 0.000394
+        theta: 0.0
+        L: 0.000394
+        phi: 0.0
+        R: 28.0
+        Q: 28.0
+        psi: 1.0
+        D2: 0.0

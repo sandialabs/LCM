@@ -547,6 +547,37 @@ evaluations of the same state take identical branch sequences and the
 AD tangent differentiates exactly the code path that produced the
 stress.
 
+\paragraph{Evolving material parameters.}
+The integrator accepts \emph{two} parameter sets, for the beginning and
+end of the strain increment, and ramps linearly between them across the
+substep pseudo-time: RK1 rates use the substep-start parameters, RK2
+rates and the drift correction the substep-end parameters. With
+constant parameters (the \texttt{Cap} model) the two sets are equal and
+the scheme reduces to the fixed-parameter integrator. This mechanism
+exists for models whose parameters follow an external field --- the
+Permafrost model's ice saturation --- and it is not merely an accuracy
+refinement. If instead the parameters jump once per step, a softening
+step leaves the stored stress far outside the shrunken yield surface,
+and the entire correction is delivered by the drift projection, whose
+consistent/normal fallback decision then sits on a knife edge: in a
+thaw-under-load verification study the resulting trajectories were
+hypersensitive to roundoff (relative perturbations of $10^{-16}$ in the
+moduli grew to order-one trajectory differences, with two distinct
+attractors). Ramping the parameters keeps each substep's surface motion
+small, the drift corrections small, and the trajectory robust --- the
+same study then matched the reference implementation to
+$\sim 10^{-15}$.
+
+Two consistency requirements accompany evolving parameters. First, the
+elastic strain, not the stress, is the state: when the moduli change
+between steps, the stored stress must be re-expressed through the
+current stiffness, $\stress_n \leftarrow \Celast(f) :
+[\Celast(f_{\mathrm{old}})]^{-1} : \stress_n$, before integrating (the
+finite-deformation path does this by construction, recovering the
+elastic logarithmic strain from the stored plastic geometry). Second,
+the previous step's parameter state must be available; the Permafrost
+model stores its ice saturation as a state variable for this purpose.
+
 \paragraph{Material parameters of the integrator.}
 \texttt{Substep Tolerance} (STOL, default $10^{-4}$) and
 \texttt{Maximum Substeps} (default 200). A rejected attempt counts
@@ -1069,6 +1100,22 @@ pore-pressure/effective-stress coupling --- the source paper
 \citet{Sun.Chen.Ostien:2014} is itself a $u$--$p$ poromechanics
 formulation, so the model is built for that extension if ACE ever
 resolves pore fluid.
+
+\paragraph{Implementation status.}
+Phases 0 and 1 are implemented: the model exists as \texttt{Permafrost}
+(material-database name \texttt{Permafrost}), built on the shared
+verified integrator, with frozen/thawed end-member parameter sublists,
+the saturation-to-parameter map above (including the $(K, G)$
+elasticity split with the capped effective Poisson ratio), ice
+saturation from the ACE field, a time table, or a constant, the
+within-step parameter ramping described in
+Section~\ref{sec:integration}, and thermal stretch in the
+finite-deformation path. Verification: equivalence with \texttt{Cap}
+at $f = 1$, the full map at constant $f = 0.5$, and thaw under load
+($f: 1 \to 0.3$ during confined compression) all match the reference
+implementation at machine precision. Failure indicators and
+element-death plumbing (Phase 2) and ACE workflow integration
+(Phase 3) remain.
 
 \paragraph{Calibration.}
 Thawed end member from standard soil-mechanics cap parameters for

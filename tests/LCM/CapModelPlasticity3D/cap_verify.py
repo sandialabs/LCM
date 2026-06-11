@@ -53,12 +53,23 @@ def main():
     elif path == 'triaxial_fd':
         F_of_t = lambda t: np.diag([1.0 - 0.025 * t, 1.0 - 0.008 * t, 1.0 - 0.012 * t])
         p = ref.CapParams(psi=0.8, L=3.5e-4, phi=0.085, theta=0.1, Q=20.0)
+    elif path == 'permafrost_thaw':
+        eps = lambda t: np.diag([-0.04 * t, 0.0, 0.0])
+        # Two-point table [0,1] -> [1.0, 0.3]: same end-clamped linear
+        # interpolation as the kernel's interpolate_table.
+        f_of_t = lambda t: 1.0 + (0.3 - 1.0) * (t - 0.0) / (1.0 - 0.0)
+    elif path == 'permafrost_f05':
+        eps = lambda t: np.diag([-0.04 * t, 0.0, 0.0])
+        f_of_t = lambda t: 0.5
     else:
         sys.exit(f'unknown path {path}')
 
     t, sxx, syy, szz, sxy, kappa, evp = exo_series(exo)
     nsteps = len(t) - 1
-    if path.endswith('_fd'):
+    if path.startswith('permafrost_'):
+        hist = ref.drive_permafrost(eps, f_of_t, nsteps, ref.SALEM_END,
+                                    ref.THAWED_TEST_END, ref.THAWED_TEST_SHARED)
+    elif path.endswith('_fd'):
         hist = ref.drive_fd(F_of_t, nsteps, p)
     else:
         hist = ref.drive(eps, nsteps, p)

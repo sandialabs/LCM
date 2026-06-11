@@ -3,29 +3,40 @@ LCM:
     Block0:
       material: Permafrost
   Materials:
-    # Phase-0 equivalence check: the Permafrost scaffold with a single
-    # parameter set must reproduce CapModel (and hence the reference
-    # implementation) exactly. Same Salem limestone set as materials.yaml.
+    # Phase-1 equivalence check: with both end members set to the Salem
+    # limestone values and ice saturation at its default (1.0, frozen),
+    # the Permafrost saturation-to-parameter map must reproduce CapModel
+    # (and hence the reference implementation). The elastic constants are
+    # the exact (K, G) images of Salem's E = 22547, nu = 0.2524.
     Permafrost:
       Material Model:
         Model Name: Permafrost
-      # Small-strain model: this flag routes MechanicsProblem to compute
-      # the infinitesimal Strain field the kernel consumes.
       Finite Deformation: false
-      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
-      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
-      A: 689.2
-      D: 0.000394
-      C: 675.2
-      theta: 0.0
-      R: 28.0
-      kappa0: -8.05
-      W: 0.08
-      D1: 0.00147
-      D2: 0.0
-      calpha: 100000.0
-      psi: 1.0
-      N: 6.0
-      L: 0.000394
-      phi: 0.0
-      Q: 28.0
+      Frozen Parameters:
+        K: 15177.03284868067
+        G: 9001.517087192591
+        A: 689.2
+        C: 675.2
+        N: 6.0
+        kappa0: -8.05
+        W: 0.08
+        D1: 0.00147
+        calpha: 100000.0
+      Thawed Parameters:
+        K: 15177.03284868067
+        G: 9001.517087192591
+        A: 689.2
+        C: 675.2
+        N: 6.0
+        kappa0: -8.05
+        W: 0.08
+        D1: 0.00147
+        calpha: 100000.0
+        D: 0.000394
+        theta: 0.0
+        L: 0.000394
+        phi: 0.0
+        R: 28.0
+        Q: 28.0
+        psi: 1.0
+        D2: 0.0

@@ -6,18 +6,30 @@
 // model specialized for frozen/thawing sediment in the ACE Arctic
 // coastal erosion application, intended to replace J2Erosion. The
 // integration and constitutive functions live in the shared
-// CapIntegrator (verified against an independent reference; see
-// doc/developersGuide/cap_plasticity.tex, including the section
-// "Planned Extension: Permafrost and Erosion" for the design recorded
-// for this model).
+// CapIntegrator (verified against an independent reference); this
+// kernel supplies parameters that vary per integration point with the
+// ice saturation f. The design is recorded in
+// doc/developersGuide/cap_plasticity.tex, Section "Planned Extension:
+// Permafrost and Erosion".
 //
-// PHASE 0 (current): scaffold. Behaves identically to CapModel with a
-// single parameter set; this is asserted by the equivalence test in
-// tests/LCM/CapModelPlasticity3D. Subsequent phases per the documented
-// plan: (1) frozen/thawed end-member parameter sets blended per
-// integration point by ice saturation, with the (K, G) elasticity
-// split; (2) failure indicators and element-death plumbing;
-// (3) ACE workflow integration.
+// Saturation-to-parameter map (Phase 1):
+//   cohesion/bonding  A, C, N, calpha     linear between end members
+//   crush             kappa0, W, D1       linear between end members
+//   friction/shape    D, theta, L, phi,   thawed (sediment skeleton)
+//                     R, Q, psi, D2       values, f-independent
+//   elasticity        G(f) log-linear; K(f) linear; effective nu
+//                     capped at nu_max (default 0.45) preserving G
+//
+// Ice saturation comes from the ACE_Ice_Saturation field
+// (Have ACE Ice Saturation: true), from a time table (Ice Saturation
+// Time Values / Ice Saturation Values), or from the constant
+// Ice Saturation parameter (default 1.0, frozen). The cap-parameter
+// state is initialized at the FROZEN kappa0: simulations are assumed to
+// start from the frozen state.
+//
+// Remaining phases per the documented plan: (2) failure indicators and
+// element-death plumbing; (3) ACE workflow integration.
+
 #include <MiniTensor.h>
 
 #include "Albany_Utils.hpp"
@@ -26,33 +38,82 @@
 
 namespace LCM {
 
+namespace {
+
+// Piecewise-linear interpolation with end clamping (mirrored exactly by
+// the verification reference implementation).
+template <typename T>
+T
+interpolate_table(Teuchos::Array<RealType> const& times, Teuchos::Array<RealType> const& values, T const& t)
+{
+  auto const n = times.size();
+  if (t <= times[0]) return T(values[0]);
+  if (t >= times[n - 1]) return T(values[n - 1]);
+  for (auto i = 1; i < n; ++i) {
+    if (t <= times[i]) {
+      return values[i - 1] + (values[i] - values[i - 1]) * (t - times[i - 1]) / (times[i] - times[i - 1]);
+    }
+  }
+  return T(values[n - 1]);
+}
+
+}  // anonymous namespace
+
 template <typename EvalT, typename Traits>
 PermafrostKernel<EvalT, Traits>::PermafrostKernel(
     ConstitutiveModel<EvalT, Traits>& model,
     Teuchos::ParameterList*           p,
     Teuchos::RCP<Albany::Layouts> const& dl)
-    : BaseKernel(model),
-      A_(p->get<RealType>("A")),
-      D_(p->get<RealType>("D")),
-      C_(p->get<RealType>("C")),
-      theta_(p->get<RealType>("theta")),
-      R_(p->get<RealType>("R")),
-      kappa0_(p->get<RealType>("kappa0")),
-      W_(p->get<RealType>("W")),
-      D1_(p->get<RealType>("D1")),
-      D2_(p->get<RealType>("D2")),
-      calpha_(p->get<RealType>("calpha")),
-      psi_(p->get<RealType>("psi")),
-      N_(p->get<RealType>("N")),
-      L_(p->get<RealType>("L")),
-      phi_(p->get<RealType>("phi")),
-      Q_(p->get<RealType>("Q")),
-      // Sloan-style adaptive substepping of the explicit integration:
-      // modified-Euler (RK1/RK2) pairs with relative stress-error control.
-      substep_tolerance_(p->get<RealType>("Substep Tolerance", 1.0e-4)),
-      max_substeps_(p->get<int>("Maximum Substeps", 200))
+    : BaseKernel(model)
 {
   finite_deformation_ = p->get<bool>("Finite Deformation", false);
+
+  auto read_end_member = [](Teuchos::ParameterList& pl) {
+    EndMember m;
+    m.K      = pl.get<RealType>("K");
+    m.G      = pl.get<RealType>("G");
+    m.A      = pl.get<RealType>("A");
+    m.C      = pl.get<RealType>("C");
+    m.N      = pl.get<RealType>("N");
+    m.kappa0 = pl.get<RealType>("kappa0");
+    m.W      = pl.get<RealType>("W");
+    m.D1     = pl.get<RealType>("D1");
+    m.calpha = pl.get<RealType>("calpha");
+    return m;
+  };
+
+  auto& frozen_pl = p->sublist("Frozen Parameters");
+  auto& thawed_pl = p->sublist("Thawed Parameters");
+
+  frozen_ = read_end_member(frozen_pl);
+  thawed_ = read_end_member(thawed_pl);
+
+  // Sediment-skeleton parameters, f-independent, from the thawed set.
+  D_     = thawed_pl.get<RealType>("D");
+  theta_ = thawed_pl.get<RealType>("theta");
+  L_     = thawed_pl.get<RealType>("L");
+  phi_   = thawed_pl.get<RealType>("phi");
+  R_     = thawed_pl.get<RealType>("R");
+  Q_     = thawed_pl.get<RealType>("Q");
+  psi_   = thawed_pl.get<RealType>("psi", 1.0);
+  D2_    = thawed_pl.get<RealType>("D2", 0.0);
+
+  nu_max_ = p->get<RealType>("Maximum Poissons Ratio", 0.45);
+
+  // Ice-saturation source
+  have_ice_field_   = p->get<bool>("Have ACE Ice Saturation", false);
+  ice_sat_constant_ = p->get<RealType>("Ice Saturation", 1.0);
+  if (p->isParameter("Ice Saturation Time Values")) {
+    ice_sat_times_  = p->get<Teuchos::Array<RealType>>("Ice Saturation Time Values");
+    ice_sat_values_ = p->get<Teuchos::Array<RealType>>("Ice Saturation Values");
+    ALBANY_ASSERT(
+        ice_sat_times_.size() == ice_sat_values_.size() && ice_sat_times_.size() >= 2,
+        "Ice Saturation Time Values / Values must have equal length >= 2");
+  }
+
+  // Sloan-style adaptive substepping of the explicit integration.
+  substep_tolerance_ = p->get<RealType>("Substep Tolerance", 1.0e-4);
+  max_substeps_      = p->get<int>("Maximum Substeps", 200);
 
   // retrieve appropriate field name strings
   std::string const cauchy_string           = field_name_map_["Cauchy_Stress"];
@@ -65,14 +126,13 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   std::string const J_string                = field_name_map_["J"];
   std::string const Fp_string               = field_name_map_["Fp"];
 
-  // define the dependent fields
-  setDependentField("Poissons Ratio", dl->qp_scalar);
-  setDependentField("Elastic Modulus", dl->qp_scalar);
+  // define the dependent fields. Elasticity is computed internally from
+  // the end-member (K, G) pairs, so there is no dependence on the
+  // Elastic Modulus / Poissons Ratio fields.
+  if (have_ice_field_) setDependentField("ACE_Ice_Saturation", dl->qp_scalar);
+  if (have_temperature_) setDependentField("Temperature", dl->qp_scalar);
 
   if (finite_deformation_) {
-    // Exponential/logarithmic-map kinematics: the verified small-strain
-    // integrator runs unchanged in logarithmic elastic strain /
-    // Kirchhoff stress space; only the kinematics wrap around it.
     setDependentField(F_string, dl->qp_tensor);
     setDependentField(J_string, dl->qp_scalar);
     // F_old (needed to recover the elastic log strain at t_n) is already
@@ -88,6 +148,17 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
     addStateVariable(strain_string, dl->qp_tensor, "scalar", 0.0, true, true);
   }
 
+  // Ice-saturation state: the saturation seen at the previous converged
+  // step, used as the start of the within-step parameter ramp. Its
+  // initial value matches the saturation source so that the first step
+  // does not ramp spuriously (the ACE field source initializes frozen).
+  RealType f_init = 1.0;
+  if (!have_ice_field_) {
+    f_init = (ice_sat_times_.size() > 0) ? ice_sat_values_[0] : ice_sat_constant_;
+  }
+  setEvaluatedField("Ice_Saturation_State", dl->qp_scalar);
+  addStateVariable("Ice_Saturation_State", dl->qp_scalar, "scalar", f_init, true, false);
+
   // define the evaluated fields
   setEvaluatedField(cauchy_string, dl->qp_tensor);
   setEvaluatedField(backStress_string, dl->qp_tensor);
@@ -96,19 +167,16 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   setEvaluatedField(volPlasticStrain_string, dl->qp_scalar);
 
   // define the state variables
-  // stress
   addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, true, true);
 
-  // backStress
   addStateVariable(backStress_string, dl->qp_tensor, "scalar", 0.0, true, true);
 
-  // capParameter
-  addStateVariable(capParameter_string, dl->qp_scalar, "scalar", kappa0_, true, true);
+  // The cap-parameter state is initialized at the frozen kappa0:
+  // simulations are assumed to start from the frozen state.
+  addStateVariable(capParameter_string, dl->qp_scalar, "scalar", frozen_.kappa0, true, true);
 
-  // eqps
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, true);
 
-  // volPlasticStrain
   addStateVariable(volPlasticStrain_string, dl->qp_scalar, "scalar", 0.0, true, true);
 }
 
@@ -130,8 +198,8 @@ PermafrostKernel<EvalT, Traits>::init(
   std::string Fp_string               = field_name_map_["Fp"];
 
   // extract dependent MDFields
-  elastic_modulus_ = *dep_fields["Elastic Modulus"];
-  poissons_ratio_  = *dep_fields["Poissons Ratio"];
+  if (have_ice_field_) ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
+  if (have_temperature_) temperature_ = *dep_fields["Temperature"];
   if (finite_deformation_) {
     def_grad_ = *dep_fields[F_string];
     J_        = *dep_fields[J_string];
@@ -146,6 +214,7 @@ PermafrostKernel<EvalT, Traits>::init(
   eqps_             = *eval_fields[eqps_string];
   volPlasticStrain_ = *eval_fields[volPlasticStrain_string];
   if (finite_deformation_) Fp_ = *eval_fields[Fp_string];
+  ice_sat_state_ = *eval_fields["Ice_Saturation_State"];
 
   // get old state variables
   if (finite_deformation_) {
@@ -159,6 +228,9 @@ PermafrostKernel<EvalT, Traits>::init(
   capParameter_old_     = (*workset.stateArrayPtr)[capParameter_string + "_old"];
   eqps_old_             = (*workset.stateArrayPtr)[eqps_string + "_old"];
   volPlasticStrain_old_ = (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
+  ice_sat_state_old_    = (*workset.stateArrayPtr)["Ice_Saturation_State_old"];
+
+  current_time_ = workset.current_time;
 }
 
 template <typename EvalT, typename Traits>
@@ -170,12 +242,67 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   Tensor const I(minitensor::eye<ScalarT>(num_dims_));
 
-  // local parameters
-  ScalarT const E  = elastic_modulus_(cell, pt);
-  ScalarT const nu = poissons_ratio_(cell, pt);
-  ScalarT const lame        = E * nu / (1.0 + nu) / (1.0 - 2.0 * nu);
-  ScalarT const mu          = E / 2.0 / (1.0 + nu);
-  ScalarT const bulkModulus = lame + (2.0 / 3.0) * mu;
+  // Ice saturation at this integration point.
+  ScalarT f_ice;
+  if (have_ice_field_) {
+    f_ice = ice_saturation_(cell, pt);
+  } else if (ice_sat_times_.size() > 0) {
+    f_ice = interpolate_table(ice_sat_times_, ice_sat_values_, ScalarT(current_time_));
+  } else {
+    f_ice = ice_sat_constant_;
+  }
+  if (f_ice < 0.0) f_ice = 0.0;
+  if (f_ice > 1.0) f_ice = 1.0;
+
+
+  // Saturation at the previous converged step: start of the parameter
+  // ramp the integrator applies across its substeps.
+  ScalarT f_old = ice_sat_state_old_(cell, pt);
+  ice_sat_state_(cell, pt) = f_ice;
+
+  // Saturation-to-parameter map (see the file banner). Elasticity from
+  // the (K, G) split: the shear modulus carries the order-of-magnitude
+  // ice-bonding dependence (log-linear); the bulk modulus is bounded
+  // below by the saturated mixture (linear between end members, with the
+  // thawed K chosen at the Wood bound during calibration). The effective
+  // Poisson ratio is capped at nu_max, preserving G (the trusted
+  // physics) and reducing K.
+  auto map_params = [&](ScalarT const& f) {
+    CapParameters<ScalarT> P;
+    ScalarT Kmod = (1.0 - f) * thawed_.K + f * frozen_.K;
+    ScalarT const Gmod = std::exp((1.0 - f) * std::log(ScalarT(thawed_.G)) + f * std::log(ScalarT(frozen_.G)));
+    ScalarT nu = (3.0 * Kmod - 2.0 * Gmod) / (2.0 * (3.0 * Kmod + Gmod));
+    if (nu > nu_max_) {
+      nu   = nu_max_;
+      Kmod = 2.0 * Gmod * (1.0 + nu) / (3.0 * (1.0 - 2.0 * nu));
+    }
+    P.lame   = Kmod - 2.0 * Gmod / 3.0;
+    P.mu     = Gmod;
+    P.A      = (1.0 - f) * thawed_.A + f * frozen_.A;
+    P.C      = (1.0 - f) * thawed_.C + f * frozen_.C;
+    P.N      = (1.0 - f) * thawed_.N + f * frozen_.N;
+    P.kappa0 = (1.0 - f) * thawed_.kappa0 + f * frozen_.kappa0;
+    P.W      = (1.0 - f) * thawed_.W + f * frozen_.W;
+    P.D1     = (1.0 - f) * thawed_.D1 + f * frozen_.D1;
+    P.calpha = (1.0 - f) * thawed_.calpha + f * frozen_.calpha;
+    P.D      = D_;
+    P.theta  = theta_;
+    P.L      = L_;
+    P.phi    = phi_;
+    P.R      = R_;
+    P.Q      = Q_;
+    P.psi    = psi_;
+    P.D2     = D2_;
+    return P;
+  };
+
+  CapParameters<ScalarT> const P0 = map_params(f_old);
+  CapParameters<ScalarT> const P1 = map_params(f_ice);
+
+  ScalarT const mu          = P1.mu;
+  ScalarT const lame        = P1.lame;
+  ScalarT const bulkModulus = P1.lame + 2.0 * P1.mu / 3.0;
+  ScalarT const E           = 9.0 * bulkModulus * P1.mu / (3.0 * bulkModulus + P1.mu);
 
   // elastic tangent
   Tensor4 const id1 = minitensor::identity_1<ScalarT>(num_dims_);
@@ -214,8 +341,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   // Kinematics: sigmaN and depsilon feed the (small-strain) integrator.
   // In finite deformation they are the Kirchhoff stress and the increment
-  // of logarithmic elastic strain (exponential/logarithmic-map approach):
-  // the verified integrator is reused unchanged in that space.
+  // of logarithmic elastic strain (exponential/logarithmic-map approach).
   Tensor sigmaN(num_dims_);
   Tensor depsilon(num_dims_);
   Tensor Fval(num_dims_);
@@ -232,6 +358,14 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
     Jdet = J_(cell, pt);
 
+    // Thermal stretch: the mechanical deformation gradient excludes the
+    // thermal expansion (J2Erosion convention).
+    if (have_temperature_) {
+      ScalarT const dtemp           = temperature_(cell, pt) - ref_temperature_;
+      ScalarT const thermal_stretch = std::exp(expansion_coeff_ * dtemp);
+      Fval = (1.0 / thermal_stretch) * Fval;
+    }
+
     Tensor const Fpinv  = minitensor::inverse(Fp_n);
     Tensor const Cpinv  = minitensor::dot(Fpinv, minitensor::transpose(Fpinv));
 
@@ -241,8 +375,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
     // Elastic logarithmic strain at t_n (same Cp^-1, old F); the
     // corresponding Kirchhoff stress tau_n = C : eps_e_n is the stress
-    // the integrator starts from, so that the trial state
-    // tau_n + C : (eps_tr - eps_e_n) = C : eps_tr is exact for the
+    // the integrator starts from, so the trial state is exact for the
     // hyperelastic logarithmic model.
     Tensor const be_n    = minitensor::dot(F_n, minitensor::dot(Cpinv, minitensor::transpose(F_n)));
     Tensor const eps_e_n = 0.5 * log_sym(be_n);
@@ -256,6 +389,19 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
         sigmaN(i, j)   = stress_old_(cell, pt, i, j);
       }
     }
+    // The elastic strain, not the stress, is the state: when the moduli
+    // change with the ice saturation, the stored stress is re-expressed
+    // through the current stiffness, sigma_n <- C(f) : C(f_old)^-1 :
+    // sigma_n. (The finite-deformation path does this by construction,
+    // recovering the elastic log strain from the stored geometry.)
+    ScalarT const K0   = P0.lame + 2.0 * P0.mu / 3.0;
+    ScalarT const tr_s = minitensor::trace(sigmaN);
+    Tensor const  eps_e_n =
+        (tr_s / (9.0 * K0)) * I + (1.0 / (2.0 * P0.mu)) * (sigmaN - (tr_s / 3.0) * I);
+    sigmaN = minitensor::dotdot(Celastic, eps_e_n);
+    // Thermal strain increment: the small-strain path requires the old
+    // temperature state and is deferred; Phase 1 supports temperature in
+    // the finite-deformation path (the ACE configuration).
   }
 
   Tensor const sigmaTr = sigmaN + minitensor::dotdot(Celastic, depsilon);
@@ -267,28 +413,15 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // convergence check is invariant to the unit system.
   ScalarT const f_tolerance = 1.0e-12 * E * E;
 
-  // The verified physics lives in the shared CapIntegrator (also used by
-  // the Permafrost model); this kernel supplies constant parameters.
+  // The integrator ramps the parameters from the previous step's
+  // saturation to the current one across its substeps.
   CapIntegrator<ScalarT> integ;
-  integ.A      = A_;
-  integ.D      = D_;
-  integ.C      = C_;
-  integ.theta  = theta_;
-  integ.R      = R_;
-  integ.kappa0 = kappa0_;
-  integ.W      = W_;
-  integ.D1     = D1_;
-  integ.D2     = D2_;
-  integ.calpha = calpha_;
-  integ.psi    = psi_;
-  integ.N      = N_;
-  integ.L      = L_;
-  integ.phi    = phi_;
-  integ.Q      = Q_;
+  integ.p0 = P0;
+  integ.p1 = P1;
   integ.substep_tolerance = substep_tolerance_;
   integ.max_substeps      = max_substeps_;
 
-  Tensor sigmaVal = integ.integrate(sigmaN, alphaVal, kappaVal, depsilon, Celastic, bulkModulus, f_tolerance);
+  Tensor sigmaVal = integ.integrate(sigmaN, alphaVal, kappaVal, depsilon, f_tolerance);
 
   // Plastic strain increment from the stress correction (zero in the
   // elastic case, where sigmaVal == sigmaTr).

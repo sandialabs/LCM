@@ -271,27 +271,33 @@ CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
   ScalarT const f_tolerance = 1.0e-12 * E * E;
 
   // The verified physics lives in the shared CapIntegrator (also used by
-  // the Permafrost model); this kernel supplies constant parameters.
+  // the Permafrost model); this kernel supplies constant parameters, so
+  // the integrator's begin/end parameter sets are equal.
   CapIntegrator<ScalarT> integ;
-  integ.A      = A_;
-  integ.D      = D_;
-  integ.C      = C_;
-  integ.theta  = theta_;
-  integ.R      = R_;
-  integ.kappa0 = kappa0_;
-  integ.W      = W_;
-  integ.D1     = D1_;
-  integ.D2     = D2_;
-  integ.calpha = calpha_;
-  integ.psi    = psi_;
-  integ.N      = N_;
-  integ.L      = L_;
-  integ.phi    = phi_;
-  integ.Q      = Q_;
+  CapParameters<ScalarT> P;
+  P.A      = A_;
+  P.D      = D_;
+  P.C      = C_;
+  P.theta  = theta_;
+  P.R      = R_;
+  P.kappa0 = kappa0_;
+  P.W      = W_;
+  P.D1     = D1_;
+  P.D2     = D2_;
+  P.calpha = calpha_;
+  P.psi    = psi_;
+  P.N      = N_;
+  P.L      = L_;
+  P.phi    = phi_;
+  P.Q      = Q_;
+  P.lame   = lame;
+  P.mu     = mu;
+  integ.p0 = P;
+  integ.p1 = P;
   integ.substep_tolerance = substep_tolerance_;
   integ.max_substeps      = max_substeps_;
 
-  Tensor sigmaVal = integ.integrate(sigmaN, alphaVal, kappaVal, depsilon, Celastic, bulkModulus, f_tolerance);
+  Tensor sigmaVal = integ.integrate(sigmaN, alphaVal, kappaVal, depsilon, f_tolerance);
 
   // Plastic strain increment from the stress correction (zero in the
   // elastic case, where sigmaVal == sigmaTr).

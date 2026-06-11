@@ -25,8 +25,10 @@
 foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           input_confined_coarse.yaml input_confined_fd.yaml
           input_triaxial_fd.yaml input_confined_permafrost.yaml
+          input_confined_thaw.yaml input_confined_f05.yaml
           materials.yaml materials_triaxial.yaml materials_fd.yaml
           materials_triaxial_fd.yaml materials_permafrost.yaml
+          materials_permafrost_thaw.yaml materials_permafrost_f05.yaml
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
                  ${CMAKE_CURRENT_BINARY_DIR}/${f} COPYONLY)
@@ -77,6 +79,33 @@ if (CAP_PY_OK)
                    -P runverify.cmake
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   set_tests_properties(Permafrost_Equivalence_confined PROPERTIES LABELS "LCM;Tpetra;Forward")
+
+  # Thaw under load: ice saturation falls 1.0 -> 0.3 during confined
+  # compression; verifies the saturation-to-parameter map (elasticity
+  # split, nu cap, parameter blending) against the reference.
+  add_test(NAME Permafrost_Verify_thaw
+           COMMAND ${CMAKE_COMMAND}
+                   "-DTEST_PROG=${SerialAlbany.exe}"
+                   "-DINPUT=input_confined_thaw.yaml"
+                   "-DEXO=permafrost_thaw.exo"
+                   "-DPATHMODE=permafrost_thaw"
+                   "-DPYTHON=${PYTHON3_FOR_CAP}"
+                   -P runverify.cmake
+           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set_tests_properties(Permafrost_Verify_thaw PROPERTIES LABELS "LCM;Tpetra;Forward")
+
+  # Constant ice saturation 0.5: the full saturation-to-parameter map
+  # (including the nu cap) without time variation.
+  add_test(NAME Permafrost_Verify_f05
+           COMMAND ${CMAKE_COMMAND}
+                   "-DTEST_PROG=${SerialAlbany.exe}"
+                   "-DINPUT=input_confined_f05.yaml"
+                   "-DEXO=permafrost_f05.exo"
+                   "-DPATHMODE=permafrost_f05"
+                   "-DPYTHON=${PYTHON3_FOR_CAP}"
+                   -P runverify.cmake
+           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set_tests_properties(Permafrost_Verify_f05 PROPERTIES LABELS "LCM;Tpetra;Forward")
 else()
   message(STATUS "CapModel verification tests skipped: python3 with numpy+netCDF4 not found")
 endif()

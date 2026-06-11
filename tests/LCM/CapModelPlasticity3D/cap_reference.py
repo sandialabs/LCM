@@ -186,11 +186,11 @@ def plastic_rates(sigma, alpha, kappa, deps_sub, p):
     ha = halpha(dgds, alpha, p)
     hk = hkappa(dgds, kappa, p)
     dfdk = num_dfdkappa(sigma, alpha, kappa, p)
-    Cedg = p.Ce(dgds)
+    Cedg = ce_apply(p, dgds)
     chi = np.tensordot(dfds, Cedg) - np.tensordot(dfda, ha) - dfdk * hk
-    dgam = np.tensordot(p.Ce(dfds), deps_sub) / chi if chi != 0 else 0.0
+    dgam = np.tensordot(ce_apply(p, dfds), deps_sub) / chi if chi != 0 else 0.0
     dgam = max(dgam, 0.0)
-    dsig = p.Ce(deps_sub) - dgam * Cedg
+    dsig = ce_apply(p, deps_sub) - dgam * Cedg
     dalp = dgam * ha
     dkap = min(dgam * hk, 0.0)
     return dsig, dalp, dkap
@@ -208,7 +208,7 @@ def drift_correct(sigma, alpha, kappa, p, tol, max_iter=20):
         ha = halpha(dgds, alpha, p)
         hk = hkappa(dgds, kappa, p)
         dfdk = num_dfdkappa(sigma, alpha, kappa, p)
-        Cedg = p.Ce(dgds)
+        Cedg = ce_apply(p, dgds)
         chi = np.tensordot(dfds, Cedg) - np.tensordot(dfda, ha) - dfdk * hk
         dg = f / chi if chi != 0 else 0.0
         dk = min(dg * hk, 0.0)
@@ -225,16 +225,27 @@ def drift_correct(sigma, alpha, kappa, p, tol, max_iter=20):
     return sigma, alpha, kappa
 
 
-def integrate_step(sigma_n, alpha_n, kappa_n, deps, p,
+def integrate_step(sigma_n, alpha_n, kappa_n, deps, p, p_begin=None,
                    tol_scale=None, stol=1.0e-4, max_substeps=200):
     """Sloan-style adaptive substepping: modified-Euler (RK1/RK2) pairs
     with relative stress-error control; each accepted substep is followed
-    by the drift correction. Mirrors the C++ kernel exactly."""
-    sigma_tr = sigma_n + p.Ce(deps)
-    if yield_f(sigma_tr, alpha_n, kappa_n, p) <= 0.0:
+    by the drift correction. The parameters ramp linearly from p_begin to
+    p across the substep pseudo-time (RK1 rates at the substep start, RK2
+    rates and the drift correction at the substep end), mirroring the C++
+    CapIntegrator exactly; p_begin defaults to p."""
+    p1 = as_blendable(p)
+    p0 = p1 if p_begin is None else as_blendable(p_begin)
+
+    sigma_tr = sigma_n + ce_apply(p1, deps)
+    if yield_f(sigma_tr, alpha_n, kappa_n, p1) <= 0.0:
         return sigma_tr, alpha_n.copy(), kappa_n
 
-    tol = 1.0e-12 * p.E * p.E if tol_scale is None else tol_scale
+    if tol_scale is None:
+        K1 = p1.lame + 2.0 * p1.mu / 3.0
+        E1 = 9.0 * K1 * p1.mu / (3.0 * K1 + p1.mu)
+        tol = 1.0e-12 * E1 * E1
+    else:
+        tol = tol_scale
     dT_min = 1.0 / max_substeps
 
     sigma, alpha, kappa = sigma_n.copy(), alpha_n.copy(), kappa_n
@@ -242,9 +253,11 @@ def integrate_step(sigma_n, alpha_n, kappa_n, deps, p,
     nsub, nsub_max = 0, 4 * max_substeps
     while T < 1.0 and nsub < nsub_max:
         deps_sub = dT * deps
-        dsig1, dalp1, dkap1 = plastic_rates(sigma, alpha, kappa, deps_sub, p)
+        Pa = blend_params(p0, p1, T)
+        Pb = blend_params(p0, p1, T + dT)
+        dsig1, dalp1, dkap1 = plastic_rates(sigma, alpha, kappa, deps_sub, Pa)
         dsig2, dalp2, dkap2 = plastic_rates(sigma + dsig1, alpha + dalp1,
-                                            kappa + dkap1, deps_sub, p)
+                                            kappa + dkap1, deps_sub, Pb)
         sig_new = sigma + 0.5 * (dsig1 + dsig2)
         alp_new = alpha + 0.5 * (dalp1 + dalp2)
         kap_new = kappa + 0.5 * (dkap1 + dkap2)
@@ -259,7 +272,7 @@ def integrate_step(sigma_n, alpha_n, kappa_n, deps, p,
             nsub += 1
             continue
 
-        sigma, alpha, kappa = drift_correct(sig_new, alp_new, kap_new, p, tol)
+        sigma, alpha, kappa = drift_correct(sig_new, alp_new, kap_new, Pb, tol)
         T += dT
         q = min(0.9 * np.sqrt(stol / max(R, 1.0e-30)), 1.1)
         dT = min(q * dT, 1.0 - T)
@@ -347,6 +360,115 @@ def drive_fd(F_of_t, nsteps, p):
         Fp = _sqrtm_sym(np.linalg.inv(Cpinv_new))
         out.append((t, tau / np.linalg.det(F), kappa, evp))
         F_prev = F
+    return out
+
+
+SALEM_END = dict(K=15177.03284868067, G=9001.517087192591,
+                 A=689.2, C=675.2, N=6.0, kappa0=-8.05, W=0.08,
+                 D1=1.47e-3, calpha=1.0e5)
+
+THAWED_TEST_END = dict(K=5000.0, G=20.0, A=10.0, C=9.0, N=0.5,
+                       kappa0=-0.5, W=0.4, D1=0.01, calpha=500.0)
+
+THAWED_TEST_SHARED = dict(D=1.0e-3, theta=0.05, L=8.0e-4, phi=0.04,
+                          R=8.0, Q=6.0, psi=1.0, D2=0.0)
+
+
+class BlendParams:
+    """Plain parameter container mirroring the C++ CapParameters: the 15
+    cap parameters plus the Lame constants, all directly assignable (the
+    kernel builds lame = K - 2G/3, mu = G, not the E/nu route)."""
+    FIELDS = ('A', 'D', 'C', 'theta', 'R', 'kappa0', 'W', 'D1', 'D2',
+              'calpha', 'psi', 'N', 'L', 'phi', 'Q', 'lame', 'mu')
+
+    def __init__(self, **kw):
+        for k in self.FIELDS:
+            setattr(self, k, kw.get(k, 0.0))
+
+
+def blend_params(a, b, T):
+    """Mirror of CapIntegrator::blend."""
+    r = BlendParams()
+    for k in BlendParams.FIELDS:
+        setattr(r, k, (1.0 - T) * getattr(a, k) + T * getattr(b, k))
+    return r
+
+
+def as_blendable(p):
+    if isinstance(p, BlendParams):
+        return p
+    return BlendParams(**{k: getattr(p, k) for k in BlendParams.FIELDS})
+
+
+def ce_apply(P, eps):
+    """C^e(P) : eps for the isotropic tangent."""
+    return P.lame * np.trace(eps) * I3 + 2.0 * P.mu * eps
+
+
+def permafrost_map(f, frozen, thawed, shared, nu_max=0.45):
+    """Saturation-to-parameter map, mirroring the Permafrost kernel
+    exactly: cohesion/bonding and crush parameters linear between end
+    members; friction/shape from the (thawed) sediment skeleton; G
+    log-linear; K linear with the effective Poisson ratio capped at
+    nu_max preserving G; lame = K - 2G/3, mu = G."""
+    K = (1.0 - f) * thawed['K'] + f * frozen['K']
+    G = np.exp((1.0 - f) * np.log(thawed['G']) + f * np.log(frozen['G']))
+    nu = (3.0 * K - 2.0 * G) / (2.0 * (3.0 * K + G))
+    if nu > nu_max:
+        nu = nu_max
+        K = 2.0 * G * (1.0 + nu) / (3.0 * (1.0 - 2.0 * nu))
+
+    def lerp(key):
+        return (1.0 - f) * thawed[key] + f * frozen[key]
+
+    return BlendParams(lame=K - 2.0 * G / 3.0, mu=G,
+                       A=lerp('A'), C=lerp('C'), N=lerp('N'),
+                       kappa0=lerp('kappa0'), W=lerp('W'), D1=lerp('D1'),
+                       calpha=lerp('calpha'),
+                       D=shared['D'], theta=shared['theta'],
+                       L=shared['L'], phi=shared['phi'],
+                       R=shared['R'], Q=shared['Q'],
+                       psi=shared['psi'], D2=shared['D2'])
+
+
+def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
+                     nu_max=0.45):
+    """Strain-driven history with per-step ice saturation, mirroring the
+    kernel exactly: parameters ramp from the previous step's saturation
+    to the current one inside the integrator; the stored stress is
+    re-expressed through the current stiffness before each step (the
+    elastic strain, not the stress, is the state); the cap parameter
+    starts at the FROZEN kappa0."""
+    sigma = np.zeros((3, 3))
+    alpha = np.zeros((3, 3))
+    kappa = frozen['kappa0']
+    f_prev = f_of_t(0.0)
+    eps_prev = eps_of_t(0.0)
+    out = [(0.0, sigma.copy(), kappa, 0.0)]
+    evp = 0.0
+    for n in range(1, nsteps + 1):
+        t = n / nsteps
+        f = f_of_t(t)
+        P0 = permafrost_map(f_prev, frozen, thawed, shared, nu_max)
+        P1 = permafrost_map(f, frozen, thawed, shared, nu_max)
+        eps = eps_of_t(t)
+        deps = eps - eps_prev
+        # sigma_n <- C(f) : C(f_prev)^-1 : sigma_n
+        K0 = P0.lame + 2.0 * P0.mu / 3.0
+        tr_s = np.trace(sigma)
+        eps_e_n = (tr_s / (9.0 * K0)) * I3 + (1.0 / (2.0 * P0.mu)) * (sigma - (tr_s / 3.0) * I3)
+        sigma_hat = ce_apply(P1, eps_e_n)
+        sigma_tr = sigma_hat + ce_apply(P1, deps)
+        sigma_new, alpha, kappa = integrate_step(sigma_hat, alpha, kappa, deps, P1, p_begin=P0)
+        K1 = P1.lame + 2.0 * P1.mu / 3.0
+        dsig = sigma_tr - sigma_new
+        tr_d = np.trace(dsig)
+        deps_p = (tr_d / (9.0 * K1)) * I3 + (1.0 / (2.0 * P1.mu)) * (dsig - (tr_d / 3.0) * I3)
+        evp += np.trace(deps_p)
+        sigma = sigma_new
+        f_prev = f
+        eps_prev = eps
+        out.append((t, sigma.copy(), kappa, evp))
     return out
 
 

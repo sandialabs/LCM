@@ -1,0 +1,44 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: Permafrost
+  Materials:
+    # Thaw-under-load verification set: frozen end member at Salem-like
+    # values, thawed end member soft (note thawed K, G imply nu ~ 0.499,
+    # exercising the nu cap). The set exists to verify the
+    # saturation-to-parameter map against the reference implementation,
+    # not to represent a calibrated material. Units: MPa.
+    Permafrost:
+      Material Model:
+        Model Name: Permafrost
+      Finite Deformation: false
+      Ice Saturation Time Values: [0.0, 1.0]
+      Ice Saturation Values: [1.0, 0.3]
+      Frozen Parameters:
+        K: 15177.03284868067
+        G: 9001.517087192591
+        A: 689.2
+        C: 675.2
+        N: 6.0
+        kappa0: -8.05
+        W: 0.08
+        D1: 0.00147
+        calpha: 100000.0
+      Thawed Parameters:
+        K: 5000.0
+        G: 20.0
+        A: 10.0
+        C: 9.0
+        N: 0.5
+        kappa0: -0.5
+        W: 0.4
+        D1: 0.01
+        calpha: 500.0
+        D: 0.001
+        theta: 0.05
+        L: 0.0008
+        phi: 0.04
+        R: 8.0
+        Q: 6.0
+        psi: 1.0
+        D2: 0.0

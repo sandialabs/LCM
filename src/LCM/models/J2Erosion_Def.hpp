@@ -55,8 +55,11 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
     auto const filename     = p->get<std::string>("ACE Z Depth File");
     z_above_mean_sea_level_ = vectorFromFile(filename);
   }
-  if (p->isParameter("ACE_Porosity File") == true) {
-    auto const filename = p->get<std::string>("ACE_Porosity File");
+  // Deck-key convention is spaces; the legacy underscore spelling is
+  // still accepted (it leaked from the ACE_Porosity FIELD name).
+  std::string const porosity_file_key = p->isParameter("ACE Porosity File") ? "ACE Porosity File" : "ACE_Porosity File";
+  if (p->isParameter(porosity_file_key) == true) {
+    auto const filename = p->get<std::string>(porosity_file_key);
     porosity_from_file_ = vectorFromFile(filename);
     ALBANY_ASSERT(
         z_above_mean_sea_level_.size() == porosity_from_file_.size(),

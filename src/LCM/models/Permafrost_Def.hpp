@@ -174,8 +174,11 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   if (p->isParameter("ACE Z Depth File")) {
     z_above_mean_sea_level_ = vectorFromFile(p->get<std::string>("ACE Z Depth File"));
   }
-  if (p->isParameter("ACE_Porosity File")) {
-    porosity_from_file_ = vectorFromFile(p->get<std::string>("ACE_Porosity File"));
+  // Deck-key convention is spaces; the legacy underscore spelling is
+  // still accepted (it leaked from the ACE_Porosity FIELD name).
+  std::string const porosity_file_key = p->isParameter("ACE Porosity File") ? "ACE Porosity File" : "ACE_Porosity File";
+  if (p->isParameter(porosity_file_key)) {
+    porosity_from_file_ = vectorFromFile(p->get<std::string>(porosity_file_key));
     ALBANY_ASSERT(
         z_above_mean_sea_level_.size() == porosity_from_file_.size(),
         "Permafrost: ACE Z Depth File and ACE_Porosity File must have the same length");

@@ -33,7 +33,7 @@ Extension: Permafrost and Erosion"):
                stress range). Associative: L = D, phi = theta, Q = R.
                f-independent (sediment skeleton).
   crush        W from porosity (the kernel overrides W per point via
-               ACE Bulk Porosity / ACE_Porosity File; the deck value
+               ACE Bulk Porosity / ACE Porosity File; the deck value
                here is the same number). kappa0 COMMON to both end
                members (see the calibration note in the doc: a frozen
                state read under a thawed kappa0 is reinterpreted as

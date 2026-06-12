@@ -1154,7 +1154,7 @@ by the ACE solver and scatter machinery without modification.
 \paragraph{The ACE environment.}
 The kernel reads the same environmental data as \texttt{J2Erosion}.
 Depth profiles against $z$ above mean sea level
-(\texttt{ACE Z Depth File} with \texttt{ACE\_Porosity File} and
+(\texttt{ACE Z Depth File} with \texttt{ACE Porosity File} and
 \texttt{ACE Peat File}, or the constant \texttt{ACE Bulk Porosity})
 supply porosity and peat fraction at each integration point. The
 porosity overrides the crushable volume $W$ --- the pore space is
@@ -1208,7 +1208,7 @@ Input name & Default & Meaning \\
 \texttt{Disable Erosion} & false & criteria never trip \\
 \midrule
 \texttt{ACE Z Depth File} & --- & $z$ profile abscissae \\
-\texttt{ACE\_Porosity File}, \texttt{ACE Peat File} & --- &
+\texttt{ACE Porosity File}, \texttt{ACE Peat File} & --- &
   depth profiles \\
 \texttt{ACE Bulk Porosity} & 0 (off) & constant porosity ($W$ override) \\
 \texttt{ACE Sea Level File}, \texttt{ACE Time File} & --- &

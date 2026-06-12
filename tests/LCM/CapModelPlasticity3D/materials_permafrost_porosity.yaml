@@ -14,7 +14,7 @@ LCM:
         Model Name: Permafrost
       Finite Deformation: false
       ACE Z Depth File: 'depth_test.txt'
-      ACE_Porosity File: 'porosity_test.txt'
+      ACE Porosity File: 'porosity_test.txt'
       Output Crush Indicator: true
       Frozen Parameters:
         K: 15177.03284868067

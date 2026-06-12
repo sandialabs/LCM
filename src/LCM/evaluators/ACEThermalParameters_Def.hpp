@@ -593,13 +593,27 @@ ACEThermalParameters<EvalT, Traits>::createElementBlockParameterMaps()
           "values in "
           "ACE Snow Depth File must match.");
     }
-    if (material_db_->isElementBlockParam(eb_name, "ACE_Porosity File") == true) {
-      std::string const filename       = material_db_->getElementBlockParam<std::string>(eb_name, "ACE_Porosity File");
+    // "ACE Porosity File" follows the deck-key convention (spaces, like
+    // every other ACE ... File key); the legacy underscore spelling --
+    // which leaked from the ACE_Porosity FIELD name -- is still accepted.
+    std::string porosity_file_key;
+    if (material_db_->isElementBlockParam(eb_name, "ACE Porosity File") == true) {
+      porosity_file_key = "ACE Porosity File";
+    } else if (material_db_->isElementBlockParam(eb_name, "ACE_Porosity File") == true) {
+      porosity_file_key = "ACE_Porosity File";
+      static bool warned = false;
+      if (!warned) {
+        std::cout << "WARNING: the input key 'ACE_Porosity File' is deprecated; use 'ACE Porosity File'.\n";
+        warned = true;
+      }
+    }
+    if (!porosity_file_key.empty()) {
+      std::string const filename       = material_db_->getElementBlockParam<std::string>(eb_name, porosity_file_key);
       porosity_from_file_map_[eb_name] = vectorFromFile(filename);
       ALBANY_ASSERT(
           z_above_mean_sea_level_map_[eb_name].size() == porosity_from_file_map_[eb_name].size(),
           "*** ERROR: Number of z values and number of porosity values in "
-          "ACE_Porosity File must match. \n"
+          "ACE Porosity File must match. \n"
           "Hint: Did you provide the 'ACE Z Depth File'?");
     }
     if (material_db_->isElementBlockParam(eb_name, "ACE Sand File") == true) {

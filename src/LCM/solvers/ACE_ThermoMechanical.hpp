@@ -17,6 +17,7 @@
 #include "Albany_ModelEvaluator.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Piro_NOXSolver.hpp"
+#include "StateVarUtils.hpp"
 #include "Thyra_DefaultProductVector.hpp"
 #include "Thyra_DefaultProductVectorSpace.hpp"
 #include "Thyra_ResponseOnlyModelEvaluatorBase.hpp"
@@ -196,6 +197,15 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_x_;
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdot_;
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdotdot_;
+
+  // Per-subdomain snapshot of the element states at the start of each
+  // global time step, restored when a subdomain solve fails and the step
+  // is retried with a reduced size. States live in the shared STK mesh
+  // and are written DURING residual fills, so a diverged nonlinear solve
+  // (e.g. Newton hitting NaN across the freezing front) leaves poisoned
+  // states behind; without the restore every retry assembles from them
+  // and fails instantly regardless of the step size.
+  mutable std::vector<LCM::StateArrays> pre_step_states_;
 
   mutable std::vector<bool> do_outputs_;
   mutable std::vector<bool> do_outputs_init_;

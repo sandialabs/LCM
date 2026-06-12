@@ -247,6 +247,20 @@ ModelEvaluator::ModelEvaluator(const Teuchos::RCP<Albany::Application>& app_, co
   // Determine the number of solution vectors (x, xdot, xdotdot)
   int num_sol_vectors = app->getAdaptSolMgr()->getInitialSolution()->domain()->dim();
 
+  // The discretization may carry more solution vectors than the
+  // subdomain's dynamic order: the ACE shared mesh sizes its storage for
+  // the highest-order subdomain, so a first-order (thermal) subdomain
+  // would otherwise advertise x_dotdot support -- which Tempus's
+  // implicit-ODE validation rejects, ruling out implicit steppers for
+  // that subdomain. The ACE solver records each subdomain's own order;
+  // outside ACE the multivector width is authoritative (e.g. mechanics
+  // decks legitimately raise the Discretization value to 2 for the
+  // trapezoid rule while the Problem value reads 1).
+  if (appParams->sublist("Problem").isParameter("ACE Dynamic Order")) {
+    int const order = appParams->sublist("Problem").get<int>("ACE Dynamic Order");
+    if (num_sol_vectors > order + 1) num_sol_vectors = order + 1;
+  }
+
   if (num_sol_vectors > 1) {  // have x dot
     supports_xdot = true;
     if (num_sol_vectors > 2)  // have both x dot and x dotdot
@@ -292,15 +306,17 @@ ModelEvaluator::allocateVectors()
   Teuchos::RCP<Thyra_Vector> const       x_init_nonconst = x_init->clone_v();
   nominalValues.set_x(x_init_nonconst);
 
-  // Have xdot
-  if (xMV->domain()->dim() > 1) {
+  // Have xdot. Condition on the advertised support, not the raw
+  // multivector width: the discretization may carry extra solution
+  // vectors beyond the problem's dynamic order (ACE shared mesh).
+  if (supports_xdot && xMV->domain()->dim() > 1) {
     Teuchos::RCP<Thyra_Vector const> const x_dot_init          = xMV->col(1);
     Teuchos::RCP<Thyra_Vector> const       x_dot_init_nonconst = x_dot_init->clone_v();
     nominalValues.set_x_dot(x_dot_init_nonconst);
   }
 
   // Have xdotdot
-  if (xMV->domain()->dim() > 2) {
+  if (supports_xdotdot && xMV->domain()->dim() > 2) {
     // Set xdotdot in parent class to pass to time integrator
 
     // GAH set x_dotdot for transient simulations. Note that xDotDot is a member
@@ -651,6 +667,23 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
 
   bool f_already_computed = false;
 
+  // Piro::InvertMassMatrixDecorator (the adapter that turns this implicit-
+  // form model into the explicit ODE f = M^-1 R for explicit Tempus
+  // steppers) evaluates with a deliberately ZERO x_dot vector and requests
+  // the mass through the documented fingerprint (alpha, beta) = (-1, 0).
+  // Those fills must not see time-dependent Dirichlet BC RATES at
+  // constrained DOFs: the explicit scheme computes R(x, xdot = 0) and
+  // divides by the LUMPED mass, so an injected boundary rate adds a
+  // consistent-mass coupling term M_fc * xdot_bc that the lumped diagonal
+  // has already absorbed -- a spurious boundary source/sink that violates
+  // the maximum principle (the silent loss of thaw-driven denudation in
+  // ACE MiniErosion). The fill keeps the adapter's zero x_dot vector (the
+  // overlap x_dot column must be re-zeroed each fill -- response
+  // evaluations scatter the integrator's real velocity into it); only the
+  // constrained-slot rate injection is suppressed. The time-dependent BC
+  // VALUES and times are unaffected.
+  bool const explicit_adapter_fill = Teuchos::nonnull(x_dot) && alpha == -1.0 && beta == 0.0;
+
   // W matrix
   if (Teuchos::nonnull(W_op_out)) {
     app->computeGlobalJacobian(alpha, beta, omega, curr_time, x, x_dot, x_dotdot, sacado_param_vec, f_out, W_op_out, dt);
@@ -660,7 +693,7 @@ ModelEvaluator::evalModelImpl(const Thyra_InArgs& inArgs, const Thyra_OutArgs& o
   // f, df/dp and distributed df/dp not suppoerted anymore
 
   if (Teuchos::nonnull(f_out) && !f_already_computed) {
-    app->computeGlobalResidual(curr_time, x, x_dot, x_dotdot, sacado_param_vec, f_out, dt);
+    app->computeGlobalResidual(curr_time, x, x_dot, x_dotdot, sacado_param_vec, f_out, dt, explicit_adapter_fill);
   }
 
   // Response functions

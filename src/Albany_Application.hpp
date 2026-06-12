@@ -221,6 +221,12 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   bool
   suppliesPreconditioner() const;
 
+  //! suppress_constrained_rates: evaluate with zero (not BC-rate) values in
+  //! the overlap x_dot's constrained slots. Set by the model evaluator for
+  //! the explicit-stepper adapter's fills, which request R(x, xdot = 0) for
+  //! the lumped-mass update -- injected BC rates there add a
+  //! consistent-mass boundary term the lumped diagonal already absorbed
+  //! (a spurious source/sink violating the maximum principle).
   void
   computeGlobalResidual(
       double const                            current_time,
@@ -229,7 +235,8 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       Teuchos::RCP<Thyra_Vector const> const& x_dotdot,
       const Teuchos::Array<ParamVec>&         p,
       Teuchos::RCP<Thyra_Vector> const&       f,
-      double const                            dt = 0.0);
+      double const                            dt = 0.0,
+      bool const                              suppress_constrained_rates = false);
 
  private:
   void
@@ -240,7 +247,8 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
       Teuchos::RCP<Thyra_Vector const> const x_dotdot,
       const Teuchos::Array<ParamVec>&        p,
       Teuchos::RCP<Thyra_Vector> const&      f,
-      double const                           dt = 0.0);
+      double const                           dt = 0.0,
+      bool const                             suppress_constrained_rates = false);
 
  public:
   //! Compute global Jacobian
@@ -755,8 +763,17 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   //! Piro's post-integration response pass where x_dot is null).
   double last_transient_time_ = 0.0;
 
+  //! Write the BC values (and, when the fill carries the corresponding
+  //! time derivatives, the BC rates/accelerations) into the overlap
+  //! solution's constrained slots. fill_has_xdot/xdotdot MUST reflect the
+  //! current fill's actual arguments: an explicit right-hand-side
+  //! evaluation (x_dot null) evaluates R(x, xdot = 0) and divides by the
+  //! LUMPED mass, so injecting BC rates there adds a consistent-mass
+  //! coupling term M_fc * xdot_bc that the lumped diagonal has already
+  //! absorbed -- a spurious boundary heat source/sink that violates the
+  //! maximum principle (the frozen-bluff MiniErosion regression).
   void
-  injectConstrainedDOFValues(double time);
+  injectConstrainedDOFValues(double time, bool fill_has_xdot = true, bool fill_has_xdotdot = true);
 
   bool is_schwarz_{false};
 

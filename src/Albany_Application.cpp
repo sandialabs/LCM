@@ -1054,7 +1054,7 @@ Application::eliminateConstrainedDOFs()
 }
 
 void
-Application::injectConstrainedDOFValues(double time)
+Application::injectConstrainedDOFValues(double time, bool fill_has_xdot, bool fill_has_xdotdot)
 {
   // Gate on the GLOBAL elimination state, not the per-rank descriptor count.
   // A rank may legitimately have an empty dbc_state_.descriptors in parallel (e.g.
@@ -1155,11 +1155,17 @@ Application::injectConstrainedDOFValues(double time)
 
   // Build per-constrained-GID u, v, a maps for the discretization to inject
   // when expanding the reduced owned solution back out to the overlap STK
-  // fields at Exodus output time. Only owned constrained DOFs participate —
-  // that's what the disc-side expand-and-inject loops index over.
+  // fields at Exodus output time. EVERY local (overlap-scope) descriptor
+  // participates, not just owned ones: the disc-side expand-and-inject
+  // loops patch the OVERLAP vector, and a rank's SHARED copy of a
+  // constrained node otherwise stays at the import's zero (decomposed
+  // meshes carry node-set membership only on some ranks, so the owner
+  // cannot be assumed to be the only rank writing the node to Exodus --
+  // epu may take any piece's copy of a shared node).
   std::map<GO, double> u_map;
   std::map<GO, double> v_map;
   std::map<GO, double> a_map;
+  auto const overlap_inject_indexer = Albany::createGlobalLocalIndexer(disc->getOverlapVectorSpace());
   auto const full_owned_vs_indexer = dbc_state_.full_owned_vs.is_null() ? Teuchos::null : Albany::createGlobalLocalIndexer(dbc_state_.full_owned_vs);
 
   for (auto const& desc : dbc_state_.descriptors) {
@@ -1175,14 +1181,21 @@ Application::injectConstrainedDOFValues(double time)
       desc.eqconc_cached_value = u;
     }
     x_data[desc.overlap_lid] = u;
+    // BC rates belong in the overlap xdot only when the fill itself
+    // carries xdot (implicit dynamic fills, where the residual's
+    // consistent-mass term M_fc * xdot_bc is correct). For fills without
+    // xdot -- in particular the explicit lumped-mass right-hand-side
+    // evaluation, which Albany::ModelEvaluator routes here with x_dot
+    // null -- write zero, both for consistency with the fill's xdot = 0
+    // and to clear any stale values in the overlap slot.
     if (num_time_deriv >= 1) {
-      xdot_data[desc.overlap_lid] = derivs.v;
+      xdot_data[desc.overlap_lid] = fill_has_xdot ? derivs.v : 0.0;
     }
     if (num_time_deriv >= 2) {
-      xdotdot_data[desc.overlap_lid] = derivs.a;
+      xdotdot_data[desc.overlap_lid] = fill_has_xdotdot ? derivs.a : 0.0;
     }
-    if (desc.full_owned_lid >= 0 && !full_owned_vs_indexer.is_null()) {
-      GO const gid = full_owned_vs_indexer->getGlobalElement(desc.full_owned_lid);
+    if (desc.overlap_lid >= 0) {
+      GO const gid = overlap_inject_indexer->getGlobalElement(desc.overlap_lid);
       u_map[gid]   = u;
       if (num_time_deriv >= 1) v_map[gid] = derivs.v;
       if (num_time_deriv >= 2) a_map[gid] = derivs.a;
@@ -1897,7 +1910,8 @@ Application::computeGlobalResidualImpl(
     Teuchos::RCP<Thyra_Vector const> const x_dotdot,
     Teuchos::Array<ParamVec> const&        p,
     Teuchos::RCP<Thyra_Vector> const&      f,
-    double                                 dt)
+    double                                 dt,
+    bool const                             suppress_constrained_rates)
 {
   TEUCHOS_FUNC_TIME_MONITOR("Albany Fill: Residual");
   using EvalT = PHAL::AlbanyTraits::Residual;
@@ -1914,7 +1928,10 @@ Application::computeGlobalResidualImpl(
 
   // Scatter x and xdot to the overlapped distrbution
   solMgr->scatterX(*x, x_dot.ptr(), x_dotdot.ptr());
-  injectConstrainedDOFValues(fixTime(current_time));
+  injectConstrainedDOFValues(
+      fixTime(current_time),
+      Teuchos::nonnull(x_dot) && !suppress_constrained_rates,
+      Teuchos::nonnull(x_dotdot) && !suppress_constrained_rates);
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -2063,9 +2080,10 @@ Application::computeGlobalResidual(
     Teuchos::RCP<Thyra_Vector const> const& x_dotdot,
     const Teuchos::Array<ParamVec>&         p,
     Teuchos::RCP<Thyra_Vector> const&       f,
-    double const                            dt)
+    double const                            dt,
+    bool const                              suppress_constrained_rates)
 {
-  this->computeGlobalResidualImpl(current_time, x, x_dot, x_dotdot, p, f, dt);
+  this->computeGlobalResidualImpl(current_time, x, x_dot, x_dotdot, p, f, dt, suppress_constrained_rates);
 
   // Debut output write residual or solution to MatrixMarket
   // every time it arises or at requested count#
@@ -2138,7 +2156,7 @@ Application::computeGlobalJacobianImpl(
 
   // Scatter x and xdot to the overlapped distribution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
-  injectConstrainedDOFValues(fixTime(current_time));
+  injectConstrainedDOFValues(fixTime(current_time), Teuchos::nonnull(xdot), Teuchos::nonnull(xdotdot));
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -2409,7 +2427,7 @@ Application::evaluateStateFieldManager(
 
   // Scatter to the overlapped distrbution
   solMgr->scatterX(x, xdot, xdotdot);
-  injectConstrainedDOFValues(fixTime(current_time));
+  injectConstrainedDOFValues(fixTime(current_time), !xdot.is_null(), !xdotdot.is_null());
 
   // Scatter distributed parameters
   distParamLib->scatter();
@@ -2598,7 +2616,7 @@ Application::setupBasicWorksetInfo(
 
   // Scatter xT and xdotT to the overlapped distrbution
   solMgr->scatterX(*x, xdot.ptr(), xdotdot.ptr());
-  injectConstrainedDOFValues(fixTime(current_time));
+  injectConstrainedDOFValues(fixTime(current_time), Teuchos::nonnull(xdot), Teuchos::nonnull(xdotdot));
 
   // Scatter distributed parameters
   distParamLib->scatter();

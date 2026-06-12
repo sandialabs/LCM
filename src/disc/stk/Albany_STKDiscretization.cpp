@@ -2442,18 +2442,62 @@ STKDiscretization::computeNodeSets()
     have_erodible_surface = true;
   }
 
+  // The face -> node induced membership behind the erodible clipping is
+  // rank-LOCAL: without aura ghosting, a rank can own a node of an
+  // erodible face it does not have, see the node as outside the
+  // erodible surface, and (post DBC elimination) write a zero into its
+  // owned output slot while other ranks apply the BC for assembly.
+  // Gather the union of erodible-surface node GIDs across ranks so the
+  // clipped membership is globally consistent.
+  std::set<GO> erodible_surface_gids;
+  if (have_erodible_surface) {
+    std::vector<stk::mesh::Entity> local_surface_nodes;
+    stk::mesh::Selector            select_local_surface =
+        erodible_surface & (stk::mesh::Selector(metaData.locally_owned_part()) | stk::mesh::Selector(metaData.globally_shared_part()));
+    stk::mesh::get_selected_entities(select_local_surface, bulkData.buckets(stk::topology::NODE_RANK), local_surface_nodes);
+    std::vector<GO> local_gids;
+    local_gids.reserve(local_surface_nodes.size());
+    for (auto const& n : local_surface_nodes) local_gids.push_back(gid(n));
+
+    int const num_procs = comm->getSize();
+    if (num_procs > 1) {
+      int const        local_count = static_cast<int>(local_gids.size());
+      std::vector<int> counts(num_procs);
+      Teuchos::gatherAll(*comm, 1, &local_count, num_procs, counts.data());
+      std::vector<int> displs(num_procs, 0);
+      for (int i = 1; i < num_procs; ++i) displs[i] = displs[i - 1] + counts[i - 1];
+      int const       total = displs[num_procs - 1] + counts[num_procs - 1];
+      std::vector<GO> all_gids(total);
+      auto const*     mpi_comm = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
+      MPI_Allgatherv(
+          local_gids.data(), local_count, MPI_LONG_LONG,
+          all_gids.data(), counts.data(), displs.data(), MPI_LONG_LONG,
+          *mpi_comm->getRawMpiComm());
+      erodible_surface_gids.insert(all_gids.begin(), all_gids.end());
+    } else {
+      erodible_surface_gids.insert(local_gids.begin(), local_gids.end());
+    }
+  }
+
   auto node_indexer = createGlobalLocalIndexer(m_node_vs);
   while (ns != stkMeshStruct->nsPartVec.end()) {  // Iterate over Node Sets
     // Get all owned nodes in this node set
     stk::mesh::Selector select_owned_in_nspart = stk::mesh::Selector(*(ns->second)) & stk::mesh::Selector(metaData.locally_owned_part());
 
-    // Erodible node sets are clipped to the live eroding surface.
-    if (have_erodible_surface && ns->first.find("erodible") != std::string::npos) {
-      select_owned_in_nspart &= erodible_surface;
-    }
+    bool const clip_to_erodible_surface = have_erodible_surface && ns->first.find("erodible") != std::string::npos;
 
     std::vector<stk::mesh::Entity> nodes;
     stk::mesh::get_selected_entities(select_owned_in_nspart, bulkData.buckets(stk::topology::NODE_RANK), nodes);
+    // Erodible node sets are clipped to the live eroding surface, by the
+    // globally gathered GID set so the result is rank-independent.
+    if (clip_to_erodible_surface) {
+      std::vector<stk::mesh::Entity> clipped;
+      clipped.reserve(nodes.size());
+      for (auto const& n : nodes) {
+        if (erodible_surface_gids.count(gid(n)) > 0) clipped.push_back(n);
+      }
+      nodes.swap(clipped);
+    }
 
     nodeSets[ns->first].resize(nodes.size());
     nodeSetGIDs[ns->first].resize(nodes.size());
@@ -2479,6 +2523,19 @@ STKDiscretization::computeNodeSets()
         (stk::mesh::Selector(metaData.locally_owned_part()) | stk::mesh::Selector(metaData.globally_shared_part()));
     std::vector<stk::mesh::Entity> overlap_nodes;
     stk::mesh::get_selected_entities(select_overlap_in_nspart, bulkData.buckets(stk::topology::NODE_RANK), overlap_nodes);
+    // Clip erodible node sets exactly as the owned-scope set above:
+    // without this, DBC DOF elimination sees the authored full-depth
+    // slabs (which jointly cover the whole mesh), classifies every DOF
+    // as constrained, and the ACE thermal subdomain silently loses its
+    // time-dependent BCs (the frozen-bluff / no-denudation regression).
+    if (clip_to_erodible_surface) {
+      std::vector<stk::mesh::Entity> clipped;
+      clipped.reserve(overlap_nodes.size());
+      for (auto const& n : overlap_nodes) {
+        if (erodible_surface_gids.count(gid(n)) > 0) clipped.push_back(n);
+      }
+      overlap_nodes.swap(clipped);
+    }
     nodeSetOverlapGIDs[ns->first].resize(overlap_nodes.size());
     nodeSetOverlapCoords[ns->first].resize(overlap_nodes.size());
     for (std::size_t i = 0; i < overlap_nodes.size(); ++i) {

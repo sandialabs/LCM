@@ -500,6 +500,15 @@ ACEThermoMechanical::createPersistentApps()
     auto& app_params  = *init_pls_[subdomain];
     auto& disc_params = app_params.sublist("Discretization");
 
+    // Record this subdomain's own dynamic order. The shared mesh is sized
+    // for the highest-order subdomain ("Number Of Time Derivatives" max
+    // below), which would otherwise make the thermal (first-order) model
+    // evaluator advertise x_dotdot support -- and Tempus's implicit-ODE
+    // validation rejects such models, ruling out implicit thermal
+    // steppers. Albany::ModelEvaluator caps its advertised support with
+    // this value.
+    app_params.sublist("Problem").set<int>("ACE Dynamic Order", (prob_types_[subdomain] == MECHANICAL) ? 2 : 1);
+
     if (prob_types_[subdomain] == MECHANICAL) {
       disc_params.set<std::string>("Exodus Solution Name", "displacement");
       disc_params.set<std::string>("Exodus SolutionDot Name", "velocity");
@@ -697,6 +706,18 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     ST const next_time{current_time + time_step};
     num_iter_ = 0;
 
+    // Snapshot every subdomain's element states so a failed solve can be
+    // retried from clean state (see pre_step_states_ in the header).
+    // States live in the shared STK mesh and are written DURING residual
+    // fills, so a diverged solve leaves poisoned states behind.
+    if (pre_step_states_.size() != static_cast<size_t>(num_subdomains_)) {
+      pre_step_states_.resize(num_subdomains_);
+    }
+    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+      auto& state_mgr = apps_[subdomain]->getStateMgr();
+      fromTo(state_mgr.getStateArrays(), pre_step_states_[subdomain]);
+    }
+
     // Coupling loop
     do {
       bool const is_initial_state = stop == 0 && num_iter_ == 0;
@@ -775,6 +796,14 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
     // One of the subdomains failed to solve. Reduce step.
     if (failed_ == true) {
+      // Restore the pre-step element states: the failed solve's residual
+      // fills have already written its (possibly NaN) iterates into the
+      // shared mesh's states.
+      for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+        auto& state_mgr = apps_[subdomain]->getStateMgr();
+        fromTo(pre_step_states_[subdomain], state_mgr.getStateArrays());
+      }
+
       auto const reduced_step = reduction_factor_ * time_step;
 
       if (time_step <= min_time_step_) {
@@ -877,6 +906,28 @@ ACEThermoMechanical::AdvanceThermalDynamics(
 
   auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
 
+  // Keep the model evaluator's stored time in sync (the Schwarz solver
+  // does the same). An explicit stepper's f(x, t) request arrives with
+  // x_dot null, so evalModelImpl classifies the fill as non-dynamic and
+  // falls back to this stored value -- without it, time-dependent
+  // Dirichlet BCs are evaluated at t = 0 for the whole run.
+  me.setCurrentTime(current_time);
+
+  // Seed Tempus with the previous coupling step's converged state, as
+  // the mechanical advance does. Besides the warm start, setInitialState
+  // rebuilds the Tempus solution history, which also resets the
+  // integrator's stepper-failure counters: without this, one failed
+  // solve latches the persistent integrator into instant failure on
+  // every subsequent attempt, defeating the coupling loop's step
+  // reduction.
+  if (Teuchos::nonnull(this_x_[subdomain])) {
+    auto ic_x    = Thyra::createMember(me.get_x_space());
+    auto ic_xdot = Thyra::createMember(me.get_x_space());
+    Thyra::copy(*this_x_[subdomain], ic_x.ptr());
+    Thyra::copy(*this_xdot_[subdomain], ic_xdot.ptr());
+    piro_tempus_solver.setInitialState(current_time, ic_x, ic_xdot);
+  }
+
   Teuchos::RCP<Tempus::SolutionHistory<ST>> solution_history;
   Teuchos::RCP<Tempus::SolutionState<ST>>   current_state;
 
@@ -948,6 +999,9 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     Thyra_ModelEvaluator::OutArgs<ST> out_args = solver.createOutArgs();
 
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
+    // Keep the stored time in sync; see the thermal advance above.
+    me.setCurrentTime(next_time);
 
     // Seed Tempus with the previous coupling step's converged state. On
     // step 0 this_x_[subdomain] is null, so we let Tempus's evalModelImpl

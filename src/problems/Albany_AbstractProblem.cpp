@@ -142,6 +142,7 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
       "Whether 'reportFinalPoint' should be allowed to overwrite nominal "
       "values");
   validPL->set<int>("Number Of Time Derivatives", 1, "Number of time derivatives in use in the problem");
+  validPL->set<int>("ACE Dynamic Order", 1, "Subdomain dynamic order recorded by the ACE thermo-mechanical solver");
 
   validPL->set<bool>("Use MDField Memoization", false, "Use memoization to avoid recomputing MDFields");
   validPL->set<bool>("Use MDField Memoization For Parameters", false, "Use memoization to avoid recomputing MDFields dependent on parameters");

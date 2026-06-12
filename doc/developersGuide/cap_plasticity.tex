@@ -951,21 +951,26 @@ at their defaults; if results change when the tolerance is
 tightened, the global time step was too coarse --- the remedy is not
 in the material parameters.
 
-\section{Planned Extension: Permafrost and Erosion}
+\section{The Permafrost Model}
 \label{sec:permafrost}
 
-The purpose of this model in LCM is to eventually replace the
-\texttt{J2Erosion} model in the ACE permafrost-erosion application
-\citep{Frederick.etal:2021}. \texttt{J2Erosion} extends $J_2$
-plasticity with an ice-saturation--dependent yield stress
+\texttt{Permafrost} (material-database name \texttt{Permafrost}) is
+the cap-plasticity model specialized for frozen and thawing sediment
+in the ACE Arctic coastal-erosion application
+\citep{Frederick.etal:2021}, and replaces the \texttt{J2Erosion}
+model there. \texttt{J2Erosion} extends $J_2$ plasticity with an
+ice-saturation--dependent yield stress
 ($\sigma_0 = \sigma^{\mathrm{sed}} + f(T)\,
 \sigma^{\mathrm{ice-sed}}$, with $f(T) \in [0,1]$ the ice saturation
-from the sediment freezing curve) and, over time, has accumulated
-five failure criteria and several empirical adjustments (polynomial
-fits of stiffness and strength in ice saturation and porosity,
+from the sediment freezing curve) and, over time, accumulated five
+failure criteria and several empirical adjustments (polynomial fits
+of stiffness and strength in ice saturation and porosity,
 ocean-exposure weakening factors, a peat-dependent strain limit).
-This section records the assessment and design decisions for the
-replacement, so the work can be resumed.
+\texttt{Permafrost} replaces those mechanisms with cap-model
+quantities. The integration and constitutive functions are the
+shared, verified integrator of Section~\ref{sec:integration}; the
+kernel supplies parameters that vary per integration point with the
+ice saturation.
 
 \paragraph{Why the cap model fits permafrost.}
 The eroding material spans a continuum from ice-bonded (frozen) to
@@ -973,31 +978,52 @@ thawed sediment, and the cap model contains both end members as
 parameter limits. With $D \to 0$ the failure envelope flattens to
 the pressure-insensitive strength $A - C$, and with $\psi = 1$ and
 the cap pushed far out the model degenerates to von Mises --- the
-current ice model. At the other extreme, thawed sediment is the
-material the cap model was designed for: frictional shear strength
-plus compaction of a porous skeleton, neither of which $J_2$
-represents (in \texttt{J2Erosion} the thawed state is a constant
-residual yield stress). Two further physical arguments: frozen soils
-exhibit a closed strength envelope (strength rises with confinement,
-peaks, and falls at high pressure through pressure melting of pore
-ice), which the cap closure can represent phenomenologically and a
-$J_2$ cylinder cannot; and thaw settlement is compaction --- crush-curve
-physics, with $W$ supplied by the effective-porosity profiles the
-ACE model already carries.
+\texttt{J2Erosion} ice model. At the other extreme, thawed sediment
+is the material the cap model was designed for: frictional shear
+strength plus compaction of a porous skeleton, neither of which
+$J_2$ represents (in \texttt{J2Erosion} the thawed state is a
+constant residual yield stress). Two further physical arguments:
+frozen soils exhibit a closed strength envelope (strength rises with
+confinement, peaks, and falls at high pressure through pressure
+melting of pore ice), which the cap closure can represent
+phenomenologically and a $J_2$ cylinder cannot; and thaw settlement
+is compaction --- crush-curve physics, with $W$ supplied by the
+effective-porosity profiles the ACE model already carries.
 
-\paragraph{Ice-saturation coupling.}
-The cap parameters separate the strength mechanisms that $J_2$
-lumps, and the ice saturation enters each by its mechanism:
-cohesion (ice cementation) through $A - C$ and $N$ as
-$c(f) = c^{\mathrm{sed}} + f\,c^{\mathrm{ice}}$, the direct analogue
-of the \texttt{J2Erosion} rule; friction ($\theta$, $D$) as a
-sediment property, approximately independent of $f$; pore-collapse
-resistance ($\kappa_0$, $D_1$) increasing with $f$ as ice fills the
-pores; crushable volume $W$ from the effective porosity; stiffness
-$E(f)$ from the existing experimental fits. The implementation
-should be structured as two calibrated end-member parameter sets ---
-frozen ($f = 1$) and thawed ($f = 0$) --- with one interpolation rule
-per mechanism, replacing the scattered polynomial fits.
+\paragraph{The saturation-to-parameter map.}
+The material input carries two calibrated end-member parameter sets,
+the \texttt{Frozen Parameters} and \texttt{Thawed Parameters}
+sublists, and the ice saturation interpolates between them with one
+rule per strength mechanism:
+\begin{itemize}
+\item \emph{Cohesion and bonding} ($A$, $C$, $N$, $c^\alpha$):
+  linear in $f$ --- ice cementation, the direct analogue of the
+  \texttt{J2Erosion} rule
+  $c(f) = c^{\mathrm{sed}} + f\,c^{\mathrm{ice}}$.
+\item \emph{Pore collapse} ($\kappa_0$, $W$, $D_1$): linear in $f$
+  --- ice filling the pores resists crushing.
+\item \emph{Friction and shape} ($D$, $\theta$, $L$, $\phi$, $R$,
+  $Q$, $\psi$, $D_2$): properties of the sediment skeleton, taken
+  from the thawed sublist and independent of $f$.
+\item \emph{Elasticity}: the $(K, G)$ split described below.
+\end{itemize}
+The saturation itself comes from one of three sources: the
+\texttt{ACE\_Ice\_Saturation} field computed by the coupled thermal
+problem (\texttt{Have ACE Ice Saturation: true}), a time table
+(\texttt{Ice Saturation Time Values} / \texttt{Ice Saturation
+Values}), or the constant \texttt{Ice Saturation} (default 1.0,
+frozen). The saturation seen at the previous converged step is kept
+as the state \texttt{Ice\_Saturation\_State}, and the integrator
+ramps the parameters from the previous to the current saturation
+across its substeps --- the within-step ramping of
+Section~\ref{sec:integration}, without which thaw-under-load
+trajectories are hypersensitive to roundoff. Because the elastic
+strain, not the stress, is the state, the stored stress is
+re-expressed through the current stiffness when the moduli change
+($\stress_n \leftarrow \Celast(f) : \Celast(f_{\mathrm{old}})^{-1}
+: \stress_n$; the finite-deformation path does this by construction).
+In the finite-deformation path the thermal stretch is removed from
+$\Fdef$ before the mechanical response is evaluated.
 
 \paragraph{Elasticity and ice saturation.}
 \texttt{J2Erosion} scales the Young's modulus with ice saturation at
@@ -1006,7 +1032,7 @@ underlying mechanism is sound --- permafrost stiffness is governed by
 what fills the pores and whether it bonds the grains, so the moduli
 are properly functions of $f$ (temperature acts only through the
 freezing curve) --- but the partition between the elastic constants
-should change. The thaw transition replaces pore ice
+must differ. The thaw transition replaces pore ice
 ($G \approx 3.5$~GPa, $K \approx 9$~GPa) with pore water ($G = 0$,
 $K \approx 2.2$~GPa) inside a mineral skeleton
 ($K_s \approx 36$~GPa for quartz), and the two moduli respond
@@ -1039,31 +1065,33 @@ weight far more than the pore water permits --- a plausible
 contributor to the large displacements that motivated
 \texttt{J2Erosion}'s displacement-norm failure criterion.
 
-The replacement should therefore take two end-member pairs
-$(K, G)_{\mathrm{frozen}}$ and $(K, G)_{\mathrm{thawed}}$ in place of
-the modulus-multiplier fits, with $G(f)$ interpolated geometrically
+Accordingly, each end member carries its own $(K, G)$ pair in place
+of modulus-multiplier fits. $G(f)$ interpolates geometrically
 (log-linearly --- the range spans two orders of magnitude, so linear
 interpolation in $f$ overweights the frozen value) and $K(f)$
-interpolated linearly down to the Wood-mixture value computed from
-the ACE porosity profile. Above the water table or in gassy
-material the Wood bound disappears (a percent of pore air destroys
-it), for which the ACE air-fraction field is the natural switch.
-Because the kernel reads per-point $E$ and $\nu$ fields, this is an
-evaluator-level change with no impact on the integrator. One
-numerical caution: the thawed limit $\nu \to 0.499$ volumetrically
-locks low-order hexahedra, so the effective $\nu$ should be capped
-near $0.45$ unless mean-dilatation element technology is adopted.
-The $(K, G)$ split also makes elasticity consistent with the
-strength assumption above: thaw removes the shear-carrying ice phase
-from both.
+linearly. The Wood-mixture bound is calibration guidance for the
+thawed $K$, not a kernel computation: until pore pressure is
+resolved (the $u$--$p$ extension below), the calibrated thawed
+member uses drained-skeleton moduli, since an undrained $K$ would
+make thawed mush bulk-stiffer than frozen soil. One numerical guard
+is built in: the thawed saturated limit $\nu \to 0.499$
+volumetrically locks low-order hexahedra, so the effective Poisson
+ratio is capped (\texttt{Maximum Poissons Ratio}, default 0.45) by
+reducing $K$ while preserving $G$ --- the trusted physics.
 
 \emph{Design constraint:} environmental softening must not flow
 through the hardening variable. When ice melts the physical cap
 moves toward the origin, which would violate the
 $\Delta\kappa \le 0$ clamp if it were imposed on $\kappa$. As with
-temperature-dependent yield in metals, $\kappa$ must store only the
+temperature-dependent yield in metals, $\kappa$ stores only the
 plastic compaction history while the surfaces are built from
-$f$-dependent parameters evaluated fresh each step.
+$f$-dependent parameters evaluated fresh each step. A corollary for
+calibration: because $\kappa$ is plastic memory while $\kappa_0(f)$
+is a parameter, a state integrated under frozen parameters and then
+read under thawed ones sits far inside the thawed crush curve ---
+reinterpreted as heavily precompacted. End members should be
+calibrated with a common $\kappa_0$ unless that reinterpretation is
+intended.
 
 \paragraph{Failure criteria.}
 The cap model supplies constitutive failure indicators that replace
@@ -1073,8 +1101,9 @@ means exhaustion of its mechanism, and each criterion is enabled by
 a positive threshold (or limit) in the material input and disabled
 at the default 0:
 \begin{itemize}
-\item \emph{Tension} (bit 0x01): the fraction of the zero-pressure
-  shear capacity $F_f(0) - N$ lost to mean tension,
+\item \emph{Tension} (bit 0x01, \texttt{Tension Indicator
+  Threshold}): the fraction of the zero-pressure shear capacity
+  $F_f(0) - N$ lost to mean tension,
   $[\,(A - C) - F_f(I_1)\,]/(A - C - N)$, which reaches 1 where the
   shear surface pinches to the tensile apex $F_f(I_1) = N$ and the
   material has no remaining strength. This replaces the
@@ -1085,25 +1114,28 @@ at the default 0:
   that branch in practice precisely because the element fails
   first --- the criterion is part of the model's domain of validity,
   not just an erosion trigger.
-\item \emph{Backstress saturation} (bit 0x02):
-  $\sqrt{J_2^\alpha}/N$, equal to 1 when the kinematic hardening is
-  exhausted ($G^\alpha = 0$: the yield surface has translated to the
-  failure envelope and the shear response is perfectly plastic).
-  This replaces the criterion that yield onset itself constitutes
-  failure --- the cap model can distinguish yielded-but-hardening
-  material from exhausted material, which $J_2$ cannot.
-\item \emph{Crush exhaustion} (bit 0x04):
-  $|\varepsilon_v^p(\kappa)|/W$ on the crush curve, the quantity
-  whose approach to 1 engages the cap lock (full pore collapse).
-\item \emph{Plastic distortion} (bit 0x20):
-  $\varepsilon_{\mathrm{eqps}}$ against a user limit, replacing the
-  total-distortion limit.
+\item \emph{Backstress saturation} (bit 0x02, \texttt{Backstress
+  Indicator Threshold}): $\sqrt{J_2^\alpha}/N$, equal to 1 when the
+  kinematic hardening is exhausted ($G^\alpha = 0$: the yield
+  surface has translated to the failure envelope and the shear
+  response is perfectly plastic). This replaces the criterion that
+  yield onset itself constitutes failure --- the cap model can
+  distinguish yielded-but-hardening material from exhausted
+  material, which $J_2$ cannot.
+\item \emph{Crush exhaustion} (bit 0x04, \texttt{Crush Indicator
+  Threshold}): $|\varepsilon_v^p(\kappa)|/W$ on the crush curve, the
+  quantity whose approach to 1 engages the cap lock (full pore
+  collapse).
+\item \emph{Plastic distortion} (bit 0x20, \texttt{Maximum
+  Equivalent Plastic Strain}): $\varepsilon_{\mathrm{eqps}}$ against
+  a user limit, replacing the total-distortion limit.
 \end{itemize}
 The backstress and crush indicators approach 1 only asymptotically,
 so their thresholds must also be below 1 (the implementation rejects
 thresholds $\ge 1$). The two structural criteria --- tilt angle
-(bit 0x08) and displacement norm (bit 0x10), which detect toppled or
-departed blocks --- are not constitutive and carry over from
+(bit 0x08, \texttt{Critical Angle}) and displacement norm (bit 0x10,
+\texttt{Maximum Displacement}), which detect toppled or departed
+blocks --- are not constitutive and carry over from
 \texttt{J2Erosion} unchanged, as does the element-death bookkeeping:
 tripped modes accumulate in the per-point \texttt{failure\_modes}
 bitmask (an STK-backed element state), the per-cell
@@ -1111,92 +1143,140 @@ bitmask (an STK-backed element state), the per-cell
 decimal digits, and a cell dies (\texttt{cell\_death} = 1, with live
 propagation into the assembly's death-status vector so Newton stops
 assembling condemned cells mid-step) when a user-settable number of
-its integration points have failed, all points by default. All
+its integration points have failed
+(\texttt{Failed Integration Points For Death}, default: all). All
 criteria branch on Sacado values so the residual and Jacobian
-evaluations take identical paths.
+evaluations take identical paths, and the death states are consumed
+by the ACE solver and scatter machinery without modification.
 
-\paragraph{Implementation plan.}
-(1)~A separate \texttt{CapErosion} kernel wrapping the verified
-integrator with the ACE plumbing (ice-saturation field,
-porosity/peat depth profiles, sea level, erodible cell sets, death
-infrastructure), leaving \texttt{CapModel} pure. (2)~Thermal
-stretch on $\Fdef$ (and optionally the $9\,\%$ freezing expansion),
-which the cap kernel currently lacks. (3)~The saturation-to-parameter
-map above. (4)~The failure indicators above. (5)~Later, in order of
-expected payoff: rate sensitivity by the Duvaut--Lions wrap of
-\citet{Regueiro.Foster:2011}, which regularizes any inviscid
+\paragraph{The ACE environment.}
+The kernel reads the same environmental data as \texttt{J2Erosion}.
+Depth profiles against $z$ above mean sea level
+(\texttt{ACE Z Depth File} with \texttt{ACE\_Porosity File} and
+\texttt{ACE Peat File}, or the constant \texttt{ACE Bulk Porosity})
+supply porosity and peat fraction at each integration point. The
+porosity overrides the crushable volume $W$ --- the pore space is
+the crushable volume, independent of what fills it --- and peat
+raises the eqps limit by the factor $(1 + \mathrm{peat})$, a
+provisional parity rule pending calibration. Sea level against time
+(\texttt{ACE Sea Level File} / \texttt{ACE Time File}) drives
+ocean-exposure weakening of submerged cells in the erodible sets:
+the cohesion by its factor ($C$ rises toward $A$, shrinking the
+zero-pressure strength $A - C$ and the offset $N$ while leaving the
+friction slope and asymptote intact), the moduli uniformly (so
+$\nu$, and the stored-stress re-expression, are unaffected), and the
+eqps limit by its factor. Unlike the saturation, the weakening
+switches on instantaneously when a cell submerges (the
+\texttt{J2Erosion} convention); if waterline flips ever destabilize
+the drift correction the way unramped parameter jumps do, the
+submersion state should be ramped like the saturation.
+
+\paragraph{Material input.}
+In addition to the cap parameters of Section~\ref{sec:parameters}
+(split per the map above between the \texttt{Frozen Parameters} and
+\texttt{Thawed Parameters} sublists, with the friction/shape
+parameters read from the thawed sublist), the \texttt{Permafrost}
+material block reads:
+
+\begin{center}
+\small
+\begin{tabular}{lrp{6.6cm}}
+\toprule
+Input name & Default & Meaning \\
+\midrule
+\texttt{K}, \texttt{G} (per sublist) & --- &
+  end-member bulk and shear moduli \\
+\texttt{Maximum Poissons Ratio} & 0.45 &
+  cap on the effective $\nu$, preserving $G$ \\
+\midrule
+\texttt{Have ACE Ice Saturation} & false &
+  read $f$ from the coupled thermal field \\
+\texttt{Ice Saturation Time Values}/\texttt{Values} & --- &
+  time-table source for $f$ \\
+\texttt{Ice Saturation} & 1.0 & constant source for $f$ \\
+\midrule
+\texttt{Tension Indicator Threshold}    & 0 (off) & see failure criteria \\
+\texttt{Backstress Indicator Threshold} & 0 (off) & '' \\
+\texttt{Crush Indicator Threshold}      & 0 (off) & '' \\
+\texttt{Maximum Equivalent Plastic Strain} & 0 (off) & '' \\
+\texttt{Critical Angle}                 & 0 (off) & tilt, radians \\
+\texttt{Maximum Displacement}           & 0 (off) & displacement norm \\
+\texttt{Failed Integration Points For Death} & 0 (= all) &
+  per-cell death threshold \\
+\texttt{Disable Erosion} & false & criteria never trip \\
+\midrule
+\texttt{ACE Z Depth File} & --- & $z$ profile abscissae \\
+\texttt{ACE\_Porosity File}, \texttt{ACE Peat File} & --- &
+  depth profiles \\
+\texttt{ACE Bulk Porosity} & 0 (off) & constant porosity ($W$ override) \\
+\texttt{ACE Sea Level File}, \texttt{ACE Time File} & --- &
+  sea level against time \\
+\texttt{ACE Cohesion Weakening Factor}   & 1 & submerged-cell weakening \\
+\texttt{ACE Stiffness Weakening Factor}  & 1 & '' \\
+\texttt{ACE Eqps Limit Weakening Factor} & 1 & '' \\
+\midrule
+\texttt{Finite Deformation}, \texttt{Substep Tolerance},
+\texttt{Maximum Substeps} & &
+  as in Section~\ref{sec:parameters} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Per-criterion indicator fields, the failure bookkeeping states, and
+the standard cap states are available for Exodus output through the
+usual \texttt{Output ...} flags.
+
+\paragraph{Calibration.}
+The thawed end member comes from standard soil-mechanics cap
+parameters for silty/clay sediments plus the ACE porosity profiles
+($W$); the frozen end member from refitting the experimental data
+behind the \texttt{J2Erosion} stiffness/strength fits to cap
+parameters, with friction ($\theta$, $D$) taken from the thawed
+sediment so the frozen fit reduces to cohesion scaling --- the
+original \texttt{J2Erosion} assumption, now in its natural place.
+The script
+\texttt{tests/LCM/ACE/MiniErosionPermafrost/calibrate\_permafrost.py}
+performs this conversion: it evaluates the \texttt{J2Erosion} fit
+polynomials (which encode the experimental program) at the end
+members for a given porosity and deck scales and emits the
+\texttt{Frozen}/\texttt{Thawed Parameters} sublists, including the
+mapping of the distortion strain limit to an eqps limit. The
+single-element verification decks of Section~\ref{sec:verification}
+double as calibration drivers.
+
+\paragraph{Verification.}
+The \texttt{Permafrost} battery extends the methodology of
+Section~\ref{sec:verification}, with the reference implementation
+mirroring the saturation map, the parameter ramping, and the failure
+indicators. Trajectory tests: equivalence with \texttt{Cap} at
+$f = 1$, the full map at constant $f = 0.5$ (the $\nu$ cap active),
+and thaw under load ($f: 1 \to 0.3$ during confined compression) all
+match at machine precision. The porosity-profile test drives the two
+Gauss-point depth groups of a single element as independent material
+points against two reference runs. Five per-mode death tests verify
+each failure criterion: the indicator series match the reference at
+machine precision and the
+\texttt{failure\_modes}/\texttt{failure\_state}/\texttt{cell\_death}
+series match the reference-predicted trip step exactly (the
+displacement criterion additionally checks the per-point indicator
+multiset against the analytic Gauss-point displacements). Finally, a
+MiniErosion-style coupled test runs \texttt{Permafrost} under the
+ACE thermo-mechanical solver: a deliberately tight displacement
+limit kills the settled upper cells early, thaw-driven failures
+follow as the bluff warms, and the run continues on the eroded mesh
+--- exercising live death, the active-part update, and the workset
+rebuilds on the shared mesh.
+
+\paragraph{Future extensions.}
+In order of expected payoff: rate sensitivity by the Duvaut--Lions
+wrap of \citet{Regueiro.Foster:2011}, which regularizes any inviscid
 integrator and would represent storm-timescale ice creep; and
 pore-pressure/effective-stress coupling --- the source paper
 \citet{Sun.Chen.Ostien:2014} is itself a $u$--$p$ poromechanics
 formulation, so the model is built for that extension if ACE ever
-resolves pore fluid.
-
-\paragraph{Implementation status.}
-Phases 0 and 1 are implemented: the model exists as \texttt{Permafrost}
-(material-database name \texttt{Permafrost}), built on the shared
-verified integrator, with frozen/thawed end-member parameter sublists,
-the saturation-to-parameter map above (including the $(K, G)$
-elasticity split with the capped effective Poisson ratio), ice
-saturation from the ACE field, a time table, or a constant, the
-within-step parameter ramping described in
-Section~\ref{sec:integration}, and thermal stretch in the
-finite-deformation path. Verification: equivalence with \texttt{Cap}
-at $f = 1$, the full map at constant $f = 0.5$, and thaw under load
-($f: 1 \to 0.3$ during confined compression) all match the reference
-implementation at machine precision. Phase 2 is implemented as well:
-the failure indicators and the element-death bookkeeping above, with
-per-mode single-element verification --- for each criterion the
-indicator series matches the reference at machine precision and the
-\texttt{failure\_modes}/\texttt{failure\_state}/\texttt{cell\_death}
-series match the reference-predicted trip step exactly (the
-displacement criterion additionally checks the per-point indicator
-multiset against the analytic Gauss-point displacements). The death
-states are consumed by the existing ACE solver and scatter machinery
-without modification.
-
-Phase 3 (ACE workflow) is implemented: depth profiles of porosity and
-peat (\texttt{ACE Z Depth File}, \texttt{ACE\_Porosity File},
-\texttt{ACE Peat File}, or the constant \texttt{ACE Bulk Porosity}),
-sea level against time, and ocean-exposure weakening. The porosity
-overrides the crushable volume $W$ at each integration point --- the
-pore space is the crushable volume, independent of what fills it ---
-verified at machine precision against two reference runs through the
-two Gauss-point depth groups of a single-element deck. Peat raises
-the eqps limit by the factor $(1 + \mathrm{peat})$, a provisional
-parity rule pending calibration. Submerged cells of the erodible
-sets are weakened: the cohesion by its factor ($C$ rises toward $A$,
-shrinking the zero-pressure strength $A - C$ and the offset $N$
-while leaving the friction slope and asymptote intact), the moduli
-uniformly (so $\nu$, and the stored-stress re-expression, are
-unaffected), and the eqps limit by its factor. Unlike the
-saturation, the weakening switches on instantaneously when a cell
-submerges (the \texttt{J2Erosion} convention); if waterline flips
-ever destabilize the drift correction the way parameter jumps did in
-Phase 1, the submersion state should be ramped the same way. The
-full erosion loop --- live death, the active-part update, workset
-rebuilds on the shared ACE mesh --- runs with \texttt{Permafrost} in
-a MiniErosion-style coupled test in which a deliberately tight
-displacement limit kills the settled upper cells early and the run
-continues on the eroded mesh. One calibration note: because the cap
-position $\kappa$ is plastic memory while $\kappa_0(f)$ is a
-parameter, a state integrated under frozen parameters and then read
-under thawed ones sits far inside the thawed crush curve, i.e.\ it
-is reinterpreted as heavily precompacted; end members should be
-calibrated with a common $\kappa_0$ unless that reinterpretation is
-intended. Remaining for validation (Phase 4): frozen/thawed
-end-member calibration and the bluff-scale side-by-side against
-\texttt{J2Erosion}.
-
-\paragraph{Calibration.}
-Thawed end member from standard soil-mechanics cap parameters for
-silty/clay sediments plus the ACE porosity profiles ($W$); frozen
-end member by refitting the experimental data behind the existing
-\texttt{J2Erosion} stiffness/strength fits to cap parameters, with
-friction ($\theta$, $D$) taken from the thawed sediment so the
-frozen fit reduces to cohesion scaling --- the original
-\texttt{J2Erosion} assumption, now in its natural place. The
-single-element verification decks of Section~\ref{sec:verification}
-double as calibration drivers.
+resolves pore fluid. The $u$--$p$ extension would also let the
+thawed bulk modulus take its undrained (Wood-bound) value instead of
+the drained-skeleton compromise above.
 
 \appendix
 

@@ -4,15 +4,15 @@
 //
 // Permafrost constitutive model: the three-invariant cap plasticity
 // model specialized for frozen/thawing sediment in the ACE Arctic
-// coastal erosion application, intended to replace J2Erosion. The
-// integration and constitutive functions live in the shared
-// CapIntegrator (verified against an independent reference); this
-// kernel supplies parameters that vary per integration point with the
-// ice saturation f. The design is recorded in
-// doc/developersGuide/cap_plasticity.tex, Section "Planned Extension:
-// Permafrost and Erosion".
+// coastal erosion application, replacing J2Erosion. The integration
+// and constitutive functions live in the shared CapIntegrator
+// (verified against an independent reference); this kernel supplies
+// parameters that vary per integration point with the ice saturation
+// f. The design is recorded in
+// doc/developersGuide/cap_plasticity.tex, Section "The Permafrost
+// Model".
 //
-// Saturation-to-parameter map (Phase 1):
+// Saturation-to-parameter map:
 //   cohesion/bonding  A, C, N, calpha     linear between end members
 //   crush             kappa0, W, D1       linear between end members
 //   friction/shape    D, theta, L, phi,   thawed (sediment skeleton)
@@ -27,7 +27,7 @@
 // state is initialized at the FROZEN kappa0: simulations are assumed to
 // start from the frozen state.
 //
-// Failure and element death (Phase 2): per-point indicators, each
+// Failure and element death: per-point indicators, each
 // normalized to reach 1 at exhaustion of its mechanism --
 //   tension      stress at the shear-surface apex, Ff(I1) - N -> 0
 //   backstress   kinematic-hardening saturation, sqrt(J2(alpha)) -> N
@@ -41,8 +41,9 @@
 // J2Erosion exactly, so the ACE solver and the scatter evaluators
 // consume Permafrost cells without modification.
 //
-// Remaining phases per the documented plan: (3) ACE workflow
-// integration (porosity/peat profiles, sea level, ocean weakening).
+// ACE environment: depth profiles of porosity (W override) and peat
+// (eqps-limit boost), sea level against time, and ocean-exposure
+// weakening of submerged erodible cells.
 
 #include <MiniTensor.h>
 
@@ -645,9 +646,9 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     Tensor const  eps_e_n =
         (tr_s / (9.0 * K0)) * I + (1.0 / (2.0 * P0.mu)) * (sigmaN - (tr_s / 3.0) * I);
     sigmaN = minitensor::dotdot(Celastic, eps_e_n);
-    // Thermal strain increment: the small-strain path requires the old
-    // temperature state and is deferred; Phase 1 supports temperature in
-    // the finite-deformation path (the ACE configuration).
+    // Thermal strain increment: not supported in the small-strain path
+    // (it would require the old temperature state); temperature enters
+    // through the finite-deformation path (the ACE configuration).
   }
 
   Tensor const sigmaTr = sigmaN + minitensor::dotdot(Celastic, depsilon);

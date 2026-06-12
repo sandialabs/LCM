@@ -121,8 +121,8 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   // ice-bonding-dependent quantities; the thawed set additionally
   // carries the sediment-skeleton (friction/shape) quantities shared by
   // both ends. See the saturation-to-parameter map in
-  // doc/developersGuide/cap_plasticity.tex, Section "Planned Extension:
-  // Permafrost and Erosion".
+  // doc/developersGuide/cap_plasticity.tex, Section "The Permafrost
+  // Model".
   struct EndMember
   {
     RealType K;       // bulk modulus
@@ -160,7 +160,7 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   Teuchos::Array<RealType> ice_sat_values_;
   RealType                 ice_sat_constant_;
 
-  // ACE environment (Phase 3): depth profiles of porosity (overrides the
+  // ACE environment: depth profiles of porosity (overrides the
   // crushable volume W) and peat (raises the eqps limit), sea level
   // against time, and the ocean-exposure weakening factors applied to
   // submerged cells of the erodible sets.

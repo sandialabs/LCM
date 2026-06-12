@@ -706,17 +706,11 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     ST const next_time{current_time + time_step};
     num_iter_ = 0;
 
-    // Snapshot every subdomain's element states so a failed solve can be
+    // Snapshot the shared mesh's element states so a failed solve can be
     // retried from clean state (see pre_step_states_ in the header).
     // States live in the shared STK mesh and are written DURING residual
     // fills, so a diverged solve leaves poisoned states behind.
-    if (pre_step_states_.size() != static_cast<size_t>(num_subdomains_)) {
-      pre_step_states_.resize(num_subdomains_);
-    }
-    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-      auto& state_mgr = apps_[subdomain]->getStateMgr();
-      fromTo(state_mgr.getStateArrays(), pre_step_states_[subdomain]);
-    }
+    snapshotSharedMeshStates();
 
     // Coupling loop
     do {
@@ -799,10 +793,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       // Restore the pre-step element states: the failed solve's residual
       // fills have already written its (possibly NaN) iterates into the
       // shared mesh's states.
-      for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-        auto& state_mgr = apps_[subdomain]->getStateMgr();
-        fromTo(pre_step_states_[subdomain], state_mgr.getStateArrays());
-      }
+      restoreSharedMeshStates();
 
       auto const reduced_step = reduction_factor_ * time_step;
 
@@ -863,6 +854,67 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   }  // Time-step loop
 
   return;
+}
+
+void
+ACEThermoMechanical::snapshotSharedMeshStates() const
+{
+  pre_step_states_.clear();
+  auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(discs_[0], true);
+  auto& bulk    = *stk_disc->getSTKMeshStruct()->bulkData;
+  auto& meta    = bulk.mesh_meta_data();
+
+  stk::mesh::Selector const owned = meta.locally_owned_part();
+  for (auto* fb : meta.get_fields(stk::topology::ELEMENT_RANK)) {
+    auto* field = dynamic_cast<stk::mesh::Field<double>*>(fb);
+    if (field == nullptr) continue;
+    auto& store = pre_step_states_[field->name()];
+    for (auto* bucket : bulk.get_buckets(stk::topology::ELEMENT_RANK, owned & stk::mesh::selectField(*field))) {
+      unsigned const ncomp = stk::mesh::field_scalars_per_entity(*field, *bucket);
+      if (ncomp == 0) continue;
+      double const* data = stk::mesh::field_data(*field, *bucket);
+      for (size_t i = 0; i < bucket->size(); ++i) {
+        auto& v = store[bulk.identifier((*bucket)[i])];
+        v.assign(data + i * ncomp, data + (i + 1) * ncomp);
+      }
+    }
+  }
+}
+
+void
+ACEThermoMechanical::restoreSharedMeshStates() const
+{
+  auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(discs_[0], true);
+  auto& bulk    = *stk_disc->getSTKMeshStruct()->bulkData;
+  auto& meta    = bulk.mesh_meta_data();
+
+  stk::mesh::Selector const owned = meta.locally_owned_part();
+  for (auto* fb : meta.get_fields(stk::topology::ELEMENT_RANK)) {
+    auto* field = dynamic_cast<stk::mesh::Field<double>*>(fb);
+    if (field == nullptr) continue;
+    auto const it = pre_step_states_.find(field->name());
+    if (it == pre_step_states_.end()) continue;
+    auto const& store = it->second;
+    for (auto* bucket : bulk.get_buckets(stk::topology::ELEMENT_RANK, owned & stk::mesh::selectField(*field))) {
+      unsigned const ncomp = stk::mesh::field_scalars_per_entity(*field, *bucket);
+      if (ncomp == 0) continue;
+      double* data = stk::mesh::field_data(*field, *bucket);
+      for (size_t i = 0; i < bucket->size(); ++i) {
+        auto const vit = store.find(bulk.identifier((*bucket)[i]));
+        if (vit == store.end()) continue;
+        auto const& v = vit->second;
+        size_t const n = std::min<size_t>(v.size(), ncomp);
+        std::copy(v.begin(), v.begin() + n, data + i * ncomp);
+      }
+    }
+  }
+
+  // The Albany-side workset state arrays are views derived from the STK
+  // fields at the last workset build; rebuild so they re-read the
+  // restored data with the current bucket layout.
+  for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    discs_[subdomain]->rebuildWorksets();
+  }
 }
 
 void

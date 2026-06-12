@@ -8,6 +8,8 @@
 
 
 #include <functional>
+#include <map>
+#include <unordered_map>
 
 #include "ACE_AdaptiveState.hpp"
 #include "Albany_AbstractDiscretization.hpp"
@@ -198,14 +200,19 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdot_;
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdotdot_;
 
-  // Per-subdomain snapshot of the element states at the start of each
-  // global time step, restored when a subdomain solve fails and the step
-  // is retried with a reduced size. States live in the shared STK mesh
-  // and are written DURING residual fills, so a diverged nonlinear solve
-  // (e.g. Newton hitting NaN across the freezing front) leaves poisoned
-  // states behind; without the restore every retry assembles from them
-  // and fails instantly regardless of the step size.
-  mutable std::vector<LCM::StateArrays> pre_step_states_;
+  // Snapshot of every element-rank double field on the shared STK mesh
+  // at the start of each global time step, restored when a subdomain
+  // solve fails and the step is retried with a reduced size. States live
+  // in the shared STK mesh and are written DURING residual fills, so a
+  // diverged nonlinear solve leaves poisoned states behind; without the
+  // restore every retry assembles from them. Keyed by field name and
+  // element ID -- NOT by workset position: rebuildWorksets re-packs the
+  // buckets between snapshot and restore, so positional copies (the
+  // Schwarz fromTo idiom) are not layout-safe here.
+  mutable std::map<std::string, std::unordered_map<stk::mesh::EntityId, std::vector<double>>> pre_step_states_;
+
+  void snapshotSharedMeshStates() const;
+  void restoreSharedMeshStates() const;
 
   mutable std::vector<bool> do_outputs_;
   mutable std::vector<bool> do_outputs_init_;

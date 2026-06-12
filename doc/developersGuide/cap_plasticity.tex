@@ -770,36 +770,38 @@ message when these are unavailable.
 \label{sec:parameters}
 
 All parameters are read from the material database with the names
-below. The Salem limestone values are the associative set of
-\citet[Table~1]{Sun.Chen.Ostien:2014}; stress-like quantities in MPa.
+below. The model is unit-agnostic: parameters must be supplied in one
+consistent unit system, with the stress unit denoted $\sigma$ in the
+table (the ACE decks use Pa). The Salem limestone values are the
+associative set of \citet[Table~1]{Sun.Chen.Ostien:2014}, in MPa.
 
 \begin{center}
 \small
-\begin{tabular}{llrp{6.4cm}}
+\begin{tabular}{llrlp{5.4cm}}
 \toprule
-Input name & Symbol & Salem & Meaning \\
+Input name & Symbol & Salem & Units & Meaning \\
 \midrule
-\texttt{A}       & $A$        & 689.2    & saturated shear strength \\
-\texttt{C}       & $C$        & 675.2    & strength deficit at zero pressure ($A{-}C$ = cohesion-like intercept) \\
-\texttt{D}       & $D$        & 3.94e-4  & pressure scale of the exponential, yield surface \\
-\texttt{theta}   & $\theta$   & 0.0      & linear pressure slope, yield surface \\
-\texttt{N}       & $N$        & 6.0      & offset of initial yield below failure envelope \\
-\texttt{R}       & $R$        & 28.0     & cap aspect ratio, yield surface \\
-\texttt{kappa0}  & $\kappa_0$ & $-8.05$  & initial cap branch point \\
-\texttt{W}       & $W$        & 0.08     & maximum compactive volumetric plastic strain ($\approx$ porosity) \\
-\texttt{D1}      & $D_1$      & 1.47e-3  & crush-curve shape (linear) \\
-\texttt{D2}      & $D_2$      & 0.0      & crush-curve shape (quadratic) \\
-\texttt{calpha}  & $c^\alpha$ & 1.0e5    & kinematic hardening rate \\
-\texttt{psi}     & $\psi$     & 1.0      & triaxial extension/compression strength ratio \\
-\texttt{L}       & $L$        & 3.94e-4  & pressure scale, plastic potential \\
-\texttt{phi}     & $\phi$     & 0.0      & linear pressure slope, plastic potential \\
-\texttt{Q}       & $Q$        & 28.0     & cap aspect ratio, plastic potential \\
+\texttt{A}       & $A$        & 689.2    & $\sigma$      & saturated shear strength \\
+\texttt{C}       & $C$        & 675.2    & $\sigma$      & strength deficit at zero pressure ($A{-}C$ = cohesion-like intercept) \\
+\texttt{D}       & $D$        & 3.94e-4  & $\sigma^{-1}$ & pressure scale of the exponential, yield surface \\
+\texttt{theta}   & $\theta$   & 0.0      & ---           & linear pressure slope, yield surface \\
+\texttt{N}       & $N$        & 6.0      & $\sigma$      & offset of initial yield below failure envelope \\
+\texttt{R}       & $R$        & 28.0     & ---           & cap aspect ratio, yield surface \\
+\texttt{kappa0}  & $\kappa_0$ & $-8.05$  & $\sigma$      & initial cap branch point \\
+\texttt{W}       & $W$        & 0.08     & ---           & maximum compactive volumetric plastic strain ($\approx$ porosity) \\
+\texttt{D1}      & $D_1$      & 1.47e-3  & $\sigma^{-1}$ & crush-curve shape (linear) \\
+\texttt{D2}      & $D_2$      & 0.0      & $\sigma^{-2}$ & crush-curve shape (quadratic) \\
+\texttt{calpha}  & $c^\alpha$ & 1.0e5    & $\sigma$      & kinematic hardening rate \\
+\texttt{psi}     & $\psi$     & 1.0      & ---           & triaxial extension/compression strength ratio \\
+\texttt{L}       & $L$        & 3.94e-4  & $\sigma^{-1}$ & pressure scale, plastic potential \\
+\texttt{phi}     & $\phi$     & 0.0      & ---           & linear pressure slope, plastic potential \\
+\texttt{Q}       & $Q$        & 28.0     & ---           & cap aspect ratio, plastic potential \\
 \midrule
-\texttt{Substep Tolerance} & STOL & $10^{-4}$ &
+\texttt{Substep Tolerance} & STOL & $10^{-4}$ & --- &
   relative stress-error target per substep \\
-\texttt{Maximum Substeps}  & ---  & 200 &
+\texttt{Maximum Substeps}  & ---  & 200 & --- &
   smallest substep is $1/$this fraction of the increment \\
-\texttt{Finite Deformation} & --- & false &
+\texttt{Finite Deformation} & --- & false & --- &
   $\log$/Kirchhoff kinematics of Section~\ref{sec:finite} \\
 \bottomrule
 \end{tabular}

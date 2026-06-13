@@ -719,8 +719,11 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         auto const prob_type = prob_types_[subdomain];
 
         // Before the coupling loop, figure out whether
-        // output needs to be done or not.
-        if (num_iter_ == 0) {
+        // output needs to be done or not. (num_iter_ is reset to 0 at
+        // every stop, so testing it here would force output at every
+        // stop and make the write interval inert -- the initial-state
+        // test is the intent.)
+        if (is_initial_state == true) {
           do_outputs_[subdomain] = true;  // We always want output in the initial step
         } else {
           if (do_outputs_init_[subdomain] == true) {

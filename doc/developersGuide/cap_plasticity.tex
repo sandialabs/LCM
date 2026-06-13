@@ -1097,8 +1097,8 @@ intended.
 
 \paragraph{Failure criteria.}
 The cap model supplies constitutive failure indicators that replace
-three of the five \texttt{J2Erosion} criteria with quantities that
-have model meaning. Each indicator is normalized so that the value 1
+the stress-based \texttt{J2Erosion} criteria with quantities that
+have model meaning, and ports the kinematic criteria unchanged. Each indicator is normalized so that the value 1
 means exhaustion of its mechanism, and each criterion is enabled by
 a positive threshold (or limit) in the material input and disabled
 at the default 0:
@@ -1130,7 +1130,24 @@ at the default 0:
   collapse).
 \item \emph{Plastic distortion} (bit 0x20, \texttt{Maximum
   Equivalent Plastic Strain}): $\varepsilon_{\mathrm{eqps}}$ against
-  a user limit, replacing the total-distortion limit.
+  a user limit, the plastic complement of the total-distortion
+  criterion below.
+\item \emph{Total distortion} (bit 0x40, \texttt{Maximum
+  Distortion}): \texttt{J2Erosion}'s strain limit ported unchanged
+  --- the norm of the isochoric right Cauchy--Green tensor,
+  $\lVert J^{-2/3} F^T\!F \rVert / \sqrt{3}$, against a user limit.
+  The measure is 1 at rest, so the limit must exceed 1 (the
+  implementation rejects positive limits $\le 1$), and it includes
+  the \emph{elastic} stretch. That matters during thaw: as the ice
+  bonding disappears the stiffness collapses by orders of magnitude
+  and the material deforms enormously at nearly zero stress, so
+  neither the stress-based indicators nor eqps grow --- the total
+  stretch is what detects the collapse, and removing such cells
+  promptly is also what keeps the implicit solve well posed through
+  the collapse transient. Peat raises the limit to at least
+  $1 + \mathrm{peat}$ and ocean exposure shrinks the excess over 1
+  by the eqps-limit weakening factor, both \texttt{J2Erosion}
+  conventions. Requires finite deformation.
 \end{itemize}
 The backstress and crush indicators approach 1 only asymptotically,
 so their thresholds must also be below 1 (the implementation rejects
@@ -1203,6 +1220,8 @@ Input name & Default & Meaning \\
 \texttt{Maximum Equivalent Plastic Strain} & 0 (off) & '' \\
 \texttt{Critical Angle}                 & 0 (off) & tilt, radians \\
 \texttt{Maximum Displacement}           & 0 (off) & displacement norm \\
+\texttt{Maximum Distortion}             & 0 (off) &
+  total isochoric stretch, $> 1$ \\
 \texttt{Failed Integration Points For Death} & 0 (= all) &
   per-cell death threshold \\
 \texttt{Disable Erosion} & false & criteria never trip \\

@@ -8,7 +8,8 @@ bookkeeping.
 Usage: cap_verify.py <exo-file> <path>
   path in {hydrostatic, confined, triaxial, confined_fd, triaxial_fd,
            permafrost_thaw, permafrost_f05, death_tension,
-           death_backstress, death_crush, death_eqps, death_displacement}
+           death_backstress, death_crush, death_eqps, death_displacement,
+           death_distortion}
 Exit code 0 on PASS.
 """
 
@@ -79,6 +80,72 @@ DEATH_MODES = {
 }
 
 NUM_PTS = 8
+
+
+def death_distortion_main(exo):
+    """Total-distortion criterion under the exp/log-map finite-deformation
+    kinematics: the indicator is a pure function of the prescribed
+    homogeneous deformation gradient F = diag(1 - 0.04 t, 1, 1) (trilinear
+    hex, exact for the linear BC field), so the oracle is closed-form and
+    no trajectory comparison is needed. The confined path is mostly
+    volumetric and the isochoric measure removes that part, so the
+    distortion barely exceeds 1 (1.0015 at t = 1) and the deck limit
+    1.001 trips about 4/5 of the way through."""
+    t, var = exo_open(exo)
+    nsteps = len(t) - 1
+    limit = 1.001  # must match materials_permafrost_death_distortion.yaml
+
+    def distortion(ti):
+        F = np.diag([1.0 - 0.04 * ti, 1.0, 1.0])
+        C = F.T @ F
+        J = np.linalg.det(F)
+        return np.linalg.norm(C / J ** (2.0 / 3.0)) / np.sqrt(3.0)
+
+    o_ind = np.array([distortion(ti) / limit for ti in t])
+
+    # LOCA's observer writes a stale duplicate of the initial state into
+    # the first post-initial output slot (index 1); mask it out.
+    mask = np.ones(len(t), dtype=bool)
+    if len(t) > 1:
+        mask[1] = False
+
+    ok = True
+
+    def check(name, a, b, scale, tol):
+        nonlocal ok
+        err = np.abs(np.asarray(a)[mask] - np.asarray(b)[mask]).max() / scale
+        status = 'ok' if err < tol else 'FAIL'
+        print(f'  {name:24s} max rel diff = {err:.3e}  [{status}]')
+        ok &= err < tol
+
+    print(f'== death_distortion: Albany ({exo}) vs closed form, {nsteps} steps ==')
+
+    # All eight points see the same homogeneous F.
+    a_ind = np.array([var(f'Strain_Indicator_{p}')
+                      for p in range(1, NUM_PTS + 1)])
+    check('distortion indicator', a_ind.max(axis=0), o_ind, 1.0, 1.0e-12)
+    check('indicator pt spread', a_ind.max(axis=0) - a_ind.min(axis=0),
+          np.zeros(len(t)), 1.0, 1.0e-12)
+
+    # Trip step (kernel trips on >=), failure_state decimal magnitude
+    # 1e6 per point, bit 0x40, and the one-step cell_death lag (no ACE
+    # death-status vector in a plain mechanics run; see death_main).
+    n_idx = np.arange(len(t))
+    trips = n_idx[np.array([distortion(ti) >= limit for ti in t])]
+    assert trips.size > 0, 'oracle predicts no trip: bad test setup'
+    trip = trips.min()
+    assert 2 < trip < nsteps, f'trip step {trip} too close to the ends'
+    print(f'  trip step: {trip} of {nsteps}')
+    check('failure_modes', var('failure_modes_1'),
+          64.0 * (n_idx >= trip), 1.0, 1.0e-12)
+    o_state = NUM_PTS * 1.0e6 * (n_idx >= trip)
+    check('failure_state', var('failure_state'), o_state,
+          max(o_state.max(), 1.0), 1.0e-12)
+    o_dead = (n_idx >= trip + 1).astype(float)
+    check('cell_death', var('cell_death'), o_dead, 1.0, 1.0e-12)
+
+    print('VERIFICATION', 'PASS' if ok else 'FAIL')
+    return 0 if ok else 1
 
 
 def death_main(exo, path):
@@ -252,6 +319,8 @@ def porosity_main(exo):
 
 def main():
     exo, path = sys.argv[1], sys.argv[2]
+    if path == 'death_distortion':
+        return death_distortion_main(exo)
     if path in DEATH_MODES:
         return death_main(exo, path)
     if path == 'porosity_profile':

@@ -76,6 +76,7 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   ScalarField eqps_indicator_;
   ScalarField angle_indicator_;
   ScalarField displacement_indicator_;
+  ScalarField strain_indicator_;
   ScalarField tilt_angle_;
   ScalarField failed_;
   ScalarField dead_;
@@ -100,6 +101,7 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   //   0x08 = tilt angle
   //   0x10 = displacement norm
   //   0x20 = equivalent plastic strain limit
+  //   0x40 = total distortion (isochoric stretch norm, elastic-inclusive)
   // Once a bit is set at (cell, pt) it stays set. failure_modes_old_ holds
   // the value converged at the previous step; failure_modes_ is this
   // fill's updated value (old | newly tripped bits), saved back to the
@@ -194,6 +196,13 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   RealType maximum_eqps_{0.0};
   RealType critical_angle_{0.0};
   RealType maximum_displacement_{0.0};
+  // Limit on the total (elastic-inclusive) distortion, the norm of the
+  // isochoric right Cauchy-Green tensor over sqrt(3): 1 at rest, so the
+  // limit must be > 1. This is the port of J2Erosion's ACE Strain Limit
+  // and the criterion that catches the elastic collapse of thawed
+  // material, whose stress (and hence eqps) stays small as the stiffness
+  // drops with the ice bonding.
+  RealType maximum_distortion_{0.0};
   bool     disable_erosion_{false};
 
   // Number of integration points whose failure_modes mask must be

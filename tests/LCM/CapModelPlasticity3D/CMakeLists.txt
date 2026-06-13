@@ -28,7 +28,7 @@ foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           input_confined_thaw.yaml input_confined_f05.yaml
           input_death_tension.yaml input_death_backstress.yaml
           input_death_crush.yaml input_death_eqps.yaml
-          input_death_displacement.yaml
+          input_death_displacement.yaml input_death_distortion.yaml
           materials.yaml materials_triaxial.yaml materials_fd.yaml
           materials_triaxial_fd.yaml materials_permafrost.yaml
           materials_permafrost_thaw.yaml materials_permafrost_f05.yaml
@@ -37,6 +37,7 @@ foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           materials_permafrost_death_crush.yaml
           materials_permafrost_death_eqps.yaml
           materials_permafrost_death_displacement.yaml
+          materials_permafrost_death_distortion.yaml
           input_porosity.yaml materials_permafrost_porosity.yaml
           depth_test.txt porosity_test.txt
           cap_reference.py cap_verify.py runverify.cmake)
@@ -136,7 +137,7 @@ if (CAP_PY_OK)
   # checks the indicator series against the reference (machine precision)
   # and the failure_modes bitmask / failure_state / cell_death series
   # against the oracle-predicted trip step (exact).
-  foreach(mode tension backstress crush eqps displacement)
+  foreach(mode tension backstress crush eqps displacement distortion)
     add_test(NAME Permafrost_Death_${mode}
              COMMAND ${CMAKE_COMMAND}
                      "-DTEST_PROG=${SerialAlbany.exe}"

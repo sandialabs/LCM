@@ -140,12 +140,19 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   maximum_eqps_                   = p->get<RealType>("Maximum Equivalent Plastic Strain", 0.0);
   critical_angle_                 = p->get<RealType>("Critical Angle", 0.0);
   maximum_displacement_           = p->get<RealType>("Maximum Displacement", 0.0);
+  maximum_distortion_             = p->get<RealType>("Maximum Distortion", 0.0);
   disable_erosion_                = p->get<bool>("Disable Erosion", false);
   num_failed_pts_for_death_       = p->get<int>("Failed Integration Points For Death", 0);
 
   ALBANY_ASSERT(
       critical_angle_ <= 0.0 || finite_deformation_,
       "Permafrost: the Critical Angle (tilt) criterion requires Finite Deformation");
+  ALBANY_ASSERT(
+      maximum_distortion_ <= 0.0 || finite_deformation_,
+      "Permafrost: the Maximum Distortion criterion requires Finite Deformation");
+  ALBANY_ASSERT(
+      maximum_distortion_ <= 0.0 || maximum_distortion_ > 1.0,
+      "Permafrost: Maximum Distortion must be > 1 (the distortion measure is 1 at rest)");
   ALBANY_ASSERT(
       tension_indicator_threshold_ < 1.0 && backstress_indicator_threshold_ < 1.0 && crush_indicator_threshold_ < 1.0,
       "Permafrost: indicator thresholds must be < 1 (the indicators reach 1 only asymptotically)");
@@ -212,6 +219,7 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   std::string const eqps_indicator_string         = field_name_map_["Eqps_Indicator"];
   std::string const angle_indicator_string        = field_name_map_["Angle_Indicator"];
   std::string const displacement_indicator_string = field_name_map_["Displacement_Indicator"];
+  std::string const strain_indicator_string       = field_name_map_["Strain_Indicator"];
   std::string const tilt_angle_string             = field_name_map_["Tilt_Angle"];
 
   // define the dependent fields. Elasticity is computed internally from
@@ -261,6 +269,7 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   setEvaluatedField(eqps_indicator_string, dl->qp_scalar);
   setEvaluatedField(angle_indicator_string, dl->qp_scalar);
   setEvaluatedField(displacement_indicator_string, dl->qp_scalar);
+  setEvaluatedField(strain_indicator_string, dl->qp_scalar);
   setEvaluatedField(tilt_angle_string, dl->qp_scalar);
   setEvaluatedField("failure_modes", dl->qp_scalar);
   setEvaluatedField("failure_state", dl->cell_scalar2);
@@ -287,6 +296,7 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   addStateVariable(eqps_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Eqps Indicator", false));
   addStateVariable(angle_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
   addStateVariable(displacement_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
+  addStateVariable(strain_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
   addStateVariable(tilt_angle_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
   addStateVariable("failure_modes", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Failure Modes", false));
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
@@ -316,6 +326,7 @@ PermafrostKernel<EvalT, Traits>::init(
   std::string eqps_indicator_string         = field_name_map_["Eqps_Indicator"];
   std::string angle_indicator_string        = field_name_map_["Angle_Indicator"];
   std::string displacement_indicator_string = field_name_map_["Displacement_Indicator"];
+  std::string strain_indicator_string       = field_name_map_["Strain_Indicator"];
   std::string tilt_angle_string             = field_name_map_["Tilt_Angle"];
 
   // extract dependent MDFields
@@ -344,6 +355,7 @@ PermafrostKernel<EvalT, Traits>::init(
   eqps_indicator_         = *eval_fields[eqps_indicator_string];
   angle_indicator_        = *eval_fields[angle_indicator_string];
   displacement_indicator_ = *eval_fields[displacement_indicator_string];
+  strain_indicator_       = *eval_fields[strain_indicator_string];
   tilt_angle_             = *eval_fields[tilt_angle_string];
   failure_modes_          = *eval_fields["failure_modes"];
   failed_                 = *eval_fields["failure_state"];
@@ -390,7 +402,7 @@ PermafrostKernel<EvalT, Traits>::init(
   // Seed failed_ (diagnostic, decimal-encoded per-mode counts) and dead_
   // (binary cell-death flag) from the per-(cell, pt) failure-mode bitmask
   // converged at the previous step. Each set bit at (cell, pt)
-  // contributes a decimal magnitude (1, 10, ..., 100000) to
+  // contributes a decimal magnitude (1, 10, ..., 1000000) to
   // failed_(cell, 0) so the encoded value decodes back to per-mode trip
   // counts across all pts of the cell; operator() adds this fill's newly
   // tripped bits on top. dead_(cell, 0) is the predicate the ACE solver
@@ -407,6 +419,7 @@ PermafrostKernel<EvalT, Traits>::init(
       if (m & 0x08) seed += 1000.0;
       if (m & 0x10) seed += 10000.0;
       if (m & 0x20) seed += 100000.0;
+      if (m & 0x40) seed += 1000000.0;
       if (m != 0u) ++num_failed_pts;
     }
     failed_(cell, 0) = seed;
@@ -446,6 +459,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     eqps_indicator_(cell, pt)         = 0.0;
     angle_indicator_(cell, pt)        = 0.0;
     displacement_indicator_(cell, pt) = 0.0;
+    strain_indicator_(cell, pt)       = 0.0;
     tilt_angle_(cell, pt)             = 0.0;
     // Carry the failure-mode bitmask forward unchanged: a dead cell never
     // trips new bits, but the state must still be written every fill.
@@ -495,6 +509,16 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   RealType max_eqps_eff = maximum_eqps_;
   if (peat > 0.0) max_eqps_eff *= 1.0 + peat;
   if (submerged) max_eqps_eff /= eqps_limit_weakening_;
+
+  // Effective distortion limit, J2Erosion's conventions for its Strain
+  // Limit: peat raises the limit to at least 1 + peat, and ocean
+  // exposure shrinks the allowed excess over 1 by the same factor that
+  // weakens the eqps limit (the port of ACE SL Weakening Factor).
+  RealType max_distortion_eff = maximum_distortion_;
+  if (max_distortion_eff > 0.0) {
+    if (peat > 0.0) max_distortion_eff = std::max(max_distortion_eff, 1.0 + peat);
+    if (submerged) max_distortion_eff = 1.0 + (max_distortion_eff - 1.0) / eqps_limit_weakening_;
+  }
 
   // Saturation-to-parameter map (see the file banner). Elasticity from
   // the (K, G) split: the shear modulus carries the order-of-magnitude
@@ -761,12 +785,30 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
       disp_failure = disp_norm > maximum_displacement_;
     }
 
+    // Total distortion: the norm of the isochoric right Cauchy-Green
+    // tensor over sqrt(3), J2Erosion's strain measure. It is 1 at rest
+    // and includes the elastic stretch, so it catches the collapse of
+    // thawed material whose stress -- and hence eqps -- stays small as
+    // the stiffness drops with the ice bonding. The isochoric
+    // normalization makes the thermal (spherical) stretch irrelevant.
+    RealType distortion_ind     = 0.0;
+    bool     distortion_failure = false;
+    if (max_distortion_eff > 0.0 && finite_deformation_) {
+      auto const     Fv         = Sacado::Value<Tensor>::eval(Fval);
+      auto const     Cv         = minitensor::transpose(Fv) * Fv;
+      RealType const Jv         = minitensor::det(Fv);
+      RealType const distortion = minitensor::norm((1.0 / std::cbrt(Jv * Jv)) * Cv) / std::sqrt(3.0);
+      distortion_ind            = distortion / max_distortion_eff;
+      distortion_failure        = distortion >= max_distortion_eff;
+    }
+
     tension_indicator_(cell, pt)      = tension_ind;
     backstress_indicator_(cell, pt)   = backstress_ind;
     crush_indicator_(cell, pt)        = crush_ind;
     eqps_indicator_(cell, pt)         = eqps_ind;
     angle_indicator_(cell, pt)        = angle_ind;
     displacement_indicator_(cell, pt) = disp_ind;
+    strain_indicator_(cell, pt)       = distortion_ind;
     tilt_angle_(cell, pt)             = theta_tilt;
 
     // Per-(cell, pt) OR-accumulation: add each mode's decimal magnitude
@@ -793,6 +835,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     trip(critical_angle_ > 0.0 && std::abs(theta_tilt) >= critical_angle_, 0x08, 1000.0);
     trip(disp_failure, 0x10, 10000.0);
     trip(max_eqps_eff > 0.0 && eqps_ind >= 1.0, 0x20, 100000.0);
+    trip(distortion_failure, 0x40, 1000000.0);
 
     // Persist this fill's updated bitmask (old | newly tripped bits) to
     // the STK-backed state, so it follows the cell across workset

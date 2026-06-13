@@ -143,6 +143,10 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
       "values");
   validPL->set<int>("Number Of Time Derivatives", 1, "Number of time derivatives in use in the problem");
   validPL->set<int>("ACE Dynamic Order", 1, "Subdomain dynamic order recorded by the ACE thermo-mechanical solver");
+  validPL->set<Teuchos::Array<std::string>>(
+      "Anchor Node Sets", Teuchos::Array<std::string>(),
+      "Node sets that kinematically ground the structure; in ACE erosion, a live cell no "
+      "longer connected through live cells to any of these has calved off and is killed");
 
   validPL->set<bool>("Use MDField Memoization", false, "Use memoization to avoid recomputing MDFields");
   validPL->set<bool>("Use MDField Memoization For Parameters", false, "Use memoization to avoid recomputing MDFields dependent on parameters");

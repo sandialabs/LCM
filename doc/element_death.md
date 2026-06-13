@@ -612,6 +612,61 @@ back-references on any rank are destroyed in Phase 4.
 
 ---
 
+## D.1 Calving: killing blocks that disconnect from the anchor
+
+Coastal erosion separates blocks of still-intact material from the
+bluff — a calving event. Once a block has lost its last connection to
+the kinematic ground it is a free body: under the dynamic mechanical
+solve it free falls, and at a coarse coupling step (e.g. 900 s) the
+implicit step finds the free-fall equilibrium and the block teleports
+~½·g·Δt² ≈ 10⁶ m in a single step. The strain-based criteria do
+eventually mark its cells dead, but only after that one absurd step,
+and a piecemeal criterion death can leave a live remnant flying for the
+rest of the run (a constant huge velocity in `xdot`, eventually
+destabilizing the parallel solve).
+
+`STKDiscretization::findDetachedCells`
+(`src/disc/stk/Albany_STKDiscretization.cpp`), called from
+`applyDeathToActivePart` right after the criterion kills are gathered
+(and after the global early-out, so every rank enters its collective
+calls), removes such a block the moment it disconnects:
+
+1. **Seed** the reachable set with the nodes of the deck's
+   `Anchor Node Sets` (owned + shared) — the kinematic ground. For the
+   bluff these are `[x-, z-]` (the inland back wall and the base);
+   `y+`/`y-` are the quasi-2D out-of-plane confinement, present on every
+   node, so they are *not* ground and are excluded. If the deck names no
+   anchor sets the check is skipped entirely (default behavior is
+   unchanged).
+2. **Flood** through live-cell node adjacency: a live cell touching any
+   reachable node makes all its nodes reachable. This step's
+   criterion-killed cells are treated as already dead, so the block is
+   seen as severed. The flood is pure node sharing, so it is dimension-
+   and topology-agnostic (2D/3D, hex/tet).
+3. **Parallel**: under `NO_AUTO_AURA` cells are never ghosted, so a
+   connected block straddling a partition boundary is joined only
+   through shared nodes. After each local saturation the reachable
+   shared-node GIDs are unioned across ranks (the `MPI_Allgatherv`
+   idiom from `computeNodeSets`), iterating to global convergence
+   (`Teuchos::reduceAll(REDUCE_MAX)` on a per-rank "added" flag).
+4. **Kill**: any live cell with no reachable node has calved off. Its
+   `cell_death` STK field is set to 1 (so assembly skips it and the
+   active-element count drops) and it is appended to the kill list, so
+   the same `applyElementDeath` surgery removes it and exposes the
+   detachment face as the new eroding surface.
+
+A safety guard refuses to proceed if the anchor seed is empty on every
+rank (a misconfigured anchor would otherwise make every live cell look
+detached and erode the whole mesh): it warns and leaves the step
+untouched.
+
+The removal happens one step *after* the block's last tie dies, so the
+single teleporting step is not itself prevented; what it prevents is the
+*sustained* multi-step flight and the live-remnant state, by retiring
+the entire disconnected component at once.
+
+---
+
 ## E. Differences from Sierra/SM Adagio
 
 The algorithm is modeled on Adagio's `Apst_ElemDeath::disconnectElements`

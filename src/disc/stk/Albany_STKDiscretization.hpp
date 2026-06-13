@@ -411,6 +411,26 @@ class STKDiscretization : public AbstractDiscretization
   void
   rebuildWorksets() override;
 
+  //! Element death: find live owned cells that have calved off the
+  //! structure -- cells no longer connected, through live-cell node
+  //! adjacency, to any of the named anchor node sets (the kinematic
+  //! ground, e.g. the bluff's back wall and base). A detached block free
+  //! falls under gravity and, at a coarse coupling step, teleports an
+  //! absurd distance in one step before the kinematic criteria fire; this
+  //! removes it the moment it disconnects instead. The flood-fill is pure
+  //! node-sharing connectivity, so it is dimension- and topology-agnostic
+  //! (2D/3D, hex/tet). cell_death is set to 1 on each detached cell here
+  //! and the cells are returned so the caller adds them to the kill set.
+  //! pending_dead are this step's criterion-killed cells, treated as dead
+  //! for the connectivity (they are about to be removed). Parallel: under
+  //! NO_AUTO_AURA cross-rank connectivity is only through shared nodes, so
+  //! reachability is exchanged via the shared-node GID union each round,
+  //! iterating to global convergence.
+  stk::mesh::EntityVector
+  findDetachedCells(
+      std::vector<std::string> const& anchor_node_sets,
+      stk::mesh::EntityVector const&  pending_dead);
+
   //! Function that transforms an STK mesh of a unit cube (for LandIce problems)
   void
   transformMesh();

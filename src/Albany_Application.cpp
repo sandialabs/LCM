@@ -1857,6 +1857,25 @@ Application::applyDeathToActivePart()
     return false;
   }
 
+  // Calving: a death this step may have severed a block from the
+  // kinematic ground. Such a block free falls and, at a coarse coupling
+  // step, teleports an absurd distance before the kinematic criteria can
+  // fire. If the deck names anchor node sets, find every live cell no
+  // longer connected (through live cells) to them and kill it now. This
+  // is collective (findDetachedCells exchanges reachability across
+  // ranks), so every rank must call it -- guaranteed because the global
+  // early-out above already passed on all ranks. findDetachedCells sets
+  // cell_death on the detached cells; we append them to the kill list so
+  // the same surgery removes them. Anchor nodes themselves are excluded
+  // from being killed since they seed the reachable set.
+  auto const anchor_node_sets =
+      problemParams->get<Teuchos::Array<std::string>>("Anchor Node Sets", Teuchos::Array<std::string>());
+  if (!anchor_node_sets.empty()) {
+    std::vector<std::string> anchors(anchor_node_sets.begin(), anchor_node_sets.end());
+    auto const detached = stk_disc->findDetachedCells(anchors, killed);
+    killed.insert(killed.end(), detached.begin(), detached.end());
+  }
+
   // Build the part vectors that the death machinery needs.
   //
   // side_parts: new faces are painted into {activePart, deadCellsPart}

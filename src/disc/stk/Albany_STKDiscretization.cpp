@@ -7,6 +7,7 @@
 #include <Albany_CommUtils.hpp>
 #include <Albany_ThyraUtils.hpp>
 #include <limits>
+#include <unordered_set>
 
 #include "Albany_BucketArray.hpp"
 #include "Albany_CombineAndScatterManager.hpp"
@@ -2869,6 +2870,156 @@ STKDiscretization::rebuildWorksets()
   computeWorksetInfo();
   computeNodeSets();
   computeSideSets();
+}
+
+stk::mesh::EntityVector
+STKDiscretization::findDetachedCells(
+    std::vector<std::string> const& anchor_node_sets,
+    stk::mesh::EntityVector const&  pending_dead)
+{
+  stk::mesh::EntityVector detached;
+
+  auto* active_part = stkMeshStruct->getActivePart();
+  if (active_part == nullptr) return detached;
+  auto* dead_part = stkMeshStruct->getDeadCellsPart();
+
+  int const   num_procs = comm->getSize();
+  auto const* mpi_comm  = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
+
+  // Seed the reachable set with the anchor node sets (owned + shared), the
+  // kinematic ground. These nodes are reachable regardless of cell
+  // liveness; the flood then spreads from them only through live cells.
+  std::unordered_set<GO> reachable;
+  for (auto const& nsname : anchor_node_sets) {
+    auto it = stkMeshStruct->nsPartVec.find(nsname);
+    if (it == stkMeshStruct->nsPartVec.end() || it->second == nullptr) {
+      *out << "STKDisc: WARNING -- anchor node set '" << nsname << "' not found; ignored.\n";
+      continue;
+    }
+    stk::mesh::Selector sel =
+        stk::mesh::Selector(*(it->second)) &
+        (stk::mesh::Selector(metaData.locally_owned_part()) | stk::mesh::Selector(metaData.globally_shared_part()));
+    std::vector<stk::mesh::Entity> nodes;
+    stk::mesh::get_selected_entities(sel, bulkData.buckets(stk::topology::NODE_RANK), nodes);
+    for (auto const& n : nodes) reachable.insert(gid(n));
+  }
+
+  // Guard: if no anchor node was found on any rank the seed is empty and
+  // every live cell would look detached. Refuse to erode the whole mesh;
+  // warn and leave the step untouched.
+  {
+    long long       local_seed  = static_cast<long long>(reachable.size());
+    long long       global_seed = 0;
+    Teuchos::reduceAll(*comm, Teuchos::REDUCE_SUM, 1, &local_seed, &global_seed);
+    if (global_seed == 0) {
+      *out << "STKDisc: WARNING -- no anchor nodes found for the disconnection "
+              "check; skipping (no cells removed).\n";
+      return detached;
+    }
+  }
+
+  // Owned live cells: in activePart, not yet in deadCellsPart, and not in
+  // this step's pending kills (those are treated as dead for connectivity).
+  std::unordered_set<stk::mesh::EntityId> pending_gids;
+  for (auto const& c : pending_dead) pending_gids.insert(bulkData.identifier(c));
+
+  stk::mesh::Selector live_sel = stk::mesh::Selector(metaData.locally_owned_part()) & stk::mesh::Selector(*active_part);
+  if (dead_part != nullptr) live_sel &= !stk::mesh::Selector(*dead_part);
+  std::vector<stk::mesh::Entity> live_all;
+  stk::mesh::get_selected_entities(live_sel, bulkData.buckets(stk::topology::ELEMENT_RANK), live_all);
+  std::vector<stk::mesh::Entity> live;
+  live.reserve(live_all.size());
+  for (auto const& c : live_all) {
+    if (pending_gids.count(bulkData.identifier(c)) == 0) live.push_back(c);
+  }
+
+  // Shared nodes, used to exchange reachability across ranks each round
+  // (under NO_AUTO_AURA cells are never ghosted, so a connected block that
+  // straddles a partition boundary is joined only through shared nodes).
+  std::vector<stk::mesh::Entity> shared_nodes;
+  if (num_procs > 1) {
+    stk::mesh::get_selected_entities(
+        stk::mesh::Selector(metaData.globally_shared_part()), bulkData.buckets(stk::topology::NODE_RANK), shared_nodes);
+  }
+
+  // Flood: a live cell touching any reachable node makes all its nodes
+  // reachable. Saturate locally, then union the reachable shared-node GIDs
+  // across ranks; repeat until no rank gains a node (global convergence).
+  bool changed_global = true;
+  while (changed_global) {
+    bool local_changed = true;
+    while (local_changed) {
+      local_changed = false;
+      for (auto const& c : live) {
+        stk::mesh::Entity const* nodes = bulkData.begin_nodes(c);
+        int const                nn    = bulkData.num_nodes(c);
+        bool                     touches = false;
+        for (int i = 0; i < nn; ++i) {
+          if (reachable.count(gid(nodes[i])) > 0) {
+            touches = true;
+            break;
+          }
+        }
+        if (!touches) continue;
+        for (int i = 0; i < nn; ++i) {
+          if (reachable.insert(gid(nodes[i])).second) local_changed = true;
+        }
+      }
+    }
+
+    changed_global = false;
+    if (num_procs > 1) {
+      std::vector<GO> local_shared;
+      local_shared.reserve(shared_nodes.size());
+      for (auto const& n : shared_nodes) {
+        GO const g = gid(n);
+        if (reachable.count(g) > 0) local_shared.push_back(g);
+      }
+      int const        local_count = static_cast<int>(local_shared.size());
+      std::vector<int> counts(num_procs);
+      Teuchos::gatherAll(*comm, 1, &local_count, num_procs, counts.data());
+      std::vector<int> displs(num_procs, 0);
+      for (int i = 1; i < num_procs; ++i) displs[i] = displs[i - 1] + counts[i - 1];
+      int const       total = displs[num_procs - 1] + counts[num_procs - 1];
+      std::vector<GO> all_shared(total);
+      MPI_Allgatherv(
+          local_shared.data(), local_count, MPI_LONG_LONG,
+          all_shared.data(), counts.data(), displs.data(), MPI_LONG_LONG,
+          *mpi_comm->getRawMpiComm());
+      bool added = false;
+      for (GO const g : all_shared) {
+        if (reachable.insert(g).second) added = true;
+      }
+      int       local_added  = added ? 1 : 0;
+      int       global_added = 0;
+      Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 1, &local_added, &global_added);
+      changed_global = (global_added != 0);
+    }
+  }
+
+  // Any live cell with no reachable node has calved off. Mark it dead (so
+  // assembly skips it and the active-element count drops) and return it for
+  // the caller to feed into the element-death surgery.
+  auto* cell_death_field = metaData.get_field<double>(stk::topology::ELEMENT_RANK, "cell_death");
+  for (auto const& c : live) {
+    stk::mesh::Entity const* nodes     = bulkData.begin_nodes(c);
+    int const                nn        = bulkData.num_nodes(c);
+    bool                     connected = false;
+    for (int i = 0; i < nn; ++i) {
+      if (reachable.count(gid(nodes[i])) > 0) {
+        connected = true;
+        break;
+      }
+    }
+    if (connected) continue;
+    detached.push_back(c);
+    if (cell_death_field != nullptr) {
+      double* cd = stk::mesh::field_data(*cell_death_field, c);
+      if (cd != nullptr) *cd = 1.0;
+    }
+  }
+
+  return detached;
 }
 
 }  // namespace Albany

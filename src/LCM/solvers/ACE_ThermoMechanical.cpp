@@ -837,6 +837,16 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
     ++stop;
     current_time += time_step;
+
+    // Guard: a simulation that has eroded every element has nothing left
+    // to solve -- handing an empty system to the next step's solvers
+    // would fail obscurely. Stop cleanly with a message instead.
+    if (countActiveElements() == 0) {
+      *fos_ << "\nACE: all elements have died (eroded). "
+            << "Stopping the simulation at time " << current_time << ".\n";
+      break;
+    }
+
     interval_index         = find_time_interval_index(event_initial_times_, event_final_times_, current_time);
     auto const in_interval = is_within_interval(event_initial_times_, event_final_times_, current_time, interval_index);
 
@@ -854,6 +864,47 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   }  // Time-step loop
 
   return;
+}
+
+// Global count of cells still alive by the cell_death element state --
+// the same source of truth the coupling loop uses to populate
+// death_status_vecs_ (a cell with cell_death = 1 is skipped by the
+// scatter regardless of its STK part membership). Reports "alive" when
+// no subdomain carries the state, so the all-dead guard never trips on
+// configurations without element death.
+long long
+ACEThermoMechanical::countActiveElements() const
+{
+  long long local_alive = -1;  // sentinel: no cell_death state found
+  for (int subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+    auto& esa = apps_[subdomain]->getStateMgr().getStateArrays().elemStateArrays;
+    bool      found = false;
+    long long alive = 0;
+    for (size_t ws = 0; ws < esa.size(); ++ws) {
+      auto it = esa[ws].find("cell_death");
+      if (it == esa[ws].end()) continue;
+      found           = true;
+      auto&     flat  = it->second;
+      int const ncell = flat.size();
+      for (int c = 0; c < ncell; ++c) {
+        if (flat[c] < 0.5) ++alive;
+      }
+    }
+    if (found) {
+      local_alive = alive;
+      break;
+    }
+  }
+
+  long long local_found = local_alive >= 0 ? 1 : 0;
+  long long any_found   = 0;
+  Teuchos::reduceAll(*comm_, Teuchos::REDUCE_MAX, 1, &local_found, &any_found);
+  if (any_found == 0) return 1;  // no death machinery anywhere: alive
+
+  long long local_sum  = local_alive >= 0 ? local_alive : 0;
+  long long global_sum = 0;
+  Teuchos::reduceAll(*comm_, Teuchos::REDUCE_SUM, 1, &local_sum, &global_sum);
+  return global_sum;
 }
 
 void

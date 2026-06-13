@@ -214,6 +214,11 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   void snapshotSharedMeshStates() const;
   void restoreSharedMeshStates() const;
 
+  //! Global number of owned elements still in the active part; "alive"
+  //! when no active-part machinery exists. Drives the all-elements-dead
+  //! stop in the time loop.
+  long long countActiveElements() const;
+
   mutable std::vector<bool> do_outputs_;
   mutable std::vector<bool> do_outputs_init_;
 

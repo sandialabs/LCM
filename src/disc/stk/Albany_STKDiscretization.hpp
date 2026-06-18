@@ -431,6 +431,27 @@ class STKDiscretization : public AbstractDiscretization
       std::vector<std::string> const& anchor_node_sets,
       stk::mesh::EntityVector const&  pending_dead);
 
+  //! Element death: owned solution-DOF local indices of every node whose
+  //! incident cells are ALL dead (no live cell touches it). Such a node is
+  //! decoupled, but the dynamic (trapezoid) integrator still advances its
+  //! velocity and acceleration: with the displacement frozen it forces
+  //! v_{n+1} = -v_n and an acceleration that grows linearly with the step
+  //! count (a_n ~ n * 4 v_0 / dt), so a dead block that detached with a
+  //! large velocity eventually develops an enormous acceleration and (if
+  //! it retains lumped mass) an inertial residual that breaks the solve.
+  //! The dynamic solver zeros velocity and acceleration at these DOFs each
+  //! step; one zeroing is enough to stop the recurrence, but doing it every
+  //! step is robust. Determination is cross-rank correct: a node owned here
+  //! but kept alive by a live cell on another rank (shared) is excluded via
+  //! the shared-node GID union, mirroring findDetachedCells. Returns the
+  //! GLOBAL DOF ids (every equation) of those owned dead-only nodes; the
+  //! caller maps them through the solution vector's own indexer and zeros
+  //! only valid local slots. Using global ids + the reduced-space indexer is
+  //! bounds-safe and immune to both DBC DOF elimination (which shrinks the
+  //! reduced solution vector) and the deck-dependent solution field name.
+  std::vector<GO>
+  getDeadNodeDOFGids();
+
   //! Function that transforms an STK mesh of a unit cube (for LandIce problems)
   void
   transformMesh();

@@ -159,6 +159,14 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   void
   setICVecs(ST const time, int const subdomain) const;
 
+  //! Zero velocity and acceleration (this_xdot_/this_xdotdot_) at every node
+  //! whose incident cells are all dead, so a calved/eroded block carries no
+  //! momentum into the next step's warm start. Prevents the linearly growing
+  //! acceleration of a decoupled, displacement-frozen dead DOF under the
+  //! trapezoid rule from eventually breaking the mechanical solve.
+  void
+  zeroDeadNodeRates(int const subdomain) const;
+
   std::vector<Teuchos::RCP<Albany::SolverFactory>>                             solver_factories_;
   mutable std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
   mutable Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>                 apps_;

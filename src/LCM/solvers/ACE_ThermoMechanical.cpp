@@ -19,6 +19,7 @@
 #include "Albany_IossSTKMeshStruct.hpp"
 #include "Albany_PiroObserver.hpp"
 #include "Teuchos_TimeMonitor.hpp"
+#include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_STKDiscretization.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Albany_Utils.hpp"
@@ -1086,6 +1087,7 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     double const time_step) const
 {
   failed_ = false;
+
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 
@@ -1153,6 +1155,11 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     Thyra::copy(*current_state->getX(), this_x_[subdomain].ptr());
     Thyra::copy(*current_state->getXDot(), this_xdot_[subdomain].ptr());
     Thyra::copy(*current_state->getXDotDot(), this_xdotdot_[subdomain].ptr());
+
+    // Zero velocity/acceleration on fully-dead (eroded) nodes before this
+    // state warm-starts the next step, so a calved block's velocity cannot
+    // drive a linearly growing acceleration that eventually breaks the solve.
+    zeroDeadNodeRates(subdomain);
 
     // Match Piro::TrapezoidRuleSolver's "Initial Velocity = " print so the
     // external monitoring tooling sees the same string from both paths.
@@ -1227,6 +1234,10 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     Thyra::copy(*gx_out, this_x_[subdomain].ptr());
     Thyra::copy(*xdot_rcp, this_xdot_[subdomain].ptr());
     Thyra::copy(*xdotdot_rcp, this_xdotdot_[subdomain].ptr());
+
+    // Zero velocity/acceleration on fully-dead (eroded) nodes before this
+    // state warm-starts the next step (see zeroDeadNodeRates).
+    zeroDeadNodeRates(subdomain);
 
     // Write solution back to model evaluator, app, and discretization
     // so the next time step starts from this solution (warm start).
@@ -1325,7 +1336,8 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
     // subsequent time steps: update ic vecs based on fields in stk discretization
     auto& abs_disc = *discs_[subdomain];
     auto& stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
-    auto  x_mv     = stk_disc.getSolutionMV();
+
+    auto x_mv = stk_disc.getSolutionMV();
 
     // Update ics_x_ and its time-derivatives
     ics_x_[subdomain] = Thyra::createMember(x_mv->col(0)->space());
@@ -1338,6 +1350,40 @@ ACEThermoMechanical::setICVecs(ST const time, int const subdomain) const
       ics_xdotdot_[subdomain] = Thyra::createMember(x_mv->col(2)->space());
       Thyra::copy(*x_mv->col(2), ics_xdotdot_[subdomain].ptr());
       auto nrm = norm_2(*ics_xdotdot_[subdomain]);
+    }
+  }
+}
+
+void
+ACEThermoMechanical::zeroDeadNodeRates(int const subdomain) const
+{
+  // Erosion can detach a block that then carries a large velocity. Once its
+  // cells are all dead the node is decoupled, but the dynamic (trapezoid)
+  // integrator keeps advancing the frozen DOF, growing its acceleration
+  // linearly with the step count until the inertial residual breaks the
+  // mechanical solve. Hold velocity and acceleration at zero on every node
+  // whose incident cells are all dead -- dead material carries no momentum.
+  // This must act on this_xdot_/this_xdotdot_, the vectors that warm-start the
+  // next step's solve (see AdvanceMechanicalDynamics: the handoff goes through
+  // this_*_, not setICVecs). Map the dead nodes' global DOF ids through the
+  // vector's own indexer and zero only valid local slots: bounds-safe, and
+  // immune to both DBC elimination (which shrinks the reduced solution vector)
+  // and the deck-dependent solution field name.
+  if (Teuchos::is_null(this_xdot_[subdomain])) return;
+  auto& abs_disc = *discs_[subdomain];
+  auto& stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
+  auto const dead_dof_gids = stk_disc.getDeadNodeDOFGids();
+  if (dead_dof_gids.empty()) return;
+
+  auto       sol_indexer  = Albany::createGlobalLocalIndexer(this_xdot_[subdomain]->space());
+  auto       xdot_data    = Albany::getNonconstLocalData(this_xdot_[subdomain]);
+  auto       xdotdot_data = Albany::getNonconstLocalData(this_xdotdot_[subdomain]);
+  auto const n_local      = static_cast<LO>(xdot_data.size());
+  for (GO const g : dead_dof_gids) {
+    LO const lid = sol_indexer->getLocalElement(g);
+    if (lid >= 0 && lid < n_local) {
+      xdot_data[lid]    = 0.0;
+      xdotdot_data[lid] = 0.0;
     }
   }
 }

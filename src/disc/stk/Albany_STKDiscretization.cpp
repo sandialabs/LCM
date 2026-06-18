@@ -3022,4 +3022,79 @@ STKDiscretization::findDetachedCells(
   return detached;
 }
 
+std::vector<GO>
+STKDiscretization::getDeadNodeDOFGids()
+{
+  std::vector<GO> dead_dof_gids;
+
+  auto* active_part = stkMeshStruct->getActivePart();
+  if (active_part == nullptr) return dead_dof_gids;
+  // Liveness is keyed off the cell_death STATE, not deadCellsPart membership:
+  // a cell that fails mid-solve has cell_death = 1 immediately, but its move
+  // into deadCellsPart lags by a step (the ACE observer applies death from a
+  // death vector snapshotted before the solve). Keying off the part would miss
+  // a freshly calved block for a step -- exactly when its velocity is largest.
+  // No cell_death field -> erosion not enabled -> nothing to do.
+  auto* cell_death_field = metaData.get_field<double>(stk::topology::ELEMENT_RANK, "cell_death");
+  if (cell_death_field == nullptr) return dead_dof_gids;
+
+  // 1. Mark every node touched by a LIVE (cell_death < 0.5) owned active cell.
+  std::unordered_set<GO> live_nodes;
+  stk::mesh::Selector    active_sel =
+      stk::mesh::Selector(metaData.locally_owned_part()) & stk::mesh::Selector(*active_part);
+  std::vector<stk::mesh::Entity> active_cells;
+  stk::mesh::get_selected_entities(active_sel, bulkData.buckets(stk::topology::ELEMENT_RANK), active_cells);
+  for (auto const& c : active_cells) {
+    double const* cd = stk::mesh::field_data(*cell_death_field, c);
+    if (cd != nullptr && *cd >= 0.5) continue;  // dead cell: do not mark its nodes live
+    stk::mesh::Entity const* nodes = bulkData.begin_nodes(c);
+    int const                nn    = bulkData.num_nodes(c);
+    for (int i = 0; i < nn; ++i) live_nodes.insert(gid(nodes[i]));
+  }
+
+  // 2. Cross-rank: a shared node kept alive by a live cell on another rank
+  // must not be treated as dead here. Union the live shared-node GIDs.
+  int const   num_procs = comm->getSize();
+  auto const* mpi_comm  = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
+  if (num_procs > 1) {
+    std::vector<stk::mesh::Entity> shared_nodes;
+    stk::mesh::get_selected_entities(
+        stk::mesh::Selector(metaData.globally_shared_part()), bulkData.buckets(stk::topology::NODE_RANK), shared_nodes);
+    std::vector<GO> local_live_shared;
+    local_live_shared.reserve(shared_nodes.size());
+    for (auto const& n : shared_nodes) {
+      GO const g = gid(n);
+      if (live_nodes.count(g) > 0) local_live_shared.push_back(g);
+    }
+    int const        local_count = static_cast<int>(local_live_shared.size());
+    std::vector<int> counts(num_procs);
+    Teuchos::gatherAll(*comm, 1, &local_count, num_procs, counts.data());
+    std::vector<int> displs(num_procs, 0);
+    for (int i = 1; i < num_procs; ++i) displs[i] = displs[i - 1] + counts[i - 1];
+    int const       total = displs[num_procs - 1] + counts[num_procs - 1];
+    std::vector<GO> all_live_shared(total);
+    MPI_Allgatherv(
+        local_live_shared.data(), local_count, MPI_LONG_LONG,
+        all_live_shared.data(), counts.data(), displs.data(), MPI_LONG_LONG,
+        *mpi_comm->getRawMpiComm());
+    live_nodes.insert(all_live_shared.begin(), all_live_shared.end());
+  }
+
+  // 3. For every owned node not touched by a live cell, emit the GLOBAL DOF
+  // ids of all its equations. The caller maps these through the (possibly
+  // DBC-reduced) solution vector's own indexer and zeros only the ones that
+  // map to a valid local slot -- which sidesteps both DBC elimination (raw
+  // node_lid*neq+eq would overrun the reduced vector) and the deck-dependent
+  // solution field name (so we never touch STK fields directly here).
+  std::vector<stk::mesh::Entity> owned_nodes;
+  stk::mesh::get_selected_entities(
+      stk::mesh::Selector(metaData.locally_owned_part()), bulkData.buckets(stk::topology::NODE_RANK), owned_nodes);
+  for (auto const& n : owned_nodes) {
+    GO const g = gid(n);
+    if (live_nodes.count(g) > 0) continue;
+    for (unsigned int eq = 0; eq < neq; ++eq) dead_dof_gids.push_back(getGlobalDOF(g, eq));
+  }
+  return dead_dof_gids;
+}
+
 }  // namespace Albany

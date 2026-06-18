@@ -2560,11 +2560,13 @@ Application::loadBasicWorksetInfo(PHAL::Workset& workset, double current_time)
   workset.xdotdot = numVectors > 2 ? overlapped_MV->col(2) : Teuchos::null;
 
   workset.numEqs            = neq;
-  workset.current_time      = current_time;
+  workset.current_time      = current_time + time_shift_;
   workset.distParamLib      = distParamLib;
   workset.disc              = disc;
-  workset.transientTerms    = Teuchos::nonnull(workset.xdot);
-  workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot);
+  // suppress_dynamics_ (ACE preload) forces a quasi-static fill: drop the
+  // rate/inertia terms even though the time integrator supplies xdot/xdotdot.
+  workset.transientTerms    = Teuchos::nonnull(workset.xdot) && !suppress_dynamics_;
+  workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot) && !suppress_dynamics_;
 }
 
 void
@@ -2648,14 +2650,16 @@ Application::setupBasicWorksetInfo(
   }
 
   double const this_time    = fixTime(current_time);
-  workset.current_time      = this_time;
+  workset.current_time      = this_time + time_shift_;
   workset.x                 = overlapped_x;
   workset.xdot              = overlapped_xdot;
   workset.xdotdot           = overlapped_xdotdot;
   workset.distParamLib      = distParamLib;
   workset.disc              = disc;
-  workset.transientTerms    = Teuchos::nonnull(workset.xdot);
-  workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot);
+  // suppress_dynamics_ (ACE preload) forces a quasi-static fill: drop the
+  // rate/inertia terms even though the time integrator supplies xdot/xdotdot.
+  workset.transientTerms    = Teuchos::nonnull(workset.xdot) && !suppress_dynamics_;
+  workset.accelerationTerms = Teuchos::nonnull(workset.xdotdot) && !suppress_dynamics_;
   workset.comm              = comm;
   workset.x_cas_manager     = solMgr->get_cas_manager();
 }

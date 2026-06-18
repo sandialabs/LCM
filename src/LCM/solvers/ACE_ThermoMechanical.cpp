@@ -1088,6 +1088,31 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
 {
   failed_ = false;
 
+  // Quasi-static preload: a negative analysis time marks the preload phase
+  // (t < 0 ramps the loads up to their full value at t = 0). During preload
+  // the mechanical subdomain is solved quasi-statically -- the rate/inertia
+  // terms are dropped -- so a slowly ramped body force settles to static
+  // equilibrium without exciting the dynamic transient (and without the
+  // from-zero-stress Newton path overshooting into spurious tension). The
+  // thermal subdomain is NOT gated, so it keeps integrating in real time and
+  // spins up over the same window. At t >= 0 the gate clears and the normal
+  // dynamic schedule resumes. The flag lives on the mechanical Application,
+  // so only this coupled solver ever activates it.
+  apps_[subdomain]->setSuppressDynamics(current_time < 0.0);
+
+  // Make the mechanical fill see physical (coupling) time DURING PRELOAD only.
+  // The Piro Trapezoid path runs a local [0, dt] window per coupling step, so
+  // without a shift the preload Expression body force (ramped in t) would see
+  // ~0. We shift only while preloading (t < 0): for t >= 0 the shift is left
+  // at zero so the real schedule reproduces the production trajectory exactly.
+  // (The mechanical model reads workset.current_time for its sea-level/ocean-
+  // exposure lookup; production ran with the Trapezoid's local time ~0, i.e. a
+  // frozen initial sea level. Shifting it for t >= 0 would instead evolve the
+  // sea level mid-run -- a different, more aggressive ocean-weakening physics
+  // that drives a death-cascade convergence wall. Keep that out of scope here.)
+  bool const is_trapezoid = (mechanical_solver_ == MechanicalSolver::TrapezoidRule);
+  apps_[subdomain]->setTimeShift((is_trapezoid && current_time < 0.0) ? current_time : 0.0);
+
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);
 

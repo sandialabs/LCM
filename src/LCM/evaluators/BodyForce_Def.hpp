@@ -8,6 +8,7 @@
 #include "Albany_Utils.hpp"
 #include "Phalanx_DataLayout.hpp"
 #include "Sacado_ParameterRegistration.hpp"
+#include "stk_expreval/Evaluator.hpp"
 
 namespace LCM {
 
@@ -48,6 +49,18 @@ BodyForce<EvalT, Traits>::BodyForce(Teuchos::ParameterList& p, Teuchos::RCP<Alba
     for (int i = 0; i < 3; i++) {
       this->rotation_axis_[i] /= len;
     }
+  } else if (type == "Expression") {
+    is_constant_   = false;
+    is_expression_ = true;
+    // One expression per spatial component, in t (time) and x, y, z
+    // (coordinates). E.g. a gravity ramp: ["0.0", "0.0",
+    // "-1.25e4*0.5*(1.0+tanh((t+5.0e4)/1.0e4))"].
+    auto const exprs = p.get<Teuchos::Array<std::string>>("Value Expressions");
+    ALBANY_PANIC(
+        exprs.size() != num_dim_,
+        "Body Force 'Value Expressions' has " << exprs.size() << " entries but the problem has "
+                                              << num_dim_ << " spatial dimensions.");
+    expression_strings_.assign(exprs.begin(), exprs.end());
   } else {
     ALBANY_ABORT("Invalid body force type " << type);
   }
@@ -65,6 +78,21 @@ BodyForce<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PH
   this->utils.setFieldData(body_force_, fm);
   if (is_constant_ == false) this->utils.setFieldData(coordinates_, fm);
   if (is_constant_ == false) this->utils.setFieldData(weights_, fm);
+
+  if (is_expression_ == true) {
+    // Parse each component expression once and bind its variables to the
+    // member scalars updated per integration point in evaluateFields.
+    expression_evals_.clear();
+    for (auto const& expr : expression_strings_) {
+      auto ev = Teuchos::rcp(new stk::expreval::Eval(expr));
+      ev->parse();
+      ev->bindVariable("t", bound_t_);
+      ev->bindVariable("x", bound_x_);
+      ev->bindVariable("y", bound_y_);
+      ev->bindVariable("z", bound_z_);
+      expression_evals_.push_back(ev);
+    }
+  }
 }
 
 template <typename EvalT, typename Traits>
@@ -78,6 +106,20 @@ BodyForce<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       for (int qp = 0; qp < num_qp_; ++qp) {
         for (int dim = 0; dim < num_dim_; ++dim) {
           body_force_(cell, qp, dim) = constant_value_[dim];
+        }
+      }
+    }
+  } else if (is_expression_ == true) {
+    bound_t_ = workset.current_time;
+    for (int cell = 0; cell < num_cells; ++cell) {
+      for (int qp = 0; qp < num_qp_; ++qp) {
+        bound_x_ = Sacado::ScalarValue<MeshScalarT>::eval(coordinates_(cell, qp, 0));
+        bound_y_ = num_dim_ > 1 ? Sacado::ScalarValue<MeshScalarT>::eval(coordinates_(cell, qp, 1)) : 0.0;
+        bound_z_ = num_dim_ > 2 ? Sacado::ScalarValue<MeshScalarT>::eval(coordinates_(cell, qp, 2)) : 0.0;
+        for (int dim = 0; dim < num_dim_; ++dim) {
+          // Body force is an applied load -- no dependence on the solution,
+          // so the (real-valued) expression result carries no AD seeds.
+          body_force_(cell, qp, dim) = expression_evals_[dim]->evaluate();
         }
       }
     }

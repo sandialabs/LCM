@@ -14,6 +14,16 @@
 #include "Sacado_ParameterAccessor.hpp"
 #include "Teuchos_Array.hpp"
 #include "Teuchos_ParameterList.hpp"
+#include "Teuchos_RCP.hpp"
+
+#include <string>
+#include <vector>
+
+namespace stk {
+namespace expreval {
+class Eval;
+}
+}  // namespace stk
 
 namespace LCM {
 
@@ -55,6 +65,22 @@ class BodyForce : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX::Evaluat
   Teuchos::Array<RealType> rotation_axis_;
 
   RealType angular_frequency_;
+
+  // Expression body force: one math expression per spatial component,
+  // evaluated per integration point in the variables t (workset time) and
+  // x, y, z (quadrature-point coordinates). Used, e.g., to ramp gravity
+  // up over a preload window via a sigmoid in t. Parsed once in
+  // postRegistrationSetup; the bound scalars below are updated per point.
+  bool is_expression_{false};
+
+  std::vector<std::string> expression_strings_;
+
+  std::vector<Teuchos::RCP<stk::expreval::Eval>> expression_evals_;
+
+  double bound_t_{0.0};
+  double bound_x_{0.0};
+  double bound_y_{0.0};
+  double bound_z_{0.0};
 };
 
 }  // namespace LCM

@@ -325,6 +325,30 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     return stateMgr;
   }
 
+  //! Quasi-static fill: when set, the residual/Jacobian fills drop the
+  //! transient (rate/inertia) terms even though xdot/xdotdot are provided,
+  //! turning the solve into a sequence of static equilibria. Used by the ACE
+  //! thermo-mechanical solver to apply loads quasi-statically during the
+  //! t < 0 preload phase. Off by default; no effect on any other solver.
+  void
+  setSuppressDynamics(bool const b)
+  {
+    suppress_dynamics_ = b;
+  }
+
+  //! Added to workset.current_time in the residual/Jacobian fills. The Piro
+  //! Trapezoid mechanical solver runs a local [0, dt] window per coupling
+  //! step, so without this the fill would see ~0 instead of the physical
+  //! time. The ACE thermo-mechanical solver sets this to the coupling-step
+  //! time so time-dependent loads (e.g. an Expression body force ramped in
+  //! t) see physical time, consistent with the Tempus path and the thermal
+  //! subdomain. Zero by default -- no effect on any other solver.
+  void
+  setTimeShift(double const s)
+  {
+    time_shift_ = s;
+  }
+
   //! Evaluate state field manager
   void
   evaluateStateFieldManager(double const current_time, Thyra_Vector const& x, Teuchos::Ptr<Thyra_Vector const> xdot, Teuchos::Ptr<Thyra_Vector const> xdotdot);
@@ -833,6 +857,15 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   int writeToCoutSol{0};
   int writeToCoutRes{0};
   int writeToCoutJac{0};
+
+  // Quasi-static fill flag (see setSuppressDynamics). When true, residual and
+  // Jacobian fills clear workset.transientTerms/accelerationTerms so the rate
+  // and inertia terms drop out. Default false -- only the ACE thermo-mechanical
+  // preload sets it.
+  bool suppress_dynamics_{false};
+
+  // Physical-time base added to the fill time (see setTimeShift). Default 0.
+  double time_shift_{0.0};
 
   // Value to scale Jacobian/Residual by to possibly improve conditioning
   double scale{0.0};

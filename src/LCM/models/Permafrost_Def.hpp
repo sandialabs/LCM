@@ -144,6 +144,12 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   disable_erosion_                = p->get<bool>("Disable Erosion", false);
   num_failed_pts_for_death_       = p->get<int>("Failed Integration Points For Death", 0);
 
+  // Gradual death: fade a marked cell's stiffness to zero over this many
+  // accepted steps. 1 = instant removal (original behavior).
+  death_steps_   = p->get<int>("Death Steps", 1);
+  ALBANY_ASSERT(death_steps_ >= 1, "Permafrost: Death Steps must be >= 1");
+  gradual_death_ = death_steps_ > 1;
+
   ALBANY_ASSERT(
       critical_angle_ <= 0.0 || finite_deformation_,
       "Permafrost: the Critical Angle (tilt) criterion requires Finite Deformation");
@@ -274,6 +280,11 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   setEvaluatedField("failure_modes", dl->qp_scalar);
   setEvaluatedField("failure_state", dl->cell_scalar2);
   setEvaluatedField("cell_death", dl->cell_scalar2);
+  // Stored per quadrature point (qp_scalar) rather than per cell: the
+  // qp_scalar old-state buffer is the proven path for a nonzero initial
+  // value (cap_scalar2's rank-1 old buffer is not reliably initialized).
+  // The value is uniform across a cell's points.
+  if (gradual_death_) setEvaluatedField("death_decay", dl->qp_scalar);
 
   // define the state variables
   addStateVariable(cauchy_string, dl->qp_tensor, "scalar", 0.0, true, true);
@@ -301,6 +312,11 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   addStateVariable("failure_modes", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Failure Modes", false));
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
   addStateVariable("cell_death", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Cell Death", false));
+  // Decay factor: needs its old state (it persists and advances one
+  // increment per accepted step via the new->old rotation). Initialized to
+  // 1.0 (intact).
+  if (gradual_death_)
+    addStateVariable("death_decay", dl->qp_scalar, "scalar", 1.0, true, p->get<bool>("Output Death Decay", false));
 }
 
 template <typename EvalT, typename Traits>
@@ -360,6 +376,10 @@ PermafrostKernel<EvalT, Traits>::init(
   failure_modes_          = *eval_fields["failure_modes"];
   failed_                 = *eval_fields["failure_state"];
   dead_                   = *eval_fields["cell_death"];
+  if (gradual_death_) {
+    death_decay_     = *eval_fields["death_decay"];
+    death_decay_old_ = (*workset.stateArrayPtr)["death_decay_old"];
+  }
 
   // get old state variables
   if (finite_deformation_) {
@@ -423,7 +443,15 @@ PermafrostKernel<EvalT, Traits>::init(
       if (m != 0u) ++num_failed_pts;
     }
     failed_(cell, 0) = seed;
-    dead_(cell, 0)   = num_failed_pts >= threshold ? 1.0 : 0.0;
+    // cell_death marks the cell as gone: in gradual mode that is when the
+    // decay has reached 0 (fully dead); otherwise when enough points have
+    // failed (instant removal). The fully-dead set is what the scatter,
+    // calving, and dead-DOF rate zeroing consume.
+    if (gradual_death_) {
+      dead_(cell, 0) = death_decay_old_(cell, 0) <= 0.0 ? 1.0 : 0.0;
+    } else {
+      dead_(cell, 0) = num_failed_pts >= threshold ? 1.0 : 0.0;
+    }
   }
 }
 
@@ -464,6 +492,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // Carry the failure-mode bitmask forward unchanged: a dead cell never
     // trips new bits, but the state must still be written every fill.
     failure_modes_(cell, pt) = failure_modes_old_(cell, pt);
+    if (gradual_death_) death_decay_(cell, pt) = 0.0;
     return;
   }
 
@@ -851,7 +880,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // last pt every failure_modes_(cell, p) is current. The threshold
     // must match the one used by init() so the seed and the live update
     // are consistent.
-    if (pt == num_pts_ - 1 && has_failed_old_) {
+    if (pt == num_pts_ - 1 && (has_failed_old_ || gradual_death_)) {
       int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
                             (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
                                                                                       num_failed_pts_for_death_);
@@ -861,9 +890,32 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
           ++num_failed_pts;
         }
       }
-      if (num_failed_pts >= threshold && (*death_status_vec_)[cell] == 0.0) {
-        (*death_status_vec_)[cell] = 1.0;
-        dead_(cell, 0)             = 1.0;
+      bool const marked = num_failed_pts >= threshold;
+
+      if (gradual_death_) {
+        // Advance the decay one increment per accepted step. Computing it
+        // from the start-of-step value (death_decay_old_) makes the write
+        // idempotent across the step's fills; the new->old rotation then
+        // advances it exactly once per accepted step. cell_death flips to 1
+        // only when the decay reaches 0 -- the fully-dead signal the scatter,
+        // calving, and dead-DOF rate zeroing consume.
+        double const d_old = death_decay_old_(cell, 0);
+        double       d_new = d_old;
+        if (marked && d_old > 0.0) {
+          d_new = d_old - 1.0 / static_cast<double>(death_steps_);
+          if (d_new < 0.0) d_new = 0.0;
+        }
+        // The decay is per cell; store it at every quadrature point (the
+        // value is uniform across the cell).
+        for (int p = 0; p < num_pts_; ++p) death_decay_(cell, p) = d_new;
+        dead_(cell, 0) = d_new <= 0.0 ? 1.0 : 0.0;
+      } else if (has_failed_old_) {
+        // Instant removal (original behavior): mark the cell dead in the
+        // shared scatter signal so it is skipped for the rest of this fill.
+        if (marked && (*death_status_vec_)[cell] == 0.0) {
+          (*death_status_vec_)[cell] = 1.0;
+          dead_(cell, 0)             = 1.0;
+        }
       }
     }
   }
@@ -887,10 +939,17 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     sigmaVal = (1.0 / Jdet) * sigmaVal;
   }
 
-  // Store results
+  // Store results. In gradual mode the stored stress -- the cell's residual
+  // force and, since sigmaVal carries the AD seeds, its consistent tangent
+  // -- is scaled by the start-of-step decay factor (constant over the step),
+  // so a failing cell sheds its load smoothly over Death Steps rather than
+  // in a single iterate. The internal state (Fp, backstress, kappa) is
+  // computed and stored UNSCALED, so the cell keeps a valid material state
+  // right up until it is fully dead.
+  ScalarT const decay = gradual_death_ ? ScalarT(death_decay_old_(cell, pt)) : ScalarT(1.0);
   for (int i = 0; i < num_dims_; ++i) {
     for (int j = 0; j < num_dims_; ++j) {
-      stress_(cell, pt, i, j)     = sigmaVal(i, j);
+      stress_(cell, pt, i, j)     = decay * sigmaVal(i, j);
       backStress_(cell, pt, i, j) = alphaVal(i, j);
     }
   }

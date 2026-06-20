@@ -81,6 +81,20 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   ScalarField failed_;
   ScalarField dead_;
 
+  // Gradual element death: a per-cell decay factor in [0, 1] (1 = intact,
+  // 0 = fully dead) that fades to zero over "Death Steps" accepted steps
+  // once the cell is marked (its failure_modes meet the death threshold).
+  // The constitutive stress -- and hence the residual force and the
+  // consistent tangent -- is scaled by the decay, so a failing cell sheds
+  // its load smoothly instead of being removed in a single iterate, which
+  // is what lets the implicit solver step through a death event. cell_death
+  // is set only when the decay reaches 0 (fully dead), so every downstream
+  // consumer (scatter skip, calving, dead-DOF rate zeroing) acts on the
+  // fully-dead set. Enabled only when Death Steps > 1; at the default 1 the
+  // model keeps the original instant-removal path bit-for-bit.
+  ScalarField     death_decay_;
+  Albany::MDArray death_decay_old_;
+
   // Old state arrays
   Albany::MDArray stress_old_;
   Albany::MDArray strain_old_;
@@ -209,6 +223,12 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   // non-zero before the cell is declared dead. 0 means "all"
   // (= num_pts_); other values are clamped into [1, num_pts_].
   int num_failed_pts_for_death_{0};
+
+  // Number of accepted steps over which a marked cell's stiffness fades to
+  // zero ("Death Steps"). 1 (the default) = instant removal = the original
+  // behavior; > 1 enables the gradual decay above.
+  int  death_steps_{1};
+  bool gradual_death_{false};
 
   RealType current_time_{0.0};
 

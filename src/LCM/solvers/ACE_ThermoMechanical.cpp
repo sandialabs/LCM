@@ -731,6 +731,16 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             do_outputs_[subdomain] = output_interval_ > 0 ? (stop + 1) % output_interval_ == 0 : false;
           }
         }
+        // Skip the quasi-static preload phase (t < 0) entirely. Those frames
+        // carry a partially-ramped body force (the bluff is settling, not yet
+        // fully self-weighted) and STKDiscretization::monotonicTimeLabel maps
+        // their negative times to positive abs-value labels, so they masquerade
+        // as early production frames -- making the bluff look unstressed at the
+        // start of the visualization. Gate on the authoritative coupling
+        // current_time (the per-stop next_time/label is not reliable here).
+        // The preload itself works: the settled displacement carries across
+        // t = 0, so production output (t >= 0) starts fully stressed.
+        if (current_time < 0.0) do_outputs_[subdomain] = false;
         *fos_ << delim << std::endl;
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == THERMAL) {
@@ -1112,6 +1122,15 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   // that drives a death-cascade convergence wall. Keep that out of scope here.)
   bool const is_trapezoid = (mechanical_solver_ == MechanicalSolver::TrapezoidRule);
   apps_[subdomain]->setTimeShift((is_trapezoid && current_time < 0.0) ? current_time : 0.0);
+
+  // Suppress the mechanical app's solution-observer Exodus output during the
+  // quasi-static preload (t < 0). The observer fires inside evalModel at the
+  // integrator's LOCAL times (0..dt), so preload frames -- where the body force
+  // is still ramping and the bluff is settling -- get written with meaningless
+  // small positive labels and masquerade as an under-stressed production start.
+  // exoOutput gates that write (Albany_STKDiscretization::writeSolutionToFile).
+  // Production (t >= 0) output is restored below.
+  stk_mesh_structs_[subdomain]->exoOutput = (current_time >= 0.0);
 
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);

@@ -126,6 +126,10 @@ ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> co
   reduction_factor_ = alt_system_params_->get<ST>("Reduction Factor", 1.0);
   increase_factor_  = alt_system_params_->get<ST>("Amplification Factor", 1.0);
   output_interval_  = alt_system_params_->get<int>("Exodus Write Interval", 1);
+  // Diagnostic: also write Exodus frames during the quasi-static preload
+  // (t < 0). Default false -- preload frames carry a ramping body force and
+  // would masquerade as production frames. Turn on to inspect the preload.
+  output_preload_   = alt_system_params_->get<bool>("Output Preload", false);
   std_init_guess_   = alt_system_params_->get<bool>("Standard Initial Guess", false);
   static_equilibrium_init_ = alt_system_params_->get<bool>("Static Equilibrium Initialization", false);
 
@@ -731,16 +735,19 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             do_outputs_[subdomain] = output_interval_ > 0 ? (stop + 1) % output_interval_ == 0 : false;
           }
         }
-        // Skip the quasi-static preload phase (t < 0) entirely. Those frames
-        // carry a partially-ramped body force (the bluff is settling, not yet
-        // fully self-weighted) and STKDiscretization::monotonicTimeLabel maps
-        // their negative times to positive abs-value labels, so they masquerade
-        // as early production frames -- making the bluff look unstressed at the
-        // start of the visualization. Gate on the authoritative coupling
-        // current_time (the per-stop next_time/label is not reliable here).
-        // The preload itself works: the settled displacement carries across
-        // t = 0, so production output (t >= 0) starts fully stressed.
-        if (current_time < 0.0) do_outputs_[subdomain] = false;
+        // Skip the quasi-static preload phase (frames before t = 0). Gate on
+        // next_time, the time of the frame this stop writes: a stop with
+        // next_time < 0 writes a preload state (body force still ramping, would
+        // masquerade as an under-stressed production frame), so skip it. The
+        // stop with next_time == 0 writes the END-of-preload, fully-loaded,
+        // settled state -- keep it. (Output Preload = true keeps them all, for
+        // inspecting the preload.)
+        if (next_time < 0.0 && output_preload_ == false) do_outputs_[subdomain] = false;
+        // Always write the t = 0 frame (the settled, fully self-weighted initial
+        // state), regardless of the write interval: it is the visual starting
+        // point and the reference for judging erosion. This is the stop that
+        // steps from preload (current_time < 0) to t = 0 (next_time == 0).
+        if (current_time < 0.0 && next_time >= 0.0) do_outputs_[subdomain] = true;
         *fos_ << delim << std::endl;
         *fos_ << "Subdomain          :" << subdomain << '\n';
         if (prob_type == THERMAL) {

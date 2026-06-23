@@ -185,6 +185,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   ST           reduction_factor_{0.0};
   ST           increase_factor_{0.0};
   int          output_interval_{1};
+  bool         output_preload_{false};
   mutable bool failed_{false};
   mutable bool converged_{false};
   mutable int  num_iter_{0};

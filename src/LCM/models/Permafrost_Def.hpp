@@ -908,7 +908,20 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
         // The decay is per cell; store it at every quadrature point (the
         // value is uniform across the cell).
         for (int p = 0; p < num_pts_; ++p) death_decay_(cell, p) = d_new;
-        dead_(cell, 0) = d_new <= 0.0 ? 1.0 : 0.0;
+        bool const now_fully_dead = d_new <= 0.0;
+        dead_(cell, 0)            = now_fully_dead ? 1.0 : 0.0;
+        // The step a cell's fade reaches 0, skip it from assembly immediately
+        // (the instant-death live write) instead of waiting for the next
+        // step's scatter snapshot. Otherwise it is assembled this step at
+        // ~zero stiffness and free-falls one step (~0.5 g dt^2) before the
+        // next-step Dirichlet pin catches it. Now its row goes exactly zero
+        // this step and the orphan fix pins it here -> no one-step jump. This
+        // fires once per cell (decay is monotone to 0), so it does not thrash
+        // the active set the way an early/eager skip of still-decaying cells
+        // would.
+        if (now_fully_dead && has_failed_old_ && (*death_status_vec_)[cell] == 0.0) {
+          (*death_status_vec_)[cell] = 1.0;
+        }
       } else if (has_failed_old_) {
         // Instant removal (original behavior): mark the cell dead in the
         // shared scatter signal so it is skipped for the rest of this fill.

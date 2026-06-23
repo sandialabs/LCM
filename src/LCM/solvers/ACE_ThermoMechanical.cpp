@@ -1130,14 +1130,17 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   bool const is_trapezoid = (mechanical_solver_ == MechanicalSolver::TrapezoidRule);
   apps_[subdomain]->setTimeShift((is_trapezoid && current_time < 0.0) ? current_time : 0.0);
 
-  // Suppress the mechanical app's solution-observer Exodus output during the
-  // quasi-static preload (t < 0). The observer fires inside evalModel at the
-  // integrator's LOCAL times (0..dt), so preload frames -- where the body force
-  // is still ramping and the bluff is settling -- get written with meaningless
-  // small positive labels and masquerade as an under-stressed production start.
-  // exoOutput gates that write (Albany_STKDiscretization::writeSolutionToFile).
-  // Production (t >= 0) output is restored below.
-  stk_mesh_structs_[subdomain]->exoOutput = (current_time >= 0.0);
+  // Disable the mechanical app's solution-observer Exodus output during the
+  // solve. The observer fires inside evalModel at the integrator's LOCAL times
+  // (0..dt) -- so it writes ~2 frames PER STEP (defeating the Exodus Write
+  // Interval) AND, during the t<0 preload, frames where the body force is still
+  // ramping that masquerade (via monotonicTimeLabel) as an under-stressed
+  // production start. doDynamicInitialOutput is the intended writer: one frame
+  // per output stop at the true coupling time, gated by do_outputs_ (which is
+  // forced false for current_time<0, so preload is skipped). exoOutput gates the
+  // observer write (Albany_STKDiscretization::writeSolutionToFile);
+  // doDynamicInitialOutput toggles it true only around its own write.
+  stk_mesh_structs_[subdomain]->exoOutput = false;
 
   // Solve for each subdomain
   Thyra::ResponseOnlyModelEvaluatorBase<ST>& solver = *(solvers_[subdomain]);

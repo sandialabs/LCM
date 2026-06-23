@@ -1769,12 +1769,34 @@ Application::fixOrphanNodesForElementDeath(Teuchos::RCP<Thyra_LinearOp> jac)
   }
   ST const diag_scale = (rep_count > 0) ? rep_sum / rep_count : 1.0;
 
-  // Collect orphan rows (exact-zero diagonal) and their column layout
-  // while the operator is still fill-complete.
+  // Rows to regularize:
+  //  (1) genuine zero-diagonal orphans (a node whose only incident cells died
+  //      in place -- nothing scatters to its row), and
+  //  (2) every fully-dead node by CONNECTIVITY (getDeadNodeDOFGids: all incident
+  //      cells dead). A calved/disconnected node carries a tiny NONZERO diagonal
+  //      (leftover mass on the cloned node + parallel-combine roundoff), so the
+  //      exact-zero test in (1) misses it and -- with that vanishing diagonal
+  //      dividing the residual -- it free-falls under gravity to ~1e8 m. Keying
+  //      (2) off the connectivity-dead set (not a diagonal tolerance) catches
+  //      these without snaring gradual-death decaying-but-alive cells. Paired
+  //      with zeroResidualAtDeadNodes (the residual companion), this is a true
+  //      hold-in-place Dirichlet condition (row = identity, r = 0 -> du = 0).
+  std::set<LO> pin_row_set;
+  for (LO i = 0; i < num_rows; ++i) {
+    if (diag_data[i] == 0.0) pin_row_set.insert(i);
+  }
+  if (!frozen_dead_dof_gids_.empty()) {
+    auto indexer = Albany::createGlobalLocalIndexer(diag->space());
+    for (GO const g : frozen_dead_dof_gids_) {
+      LO const lid = indexer->getLocalElement(g);
+      if (lid >= 0 && lid < num_rows) pin_row_set.insert(lid);
+    }
+  }
+
+  // Collect the pin rows' column layouts while the operator is fill-complete.
   std::vector<LO>                 orphan_rows;
   std::vector<Teuchos::Array<LO>> orphan_cols;
-  for (LO i = 0; i < num_rows; ++i) {
-    if (diag_data[i] != 0.0) continue;  // not an orphan DOF
+  for (LO const i : pin_row_set) {
     Teuchos::Array<LO> indices;
     Teuchos::Array<ST> values;
     Albany::getLocalRowValues(jac, i, indices, values);
@@ -1793,6 +1815,29 @@ Application::fixOrphanNodesForElementDeath(Teuchos::RCP<Thyra_LinearOp> jac)
       if (indices[k] == row) values[k] = diag_scale;
     }
     Albany::setLocalRowValues(jac, row, indices(), values());
+  }
+}
+
+void
+Application::zeroResidualAtDeadNodes(Teuchos::RCP<Thyra_Vector> const& f) const
+{
+  if (Teuchos::is_null(f)) return;
+  auto const& dead_dof_gids = frozen_dead_dof_gids_;
+  if (dead_dof_gids.empty()) return;
+
+  // Hold-in-place Dirichlet residual: r = 0 at every fully-dead node DOF, so
+  // the Newton update du = -r/diag = 0 leaves the dead node where it was when
+  // it became fully dead. This is the companion the orphan-Jacobian pin was
+  // missing: without it, a calved node's nonzero residual stayed in |F| and
+  // (with the pinned row) could not be reduced -> the solve stalled. Map the
+  // global dead-DOF ids through the owned vector's own indexer, bounds-safe and
+  // immune to DBC elimination (which keeps original gids in a reduced space).
+  auto       indexer = Albany::createGlobalLocalIndexer(f->space());
+  auto       f_data  = Albany::getNonconstLocalData(f);
+  auto const n_local = static_cast<LO>(f_data.size());
+  for (GO const g : dead_dof_gids) {
+    LO const lid = indexer->getLocalElement(g);
+    if (lid >= 0 && lid < n_local) f_data[lid] = 0.0;
   }
 }
 
@@ -2019,6 +2064,10 @@ Application::computeGlobalResidualImpl(
     TEUCHOS_FUNC_TIME_MONITOR("Albany Residual Fill: Export");
     cas_manager->combine(overlapped_f, f, CombineMode::ADD);
   }
+
+  // Element death: hold-in-place Dirichlet residual at fully-dead node DOFs
+  // (companion to the Jacobian row pin in fixOrphanNodesForElementDeath).
+  zeroResidualAtDeadNodes(f);
 
   // Allocate scaleVec_
   if (scale != 1.0) {
@@ -2265,7 +2314,12 @@ Application::computeGlobalJacobianImpl(
     cas_manager->combine(overlapped_jac, jac, CombineMode::ADD);
   }
 
-  // Element death: regularize zero-diagonal (orphan) rows
+  // Element death: hold-in-place Dirichlet on fully-dead node DOFs. The
+  // Jacobian row pin and the residual zeroing must use the SAME dead set so
+  // the pinned rows (du = -r/diag) drive du = 0; apply both here.
+  zeroResidualAtDeadNodes(f);
+
+  // Element death: regularize zero-diagonal (orphan) rows + pin fully-dead rows
   fixOrphanNodesForElementDeath(jac);
 
   // scale Jacobian

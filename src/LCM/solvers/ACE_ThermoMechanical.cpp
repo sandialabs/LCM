@@ -780,6 +780,13 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
                 app.death_status_vecs_[ws] = ds;
               }
             }
+            // Capture the fully-dead node DOFs at this same (step-start) instant
+            // for the hold-in-place Dirichlet (Application::zeroResidualAtDeadNodes
+            // + fixOrphanNodesForElementDeath). Frozen here -- consistent with the
+            // death_status_vecs_ scatter snapshot -- so a cell that dies mid-Newton
+            // is not pinned until the next step, matching the scatter skip.
+            auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discs_[subdomain]);
+            app.frozen_dead_dof_gids_ = stk_disc.getDeadNodeDOFGids();
           }
           {
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Solve"));

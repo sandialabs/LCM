@@ -272,6 +272,17 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   void
   fixOrphanNodesForElementDeath(Teuchos::RCP<Thyra_LinearOp> jac);
 
+  //! Zero the residual at every fully-dead (eroded/calved) node DOF -- the
+  //! residual companion to the Jacobian row pin in
+  //! fixOrphanNodesForElementDeath. Together they impose a true hold-in-place
+  //! Dirichlet condition on dead DOFs (J row = identity, r = 0 -> du = 0), so
+  //! a disconnected calved block stays put instead of free-falling under
+  //! gravity. Keyed off the connectivity-dead set (getDeadNodeDOFGids), not a
+  //! diagonal tolerance, so gradual-death decaying-but-alive cells are not
+  //! caught. f is the owned residual.
+  void
+  zeroResidualAtDeadNodes(Teuchos::RCP<Thyra_Vector> const& f) const;
+
   //! Phase 1 of the activePart-based element-death port: at step
   //! boundaries, remove cells flagged dead in death_status_vecs_ from
   //! STK's activePart and rebuild worksets so they no longer appear in
@@ -283,6 +294,17 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   // Element death status per workset, set by the ACE solver.
   // death_status_vecs_[ws] is a vector of per-cell death indicators.
   std::vector<Teuchos::RCP<std::vector<double>>> death_status_vecs_;
+
+  // Global DOF ids of fully-dead nodes (all incident cells dead), captured by
+  // the ACE solver at the START of each mechanical step -- the SAME instant
+  // death_status_vecs_ is snapshotted. zeroResidualAtDeadNodes /
+  // fixOrphanNodesForElementDeath impose the hold-in-place Dirichlet on these.
+  // Using the frozen step-start set (rather than a live getDeadNodeDOFGids
+  // recompute mid-fill) keeps the Dirichlet active set consistent with the
+  // scatter skip: a cell that dies mid-Newton (in-place death) is handled by
+  // the scatter next step, not pinned mid-solve (which would thrash the
+  // active set). Empty in non-ACE runs (the exact-zero orphan fix still runs).
+  std::vector<GO> frozen_dead_dof_gids_;
 
  private:
   void

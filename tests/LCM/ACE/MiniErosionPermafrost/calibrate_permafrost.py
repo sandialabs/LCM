@@ -10,7 +10,7 @@ y. This script evaluates those fits at the end members (x = 1 frozen,
 x = 0 thawed) for a given porosity and deck scales, maps them to cap
 parameters, and emits the Frozen/Thawed Parameters YAML sublists.
 
-Mapping rules (one per mechanism; see cap_plasticity.tex, "Planned
+Mapping rules (one per mechanism; see cap-plasticity.tex, "Planned
 Extension: Permafrost and Erosion"):
   elasticity   (K, G) from the fitted E at the deck Poisson ratio.
                The thawed fit is negative (the experiments do not

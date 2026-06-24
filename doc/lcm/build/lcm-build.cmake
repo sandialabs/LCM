@@ -1,5 +1,5 @@
 # LCM Build Script
-# Called via: ctest -S lcm_build.cmake
+# Called via: ctest -S lcm-build.cmake
 #   -DPACKAGE:STRING=trilinos|lcm
 #   -DBUILD_THREADS:STRING=N
 #   -DCLEAN_BUILD:BOOL=ON|OFF
@@ -8,7 +8,7 @@
 #   -DDO_TEST:BOOL=ON|OFF
 #   -DCTEST_DO_SUBMIT:BOOL=OFF
 
-include("${CMAKE_CURRENT_LIST_DIR}/lcm_do_package.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/lcm-do-package.cmake")
 
 set(CTEST_TEST_TYPE Nightly)
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")

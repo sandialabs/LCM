@@ -92,7 +92,7 @@ git clone git@github.com:sandialabs/LCM.git
 Add to `~/.bashrc`:
 ```bash
 export LCM_DIR=~/LCM
-module use $LCM_DIR/LCM/doc/LCM/modulefiles
+module use $LCM_DIR/LCM/doc/lcm/modulefiles
 ```
 
 Log out and back in, or `source ~/.bashrc`.
@@ -105,7 +105,7 @@ the init script automatically, so `.bashrc` changes are optional on CEE.
 
 ```bash
 cd ~/LCM
-ln -s LCM/doc/LCM/build/lcm .
+ln -s LCM/doc/lcm/build/lcm .
 ```
 
 ### 4. Build and test

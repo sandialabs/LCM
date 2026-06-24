@@ -1928,7 +1928,7 @@ Application::applyDeathToActivePart()
   // "-erodible" side-set, so the eroding surface tracks the receding
   // bluff -- STKDiscretization::computeNodeSets clips an "-erodible"
   // node set to that side-set's nodes, keeping a Dirichlet BC on the
-  // live exposed surface (see doc/element_death.md section 8).
+  // live exposed surface (see doc/element-death.md section 8).
   //
   // bc_mesh_parts (boundary_mesh_parts): every declared side-set. STK
   // inherits a dying cell's side-set membership onto the newly-exposed
@@ -1951,7 +1951,7 @@ Application::applyDeathToActivePart()
   // clone-before-disconnect algorithm (Adagio-style), which sidesteps
   // an STK multi-rank harmonization bug in
   // make_mesh_parallel_consistent_after_element_death. See
-  // doc/element_death.md (section "Implementation reference") for the
+  // doc/element-death.md (section "Implementation reference") for the
   // algorithm and ~/LCM/stk_findings_draft.txt for the STK-bug
   // diagnosis.
   applyElementDeath(

@@ -260,7 +260,7 @@ GenericSTKMeshStruct::SetupFieldData(
   stk::io::put_io_part_attribute(*deadCellsPart);
 
   // Scratch fields for the new element-death path (see
-  // doc/element_death.md "Implementation reference" and
+  // doc/element-death.md "Implementation reference" and
   // src/Albany_ElementDeath.cpp). All
   // three live on the side rank; each is a single scalar zeroed at
   // the start of every applyElementDeath call. Declared

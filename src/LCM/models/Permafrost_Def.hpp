@@ -9,7 +9,7 @@
 // (verified against an independent reference); this kernel supplies
 // parameters that vary per integration point with the ice saturation
 // f. The design is recorded in
-// doc/developersGuide/cap_plasticity.tex, Section "The Permafrost
+// doc/developers-guide/cap-plasticity.tex, Section "The Permafrost
 // Model".
 //
 // Saturation-to-parameter map:

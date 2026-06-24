@@ -51,7 +51,7 @@ set_tests_properties(ACE_${testName}_Denudation_Serial PROPERTIES LABELS "LCM;Tp
 # 4-rank parallel test - same gold, exodiff after merging with epu.
 # Guards against regressions in the clone-before-disconnect element-death
 # algorithm (Albany::applyElementDeath) which is what makes parallel
-# erosion work; see doc/element_death.md.
+# erosion work; see doc/element-death.md.
 set(runtest_np4.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_np4.cmake)
 add_test(
   NAME ACE_${testName}_Denudation_np4

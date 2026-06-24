@@ -38,8 +38,8 @@ jobs:
     - name: Build and test
       run: |
         cd $LCM_DIR
-        ln -sf LCM/doc/LCM/build/lcm .
+        ln -sf LCM/doc/lcm/build/lcm .
         source /usr/share/modules/init/bash
-        export MODULEPATH=$LCM_DIR/LCM/doc/LCM/modulefiles:$MODULEPATH
+        export MODULEPATH=$LCM_DIR/LCM/doc/lcm/modulefiles:$MODULEPATH
         module load release
         ./lcm all $(nproc) --quiet

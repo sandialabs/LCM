@@ -768,8 +768,8 @@ if(NOT DISABLE_DOXYGEN)
   find_package(Doxygen)
   if(DOXYGEN_FOUND)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/albanyMainPage.doc
-                   ${CMAKE_CURRENT_BINARY_DIR}/albanyMainPage.doc)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/albany-main-page.doc
+                   ${CMAKE_CURRENT_BINARY_DIR}/albany-main-page.doc)
     add_custom_target(
       doc
       ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile

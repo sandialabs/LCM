@@ -137,7 +137,7 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   // ice-bonding-dependent quantities; the thawed set additionally
   // carries the sediment-skeleton (friction/shape) quantities shared by
   // both ends. See the saturation-to-parameter map in
-  // doc/developersGuide/cap_plasticity.tex, Section "The Permafrost
+  // doc/developers-guide/cap-plasticity.tex, Section "The Permafrost
   // Model".
   struct EndMember
   {

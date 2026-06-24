@@ -24,7 +24,7 @@ namespace Albany {
 /// bug in make_mesh_parallel_consistent_after_element_death that
 /// corrupts {SHARES} buckets when 3+ ranks simultaneously kill cells
 /// whose deaths cross shared face boundaries. See
-/// doc/element_death.md (section "Implementation reference") for the
+/// doc/element-death.md (section "Implementation reference") for the
 /// full algorithm and ~/LCM/stk_findings_draft.txt for the STK-bug
 /// diagnosis.
 ///

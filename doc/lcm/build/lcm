@@ -19,10 +19,10 @@ set -e
 # or fall back to the current working directory.
 #---------------------------------------------------------------------------
 if [ -z "$LCM_DIR" ]; then
-    # Script lives in <workspace>/LCM/doc/LCM/build/lcm
+    # Script lives in <workspace>/LCM/doc/lcm/build/lcm
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     CANDIDATE="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
-    if [ -d "$CANDIDATE/LCM/doc/LCM" ]; then
+    if [ -d "$CANDIDATE/LCM/doc/lcm" ]; then
         export LCM_DIR="$CANDIDATE"
     else
         export LCM_DIR="$(pwd)"
@@ -33,7 +33,7 @@ fi
 # Module environment
 #---------------------------------------------------------------------------
 MODULE_NAME="${LCM_MODULE:-release}"
-export MODULEPATH="$LCM_DIR/LCM/doc/LCM/modulefiles${MODULEPATH:+:$MODULEPATH}"
+export MODULEPATH="$LCM_DIR/LCM/doc/lcm/modulefiles${MODULEPATH:+:$MODULEPATH}"
 
 # Source the module init if 'module' is not already a function/command
 if ! type module &>/dev/null; then
@@ -85,7 +85,7 @@ if [ -f "$SEMS_INIT" ]; then
             export NETCDF_LIB="$NETCDF_ROOT/lib"
             export NETCDF="$NETCDF_ROOT"
             # Re-add LCM modulefiles since SEMS init resets MODULEPATH
-            export MODULEPATH="$LCM_DIR/LCM/doc/LCM/modulefiles${MODULEPATH:+:$MODULEPATH}"
+            export MODULEPATH="$LCM_DIR/LCM/doc/lcm/modulefiles${MODULEPATH:+:$MODULEPATH}"
             ;;
     esac
 fi
@@ -220,7 +220,7 @@ run_ctest() {
     local DO_BUILD="${3:-OFF}"
     local DO_TEST="${4:-OFF}"
 
-    local BUILD_SCRIPT="$LCM_DIR/LCM/doc/LCM/build/lcm_build.cmake"
+    local BUILD_SCRIPT="$LCM_DIR/LCM/doc/lcm/build/lcm-build.cmake"
 
     if [ ! -f "$BUILD_SCRIPT" ]; then
         echo "ERROR: Cannot find $BUILD_SCRIPT"
@@ -229,7 +229,7 @@ run_ctest() {
 
     cd "$LCM_DIR"
 
-    echo "Running: ctest $CTEST_VERBOSITY -S lcm_build.cmake"
+    echo "Running: ctest $CTEST_VERBOSITY -S lcm-build.cmake"
     echo "  PACKAGE=$PACKAGE  CLEAN_BUILD=$CLEAN_BUILD"
     echo "  DO_CONFIG=$DO_CONFIG  DO_BUILD=$DO_BUILD  DO_TEST=$DO_TEST"
     echo "  BUILD_THREADS=$THREADS"

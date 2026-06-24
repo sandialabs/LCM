@@ -628,7 +628,7 @@
 
 	%\hspace*{-0.5in}
 	\begin{minipage}[b]{6.0in}
-	    \includegraphics{snllineblk}
+	    \includegraphics{snl-line-blk}
 	\end{minipage}
 
 
@@ -719,7 +719,7 @@
 	    \vspace{\baselineskip}
 	    \vspace{0.125in}
 
-	    \includegraphics[width=0.75in]{DOEbwlogo}
+	    \includegraphics[width=0.75in]{doe-bw-logo}
 	    % Not necessary for SAND reports
 	    % \hfill
 	    % \includegraphics[height=0.5in]{NNSAbwlogo}
@@ -1907,7 +1907,7 @@
 	\vspace*{\fill}		% Move the logo to the bottom of the page
 	\thispagestyle{empty}
 	\begin{center}
-	    \includegraphics{snllineblk}
+	    \includegraphics{snl-line-blk}
 	\end{center}
 
     } % End of AtEndDocument{}

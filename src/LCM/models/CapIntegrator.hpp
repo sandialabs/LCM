@@ -9,7 +9,7 @@
 // implementation; CapModel supplies constant material parameters, while
 // the Permafrost model supplies parameters that vary per integration
 // point with ice saturation (which is why the parameters are ScalarT, not
-// RealType). See doc/developersGuide/cap_plasticity.tex for the
+// RealType). See doc/developers-guide/cap-plasticity.tex for the
 // formulation, its sources, and the verification.
 
 #if !defined(LCM_CapIntegrator_hpp)

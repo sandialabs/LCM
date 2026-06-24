@@ -3,7 +3,7 @@ if(LCM_DO_TRILINOS_CMAKE)
 endif()
 set(LCM_DO_TRILINOS_CMAKE true)
 
-include(${CMAKE_CURRENT_LIST_DIR}/snl_helpers.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/snl-helpers.cmake)
 
 function(lcm_do_trilinos)
   cmake_policy(SET CMP0054 NEW)

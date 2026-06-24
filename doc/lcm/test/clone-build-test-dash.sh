@@ -7,7 +7,7 @@
 set -e
 
 export LCM_DIR=$(pwd)
-export MODULEPATH=$LCM_DIR/LCM/doc/LCM/modulefiles:$MODULEPATH
+export MODULEPATH=$LCM_DIR/LCM/doc/lcm/modulefiles:$MODULEPATH
 
 echo "=== LCM Nightly Build ==="
 echo "Date: $(date)"
@@ -31,7 +31,7 @@ done
 echo
 
 # Create lcm symlink
-ln -sf LCM/doc/LCM/build/lcm .
+ln -sf LCM/doc/lcm/build/lcm .
 
 # Build and test with each compiler.
 # Use 'nproc --all' to report installed CPUs regardless of OMP_NUM_THREADS,

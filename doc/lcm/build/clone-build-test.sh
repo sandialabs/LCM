@@ -7,7 +7,7 @@ set -e
 
 THREADS="${1:-$(nproc)}"
 export LCM_DIR="${LCM_DIR:-$(pwd)}"
-LCM_SCRIPT="$LCM_DIR/LCM/doc/LCM/build/lcm"
+LCM_SCRIPT="$LCM_DIR/LCM/doc/lcm/build/lcm"
 
 echo "=== LCM Clone-Build-Test ==="
 echo "LCM_DIR:  $LCM_DIR"

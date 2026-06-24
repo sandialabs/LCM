@@ -46,7 +46,7 @@ same step and is structurally removed by the step-N observer.
 The death decision is made by the constitutive model, per integration
 point. Two ACE models implement it: `J2Erosion` (the five criteria of
 §2) and `Permafrost` (the cap-plasticity model, with its own larger set
-of criteria — see `doc/developersGuide/cap_plasticity.tex`). Everything
+of criteria — see `doc/developers-guide/cap-plasticity.tex`). Everything
 downstream of the decision — the assembly skip (§3), the structural
 update (§4), the eroding-surface BC convention (§5), the orphan/dead-node
 fix (§6), and calving (§D.1) — is **model-agnostic** and shared by both;

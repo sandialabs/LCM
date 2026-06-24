@@ -3,7 +3,7 @@ if(LCM_DO_ALBANY_CMAKE)
 endif()
 set(LCM_DO_ALBANY_CMAKE true)
 
-include(${CMAKE_CURRENT_LIST_DIR}/snl_helpers.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/snl-helpers.cmake)
 
 function(lcm_do_albany)
   set(BOOL_OPTS

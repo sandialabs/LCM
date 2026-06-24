@@ -4,7 +4,7 @@
 #
 # Usage:
 #
-#    lcm_cdash_status.sh [--date=<YYYY-MM-DD>] \
+#    lcm-cdash-status.sh [--date=<YYYY-MM-DD>] \
 #      --email-from-address=<email-from-address> \
 #      --send-email-to=<email-1>,<email-2>,...
 #
@@ -18,7 +18,7 @@
 # TriBITS (like in Trilinos 'develop') with:
 #
 #   env TRIBITS_DIR=<trilinos-src-dir>/cmake/tribits \
-#   lcm_cdash_status.sh [--date=<YYYY-MM-DD>] \
+#   lcm-cdash-status.sh [--date=<YYYY-MM-DD>] \
 #      --email-from-address=<email-from-address> \
 #      --send-email-to=<email-1>,<email-2>,...
 #
@@ -49,5 +49,5 @@ ${TRIBITS_DIR}/ci_support/cdash_analyze_and_report.py \
 --limit-table-rows=50 \
 --write-failing-tests-without-issue-trackers-to-file="lcmNightlyBuildsTwoif.csv" \
 --write-email-to-file="lcmNightlyBuilds.html" \
---expected-builds-file="LCMExpectedBuilds.csv" \
+--expected-builds-file="lcm-expected-builds.csv" \
 "$@"

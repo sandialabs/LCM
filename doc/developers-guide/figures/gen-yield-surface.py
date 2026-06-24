@@ -7,7 +7,7 @@ parameter sets used in the ACE permafrost bluff simulation. Sign convention:
 tension positive, compression negative (I1 < 0 under confinement), so the cap
 sits on the negative-I1 side and the cone opens toward the tensile apex.
 
-Re-run to regenerate doc/developersGuide/figures/yield-surface-permafrost.pdf
+Re-run to regenerate doc/developers-guide/figures/yield-surface-permafrost.pdf
 if the calibrated parameters change.
 """
 import numpy as np

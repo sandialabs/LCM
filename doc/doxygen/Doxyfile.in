@@ -582,9 +582,9 @@ WARN_LOGFILE           =
 # with spaces.
 
 #INPUT                  = ../../src \
-#                         albanyMainPage.doc
+#                         albany-main-page.doc
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/src \
-                         albanyMainPage.doc
+                         albany-main-page.doc
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

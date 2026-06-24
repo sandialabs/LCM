@@ -993,9 +993,23 @@ is compaction --- crush-curve physics, with $W$ supplied by the
 effective-porosity profiles the ACE model already carries.
 
 \paragraph{The saturation-to-parameter map.}
+Ice saturation enters the cap model in exactly one place: as a
+per--integration--point modulation of the \emph{material parameters}.
+The kinematics (Section~\ref{sec:smallstrain}), the invariants and
+yield surface (Section~\ref{sec:yield}), and the flow and hardening
+laws (Section~\ref{sec:flow}) are used verbatim; no governing equation
+acquires an explicit saturation term. This is the same device as
+temperature--dependent yield in metal plasticity --- the constitutive
+structure is fixed and the environment acts only through the
+coefficients. Let $f \in [0,1]$ be the ice saturation, with $f = 1$
+fully frozen and $f = 0$ fully thawed. At each integration point the
+kernel evaluates every cap parameter as a function of $f$ and hands the
+resulting parameter set to the shared integrator of
+Section~\ref{sec:integration}.
+
 The material input carries two calibrated end-member parameter sets,
 the \texttt{Frozen Parameters} and \texttt{Thawed Parameters}
-sublists, and the ice saturation interpolates between them with one
+sublists, and the saturation interpolates between them with one
 rule per strength mechanism:
 \begin{itemize}
 \item \emph{Cohesion and bonding} ($A$, $C$, $N$, $c^\alpha$):
@@ -1009,6 +1023,23 @@ rule per strength mechanism:
   from the thawed sublist and independent of $f$.
 \item \emph{Elasticity}: the $(K, G)$ split described below.
 \end{itemize}
+Writing $p_{\mathrm f}$ and $p_{\mathrm t}$ for the frozen and thawed
+values of a parameter, these rules are
+\begin{equation*}
+  p(f) = (1-f)\,p_{\mathrm t} + f\,p_{\mathrm f}
+  \quad\text{for } p \in \{A,\,C,\,N,\,\kappa_0,\,W,\,D_1,\,c^\alpha,\,K\},
+  \qquad
+  G(f) = G_{\mathrm t}^{\,1-f}\,G_{\mathrm f}^{\,f},
+\end{equation*}
+while the friction and shape parameters
+$\{D,\,\theta,\,L,\,\phi,\,R,\,Q,\,\psi,\,D_2\}$ are held at their
+thawed (skeleton) values. The shear modulus interpolates geometrically
+rather than linearly because $G$ spans two orders of magnitude across
+the transition (see below). At the end members the map returns the
+frozen ($f = 1$) or thawed ($f = 0$) sublist exactly, so either limit
+is a standard \texttt{Cap} material. The saturation is clamped to
+$[0, 1]$ before use.
+
 The saturation itself comes from one of three sources: the
 \texttt{ACE\_Ice\_Saturation} field computed by the coupled thermal
 problem (\texttt{Have ACE Ice Saturation: true}), a time table

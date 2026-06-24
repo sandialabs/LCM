@@ -29,7 +29,9 @@ different time scales:
 - **Within a step** — a cell that fails is *skipped* during residual
   and Jacobian assembly, so it contributes nothing to the global
   system. The cell is still a member of the active part and still in
-  the worksets.
+  the worksets. (The `Permafrost` model can instead fade a failing
+  cell's stiffness out over several steps before the skip — see [§3.1
+  Gradual death](#31-gradual-death-optional-fading-stiffness-over-death-steps).)
 - **Between steps** — once per accepted step, the structural update
   moves dead cells out of the active part into a dead-cells part, STK
   creates the newly-exposed boundary faces, and the worksets are
@@ -41,10 +43,17 @@ face entities appear on the eroding surface. Death therefore lags by
 one step — a cell flagged during step N is skipped in assembly that
 same step and is structurally removed by the step-N observer.
 
-The death decision is made by the `J2Erosion` constitutive model, which
-runs per integration point. The ACE coupling solver
-(`LCM::ACEThermoMechanical`) reads the result at the start of each
-mechanical step and passes it to the assembly evaluators.
+The death decision is made by the constitutive model, per integration
+point. Two ACE models implement it: `J2Erosion` (the five criteria of
+§2) and `Permafrost` (the cap-plasticity model, with its own larger set
+of criteria — see `doc/developersGuide/cap_plasticity.tex`). Everything
+downstream of the decision — the assembly skip (§3), the structural
+update (§4), the eroding-surface BC convention (§5), the orphan/dead-node
+fix (§6), and calving (§D.1) — is **model-agnostic** and shared by both;
+only the criteria and (for `Permafrost`) the optional gradual fade (§3.1)
+differ. The ACE coupling solver (`LCM::ACEThermoMechanical`) reads the
+result at the start of each mechanical step and passes it to the assembly
+evaluators.
 
 Two ideas are kept deliberately separate:
 
@@ -123,12 +132,67 @@ A dead cell contributes nothing to the global residual (and, in the
 Jacobian/Tangent specializations, nothing to the global matrix). Its
 stiffness and internal force never reach the global system.
 
-During the fill, if `J2Erosion` flags a *new* cell as dead at the last
+During the fill, if the model flags a *new* cell as dead at the last
 integration point of that cell, it updates `death_status_vec` in place
 so the scatter evaluator and the orphan-node fix observe the new death
 within the same fill. This prevents Newton from pushing a just-failed
 cell deeper into a nonphysical regime while the scatter continues to
 assemble its stress contributions.
+
+### 3.1 Gradual death (optional): fading stiffness over Death Steps
+
+By default a cell dies instantly: the step its death predicate is met,
+it is skipped entirely (above). Dropping a fully-loaded cell's stiffness
+and internal force to zero in a single iterate is a large, discontinuous
+change to the global system, and during a death *cascade* it can thrash
+the active set enough to stall Newton.
+
+The `Permafrost` model offers a gradual alternative, modeled on the
+gradual stiffness decay Sierra/SM Adagio uses for the same reason (§E).
+It is enabled by the mechanics material YAML key:
+
+| YAML parameter | Effect |
+|----------------|--------|
+| `Death Steps`  | number of accepted steps over which a failing cell sheds its load. Default `1` = instant death, bit-identical to the original behavior. `> 1` enables gradual death. |
+
+The mechanism is a per-cell **decay factor** in `[0, 1]`, stored as the
+integration-point state `death_decay` (with an old-state companion, so
+it survives the workset rebuilds of §4 — see §A):
+
+- **State.** `death_decay` starts at `1.0` (fully alive). It is a
+  per-cell value written to every quadrature point of the cell.
+- **Per-step advance.** The first accepted step a cell meets the death
+  predicate, and every accepted step after, the decay is decremented by
+  `1 / Death Steps` (clamped at `0`). The new value is computed from the
+  *start-of-step* value (`death_decay_old`), so the write is idempotent
+  across the fills of a step; the new→old state rotation advances it
+  exactly once per accepted step.
+- **Stress scaling.** During assembly the cell's stored stress — which
+  is both its residual force and, through the AD seeds, its consistent
+  tangent — is multiplied by the start-of-step decay factor (constant
+  over the step's fills). So a failing cell sheds its load smoothly over
+  `Death Steps` rather than in one iterate. The cell's *internal* state
+  (plastic deformation gradient `Fp`, back stress, `kappa`) is computed
+  and stored **unscaled**, so the material state stays valid right up to
+  full death.
+- **Full death.** `cell_death` flips to `1.0` only when the decay
+  reaches `0`. That is the single "fully dead" signal that the assembly
+  skip (§3), calving (§D.1), the dead-node Dirichlet (§6), and the
+  warm-start rate zeroing (§6) all consume — a decaying-but-not-yet-zero
+  cell is still alive to all of them.
+- **Skip on the zeroing step.** The step the decay reaches `0`, the cell
+  sets `death_status_vec` in place so it is skipped from assembly that
+  *same* step (the same-fill propagation of §B.3). Otherwise it would be
+  assembled once more at ~zero stiffness, and a calved cell would
+  free-fall one step (~½·g·Δt²) before the next step's Dirichlet pin
+  (§6) caught it. Its row goes exactly zero this step instead, and the
+  orphan/dead-node fix pins it here. This fires once per cell (the decay
+  is monotone to `0`), so it does not thrash the active set the way an
+  eager skip of still-decaying cells would.
+
+Gradual death changes only *how a condemned cell sheds its load*; the
+death predicate, the criteria, the bitmask, the structural update, and
+the BC machinery are all unchanged.
 
 ---
 
@@ -324,22 +388,74 @@ node-set BC clipping (§5.3). One mesh tag, three behaviors.
 
 ---
 
-## 6. Orphan-node fix
+## 6. Dead-node hold-in-place Dirichlet
 
-Skipping dead elements can leave **orphan nodes** — nodes connected
-only to dead elements. They receive no stiffness, so their Jacobian
-rows would be singular.
+Skipping dead elements leaves their nodes without stiffness. A node all
+of whose incident cells are dead must be held in place — given no
+stiffness it would either make the system singular or, worse, free-fall
+under gravity. The solver imposes a true Dirichlet condition on every
+such DOF: identity row in the Jacobian, zero residual, so the Newton
+update `du = -r / diag = 0` leaves the node exactly where it was when it
+became fully dead. There are two halves, applied after each residual and
+Jacobian assembly.
 
-After assembly, the solver scans the assembled Jacobian for rows whose
-diagonal is exactly zero — those are the orphan DOFs — and sets the
-diagonal entry to a representative magnitude (the average of the
-non-zero diagonal entries). Off-diagonals are already zero. The result
-is a well-posed global system in which orphan DOFs simply hold their
-value, with a diagonal scaled like the rest of the matrix so the
-preconditioner is not disturbed.
+### 6.1 The Jacobian row pin (`fixOrphanNodesForElementDeath`)
 
-This is purely operator-based — the fix consults the assembled
-operator, not the death flags or the mesh.
+Two sets of rows are pinned (`src/Albany_Application.cpp`):
+
+1. **Exact-zero-diagonal orphans.** A node whose only incident cells
+   died *in place* scatters nothing to its row, so its diagonal is
+   exactly zero. These are found by scanning the assembled diagonal.
+2. **Connectivity-dead nodes.** A node on a *calved/disconnected* block
+   carries a tiny but **non-zero** diagonal — leftover mass on the
+   cloned face node plus parallel-combine roundoff — so the exact-zero
+   test in (1) misses it. With that vanishing diagonal dividing the
+   residual it would free-fall under gravity to ~1e8 m. These are
+   identified not by a diagonal tolerance (which would also snare a
+   gradual-death cell that is still alive but decaying, §3.1) but by
+   *connectivity*: the set of DOFs whose every incident cell is dead,
+   captured at the start of the step (`frozen_dead_dof_gids_`, §6.3).
+
+For each pinned row the diagonal is set to a representative magnitude
+(the average of the non-zero diagonals) and the off-diagonals to zero,
+so the row becomes a scaled identity that does not disturb the
+preconditioner.
+
+### 6.2 The residual companion (`zeroResidualAtDeadNodes`)
+
+Pinning the Jacobian row alone is not enough for the calved set: those
+DOFs still carry a non-zero gravity residual, which (with the pinned
+row) cannot be reduced, so `|F|` stalls. So the residual is also zeroed
+at every connectivity-dead DOF. Row = identity **and** `r = 0` together
+make a genuine hold-in-place Dirichlet condition (`du = 0`). It is
+applied in both the residual fill and the Jacobian fill.
+
+### 6.3 Why the dead set is frozen at step start
+
+The connectivity-dead DOF set is captured once, at the start of the
+step (`ACEThermoMechanical` calls
+`STKDiscretization::getDeadNodeDOFGids` right after it snapshots
+`death_status_vec`, §C). Using this frozen set — rather than recomputing
+it live during each fill — keeps the pin **consistent with the assembly
+skip**: a cell that dies mid-Newton is skipped this step (§3) but not
+pinned until the next, exactly matching the scatter's frozen snapshot.
+A live recompute would pin in-place deaths mid-Newton that the scatter
+is not yet skipping, and the two disagreeing sets stall the solve.
+`getDeadNodeDOFGids` keys liveness off the `cell_death` *state* (not
+`deadCellsPart` membership, which lags a step), floods owned + shared
+nodes, and unions the live shared-node GIDs across ranks so a block held
+alive on another rank is not treated as dead.
+
+### 6.4 Warm-start rate zeroing (`zeroDeadNodeRates`)
+
+The Dirichlet pin holds a dead node's *position*. Its *velocity and
+acceleration* must also be retired, or the dynamic (trapezoid)
+integrator keeps advancing the decoupled DOF — its acceleration growing
+linearly with step count until the inertial residual breaks the solve.
+After each accepted step the ACE solver zeros `this_xdot_` and
+`this_xdotdot_` (the vectors that warm-start the next step) at every
+connectivity-dead DOF: dead material carries no momentum into the next
+step.
 
 ---
 
@@ -437,7 +553,8 @@ LCM-specific choices, and the modification guide.
 
 ## A. Data structures
 
-Five objects carry failure/death information.
+Five objects carry failure/death information (six with the optional
+gradual-death state, §A.6).
 
 ### A.1 `failure_modes` — the per-(cell, point) bitmask
 
@@ -498,6 +615,20 @@ Five objects carry failure/death information.
 - Both are obtained from the STK mesh struct (`getActivePart()`,
   `getDeadCellsPart()`). A cell keeps its element-block membership
   when it dies — death only changes active/dead membership.
+
+### A.6 `death_decay` — the per-cell gradual-death factor (optional)
+
+- An Albany integration-point state (`dl->qp_scalar`), registered
+  **with an old-state companion**, only when the `Permafrost` model runs
+  with `Death Steps > 1` (§3.1). Absent otherwise.
+- Holds a per-cell factor in `[0, 1]` (written to every quadrature point
+  of the cell): `1.0` alive, decremented by `1 / Death Steps` per
+  accepted step once the cell's predicate is met, `0.0` fully dead.
+- Read at assembly time (`death_decay_old`, the start-of-step value) to
+  scale the cell's stored stress; `cell_death` flips to `1` exactly when
+  it reaches `0`.
+- STK-backed for the same reason as the bitmask — it must survive the
+  workset rebuilds of §4.
 
 ---
 
@@ -660,10 +791,16 @@ rank (a misconfigured anchor would otherwise make every live cell look
 detached and erode the whole mesh): it warns and leaves the step
 untouched.
 
-The removal happens one step *after* the block's last tie dies, so the
-single teleporting step is not itself prevented; what it prevents is the
-*sustained* multi-step flight and the live-remnant state, by retiring
-the entire disconnected component at once.
+The structural removal happens one step *after* the block's last tie
+dies, retiring the entire disconnected component at once so there is no
+*sustained* multi-step flight and no live remnant. The single
+teleporting step the calved block would otherwise take in between is
+itself prevented by the dead-node hold-in-place Dirichlet (§6): once the
+block's nodes are connectivity-dead they are pinned (row = identity,
+`r = 0`) and their velocity/acceleration zeroed, so they stay put rather
+than free-falling. With the `Permafrost` gradual fade (§3.1) the cell is
+additionally skipped the very step its decay reaches zero, so it never
+gets the one free-fall iterate at near-zero stiffness.
 
 ---
 
@@ -712,19 +849,31 @@ broken harmonization path is never exercised.
 
 ## G. Source layout
 
-- `src/LCM/models/J2Erosion.hpp` / `J2Erosion_Def.hpp` — the failure
-  criteria, the bitmask update, the cell-death predicate, the
-  same-fill propagation.
+- `src/LCM/models/J2Erosion.hpp` / `J2Erosion_Def.hpp` — the five
+  failure criteria, the bitmask update, the cell-death predicate, the
+  same-fill propagation (the model behind §2).
+- `src/LCM/models/Permafrost.hpp` / `Permafrost_Def.hpp` — the
+  cap-plasticity model that shares the same death machinery, with its
+  own criteria and the optional gradual fade (`Death Steps`,
+  `death_decay`, §3.1).
 - `src/LCM/solvers/ACE_ThermoMechanical.cpp` — the per-step seeding
-  of `death_status_vec` from the mechanical mesh state.
+  of `death_status_vec` from the mechanical mesh state (§C); the
+  start-of-step capture of `frozen_dead_dof_gids_` (§6.3); and
+  `zeroDeadNodeRates`, the warm-start velocity/acceleration zeroing
+  (§6.4).
 - `src/evaluators/scatter/PHAL_ScatterResidual_Def.hpp` — the
   assembly-time skip of dead cells (`death_status_(cell) > 0.0`).
 - `src/Albany_Application.cpp` — `applyDeathToActivePart`: the
   observer entry point, dedup against `deadCellsPart`, `side_parts`
-  and `bc_mesh_parts` construction, the orphan-node fix.
+  and `bc_mesh_parts` construction; `fixOrphanNodesForElementDeath`
+  (the Jacobian row pin, §6.1) and `zeroResidualAtDeadNodes` (the
+  residual companion, §6.2).
 - `src/Albany_ElementDeath.hpp` / `Albany_ElementDeath.cpp` — the
   clone-before-disconnect implementation (`applyElementDeath` and
   helpers).
+- `src/disc/stk/Albany_STKDiscretization.cpp` — `getDeadNodeDOFGids`
+  (the connectivity-dead DOF set, §6.3) and `findDetachedCells` (the
+  calving flood-fill, §D.1).
 - `src/disc/stk/Albany_GenericSTKMeshStruct.cpp` — registration of
   the four scratch fields when erosion is enabled, plus
   `activePart` / `deadCellsPart` setup.

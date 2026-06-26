@@ -24,6 +24,7 @@ set(SOURCES
     Albany_ElementDeath.cpp
     Albany_Memory.cpp
     Albany_ModelEvaluator.cpp
+    Albany_NodalFieldProjector.cpp
     Albany_NullSpaceUtils.cpp
     Albany_ObserverImpl.cpp
     Albany_PiroObserver.cpp

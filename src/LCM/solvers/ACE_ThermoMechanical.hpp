@@ -17,6 +17,7 @@
 #include "Albany_Application.hpp"
 #include "Albany_MaterialDatabase.hpp"
 #include "Albany_ModelEvaluator.hpp"
+#include "Albany_NodalFieldProjector.hpp"
 #include "Albany_SolverFactory.hpp"
 #include "Piro_NOXSolver.hpp"
 #include "StateVarUtils.hpp"
@@ -230,6 +231,13 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
 
   mutable std::vector<bool> do_outputs_;
   mutable std::vector<bool> do_outputs_init_;
+
+  //! Per-subdomain nodal-field projectors. Built only for mechanical
+  //! subdomains, whose "Project IP to Nodal Field" response never runs (the
+  //! TrapezoidRule solver hands the observer a MultiVector, whose overload
+  //! omits observeResponse). Driven from doDynamicInitialOutput; reads saved
+  //! quadrature-point states, so it cannot perturb the coupled trajectory.
+  mutable std::vector<std::vector<Teuchos::RCP<Albany::NodalFieldProjector>>> projectors_;
 
   bool std_init_guess_{false};
   // Start the mechanical subproblem from static equilibrium under its

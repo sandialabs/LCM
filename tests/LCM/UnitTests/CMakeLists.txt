@@ -8,6 +8,8 @@ if(NOT ALBANY_PARALLEL_ONLY)
   endif()
   add_test(utSurfaceElement ${Albany_BINARY_DIR}/src/LCM/utSurfaceElement)
   add_test(utHeliumODEs ${Albany_BINARY_DIR}/src/LCM/utHeliumODEs)
+  add_test(utNodalFieldProjector
+           ${Albany_BINARY_DIR}/src/LCM/utNodalFieldProjector)
   if(ALBANY_LAME)
     add_test(utLameStress_elastic
              ${Albany_BINARY_DIR}/src/LCM/utLameStress_elastic)

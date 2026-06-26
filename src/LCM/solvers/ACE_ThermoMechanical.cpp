@@ -660,6 +660,40 @@ ACEThermoMechanical::createPersistentApps()
     }
   }
 
+  // ----- Nodal-field projectors for mechanical output -----
+  // The mechanical subdomain's "Project IP to Nodal Field" response never fires
+  // (its TrapezoidRule solver hands the observer a MultiVector, whose observer
+  // overload omits observeResponse), so proj_nodal_* would be written as zeros.
+  // Drive the projection explicitly from doDynamicInitialOutput via a standalone
+  // projector that reads the SAVED quadrature-point states. It re-runs no
+  // constitutive model, so it cannot mutate the death/plastic state the coupling
+  // loop reads each step -- unlike re-running the response field manager, which
+  // corrupts the trajectory. Thermal projects fine through its Vector-path
+  // observeResponse and is left untouched. The projector reuses the projection
+  // manager the response already created during app construction.
+  projectors_.resize(num_subdomains_);
+  for (int s = 0; s < num_subdomains_; ++s) {
+    if (prob_types_[s] != MECHANICAL) continue;
+    auto& problem = init_pls_[s]->sublist("Problem");
+    if (!problem.isSublist("Response Functions")) continue;
+    auto&     rf       = problem.sublist("Response Functions");
+    int const num_resp = rf.get<int>("Number", 0);
+    for (int r = 0; r < num_resp; ++r) {
+      if (rf.get<std::string>(Albany::strint("Response", r), "") != "Project IP to Nodal Field") continue;
+      auto&     rp = rf.sublist(Albany::strint("ResponseParams", r));
+      int const nf = rp.get<int>("Number of Fields", 0);
+      std::vector<Albany::NodalFieldProjector::FieldSpec> fields;
+      for (int f = 0; f < nf; ++f) {
+        fields.push_back(
+            {rp.get<std::string>(Albany::strint("IP Field Name", f)),
+             rp.get<std::string>(Albany::strint("IP Field Layout", f))});
+      }
+      std::string const mass_matrix_type = rp.get<std::string>("Mass Matrix Type", "Full");
+      bool const        output_to_exodus = rp.get<bool>("Output to File", true);
+      projectors_[s].push_back(Teuchos::rcp(
+          new Albany::NodalFieldProjector(apps_[s], fields, mass_matrix_type, output_to_exodus)));
+    }
+  }
 }
 
 bool
@@ -1481,6 +1515,15 @@ ACEThermoMechanical::doDynamicInitialOutput(ST const time, int const subdomain) 
   // (createPersistentApps removed its "Exodus Output File Name"); this
   // early return also guards against do_outputs_ being forced true.
   if (prob_types_[subdomain] != MECHANICAL) return;
+
+  // Project the saved quadrature-point states to nodal fields before writing.
+  // The mechanical "Project IP to Nodal Field" response never runs (see
+  // createPersistentApps), so without this the proj_nodal_* fields are zero.
+  // Gated implicitly by the do_outputs_ early return above, so the projection
+  // solve only runs on frames that are actually written.
+  if (subdomain < static_cast<int>(projectors_.size())) {
+    for (auto const& projector : projectors_[subdomain]) projector->project(time);
+  }
 
   auto const xMV_rcp         = apps_[subdomain]->getAdaptSolMgr()->getOverlappedSolution();
   auto&      abs_disc        = *discs_[subdomain];

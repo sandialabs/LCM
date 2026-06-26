@@ -243,12 +243,18 @@ Albany::StateManager::registerNodalVectorStateVariable(
     std::string const&                   responseIDtoRequire)
 
 {
-  ALBANY_PANIC(stateVarsAreAllocated);
   using Albany::StateStruct;
 
+  // Re-registering an already-registered state is a no-op and is safe even after
+  // allocation (no new storage is needed). This must precede the
+  // stateVarsAreAllocated guard so that consumers built after the discretization
+  // exists -- e.g. Albany::NodalFieldProjector -- can reuse existing nodal
+  // states.
   if (statesToStore[ebName].find(stateName) != statesToStore[ebName].end()) {
     return;  // Don't re-register the same state name
   }
+
+  ALBANY_PANIC(stateVarsAreAllocated);
 
   statesToStore[ebName][stateName] = dl;
 

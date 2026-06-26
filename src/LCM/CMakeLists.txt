@@ -621,6 +621,9 @@ if(LCM_TEST_EXES)
   add_executable(utHeliumODEs test/unit_tests/StandardUnitTestMain.cpp
                               test/unit_tests/utHeliumODEs.cpp)
 
+  add_executable(utNodalFieldProjector test/unit_tests/StandardUnitTestMain.cpp
+                                       test/unit_tests/utNodalFieldProjector.cpp)
+
   if(NOT BUILD_SHARED_LIBS)
     add_executable(utStaticAllocator test/unit_tests/utStaticAllocator.cpp)
   endif()
@@ -705,6 +708,7 @@ if(LCM_TEST_EXES)
   endif()
   target_link_libraries(utSurfaceElement ${repeat_libs} ${ALL_LIBRARIES})
   target_link_libraries(utHeliumODEs ${repeat_libs} ${ALL_LIBRARIES})
+  target_link_libraries(utNodalFieldProjector ${repeat_libs} ${ALL_LIBRARIES})
   if(NOT BUILD_SHARED_LIBS)
     target_link_libraries(utStaticAllocator ${repeat_libs} ${ALL_LIBRARIES})
   endif()

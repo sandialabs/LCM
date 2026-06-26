@@ -220,6 +220,8 @@ getValidProjectIPtoNodalFieldParameters()
   valid_pl->set<bool>("Output to File", true, "Whether nodal field info should be output to a file");
   valid_pl->set<std::string>("Mass Matrix Type", "Full", "Full or Lumped");
   valid_pl->set<double>("Solver Tolerance", 1e-12, "Linear solver tolerance");
+  valid_pl->set<bool>(
+      "Skip Worker Registration", false, "Reuse an existing projection manager without adding a worker (external driver)");
 
   return valid_pl;
 }
@@ -395,9 +397,23 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::initManager(Teuchos
   std::string const                  key = "ProjectIPtoNodalField_" + key_suffix;
   Teuchos::RCP<Adapt::NodalDataBase> ndb = p_state_mgr_->getNodalDataBase();
   bool const                         isr = ndb->isManagerRegistered(key);
+
+  // When an external driver (e.g. Albany::NodalFieldProjector) reuses the
+  // projection manager that the response path already created, it must NOT add
+  // itself as a worker: the manager's worker count already matches the number of
+  // evaluate sweeps that will be driven, and the existing manager carries the
+  // correct nodal-database offset. Registering an extra worker would inflate the
+  // expected count so the final solve never fires.
+  bool const skip_worker = pl->get<bool>("Skip Worker Registration", false);
+
   if (isr)
     mgr_ = Teuchos::rcp_dynamic_cast<ProjectIPtoNodalFieldManager>(ndb->getManager(key));
   else {
+    ALBANY_PANIC(
+        skip_worker,
+        "ProjectIPtoNodalField: 'Skip Worker Registration' was requested but no "
+        "manager exists for key '" << key << "'. The reuse path requires the projection "
+        "to have been set up already (e.g. via a 'Project IP to Nodal Field' response).");
     EMassLinearOpType::Enum mass_linear_op_type;
     std::string const&      mmstr = pl->get<std::string>("Mass Matrix Type", "Full");
     mass_linear_op_type           = EMassLinearOpType::fromString(mmstr);
@@ -407,7 +423,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::initManager(Teuchos
     mgr_->ndb_start = p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getVecsize();
     ndb->registerManager(key, mgr_);
   }
-  mgr_->registerWorker();
+  if (!skip_worker) mgr_->registerWorker();
   return !isr;
 }
 

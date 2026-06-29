@@ -306,6 +306,27 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   // active set). Empty in non-ACE runs (the exact-zero orphan fix still runs).
   std::vector<GO> frozen_dead_dof_gids_;
 
+  // Set true by applyDeathToActivePart when a clone-before-disconnect death
+  // changes the shared mesh topology (new cloned nodes / cross-rank ownership
+  // migration during modification_end). The driving solver consumes and clears
+  // it to rebuild the discretization maps/graph and the solution manager's
+  // CombineAndScatter structures at a clean between-step point -- the bare
+  // rebuildWorksets() that runs inside the observer refreshes worksets only and
+  // leaves the parallel partition stale (see ACEThermoMechanical loop).
+  bool topology_changed_{false};
+
+  bool
+  topologyChanged() const
+  {
+    return topology_changed_;
+  }
+
+  void
+  clearTopologyChanged()
+  {
+    topology_changed_ = false;
+  }
+
  private:
   void
   computeGlobalJacobianImpl(

@@ -411,6 +411,16 @@ class STKDiscretization : public AbstractDiscretization
   void
   rebuildWorksets() override;
 
+  //! Full map/graph subset of updateMesh(), for the topology-changing
+  //! element-death path (clone-before-disconnect). Rebuilds the owned/overlap
+  //! vector spaces, DOF maps, Jacobian graph, worksets, node sets and side
+  //! sets so the parallel partition matches the mutated mesh. Omits the
+  //! one-shot / destructive steps of updateMesh(): transformMesh() (would
+  //! re-apply the coordinate transform) and setupExodusOutput() (would reset
+  //! the output file).
+  void
+  rebuildAfterTopologyChange();
+
   //! Element death: find live owned cells that have calved off the
   //! structure -- cells no longer connected, through live-cell node
   //! adjacency, to any of the named anchor node sets (the kinematic

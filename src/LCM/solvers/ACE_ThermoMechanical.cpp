@@ -881,6 +881,102 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       continue;
     }
 
+    // Element death this step (clone-before-disconnect, fired in the
+    // mechanical observer) changed the shared mesh topology: cloned nodes
+    // grew the owned/overlap DOF maps and, in parallel, modification_end may
+    // have migrated ownership of boundary nodes across ranks. The observer
+    // could only refresh worksets (rebuilding the maps mid-evalModel would
+    // invalidate the model evaluator's x_space under the running solver), so
+    // it flagged the change. Now, at this clean between-step point, rebuild
+    // each subdomain's parallel state so the next step assembles on the
+    // correct partition:
+    //   1. the discretization's owned/overlap vector spaces, DOF maps and
+    //      Jacobian graph (rebuildAfterTopologyChange);
+    //   2. the solution manager's overlap vectors, overlap Jacobian and
+    //      CombineAndScatter manager (resizeMeshDataArraysAfterTopologyChange);
+    //   3. the Piro solver + model evaluator -- their cached operators (NOX's
+    //      owned Jacobian; the thermal InvertMassMatrixDecorator's mass matrix)
+    //      were built on the pre-death map, and the residual/Jacobian fill
+    //      combines the rebuilt overlap operator into them via the rebuilt
+    //      CombineAndScatter manager. Leaving the cached operators stale makes
+    //      that combine index a mismatched map and segfault, so rebuild the
+    //      solver stack (reusing the existing Application, whose disc was
+    //      rebuilt in step 1) to get fresh operators on the new map.
+    // Then re-read the converged solution from the shared STK mesh onto the
+    // rebuilt owned maps. STK is the migration bridge: applyElementDeath copied
+    // field data onto the clones and the step's converged solution was written
+    // back to STK, so getSolutionMV() returns it correctly repartitioned for
+    // the new ownership. Without all this the stale parallel partition corrupts
+    // residual assembly and detonates the run (~step 992 in the bluff); serial
+    // is immune because it has no overlap/CombineAndScatter layer.
+    bool topo_changed = false;
+    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+      if (apps_[subdomain]->topologyChanged()) {
+        topo_changed = true;
+        break;
+      }
+    }
+    if (topo_changed == true) {
+      for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+        auto& app      = *apps_[subdomain];
+        auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discs_[subdomain]);
+
+        // 1: rebuild discretization maps/graph (full size). This mirrors the
+        // updateMesh() that finalizePostCommit runs at construction.
+        stk_disc.rebuildAfterTopologyChange();
+
+        // 1b: re-apply DBC DOF elimination, mirroring the eliminateConstrainedDOFs
+        // that finalizePostCommit runs right after updateMesh. rebuildAfterTopologyChange
+        // leaves the owned vector space FULL; without re-reducing it the mechanical
+        // system loses its Dirichlet constraints (the owned map jumps from the
+        // reduced size back to full), becomes singular, and the next solve blows up.
+        app.eliminateConstrainedDOFs();
+
+        // 2: rebuild the solution manager's comms from the (now reduced) maps.
+        app.getAdaptSolMgr()->resizeMeshDataArraysAfterTopologyChange();
+
+        // Migrate the warm-start state onto the rebuilt owned map via STK.
+        // Capture BEFORE the solver rebuild so the model-evaluator construction
+        // cannot perturb the STK solution field underneath the read.
+        auto      x_mv  = stk_disc.getSolutionMV();
+        int const ncols = x_mv->domain()->dim();
+
+        this_x_[subdomain] = Thyra::createMember(x_mv->col(0)->space());
+        Thyra::copy(*x_mv->col(0), this_x_[subdomain].ptr());
+        if (ncols > 1) {
+          this_xdot_[subdomain] = Thyra::createMember(x_mv->col(1)->space());
+          Thyra::copy(*x_mv->col(1), this_xdot_[subdomain].ptr());
+        }
+        if (ncols > 2) {
+          this_xdotdot_[subdomain] = Thyra::createMember(x_mv->col(2)->space());
+          Thyra::copy(*x_mv->col(2), this_xdotdot_[subdomain].ptr());
+        }
+
+        // 3: rebuild the Piro solver + model evaluator around the existing app
+        // (createAlbanyApp = false), so their operators match the new map.
+        solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(init_pls_[subdomain], comm_));
+        Teuchos::RCP<Albany::Application> app_ref = apps_[subdomain];
+        solvers_[subdomain]          = solver_factories_[subdomain]->createAndGetAlbanyApp(
+            app_ref, comm_, comm_, Teuchos::null, /*createAlbanyApp=*/false);
+        model_evaluators_[subdomain] = solver_factories_[subdomain]->returnModel();
+
+        auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
+        // Refresh the handoff the next solve warm-starts from (nominal values
+        // for the trapezoid path; setX/Xdot/Xdotdot on the app), now on the
+        // rebuilt map.
+        auto nv = me.getNominalValues();
+        nv.set_x(this_x_[subdomain]);
+        if (ncols > 1) nv.set_x_dot(this_xdot_[subdomain]);
+        me.setNominalValues(nv);
+        app.setX(this_x_[subdomain]);
+        if (ncols > 1) app.setXdot(this_xdot_[subdomain]);
+        if (ncols > 2) app.setXdotdot(this_xdotdot_[subdomain]);
+
+        app.clearTopologyChanged();
+      }
+    }
+
     // Update IC vecs
     for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
       setICVecs(next_time, subdomain);

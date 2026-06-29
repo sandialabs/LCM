@@ -124,6 +124,17 @@ class AdaptiveSolutionManager : public Thyra::AdaptiveSolutionManager
     return method_;
   }
 
+  //! Rebuild the overlap vectors, overlap Jacobian, owned solution MV and the
+  //! CombineAndScatter manager from the discretization's current maps. Call
+  //! after a topology-changing element death has rebuilt those maps in place
+  //! (see STKDiscretization::rebuildAfterTopologyChange), so scatter/combine
+  //! again target the correct DOFs.
+  void
+  resizeMeshDataArraysAfterTopologyChange()
+  {
+    resizeMeshDataArrays(disc_);
+  }
+
  private:
   Teuchos::RCP<const Albany::CombineAndScatterManager> cas_manager;
 

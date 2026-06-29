@@ -483,6 +483,12 @@ SolverFactory::getValidAppParameters() const
   validPL->sublist("Coupled System", false, "Coupled system sublist");
   validPL->sublist("Alternating System", false, "Alternating system sublist");
   validPL->set<bool>("Enable TimeMonitor Output", false, "Flag to enable TimeMonitor output");
+  // Albany::ModelEvaluator's constructor reads this top-level flag via get()
+  // with a default, which inserts it into the list. Declaring it valid here lets
+  // a SolverFactory be reconstructed on an already-built parameter list (e.g.
+  // the ACE solver rebuilds the per-subdomain Piro solver after a
+  // topology-changing element death) without tripping top-level validation.
+  validPL->set<bool>("Overwrite Nominal Values With Final Point", false, "Flag to overwrite the model's nominal values with the final solution");
 
   // validPL->set<std::string>("Jacobian Operator", "Have Jacobian", "Flag to
   // allow Matrix-Free specification in Piro");

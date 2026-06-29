@@ -168,7 +168,7 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   void
   zeroDeadNodeRates(int const subdomain) const;
 
-  std::vector<Teuchos::RCP<Albany::SolverFactory>>                             solver_factories_;
+  mutable std::vector<Teuchos::RCP<Albany::SolverFactory>>                     solver_factories_;
   mutable std::vector<Teuchos::RCP<Thyra::ResponseOnlyModelEvaluatorBase<ST>>> solvers_;
   mutable Teuchos::ArrayRCP<Teuchos::RCP<Albany::Application>>                 apps_;
   mutable std::vector<Teuchos::RCP<Albany::AbstractSTKMeshStruct>>             stk_mesh_structs_;

@@ -1960,8 +1960,21 @@ Application::applyDeathToActivePart()
 
   // Step B3: rebuild worksets so the discretization picks up the new
   // faces and computeNodeSets re-clips the "-erodible" node sets to the
-  // grown side-set.
+  // grown side-set. This keeps the mesh usable for the rest of THIS step
+  // (e.g. the immediate output write), but refreshes worksets ONLY.
   stk_disc->rebuildWorksets();
+
+  // The clone-before-disconnect surgery above also added nodes (the clones
+  // carry new global ids, so the owned/overlap DOF maps grow) and, in
+  // parallel, modification_end may have migrated ownership of boundary
+  // nodes across ranks. rebuildWorksets() does not refresh the owned/overlap
+  // vector spaces, DOF maps, Jacobian graph, or the solution manager's
+  // CombineAndScatter manager, so the parallel partition is now stale.
+  // Rebuilding those here would invalidate the model evaluator's x_space
+  // mid-evalModel (this runs inside the solver's observer), so instead flag
+  // the change and let the driving solver do the full rebuild + solution
+  // migration at a clean between-step point.
+  topology_changed_ = true;
 
   return true;
 }

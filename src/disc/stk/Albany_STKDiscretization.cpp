@@ -2872,6 +2872,41 @@ STKDiscretization::rebuildWorksets()
   computeSideSets();
 }
 
+void
+STKDiscretization::rebuildAfterTopologyChange()
+{
+  // A topology-changing element death (clone-before-disconnect in
+  // Application::applyDeathToActivePart) added cloned nodes -- which carry
+  // new global ids, so the owned/overlap DOF maps grow -- and, in parallel,
+  // modification_end may have migrated ownership of boundary nodes across
+  // ranks. rebuildWorksets() refreshes only worksets/nodesets/sidesets and
+  // leaves the owned/overlap vector spaces, DOF maps and Jacobian graph
+  // describing the pre-death partition; in parallel that stale partition makes
+  // the CombineAndScatter scatter/combine target the wrong DOFs and corrupts
+  // residual assembly (the bluff detonates ~step 992; serial is immune as it
+  // has no overlap/combine layer). Re-run the map/graph subset of
+  // updateMesh(). The nodal DOFsStruct containers were populated on the first
+  // updateMesh() and persist, so we start at computeNodalVectorSpaces(); we
+  // skip transformMesh() (would re-apply the coordinate transform every death)
+  // and setupExodusOutput() (would reset the open output file).
+  computeNodalVectorSpaces(false);
+  computeOwnedNodesAndUnknowns();
+  computeNodalVectorSpaces(true);
+  computeOverlapNodesAndUnknowns();
+  // NOTE: deliberately NOT calling setupMLCoords() here. It is a
+  // once-at-construction call: RigidBodyModes::clearCoordinatesAndNullspace()
+  // nulls the traits object after MueLu/FROSch builds the preconditioner the
+  // first time, so setCoordinatesAndNullspace() is not re-entrant (a re-call
+  // dereferences the null traits and segfaults). It is also unnecessary for
+  // the erosion path: once the rigid-body nullspace has been consumed, MueLu
+  // rebuilds on the new matrix with coordinate-free aggregation, so the stale
+  // ML coordinates do not affect correctness.
+  computeGraphs();
+  computeWorksetInfo();
+  computeNodeSets();
+  computeSideSets();
+}
+
 stk::mesh::EntityVector
 STKDiscretization::findDetachedCells(
     std::vector<std::string> const& anchor_node_sets,

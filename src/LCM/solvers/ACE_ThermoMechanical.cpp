@@ -729,6 +729,32 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   int stop{0};
   ST  current_time{initial_time_};
 
+  // Emit the initial state as the first output frame, stamped t = initial_time_.
+  // The time loop otherwise writes each frame at the END of its step
+  // (doDynamicInitialOutput(next_time)), so the first written frame lands at
+  // initial_time_ + time_step (e.g. t = 900) and the true initial condition is
+  // never written. Only the mechanical subdomain writes the coupled Exodus file
+  // (doDynamicInitialOutput early-returns for thermal); the frame carries the
+  // IC displacement plus the shared mesh's initial element state (temperature,
+  // ice saturation, salinity, ...). Skipped for a preload start
+  // (initial_time_ < 0) unless preload output is requested, matching the
+  // in-loop preload gating below.
+  if (initial_time_ >= 0.0 || output_preload_ == true) {
+    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+      // Force the write on, exactly as the loop does for is_initial_state
+      // below (do_outputs_init_ tracks the observer's Exodus flag, which is
+      // disabled at construction, so it cannot gate this frame).
+      do_outputs_[subdomain] = true;
+      // The deck's "Disable Exodus Output Initial Time" sets
+      // output_initial_soln_to_exo_file = false, which makes writeSolution skip
+      // the outputInterval == 0 write -- i.e. this very frame. Override it so the
+      // initial state is emitted (the in-loop frames are unaffected: they write
+      // at outputInterval > 0 regardless).
+      static_cast<Albany::STKDiscretization&>(*discs_[subdomain]).outputExodusSolutionInitialTime(true);
+      doDynamicInitialOutput(initial_time_, subdomain);
+    }
+  }
+
   // Time-stepping loop
   while (stop < maximum_steps_ && current_time < final_time_) {
     if (interval_index != -1) {

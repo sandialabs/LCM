@@ -1254,18 +1254,16 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   // so only this coupled solver ever activates it.
   apps_[subdomain]->setSuppressDynamics(current_time < 0.0);
 
-  // Make the mechanical fill see physical (coupling) time DURING PRELOAD only.
-  // The Piro Trapezoid path runs a local [0, dt] window per coupling step, so
-  // without a shift the preload Expression body force (ramped in t) would see
-  // ~0. We shift only while preloading (t < 0): for t >= 0 the shift is left
-  // at zero so the real schedule reproduces the production trajectory exactly.
-  // (The mechanical model reads workset.current_time for its sea-level/ocean-
-  // exposure lookup; production ran with the Trapezoid's local time ~0, i.e. a
-  // frozen initial sea level. Shifting it for t >= 0 would instead evolve the
-  // sea level mid-run -- a different, more aggressive ocean-weakening physics
-  // that drives a death-cascade convergence wall. Keep that out of scope here.)
-  bool const is_trapezoid = (mechanical_solver_ == MechanicalSolver::TrapezoidRule);
-  apps_[subdomain]->setTimeShift((is_trapezoid && current_time < 0.0) ? current_time : 0.0);
+  // No time shift: both mechanical solvers now carry global coupling time
+  // directly. Tempus is told setStartTime/setFinalTime each step; the Trapezoid
+  // path likewise retargets its window to [current_time, next_time] below (Piro
+  // TrapezoidRuleSolver::setStartTime/setFinalTime). So workset.current_time is
+  // the true simulation time -- the preload Expression body force (ramped in t)
+  // and the mechanical model's sea-level/ocean-exposure/ice-saturation lookups
+  // all see the correct time. (Previously the Trapezoid ran a fixed local
+  // [0, dt] window and a preload-only shift papered over the body force, which
+  // left the sea level frozen at its initial value for the whole run.)
+  apps_[subdomain]->setTimeShift(0.0);
 
   // Disable the mechanical app's solution-observer Exodus output during the
   // solve. The observer fires inside evalModel at the integrator's LOCAL times
@@ -1359,6 +1357,15 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   } else if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
     auto&             piro_tr_solver = dynamic_cast<Piro::TrapezoidRuleSolver<ST>&>(solver);
     auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
+    // Retarget the integration window to this coupling step's global time span.
+    // numTimeSteps was fixed to 1 at setup, so delta_t = next_time - current_time
+    // (= time_step) and the model sees true simulation time through InArgs::set_t
+    // -- which is what makes the sea-level/ocean-exposure lookups correct. The
+    // dynamics depend only on delta_t, so moving the window origin off zero does
+    // not change the integration.
+    piro_tr_solver.setStartTime(current_time);
+    piro_tr_solver.setFinalTime(next_time);
 
     std::string const delim(72, '=');
     *fos_ << "Initial time       :" << current_time << '\n';

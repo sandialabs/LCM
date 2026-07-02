@@ -86,7 +86,6 @@ class CahnHillProblem : public AbstractProblem
 
   Teuchos::RCP<Albany::Layouts> dl;
 
-  /// Boolean marking whether SDBCs are used
 };
 
 }  // namespace Albany

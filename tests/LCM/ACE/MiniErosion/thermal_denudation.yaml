@@ -11,23 +11,28 @@ LCM:
     MaterialDB Filename: './materials_thermal_denudation.yaml'
     
     Dirichlet BCs:
-      Time Dependent SDBC on NS z+ for DOF T:
+      DBC on NS z+ for DOF T:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.0, 9000.0, 900000.0]
         BC Values: [270.0, 300.0, 290.0]
-      Time Dependent SDBC on NS interval4-erodible for DOF T:
+      DBC on NS interval4-erodible for DOF T:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.0, 9000.0, 900000.0]
         BC Values: [270.0, 300.0, 290.0]
-      Time Dependent SDBC on NS interval3-erodible for DOF T:
+      DBC on NS interval3-erodible for DOF T:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.0, 9000.0, 900000.0]
         BC Values: [270.0, 290.0, 290.0]
-      Time Dependent SDBC on NS interval2-erodible for DOF T:
+      DBC on NS interval2-erodible for DOF T:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.0, 9000.0, 900000.0]
         BC Values: [270.0, 290.0, 280.0]
-      Time Dependent SDBC on NS interval1-erodible for DOF T:
+      DBC on NS interval1-erodible for DOF T:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.0, 9000.0, 900000.0]
         BC Values: [270.0, 280.0, 280.0]

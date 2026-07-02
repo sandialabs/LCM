@@ -5,7 +5,7 @@ LCM:
     Phalanx Graph Visualization Detail: 1
     Dirichlet BCs:
       DBC on NS NodeSet0 for DOF X: 0.00000000e+00
-      ExpressionEvaluated SDBC on NS NodeSet1 for DOF X: '1.0 * t'
+      DBC on NS NodeSet1 for DOF X: '1.0 * t'
       DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
       DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Bulk Modulus:

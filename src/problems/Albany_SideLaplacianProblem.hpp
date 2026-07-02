@@ -108,7 +108,6 @@ class SideLaplacian : public Albany::AbstractProblem
   std::string cellEBName;
   std::string sideEBName;
 
-  /// Boolean marking whether SDBCs are used
 };
 
 // ===================================== IMPLEMENTATION

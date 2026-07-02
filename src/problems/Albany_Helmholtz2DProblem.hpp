@@ -77,7 +77,6 @@ class Helmholtz2DProblem : public Albany::AbstractProblem
   double ksqr;
   bool   haveSource;
 
-  /// Boolean marking whether SDBCs are used
 };
 
 }  // namespace Albany

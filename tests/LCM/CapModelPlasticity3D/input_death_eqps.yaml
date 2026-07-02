@@ -13,7 +13,8 @@ LCM:
     MaterialDB Filename: materials_permafrost_death_eqps.yaml
     Dirichlet BCs:
       DBC on NS NodeSet0 for DOF X: 0.00000000e+00
-      Time Dependent DBC on NS NodeSet1 for DOF X:
+      DBC on NS NodeSet1 for DOF X:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 1.0]
         BC Values: [0.0, -4.00000000e-02]

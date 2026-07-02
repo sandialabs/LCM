@@ -16,31 +16,38 @@ LCM:
       Tau Type: 'Proportional to Mesh Size'
       Stabilization Type: 'Laplacian'
     Dirichlet BCs:
-      Time Dependent SDBC on NS z+ for DOF T:
+      DBC on NS z+ for DOF T:
+        BC Function: Array
         Time File: './TimeHis_ExSec3600_2011.txt'
         #BC File: './Ablufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
         BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent SDBC on NS intervalrest for DOF T:
+      DBC on NS intervalrest for DOF T:
+        BC Function: Array
         Time File: './TimeHis_ExSec3600_2011.txt'
         #BC File: './Ablufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
         BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent SDBC on NS interval5 for DOF T:
+      DBC on NS interval5 for DOF T:
+        BC Function: Array
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp5_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent SDBC on NS interval4 for DOF T:
+      DBC on NS interval4 for DOF T:
+        BC Function: Array
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp4_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent SDBC on NS interval3 for DOF T:
+      DBC on NS interval3 for DOF T:
+        BC Function: Array
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp3_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent SDBC on NS interval2 for DOF T:
+      DBC on NS interval2 for DOF T:
+        BC Function: Array
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp2_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'
-      Time Dependent SDBC on NS interval1 for DOF T:
+      DBC on NS interval1 for DOF T:
+        BC Function: Array
         Time File: './TimeHis_ExSec3600_2011.txt'
         BC File: './Oblufftemp1_ExSec3600_Grid0.1_DBC_2011.txt'
         #BC File: './ARESTblufftemp6_ExSec3600_Grid0.1_DBC_2011.txt'

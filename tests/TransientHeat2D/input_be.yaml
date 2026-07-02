@@ -6,7 +6,8 @@ LCM:
     Dirichlet BCs: 
       DBC on NS NodeSet0 for DOF T: 0.0e+00
       DBC on NS NodeSet1 for DOF T: 0.0e+00
-      Time Dependent DBC on NS NodeSet2 for DOF T:
+      DBC on NS NodeSet2 for DOF T:
+        BC Function: Array
         Time Values: [0.0, 1.0]
         BC Values: [0.0, 1.0]
       DBC on NS NodeSet3 for DOF T: 0.0e+00

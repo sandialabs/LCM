@@ -4,12 +4,12 @@ LCM:
     Solution Method: Transient Tempus
     MaterialDB Filename: '../gauge_material.yaml'
     Dirichlet BCs:
-      SDBC on NS nodelist_4 for DOF StrongSchwarz:
-        BC Function: StrongSchwarz
+      DBC on NS nodelist_4 for DOF all:
+        BC Function: Schwarz
         Coupled Application: 'upper_bar.yaml'
         Coupled Block: block_2
-      SDBC on NS nodelist_3 for DOF StrongSchwarz:
-        BC Function: StrongSchwarz
+      DBC on NS nodelist_3 for DOF all:
+        BC Function: Schwarz
         Coupled Application: 'lower_bar.yaml'
         Coupled Block: block_3
   Discretization:

@@ -108,7 +108,6 @@ class MechanicsProblem : public AbstractProblem
   /// Boundary conditions on source term
   bool have_source_;
 
-  /// Boolean marking whether SDBCs are used
   /// Boolean marking whether adaptation is used
   /// Type of thermal source that is in effect
   SOURCE_TYPE thermal_source_;

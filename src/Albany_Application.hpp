@@ -674,7 +674,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   //! prescribed value given the current time (and, for expressions, node coords).
   struct DBCDescriptor
   {
-    enum class Kind { Constant, TimeArray, Expression, Schwarz, Torsion, Kfield, EquilibriumConcentration };
+    enum class Kind { Constant, TimeArray, Expression, Schwarz, Kfield, EquilibriumConcentration };
     Kind              kind           = Kind::Constant;
     LO                overlap_lid    = -1;
     LO                full_owned_lid = -1;  // LID in full (pre-elimination) owned VS; -1 if this rank does not own this DOF
@@ -701,16 +701,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     mutable double schwarz_cached_value        = 0.0;
     mutable double schwarz_cached_velocity     = 0.0;
     mutable double schwarz_cached_acceleration = 0.0;
-    // Torsion: rotation by angle theta = theta_dot * time about (X0, Y0)
-    // in the xy-plane. The descriptor stores the node's (X, Y) coordinates
-    // and which displacement component (0 = ux, 1 = uy) it represents, so
-    // eval() returns just the scalar for this DOF.
-    double torsion_theta_dot = 0.0;
-    double torsion_x0        = 0.0;
-    double torsion_y0        = 0.0;
-    double torsion_node_x    = 0.0;
-    double torsion_node_y    = 0.0;
-    int    torsion_component = 0;  // 0 → ux, 1 → uy
     // Kfield: plane-strain crack-tip Williams' solution with time-varying
     // KI(t) and KII(t) interpolated from piecewise-linear time series. The
     // descriptor stores (r, theta) for the node, the elastic constants

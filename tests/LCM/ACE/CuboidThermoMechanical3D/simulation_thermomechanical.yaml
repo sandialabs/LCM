@@ -16,7 +16,8 @@ LCM:
       DBC on NS y- for DOF Y: 0.0
       DBC on NS z- for DOF Z: 0.0
       DBC on NS z- for DOF T: 260.0
-      Time Dependent DBC on NS z+ for DOF T:
+      DBC on NS z+ for DOF T:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.0, 120000.0, 17290000.0]
         BC Values: [260.0, 300.0, 300.0]

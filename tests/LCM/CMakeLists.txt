@@ -52,7 +52,6 @@ add_subdirectory(ThermoElasticity2D)
 add_subdirectory(ThermoMechanicalCan)
 add_subdirectory(ThermoMechanicalContact)
 add_subdirectory(TimeDependentSDBC)
-add_subdirectory(TorsionBC)
 add_subdirectory(TransientElasticity2D)
 add_subdirectory(UnitTests)
 

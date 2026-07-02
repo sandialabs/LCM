@@ -34,8 +34,8 @@ LCM:
     Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: materials_bolts.yaml
     Dirichlet BCs:
-      SDBC on NS nodelist_4 for DOF StrongSchwarz:
-        BC Function: StrongSchwarz
+      DBC on NS nodelist_4 for DOF all:
+        BC Function: Schwarz
         Coupled Application: 'parts.yaml'
   Discretization:
     Method: Ioss

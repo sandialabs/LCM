@@ -83,7 +83,6 @@ class ThermoElasticityProblem : public Albany::AbstractProblem
 
  protected:
   ///
-  /// Boolean marking whether SDBCs are used
   //! Boundary conditions on source term
   bool haveSource;
   int  T_offset;  // Position of T unknown in nodal DOFs

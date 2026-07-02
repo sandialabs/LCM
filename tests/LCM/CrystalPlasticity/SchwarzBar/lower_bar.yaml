@@ -23,7 +23,8 @@ LCM:
     Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: '../lower_bar_material.yaml'
     Dirichlet BCs:
-      Time Dependent DBC on NS nodelist_1 for DOF Y:
+      DBC on NS nodelist_1 for DOF Y:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.00000000e+00, 1000.00000000]
         BC Values: [0.00000000e+00, -2.50000000e+00]

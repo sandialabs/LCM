@@ -3,9 +3,9 @@ LCM:
     Name: Mechanics 3D
     Solution Method: Steady
     Dirichlet BCs:
-      SDBC on NS BoundaryNodeSet_min_x for DOF X: 0.00000000e+00
-      SDBC on NS BoundaryNodeSet_min_y for DOF Y: 0.00000000e+00
-      SDBC on NS BoundaryNodeSet_min_z for DOF Z: 0.00000000e+00
+      DBC on NS BoundaryNodeSet_min_x for DOF X: 0.00000000e+00
+      DBC on NS BoundaryNodeSet_min_y for DOF Y: 0.00000000e+00
+      DBC on NS BoundaryNodeSet_min_z for DOF Z: 0.00000000e+00
     Neumann BCs:
       'NBC on SS BoundarySideSet_max_x for DOF all set (t_x, t_y, t_z)': [1.0, 0.0, 0.0]
     MaterialDB Filename: 'material.yaml'

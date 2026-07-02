@@ -75,7 +75,6 @@ class ReactDiffSystem : public AbstractProblem
  protected:
   int numDim;
 
-  /// Boolean marking whether SDBCs are used
 };
 
 }  // namespace Albany

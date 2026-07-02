@@ -8,8 +8,8 @@ LCM:
     Solution Method: Transient Tempus
     MaterialDB Filename: './materials_thermal_only.yaml'
     Dirichlet BCs: 
-      SDBC on NS z- for DOF T: 260.0
-      SDBC on NS z+ for DOF T: 300.0
+      DBC on NS z- for DOF T: 260.0
+      DBC on NS z+ for DOF T: 300.0
     Initial Condition:
       Function: Constant
       Function Data: [260.0]

@@ -87,7 +87,6 @@ class ElasticityProblem : public Albany::AbstractProblem
 
  protected:
   ///
-  /// Boolean marking whether SDBCs are used
   //! Boundary conditions on source term
   bool haveSource;
   int  numDim;

@@ -4,27 +4,33 @@ LCM:
     Solution Method: Continuation
     MaterialDB Filename: 'materials.yaml'
     Dirichlet BCs:
-      Time Dependent SDBC on NS -X for DOF X:
+      DBC on NS -X for DOF X:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0]
         BC Values: [0.0, -2.0]
-      Time Dependent SDBC on NS -Y for DOF Y:
+      DBC on NS -Y for DOF Y:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0]
         BC Values: [0.0, -2.0]
-      Time Dependent SDBC on NS -Z for DOF Z:
+      DBC on NS -Z for DOF Z:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0]
         BC Values: [0.0, -2.0]
-      Time Dependent SDBC on NS +X for DOF X:
+      DBC on NS +X for DOF X:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0]
         BC Values: [0.0, 2.0]
-      Time Dependent SDBC on NS +Y for DOF Y:
+      DBC on NS +Y for DOF Y:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0]
         BC Values: [0.0, 2.0]
-      Time Dependent SDBC on NS +Z for DOF Z:
+      DBC on NS +Z for DOF Z:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0]
         BC Values: [0.0, 2.0]

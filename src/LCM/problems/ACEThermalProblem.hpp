@@ -95,7 +95,6 @@ class ACEThermalProblem : public AbstractProblem
 
   Teuchos::RCP<Albany::Layouts> dl_;
 
-  /// Boolean marking whether SDBCs are used
   /// Boolean marking whether adaptation is used
   // Stabilization-related parameters
   bool        use_stab_{false};

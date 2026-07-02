@@ -21,13 +21,14 @@ LCM:
     Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: materials_01.yaml
     Dirichlet BCs:
-      SDBC on NS nodelist_1 for DOF X: 0.0
-      SDBC on NS nodelist_3 for DOF Y: 0.0
-      SDBC on NS nodelist_5 for DOF StrongSchwarz:
-        BC Function: StrongSchwarz
+      DBC on NS nodelist_1 for DOF X: 0.0
+      DBC on NS nodelist_3 for DOF Y: 0.0
+      DBC on NS nodelist_5 for DOF all:
+        BC Function: Schwarz
         Coupled Application: cuboid_00.yaml
         Coupled Block: fine
-      Time Dependent SDBC on NS nodelist_6 for DOF Z:
+      DBC on NS nodelist_6 for DOF Z:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0]
         BC Values: [0.0, 4.0]

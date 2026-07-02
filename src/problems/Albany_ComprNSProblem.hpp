@@ -78,7 +78,6 @@ class ComprNSProblem : public AbstractProblem
   int                           numDim;
   Teuchos::RCP<Albany::Layouts> dl;
 
-  /// Boolean marking whether SDBCs are used
   /// Problem parameter list
   const Teuchos::RCP<Teuchos::ParameterList> params;
 };

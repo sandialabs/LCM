@@ -21,8 +21,8 @@ LCM:
         IP Field Layout 0: Tensor
         Output to File: true
     Dirichlet BCs:
-      SDBC on NS NodeSet4 for DOF StrongSchwarz:
-        BC Function: StrongSchwarz
+      DBC on NS NodeSet4 for DOF all:
+        BC Function: Schwarz
         Coupled Application: nobcs_00.yaml
         Coupled Block: Block0
   Discretization:

@@ -21,13 +21,13 @@ LCM:
     # are constrained in their normal direction to suppress rigid-body
     # rotation and lateral motion.
     Dirichlet BCs:
-      SDBC on NS nsx- for DOF X: 0.0
-      SDBC on NS nsx+ for DOF X: 0.0
-      SDBC on NS nsy- for DOF Y: 0.0
-      SDBC on NS nsy+ for DOF Y: 0.0
-      SDBC on NS nsz- for DOF Z: 0.0
-      SDBC on NS nsz+ for DOF StrongSchwarz:
-        BC Function: StrongSchwarz
+      DBC on NS nsx- for DOF X: 0.0
+      DBC on NS nsx+ for DOF X: 0.0
+      DBC on NS nsy- for DOF Y: 0.0
+      DBC on NS nsy+ for DOF Y: 0.0
+      DBC on NS nsz- for DOF Z: 0.0
+      DBC on NS nsz+ for DOF all:
+        BC Function: Schwarz
         Coupled Application: clamped_01.yaml
         Coupled Block: fine
     Response Functions:

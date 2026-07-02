@@ -15,11 +15,12 @@ LCM:
       #Function Data: [0.00000000e+00, 0.00000000e+00, 1.0]
 
     Dirichlet BCs:
-      SDBC on NS nsx- for DOF X: 0.0
-      SDBC on NS nsy- for DOF Y: 0.0
-      SDBC on NS nsz- for DOF Z: 0.0
-      ExpressionEvaluated SDBC on NS nsz+ for DOF Z: '1.0 * t'
-      #Time Dependent DBC on NS nsz+ for DOF Z:
+      DBC on NS nsx- for DOF X: 0.0
+      DBC on NS nsy- for DOF Y: 0.0
+      DBC on NS nsz- for DOF Z: 0.0
+      DBC on NS nsz+ for DOF Z: '1.0 * t'
+      #DBC on NS nsz+ for DOF Z:
+      #  BC Function: Array
         #Number of points: 2
         #Time Values: [0.0, 1.0]
         #BC Values: [0.0, 1.0]

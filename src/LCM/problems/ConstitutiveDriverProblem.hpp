@@ -117,7 +117,6 @@ class ConstitutiveDriverProblem : public Albany::AbstractProblem
 
  protected:
   ///
-  /// Boolean marking whether SDBCs are used
   ///
   /// num of dimensions
   ///

@@ -11,10 +11,10 @@ LCM:
       Function Data: [0.0, 0.0, 0.0]
 
     Dirichlet BCs:
-      SDBC on NS x- for DOF X: 0.0
-      SDBC on NS y- for DOF Y: 0.0
-      SDBC on NS y+ for DOF Y: 0.0
-      SDBC on NS z- for DOF Z: 0.0
+      DBC on NS x- for DOF X: 0.0
+      DBC on NS y- for DOF Y: 0.0
+      DBC on NS y+ for DOF Y: 0.0
+      DBC on NS z- for DOF Z: 0.0
 
     Response Functions:
       Number: 1

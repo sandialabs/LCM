@@ -5,7 +5,8 @@ ANONYMOUS:
     Name: NavierStokes 2D
     Solution Method: Transient Tempus
     Dirichlet BCs:
-      Time Dependent DBC on NS inlet for DOF ux:
+      DBC on NS inlet for DOF ux:
+        BC Function: Array
         Time Values: [0.00000000000000000e+00, 1.00000000000000000e+00, 1.20000000000000000e+01]
         BC Values: [0.00000000000000000e+00, 5.20000000000000000e+01, 5.20000000000000000e+01]
       DBC on NS inlet for DOF uy: 0.00000000000000000e+00

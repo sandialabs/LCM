@@ -5,7 +5,8 @@ LCM:
     Phalanx Graph Visualization Detail: 1
     MaterialDB Filename: 3materials.yaml
     Dirichlet BCs:
-      Time Dependent DBC on NS nodelist_5 for DOF Y:
+      DBC on NS nodelist_5 for DOF Y:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.00000000e+00, 0.50000000, 1.00000000]
         BC Values: [0.00000000e+00, 0.25000000, 0.50000000]

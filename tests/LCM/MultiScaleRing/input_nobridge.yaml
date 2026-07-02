@@ -9,7 +9,8 @@ LCM:
       DBC on NS nodelist_1 for DOF Z: 0.00000000e+00
       DBC on NS nodelist_2 for DOF X: 0.00000000e+00
       DBC on NS nodelist_2 for DOF Z: 0.00000000e+00
-      Time Dependent DBC on NS nodelist_2 for DOF Y:
+      DBC on NS nodelist_2 for DOF Y:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.00000000e+00, 0.01000000]
         BC Values: [0.00000000e+00, 0.00030000]

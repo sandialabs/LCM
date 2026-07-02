@@ -15,17 +15,20 @@ LCM:
     MaterialDB Filename: materials_triaxial.yaml
     Dirichlet BCs:
       DBC on NS NodeSet0 for DOF X: 0.00000000e+00
-      Time Dependent DBC on NS NodeSet1 for DOF X:
+      DBC on NS NodeSet1 for DOF X:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 1.0]
         BC Values: [0.0, -2.50000000e-02]
       DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
-      Time Dependent DBC on NS NodeSet3 for DOF Y:
+      DBC on NS NodeSet3 for DOF Y:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 1.0]
         BC Values: [0.0, -8.00000000e-03]
       DBC on NS NodeSet4 for DOF Z: 0.00000000e+00
-      Time Dependent DBC on NS NodeSet5 for DOF Z:
+      DBC on NS NodeSet5 for DOF Z:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 1.0]
         BC Values: [0.0, -1.20000000e-02]

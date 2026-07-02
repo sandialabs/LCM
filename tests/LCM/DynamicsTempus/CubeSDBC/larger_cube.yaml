@@ -15,15 +15,17 @@ LCM:
     ACE Temperature:
       Variable Type: DOF
     Dirichlet BCs:
-      SDBC on NS -X for DOF X: 0.0
-      SDBC on NS -Y for DOF Y: 0.0
-      SDBC on NS -Z for DOF Z: 0.0
-      SDBC on NS -Z for DOF T: 250.0
-      Time Dependent SDBC on NS +Z for DOF Z:
+      DBC on NS -X for DOF X: 0.0
+      DBC on NS -Y for DOF Y: 0.0
+      DBC on NS -Z for DOF Z: 0.0
+      DBC on NS -Z for DOF T: 250.0
+      DBC on NS +Z for DOF Z:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0e+06]
         BC Values: [0.0, 2.0]
-      Time Dependent SDBC on NS +Z for DOF T:
+      DBC on NS +Z for DOF T:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0e+06]
         BC Values: [250.0, 450.0]

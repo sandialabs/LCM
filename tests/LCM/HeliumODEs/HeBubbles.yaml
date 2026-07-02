@@ -15,7 +15,8 @@ LCM:
       Function: Constant
       Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00056000, 0.00000000e+00]
     Dirichlet BCs:
-      Time Dependent DBC on NS nodelist_4 for DOF Y:
+      DBC on NS nodelist_4 for DOF Y:
+        BC Function: Array
         Number of points: 4
         Time Values: [0.00000000e+00, 86400.00000000, 89400.00000000, 89500.00000000]
         BC Values: [0.00000000e+00, 0.00000000e+00, 0.10000000, 0.10000000]

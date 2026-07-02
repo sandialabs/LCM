@@ -7,12 +7,14 @@ LCM:
       DBC on NS NodeSet3 for DOF X: 0.00000000e+00
       DBC on NS NodeSet1 for DOF Y: 0.00000000e+00
       DBC on NS NodeSet1 for DOF T: 1.00000000
-      Time Dependent DBC on NS NodeSet1 for DOF T:
+      DBC on NS NodeSet1 for DOF T:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.00000000e+00, 0.10000000, 3.15360000e+10]
         BC Values: [0.00000000e+00, 10000.00000000, 10000.00000000]
       DBC on NS NodeSet2 for DOF T: 1.00000000
-      Time Dependent DBC on NS NodeSet2 for DOF T:
+      DBC on NS NodeSet2 for DOF T:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.00000000e+00, 0.10000000, 3.15360000e+10]
         BC Values: [0.00000000e+00, -1.00000000e+04, -1.00000000e+04]

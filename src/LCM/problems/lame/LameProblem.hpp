@@ -85,7 +85,6 @@ class LameProblem : public Albany::AbstractProblem
   std::string                            mtrlDbFilename;
   Teuchos::RCP<Albany::MaterialDatabase> materialDB;
 
-  /// Boolean marking whether SDBCs are used
 };
 
 }  // namespace Albany

@@ -488,18 +488,6 @@ Application::DBCDescriptor::eval(double time) const
 
     case Kind::Schwarz: return schwarz_cached_value;
 
-    case Kind::Torsion: {
-      double const theta = torsion_theta_dot * time;
-      double const dx    = torsion_node_x - torsion_x0;
-      double const dy    = torsion_node_y - torsion_y0;
-      double const c     = std::cos(theta);
-      double const s     = std::sin(theta);
-      if (torsion_component == 0) {
-        return torsion_x0 + dx * c - dy * s - torsion_node_x;
-      }
-      return torsion_y0 + dx * s + dy * c - torsion_node_y;
-    }
-
     case Kind::Kfield: {
       // Linearly interpolate KI(t) and KII(t) from the time series and
       // multiply by the YAML "Kfield KI" / "Kfield KII" scalars (which the
@@ -596,28 +584,6 @@ Application::DBCDescriptor::derivs_at(double time) const
 
     case Kind::Schwarz: return {schwarz_cached_velocity, schwarz_cached_acceleration};
 
-    case Kind::Torsion: {
-      // u(t) = (X - X0) cos(theta_dot t) - (Y - Y0) sin(theta_dot t) - X
-      //      = ... after expanding cos / sin around the moving angle.
-      // Time derivative of the affine offset terms is zero, so v reduces
-      // to the chain rule applied to cos/sin:
-      double const theta = torsion_theta_dot * time;
-      double const dx    = torsion_node_x - torsion_x0;
-      double const dy    = torsion_node_y - torsion_y0;
-      double const c     = std::cos(theta);
-      double const s     = std::sin(theta);
-      double const omega = torsion_theta_dot;
-      double v, a;
-      if (torsion_component == 0) {
-        v = -dx * s * omega - dy * c * omega;
-        a = -dx * c * omega * omega + dy * s * omega * omega;
-      } else {
-        v = dx * c * omega - dy * s * omega;
-        a = -dx * s * omega * omega - dy * c * omega * omega;
-      }
-      return {v, a};
-    }
-
     case Kind::Kfield: {
       double const h_max = 1.0e-6;
       double const h     = (time > h_max) ? h_max : (time > 0.0 ? time : h_max);
@@ -675,11 +641,48 @@ Application::eliminateConstrainedDOFs()
   auto& bc_params = problemParams->sublist("Dirichlet BCs");
 
   // Step 1: Build per-(node_set, eq) descriptors for every constrained DOF.
-  // Supported BC key forms (in order of precedence):
-  //   "DBC on NS <ns> for DOF <dof>"                 → double          → Constant
-  //   "SDBC on NS <ns> for DOF <dof>"                → double          → Constant
-  //   "Time Dependent DBC on NS <ns> for DOF <dof>"  → sublist         → TimeArray
-  //   "ExpressionEvaluated SDBC on NS <ns> for DOF <dof>" → string     → Expression
+  // The canonical (and only) key form is
+  //
+  //   "DBC on NS <nodeset> for DOF <dof>": <value>
+  //
+  // dispatched on the VALUE type:
+  //   double  → Constant
+  //   string  → Expression in x, y, z, t (STK expreval)
+  //   sublist → named function, selected by the required "BC Function" entry:
+  //     "Array"                     → piecewise-linear in time ("Time Values"/
+  //                                   "BC Values" inline, or "Time File"/"BC File")
+  //     "Schwarz"                   → value from the coupled subdomain; only on
+  //                                   the pseudo-DOF "all" (covers every equation)
+  //     "Kfield"                    → Williams crack-tip solution; only on the
+  //                                   pseudo-DOF "K" (writes X and Y)
+  //     "Equilibrium Concentration" → concentration from the local pressure DOF
+  //
+  // Every entry in the "Dirichlet BCs" list must match this form. Anything
+  // else — including the retired spellings "SDBC on NS", "Time Dependent
+  // DBC/SDBC on NS", "ExpressionEvaluated SDBC on NS", "Pressure Dependent
+  // DBC on NS", and the pseudo-DOFs "StrongSchwarz" and "twist" — is
+  // rejected here, before parsing.
+  {
+    std::set<std::string> valid_keys;
+    for (auto const& ns : node_set_ids) {
+      for (auto const& dof : bc_names) valid_keys.insert("DBC on NS " + ns + " for DOF " + dof);
+      valid_keys.insert("DBC on NS " + ns + " for DOF K");
+      valid_keys.insert("DBC on NS " + ns + " for DOF all");
+    }
+    std::string bad;
+    for (auto it = bc_params.begin(); it != bc_params.end(); ++it) {
+      std::string const& key = bc_params.name(it);
+      if (valid_keys.count(key) == 0) bad += "\n  " + key;
+    }
+    ALBANY_ASSERT(
+        bad.empty(),
+        "Unrecognized Dirichlet BC key(s):" + bad +
+            "\nThe only accepted form is \"DBC on NS <nodeset> for DOF <dof>\", where "
+            "<nodeset> is a mesh node set and <dof> is one of the problem's DBC names "
+            "(or the pseudo-DOFs \"K\" for Kfield and \"all\" for Schwarz), with a "
+            "double (constant), string (expression in x, y, z, t), or sublist "
+            "(BC Function: Array | Schwarz | Kfield | Equilibrium Concentration) value.");
+  }
   std::map<GO, DBCDescriptor> local_gid_desc_map;
 
   for (std::size_t i = 0; i < node_set_ids.size(); ++i) {
@@ -701,46 +704,73 @@ Application::eliminateConstrainedDOFs()
       // Build a descriptor prototype for this (ns, dof) pair.
       DBCDescriptor proto;
 
-      std::string const dbc_key   = "DBC on NS " + ns + " for DOF " + dof;
-      std::string const sdbc_key  = "SDBC on NS " + ns + " for DOF " + dof;
-      std::string const tdep_key  = "Time Dependent DBC on NS " + ns + " for DOF " + dof;
-      std::string const tdep_skey = "Time Dependent SDBC on NS " + ns + " for DOF " + dof;
-      std::string const expr_key  = "ExpressionEvaluated SDBC on NS " + ns + " for DOF " + dof;
+      std::string const dbc_key = "DBC on NS " + ns + " for DOF " + dof;
 
       if (bc_params.isType<double>(dbc_key)) {
         proto.kind     = DBCDescriptor::Kind::Constant;
         proto.constant = bc_params.get<double>(dbc_key);
-      } else if (bc_params.isType<double>(sdbc_key)) {
-        proto.kind     = DBCDescriptor::Kind::Constant;
-        proto.constant = bc_params.get<double>(sdbc_key);
-      } else if (bc_params.isSublist(tdep_key) || bc_params.isSublist(tdep_skey)) {
-        auto& tlist    = bc_params.sublist(bc_params.isSublist(tdep_key) ? tdep_key : tdep_skey);
-        proto.kind     = DBCDescriptor::Kind::TimeArray;
-        // Accept either inline "Time Values"/"BC Values" arrays or file-backed
-        // "Time File"/"BC File" (whitespace-separated array text, as parsed by
-        // Albany_BCUtils_Def's weak-path reader).
-        auto read_array = [](Teuchos::ParameterList& list, char const* values_key, char const* file_key) {
-          if (list.isParameter(file_key)) {
-            auto const filename = list.get<std::string>(file_key);
-            std::ifstream file(filename);
-            ALBANY_ASSERT(file.good(), "Error opening " + std::string(file_key) + ": " + filename);
-            std::stringstream buffer;
-            buffer << file.rdbuf();
-            std::istringstream iss(buffer.str());
-            Teuchos::Array<double> a;
-            iss >> a;
-            return a;
-          }
-          return list.get<Teuchos::Array<double>>(values_key);
-        };
-        auto tv        = read_array(tlist, "Time Values", "Time File");
-        auto bv        = read_array(tlist, "BC Values",   "BC File");
-        proto.times    = tv.toVector();
-        proto.values   = bv.toVector();
-      } else if (bc_params.isType<std::string>(expr_key)) {
+      } else if (bc_params.isType<std::string>(dbc_key)) {
         proto.kind     = DBCDescriptor::Kind::Expression;
-        proto.expr_str = bc_params.get<std::string>(expr_key);
+        proto.expr_str = bc_params.get<std::string>(dbc_key);
         // Coordinates are per-node and filled in the loop below.
+      } else if (bc_params.isSublist(dbc_key)) {
+        auto& sub = bc_params.sublist(dbc_key);
+        ALBANY_ASSERT(
+            sub.isType<std::string>("BC Function"),
+            "Dirichlet BC \"" + dbc_key + "\": a sublist value requires a \"BC Function\" string entry "
+            "(Array | Schwarz | Kfield | Equilibrium Concentration).");
+        std::string const bc_fn = sub.get<std::string>("BC Function");
+        if (bc_fn == "Array") {
+          proto.kind = DBCDescriptor::Kind::TimeArray;
+          // Accept either inline "Time Values"/"BC Values" arrays or file-backed
+          // "Time File"/"BC File" (whitespace-separated array text).
+          auto read_array = [](Teuchos::ParameterList& list, char const* values_key, char const* file_key) {
+            if (list.isParameter(file_key)) {
+              auto const filename = list.get<std::string>(file_key);
+              std::ifstream file(filename);
+              ALBANY_ASSERT(file.good(), "Error opening " + std::string(file_key) + ": " + filename);
+              std::stringstream buffer;
+              buffer << file.rdbuf();
+              std::istringstream iss(buffer.str());
+              Teuchos::Array<double> a;
+              iss >> a;
+              return a;
+            }
+            return list.get<Teuchos::Array<double>>(values_key);
+          };
+          auto tv      = read_array(sub, "Time Values", "Time File");
+          auto bv      = read_array(sub, "BC Values",   "BC File");
+          proto.times  = tv.toVector();
+          proto.values = bv.toVector();
+        } else if (bc_fn == "Equilibrium Concentration") {
+          // Coupled BC: the concentration at each node depends on the local
+          // pressure DOF ("TAU") through c_bc = applied * exp(pressure_factor * P).
+          // Injection reads the pressure from the overlap solution.
+          int p_eq = -1;
+          for (std::size_t e = 0; e < bc_names.size(); ++e) {
+            if (bc_names[e] == "TAU") p_eq = static_cast<int>(e);
+          }
+          ALBANY_ASSERT(
+              p_eq >= 0,
+              "Dirichlet BC \"" + dbc_key + "\": BC Function \"Equilibrium Concentration\" requires "
+              "a pressure DOF named \"TAU\" in this problem.");
+          proto.kind                   = DBCDescriptor::Kind::EquilibriumConcentration;
+          proto.eqconc_applied         = sub.get<double>("Applied Concentration");
+          proto.eqconc_pressure_factor = sub.get<double>("Pressure Factor");
+          // Overlap LID of the pressure DOF at this node — resolved at
+          // descriptor finalization by adding (p_eq - eq) to the
+          // concentration overlap LID. Stride is +/- per DOF here:
+          proto.eqconc_pressure_overlap_lid = p_eq - eq;
+        } else {
+          ALBANY_ABORT(
+              "Dirichlet BC \"" + dbc_key + "\": unrecognized BC Function \"" + bc_fn +
+              "\". Valid on a real DOF: Array | Equilibrium Concentration. "
+              "Schwarz goes on the pseudo-DOF \"all\"; Kfield on the pseudo-DOF \"K\".");
+        }
+      } else if (bc_params.isParameter(dbc_key)) {
+        ALBANY_ABORT(
+            "Dirichlet BC \"" + dbc_key + "\": value must be a double (constant), a string "
+            "(expression in x, y, z, t), or a sublist with a \"BC Function\" entry.");
       } else {
         // No matching BC entry — this node set / DOF has no DBC.
         continue;
@@ -759,146 +789,83 @@ Application::eliminateConstrainedDOFs()
       }
     }
 
-    std::string const& schwarz_ns = node_set_ids[i];
+    std::string const& ns_id = node_set_ids[i];
 
-    // Check for Torsion SDBC: rotation BC on a single nodeset that writes
-    // both x and y displacement DOFs. YAML key form:
-    //   "DBC on NS <ns> for DOF twist":
-    //     BC Function: Torsion
-    //     Theta Dot:  <double>
-    //     X0:         <double>
-    //     Y0:         <double>
-    std::string const torsion_key = "DBC on NS " + schwarz_ns + " for DOF twist";
-    if (bc_params.isSublist(torsion_key) && ns_coords != nullptr) {
-      auto const& torsion_sub = bc_params.sublist(torsion_key);
-      if (torsion_sub.get<std::string>("BC Function") == "Torsion") {
-        double const theta_dot = torsion_sub.get<double>("Theta Dot");
-        double const x0        = torsion_sub.get<double>("X0");
-        double const y0        = torsion_sub.get<double>("Y0");
-        for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
-          double* c = (*ns_coords)[ni];
-          for (int comp = 0; comp < 2; ++comp) {
-            GO const      dof_gid       = stk_disc->getGlobalDOF(node_gids[ni], comp);
-            DBCDescriptor desc;
-            desc.kind              = DBCDescriptor::Kind::Torsion;
-            desc.torsion_theta_dot = theta_dot;
-            desc.torsion_x0        = x0;
-            desc.torsion_y0        = y0;
-            desc.torsion_node_x    = c[0];
-            desc.torsion_node_y    = c[1];
-            desc.torsion_component = comp;
-            local_gid_desc_map[dof_gid] = desc;
-          }
-        }
-      }
-    }
-
-    // Check for Kfield BC: plane-strain crack-tip Williams' solution on a
-    // single nodeset that writes both x and y displacement DOFs. YAML key
-    // form:
+    // Kfield BC on the pseudo-DOF "K": plane-strain crack-tip Williams'
+    // solution on a single nodeset; writes both x and y displacement DOFs.
+    // YAML key form:
     //   "DBC on NS <ns> for DOF K":
     //     BC Function: Kfield
-    //     Number of points: <int>
     //     Time Values: [...]
     //     KI Values:   [...]
     //     KII Values:  [...]
-    //     Shear Modulus: <double>
+    //     Kfield KI:      <double>
+    //     Kfield KII:     <double>
+    //     Shear Modulus:  <double>
     //     Poissons Ratio: <double>
-    std::string const kfield_key = "DBC on NS " + schwarz_ns + " for DOF K";
+    std::string const kfield_key = "DBC on NS " + ns_id + " for DOF K";
     if (bc_params.isSublist(kfield_key) && ns_coords != nullptr) {
       auto const& k_sub = bc_params.sublist(kfield_key);
-      if (k_sub.get<std::string>("BC Function") == "Kfield") {
-        auto const& ttv   = k_sub.get<Teuchos::Array<double>>("Time Values");
-        auto const& kiv   = k_sub.get<Teuchos::Array<double>>("KI Values");
-        auto const& kiiv  = k_sub.get<Teuchos::Array<double>>("KII Values");
-        double const mu        = k_sub.get<double>("Shear Modulus");
-        double const nu        = k_sub.get<double>("Poissons Ratio");
-        double const ki_scale  = k_sub.get<double>("Kfield KI");
-        double const kii_scale = k_sub.get<double>("Kfield KII");
-        for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
-          double* c = (*ns_coords)[ni];
-          double const r     = std::sqrt(c[0] * c[0] + c[1] * c[1]);
-          double const th    = std::atan2(c[1], c[0]);
-          for (int comp = 0; comp < 2; ++comp) {
-            GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], comp);
-            DBCDescriptor desc;
-            desc.kind               = DBCDescriptor::Kind::Kfield;
-            desc.kfield_time_values = ttv.toVector();
-            desc.kfield_ki_values   = kiv.toVector();
-            desc.kfield_kii_values  = kiiv.toVector();
-            desc.kfield_mu          = mu;
-            desc.kfield_nu          = nu;
-            desc.kfield_ki_scale    = ki_scale;
-            desc.kfield_kii_scale   = kii_scale;
-            desc.kfield_r           = r;
-            desc.kfield_theta       = th;
-            desc.kfield_component   = comp;
-            local_gid_desc_map[dof_gid] = desc;
-          }
+      ALBANY_ASSERT(
+          k_sub.isType<std::string>("BC Function") && k_sub.get<std::string>("BC Function") == "Kfield",
+          "Dirichlet BC \"" + kfield_key + "\": the pseudo-DOF \"K\" requires \"BC Function: Kfield\".");
+      auto const& ttv   = k_sub.get<Teuchos::Array<double>>("Time Values");
+      auto const& kiv   = k_sub.get<Teuchos::Array<double>>("KI Values");
+      auto const& kiiv  = k_sub.get<Teuchos::Array<double>>("KII Values");
+      double const mu        = k_sub.get<double>("Shear Modulus");
+      double const nu        = k_sub.get<double>("Poissons Ratio");
+      double const ki_scale  = k_sub.get<double>("Kfield KI");
+      double const kii_scale = k_sub.get<double>("Kfield KII");
+      for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
+        double* c = (*ns_coords)[ni];
+        double const r     = std::sqrt(c[0] * c[0] + c[1] * c[1]);
+        double const th    = std::atan2(c[1], c[0]);
+        for (int comp = 0; comp < 2; ++comp) {
+          GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], comp);
+          DBCDescriptor desc;
+          desc.kind               = DBCDescriptor::Kind::Kfield;
+          desc.kfield_time_values = ttv.toVector();
+          desc.kfield_ki_values   = kiv.toVector();
+          desc.kfield_kii_values  = kiiv.toVector();
+          desc.kfield_mu          = mu;
+          desc.kfield_nu          = nu;
+          desc.kfield_ki_scale    = ki_scale;
+          desc.kfield_kii_scale   = kii_scale;
+          desc.kfield_r           = r;
+          desc.kfield_theta       = th;
+          desc.kfield_component   = comp;
+          local_gid_desc_map[dof_gid] = desc;
         }
       }
     }
 
-    // Check for Equilibrium Concentration BC: coupled BC where the
-    // concentration at each node depends on the local pressure DOF value
-    // through c_bc = applied * exp(pressure_factor * P). YAML key form:
-    //   "Pressure Dependent DBC on NS <ns> for DOF C":
-    //     BC Function: Equilibrium Concentration
-    //     Applied Concentration: <double>
-    //     Pressure Factor:       <double>
-    // The descriptor identifies the local pressure DOF by its equation
-    // offset (the "TAU" entry in bc_names_); injection reads the pressure
-    // value from the overlap solution and computes the concentration.
-    {
-      int c_eq = -1;
-      int p_eq = -1;
-      for (std::size_t e = 0; e < bc_names.size(); ++e) {
-        if (bc_names[e] == "C")   c_eq = static_cast<int>(e);
-        if (bc_names[e] == "TAU") p_eq = static_cast<int>(e);
-      }
-      if (c_eq >= 0 && p_eq >= 0) {
-        std::string const eqconc_key = "Pressure Dependent DBC on NS " + schwarz_ns + " for DOF " + bc_names[c_eq];
-        if (bc_params.isSublist(eqconc_key)) {
-          auto const& ec_sub = bc_params.sublist(eqconc_key);
-          if (ec_sub.get<std::string>("BC Function") == "Equilibrium Concentration") {
-            double const applied = ec_sub.get<double>("Applied Concentration");
-            double const pf      = ec_sub.get<double>("Pressure Factor");
-            for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
-              GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], c_eq);
-              DBCDescriptor desc;
-              desc.kind                   = DBCDescriptor::Kind::EquilibriumConcentration;
-              desc.eqconc_applied         = applied;
-              desc.eqconc_pressure_factor = pf;
-              // Overlap LID of the pressure DOF at this node — resolved
-              // at descriptor finalization by adding (p_eq - c_eq) to the
-              // concentration overlap LID. Stride is +/- per DOF here:
-              desc.eqconc_pressure_overlap_lid = p_eq - c_eq;
-              local_gid_desc_map[dof_gid]      = desc;
-            }
-          }
-        }
-      }
-    }
-
-    // Check for StrongSchwarz SDBC (one sublist entry covers all equations).
-    std::string const  schwarz_key = "SDBC on NS " + schwarz_ns + " for DOF StrongSchwarz";
+    // Schwarz BC on the pseudo-DOF "all": one sublist entry covers every
+    // equation on the nodeset; values come from the coupled subdomain's
+    // overlap solution via DTK transfer. YAML key form:
+    //   "DBC on NS <ns> for DOF all":
+    //     BC Function: Schwarz
+    //     Coupled Application: <name>
+    std::string const schwarz_key = "DBC on NS " + ns_id + " for DOF all";
     if (bc_params.isSublist(schwarz_key)) {
-      auto const& schwarz_sub        = bc_params.sublist(schwarz_key);
+      auto const& schwarz_sub = bc_params.sublist(schwarz_key);
+      ALBANY_ASSERT(
+          schwarz_sub.isType<std::string>("BC Function") && schwarz_sub.get<std::string>("BC Function") == "Schwarz",
+          "Dirichlet BC \"" + schwarz_key + "\": the pseudo-DOF \"all\" requires \"BC Function: Schwarz\".");
       std::string const coupled_name = schwarz_sub.get<std::string>("Coupled Application");
       // Record the coupling for the collective DTK transfer driver. Every
       // rank reads the same YAML, so every rank registers the same coupling
       // here — even ranks whose local mesh slice ghosts no Schwarz DOFs. This
       // keeps Albany::computeSchwarzTransferDTK called consistently across
       // ranks (DTK MapOperator::setup/apply is collective on the MPI comm).
-      dbc_state_.schwarz_couplings.emplace_back(coupled_name, schwarz_ns);
-      int const neq_strong_schwarz = static_cast<int>(bc_names.size());
-      for (int eq = 0; eq < neq_strong_schwarz; ++eq) {
+      dbc_state_.schwarz_couplings.emplace_back(coupled_name, ns_id);
+      int const neq_schwarz = static_cast<int>(bc_names.size());
+      for (int eq = 0; eq < neq_schwarz; ++eq) {
         for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
           GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], eq);
           DBCDescriptor desc;
           desc.kind                     = DBCDescriptor::Kind::Schwarz;
           desc.schwarz_coupled_app_name = coupled_name;
-          desc.schwarz_nodeset_id       = schwarz_ns;
+          desc.schwarz_nodeset_id       = ns_id;
           desc.schwarz_ns_node_idx      = static_cast<int>(ni);
           desc.schwarz_eq               = eq;
           local_gid_desc_map[dof_gid]   = desc;

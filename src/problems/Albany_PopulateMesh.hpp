@@ -113,7 +113,6 @@ class PopulateMesh : public Albany::AbstractProblem
 
   std::string                        cellEBName;
   std::map<std::string, std::string> sideEBName;
-  /// Boolean marking whether SDBCs are used
 };
 
 // ================================ IMPLEMENTATION ============================

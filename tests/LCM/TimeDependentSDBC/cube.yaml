@@ -17,10 +17,11 @@ LCM:
     MaterialDB Filename: 'material.yaml'
     Solution Method: Continuation
     Dirichlet BCs:
-      SDBC on NS nodelist_1 for DOF X: 0.0
-      SDBC on NS nodelist_3 for DOF Y: 0.0
-      SDBC on NS nodelist_5 for DOF Z: 0.0
-      Time Dependent SDBC on NS nodelist_6 for DOF Z:
+      DBC on NS nodelist_1 for DOF X: 0.0
+      DBC on NS nodelist_3 for DOF Y: 0.0
+      DBC on NS nodelist_5 for DOF Z: 0.0
+      DBC on NS nodelist_6 for DOF Z:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0]
         BC Values: [0.0, 2.0]

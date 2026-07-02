@@ -15,7 +15,7 @@ LCM:
       Function: Constant
       Function Data: [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00003870, 0.00000000e+00]
     Dirichlet BCs:
-      Pressure Dependent DBC on NS nodelist_3 for DOF C:
+      DBC on NS nodelist_3 for DOF C:
         BC Function: Equilibrium Concentration
         Applied Concentration: 0.00056000
         Pressure Factor: 801.86031593

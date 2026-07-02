@@ -21,15 +21,17 @@ LCM:
     Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: materials.yaml
     Dirichlet BCs:
-      #SDBC on NS lower_grip for DOF X: 0.0
-      #SDBC on NS lower_grip for DOF Z: 0.0
-      Time Dependent SDBC on NS lower_grip for DOF Y:
+      #DBC on NS lower_grip for DOF X: 0.0
+      #DBC on NS lower_grip for DOF Z: 0.0
+      DBC on NS lower_grip for DOF Y:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0e-3]
         BC Values: [0.0, -0.02]
-      #SDBC on NS upper_grip for DOF X: 0.0
-      #SDBC on NS upper_grip for DOF Z: 0.0
-      Time Dependent SDBC on NS upper_grip for DOF Y:
+      #DBC on NS upper_grip for DOF X: 0.0
+      #DBC on NS upper_grip for DOF Z: 0.0
+      DBC on NS upper_grip for DOF Y:
+        BC Function: Array
         Number of points: 2
         Time Values: [0.0, 2.0e-3]
         BC Values: [0.0, 0.02]

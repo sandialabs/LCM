@@ -6,11 +6,13 @@ LCM:
     MaterialDB Filename: SingleSlip_Implicit_Material.yaml
     Register dirichlet_field: true
     Dirichlet BCs:
-      Time Dependent DBC on NS nodelist_2 for DOF X:
+      DBC on NS nodelist_2 for DOF X:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.00000000e+00, 1.00000000, 2.00000000]
         BC Values: [0.00000000e+00, 1.00000000, 2.00000000]
-      Time Dependent DBC on NS nodelist_12 for DOF X:
+      DBC on NS nodelist_12 for DOF X:
+        BC Function: Array
         Number of points: 3
         Time Values: [0.00000000e+00, 1.00000000, 2.00000000]
         BC Values: [0.00000000e+00, 1.00000000, 2.00000000]

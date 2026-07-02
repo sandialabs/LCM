@@ -80,7 +80,6 @@ class PNPProblem : public Albany::AbstractProblem
 
   Teuchos::RCP<Albany::Layouts> dl;
 
-  /// Boolean marking whether SDBCs are used
   /// Problem parameter list
   const Teuchos::RCP<Teuchos::ParameterList> params;
 };

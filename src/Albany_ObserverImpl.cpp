@@ -5,12 +5,46 @@
 
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include "Albany_AbstractDiscretization.hpp"
+#include "Albany_Application.hpp"
 #include "Albany_DistributedParameterLibrary.hpp"
+#include "Albany_Utils.hpp"
 #include "Teuchos_VerboseObject.hpp"
 
 namespace Albany {
+
+void
+ObserverImpl::projectNodalFields(double stamp)
+{
+  // Build the projectors once, from every "Project IP to Nodal Field" response
+  // the problem declares (same field list the response used). They read the
+  // saved quadrature-point states and write the proj_nodal_* nodal states the
+  // response already registered, so nothing here depends on the response ever
+  // being evaluated.
+  if (!projectors_built_) {
+    projectors_built_ = true;
+    auto problem_pl   = app_->getProblemPL();
+    if (problem_pl->isSublist("Response Functions")) {
+      auto&     rf       = problem_pl->sublist("Response Functions");
+      int const num_resp = rf.get<int>("Number", 0);
+      for (int r = 0; r < num_resp; ++r) {
+        if (rf.get<std::string>(Albany::strint("Response", r), "") != "Project IP to Nodal Field") continue;
+        auto&     rp = rf.sublist(Albany::strint("ResponseParams", r));
+        int const nf = rp.get<int>("Number of Fields", 0);
+        std::vector<NodalFieldProjector::FieldSpec> fields;
+        for (int f = 0; f < nf; ++f) {
+          fields.push_back({rp.get<std::string>(Albany::strint("IP Field Name", f)), rp.get<std::string>(Albany::strint("IP Field Layout", f))});
+        }
+        std::string const mass_matrix_type = rp.get<std::string>("Mass Matrix Type", "Full");
+        bool const        output_to_exodus = rp.get<bool>("Output to File", true);
+        projectors_.push_back(Teuchos::rcp(new NodalFieldProjector(app_, fields, mass_matrix_type, output_to_exodus)));
+      }
+    }
+  }
+  for (auto const& projector : projectors_) projector->project(stamp);
+}
 
 namespace {
 // Phase 0 gate: set ALBANY_TEST_REBUILD_WORKSETS=1 to exercise the
@@ -58,6 +92,11 @@ ObserverImpl::observeSolution(
         /*overlapped*/ true);
   }
 
+  // Project the just-saved quadrature-point states to nodal fields before the
+  // write, so the written frame (including the first dynamic step) carries the
+  // correct proj_nodal_* fields (GitHub #11).
+  projectNodalFields(stamp);
+
   StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
 
   // M3a: activePart-based element death is on by default. The function
@@ -75,6 +114,10 @@ ObserverImpl::observeSolution(double stamp, const Thyra_MultiVector& nonOverlapp
 {
   app_->evaluateStateFieldManager(stamp, nonOverlappedSolution);
   app_->getStateMgr().updateStates();
+  // See the vector overload: project before the write so the MultiVector
+  // (e.g. Trapezoid) path, whose observer omits observeResponse entirely, still
+  // gets non-zero proj_nodal_* fields (GitHub #11).
+  projectNodalFields(stamp);
   StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution);
 
   // M3a: activePart-based element death is on by default. The function

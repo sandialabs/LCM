@@ -5,7 +5,9 @@
 #define ALBANY_OBSERVER_IMPL_HPP
 
 #include <string>
+#include <vector>
 
+#include "Albany_NodalFieldProjector.hpp"
 #include "Albany_StatelessObserverImpl.hpp"
 
 namespace Albany {
@@ -27,6 +29,18 @@ class ObserverImpl : public StatelessObserverImpl
 
   void
   parameterChanged(std::string const& param);
+
+ private:
+  // Project saved quadrature-point states to nodal fields, driven explicitly
+  // just before each solution write. Built lazily from the problem's "Project
+  // IP to Nodal Field" responses (the standalone projector supersedes the
+  // response-based projection, whose evaluation lags the output write and so
+  // leaves the first written dynamic step's nodal fields zero -- GitHub #11).
+  void
+  projectNodalFields(double stamp);
+
+  std::vector<Teuchos::RCP<NodalFieldProjector>> projectors_;
+  bool                                           projectors_built_{false};
 };
 
 }  // namespace Albany

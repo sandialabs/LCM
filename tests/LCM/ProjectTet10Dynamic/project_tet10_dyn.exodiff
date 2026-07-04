@@ -1,0 +1,22 @@
+#  ***************************************************************************
+#  Regression test for the nodal projection in dynamic runs (GitHub issue
+#  #11). A Tet<10> cube is run with implicit dynamics and "Project IP to
+#  Nodal Field" at Exodus Write Interval 1. The projection is driven from
+#  the solution observer (before each write), so proj_nodal_* is correct in
+#  every written frame, including the first computed step -- the response-
+#  based projection used to leave that first frame zero.
+#
+#  The sharp signal is proj_nodal_linear: the built-in linear field
+#  1.5*x - 0.8*y + 1.1*z, recovered to machine precision at every node and
+#  EVERY frame. Checked ABSOLUTE at 1e-10 -- if the first frame regresses to
+#  zero (the #11 bug), it reads 0 instead of the linear field and fails.
+#  ***************************************************************************
+
+COORDINATES absolute 1.e-6
+
+TIME STEPS relative 1.e-6 floor 0.0
+
+NODAL VARIABLES relative 1.0e-5 floor 1.0e-9
+	proj_nodal_linear   absolute 1.0e-10
+
+ELEMENT VARIABLES relative 1.0e-5 floor 1.0e-8

@@ -1,0 +1,21 @@
+#  ***************************************************************************
+#  Regression test for the 10-node-tet nodal projection (GitHub issue #12).
+#  A composite Tet<10> cube is projected with "Project IP to Nodal Field".
+#
+#  The sharp regression signal is proj_nodal_linear: the built-in linear
+#  field 1.5*x - 0.8*y + 1.1*z, which a correct linear Tet<4> down-cast
+#  projection recovers to machine precision at every node. It is checked
+#  ABSOLUTE at 1e-10 -- a broken projection is off by O(0.1-1), so this
+#  catches any regression while being build-independent. The projected and
+#  raw Cauchy stress are checked relative to guard the projected values and
+#  the solve.
+#  ***************************************************************************
+
+COORDINATES absolute 1.e-6
+
+TIME STEPS relative 1.e-6 floor 0.0
+
+NODAL VARIABLES relative 1.0e-5 floor 1.0e-9
+	proj_nodal_linear   absolute 1.0e-10
+
+ELEMENT VARIABLES relative 1.0e-5 floor 1.0e-8

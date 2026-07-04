@@ -6,7 +6,9 @@
 #include "Albany_config.h"
 #include "ProjectIPtoNodalField.hpp"
 // #include "Albany_ProblemUtils.hpp"
+#include <Intrepid2_HGRAD_TET_C1_FEM.hpp>
 #include <Phalanx_DataLayout_MDALayout.hpp>
+#include <Shards_BasicTopologies.hpp>
 #include <Teuchos_AbstractFactoryStd.hpp>
 
 #include "Albany_GlobalLocalIndexer.hpp"
@@ -90,9 +92,25 @@ class ProjectIPtoNodalFieldQuadrature
   CellTopologyData                           ctd_;
   Teuchos::RCP<shards::CellTopology>         cell_topo_;
   Kokkos::DynRankView<RealType, PHX::Device> ref_points_, ref_weights_;
+  // Tet<10> "down-cast to linear Tet<4>" projection (composite or standard):
+  // the quadrature carries the 4-node linear basis, evaluated at the element's
+  // own integration points, so the projection lands on the 4 corner nodes and
+  // the 6 edge nodes are filled by interpolation afterward (issue #12; mirrors
+  // Sierra/Adagio's getExtrapolationMasterElement).
+  bool tet4_projection_{false};
 
  public:
   ProjectIPtoNodalFieldQuadrature(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl, const CellTopologyData& ctd, int const degree);
+  bool
+  isTet4Projection() const
+  {
+    return tet4_projection_;
+  }
+  int
+  numProjNodes() const
+  {
+    return intrepid_basis_->getCardinality();
+  }
   void
   evaluateBasis(const PHX::MDField<const MeshScalarT, Cell, Vertex, Dim>& coords_verts);
   const PHX::MDField<RealType, Cell, Node, QuadPoint>&
@@ -124,32 +142,48 @@ ProjectIPtoNodalFieldQuadrature::ProjectIPtoNodalFieldQuadrature(
     int const                            degree)
     : ctd_(ctd)
 {
-  cell_topo_ = Teuchos::rcp(new shards::CellTopology(&ctd_));
+  const Teuchos::RCP<Teuchos::ParameterList>& pfp       = p.get<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem", Teuchos::null);
+  bool const                                  composite = pfp.is_null() ? false : pfp->get<bool>("Use Composite Tet 10", false);
+
+  // A 10-node tet -- composite or standard quadratic -- is projected using the
+  // linear Tet<4> basis (issue #12; the composite COMP12 L2 projection does not
+  // recover even a linear field, and Sierra/Adagio down-casts to Tet<4> for all
+  // tet10s). The IP field values live at the element's own integration points,
+  // so the cubature must be the element's: Tetrahedron<11> yields the composite
+  // rule, Tetrahedron<10> the standard rule. The Jacobian (element measure) is
+  // taken on the true Tet<10> geometry via cell_topo_.
+  tet4_projection_ = (ctd_.dimension == 3 && ctd_.node_count == 10);
+
+  Teuchos::RCP<shards::CellTopology> cub_topo;
+  if (tet4_projection_) {
+    static bool warned = false;
+    if (!warned) {
+      warned = true;
+      *Teuchos::VerboseObjectBase::getDefaultOStream()
+          << "WARNING: Project IP to Nodal Field down-casts the 10-node "
+          << (composite ? "composite " : "") << "tetrahedron to a 4-node linear tetrahedron: it projects the "
+          << "element variables onto the 4 corner nodes and then interpolates "
+          << "those to the 6 edge nodes.\n";
+    }
+    cell_topo_      = Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Tetrahedron<10>>()));
+    cub_topo        = composite ? Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Tetrahedron<11>>())) : cell_topo_;
+    intrepid_basis_ = Teuchos::rcp(new Intrepid2::Basis_HGRAD_TET_C1_FEM<PHX::Device>());
+  } else {
+    cell_topo_      = Teuchos::rcp(new shards::CellTopology(&ctd_));
+    cub_topo        = cell_topo_;
+    intrepid_basis_ = Albany::getIntrepid2Basis(ctd_, /*compositeTet=*/false);
+  }
+
   Intrepid2::DefaultCubatureFactory              cubFactory;
-  Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cell_topo_, degree);
+  Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature = cubFactory.create<PHX::Device, RealType, RealType>(*cub_topo, degree);
   int const                                      nqp = cubature->getNumPoints(), nd = cubature->getDimension();
   ref_points_  = Kokkos::DynRankView<RealType, PHX::Device>("XXX", nqp, nd);
   ref_weights_ = Kokkos::DynRankView<RealType, PHX::Device>("XXX", nqp);
   cubature->getCubature(ref_points_, ref_weights_);
 
-  // Composite Tet<10> is not supported for the L2 projection: the COMP12 basis
-  // does not recover even a linear field through this projection (a DOF-ordering
-  // / composite-cubature issue; see GitHub issue #12). Fail loudly instead of
-  // returning a silently wrong nodal field. Use "IP to Nodal Field" (no
-  // projection) for composite tets.
-  const Teuchos::RCP<Teuchos::ParameterList>& pfp       = p.get<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem", Teuchos::null);
-  bool const                                  composite = pfp.is_null() ? false : pfp->get<bool>("Use Composite Tet 10", false);
-
-  ALBANY_ASSERT(
-      !composite,
-      "\n Project IP to Nodal Field is not supported with Composite Tet 10s. \n"
-          << "Re-run with Use Composite Tet 10 = false or with the IP to Nodal "
-             "Field response. \n");
-
-  intrepid_basis_ = Albany::getIntrepid2Basis(ctd_, composite);
-
+  int const                                     ncard          = intrepid_basis_->getCardinality();
   typedef PHX::MDALayout<Cell, Node, QuadPoint> Layout;
-  Teuchos::RCP<Layout>                          node_qp_scalar = Teuchos::rcp(new Layout(dl->node_qp_scalar->extent(0), dl->node_qp_scalar->extent(1), nqp));
+  Teuchos::RCP<Layout>                          node_qp_scalar = Teuchos::rcp(new Layout(dl->node_qp_scalar->extent(0), ncard, nqp));
   bf_                                                          = decltype(bf_)("my BF", node_qp_scalar);
   bf_const_                                                    = decltype(bf_const_)("my BF", node_qp_scalar);
   wbf_                                                         = decltype(wbf_)("my wBF", node_qp_scalar);
@@ -167,9 +201,10 @@ ProjectIPtoNodalFieldQuadrature::evaluateBasis(const PHX::MDField<const MeshScal
 {
   using namespace Intrepid2;
   typedef CellTools<PHX::Device>             CellTools;
-  int const                                  nqp = ref_points_.extent(0), nd = ref_points_.extent(1), nc = coord_vert.extent(0), nn = coord_vert.extent(1);
+  int const                                  nqp = ref_points_.extent(0), nd = ref_points_.extent(1), nc = coord_vert.extent(0);
+  int const                                  ncard = intrepid_basis_->getCardinality();
   Kokkos::DynRankView<RealType, PHX::Device> jacobian("JJJ", nc, nqp, nd, nd), jacobian_det("JJJ", nc, nqp), weighted_measure("JJJ", nc, nqp),
-      val_ref_points("JJJ", nn, nqp);
+      val_ref_points("JJJ", ncard, nqp);
   CellTools::setJacobian(jacobian, ref_points_, coord_vert.get_view(), *cell_topo_);
   CellTools::setJacobianDet(jacobian_det, jacobian);
   intrepid_basis_->getValues(val_ref_points, ref_points_, Intrepid2::OPERATOR_VALUE);
@@ -181,6 +216,12 @@ ProjectIPtoNodalFieldQuadrature::evaluateBasis(const PHX::MDField<const MeshScal
 static Teuchos::RCP<ProjectIPtoNodalFieldQuadrature>
 initQuadMgr(Teuchos::ParameterList& p, const Teuchos::RCP<Albany::Layouts>& dl, Albany::MeshSpecsStruct const* mesh_specs)
 {
+  // 10-node tets (composite or standard) are down-cast to a linear Tet<4>
+  // projection (issue #12). The quadrature uses the element's own cubature
+  // degree so its integration points coincide with the saved IP data.
+  bool const is_tet10 = mesh_specs->ctd.dimension == 3 && mesh_specs->ctd.node_count == 10;
+  if (is_tet10) { return Teuchos::rcp(new ProjectIPtoNodalFieldQuadrature(p, dl, mesh_specs->ctd, mesh_specs->cubatureDegree)); }
+
   int const min_quad_deg = mesh_specs->ctd.node_count > mesh_specs->ctd.vertex_count ? 4 : 2;
   if (mesh_specs->cubatureDegree >= min_quad_deg) return Teuchos::null;
   return Teuchos::rcp(new ProjectIPtoNodalFieldQuadrature(p, dl, mesh_specs->ctd, min_quad_deg));
@@ -609,6 +650,13 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(const typen
 #endif
       ;
 
+  // For a Tet<10> down-cast projection the RHS is integrated with the linear
+  // Tet<4> weighted basis carried by the quadrature manager (4 corner nodes);
+  // otherwise it uses the field manager's element basis over all nodes.
+  bool const                                                tet4 = Teuchos::nonnull(quad_mgr_) && quad_mgr_->isTet4Projection();
+  std::size_t const                                         proj_nodes = tet4 ? static_cast<std::size_t>(quad_mgr_->numProjNodes()) : num_nodes_;
+  const PHX::MDField<const MeshScalarT, Cell, Node, QuadPoint>& wbf = tet4 ? quad_mgr_->wbf_const() : wBF;
+
   Teuchos::RCP<Thyra_VectorSpace const> ip_field_space      = mgr_->ip_field->col(0)->space();
   auto                                  ip_field_vs_indexer = Albany::createGlobalLocalIndexer(ip_field_space);
   for (int field = 0; field < num_fields; ++field) {
@@ -616,21 +664,21 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::fillRHS(const typen
     node_data->getNDofsAndOffset(nodal_field_names_[field], node_var_offset, node_var_ndofs);
     node_var_offset -= mgr_->ndb_start;
     for (unsigned int cell = 0; cell < workset.numCells; ++cell) {
-      for (std::size_t node = 0; node < num_nodes_; ++node) {
+      for (std::size_t node = 0; node < proj_nodes; ++node) {
         const GO global_row = wsElNodeID[cell][node];
         const LO local_row  = ip_field_vs_indexer->getLocalElement(global_row);
         for (std::size_t qp = 0; qp < num_pts_; ++qp) {
           switch (ip_field_layouts_[field]) {
-            case EFieldLayout::scalar: ip_field_nonconstView[node_var_offset][local_row] += ip_fields_[field](cell, qp) * wBF(cell, node, qp); break;
+            case EFieldLayout::scalar: ip_field_nonconstView[node_var_offset][local_row] += ip_fields_[field](cell, qp) * wbf(cell, node, qp); break;
             case EFieldLayout::vector:
               for (std::size_t i = 0; i < num_dims_; ++i) {
-                ip_field_nonconstView[node_var_offset + i][local_row] += (ip_fields_[field](cell, qp, i) * wBF(cell, node, qp));
+                ip_field_nonconstView[node_var_offset + i][local_row] += (ip_fields_[field](cell, qp, i) * wbf(cell, node, qp));
               }
               break;
             case EFieldLayout::tensor:
               for (std::size_t i = 0; i < num_dims_; ++i) {
                 for (std::size_t j = 0; j < num_dims_; ++j) {
-                  ip_field_nonconstView[node_var_offset + j * num_dims_ + i][local_row] += (ip_fields_[field](cell, qp, i, j) * wBF(cell, node, qp));
+                  ip_field_nonconstView[node_var_offset + j * num_dims_ + i][local_row] += (ip_fields_[field](cell, qp, i, j) * wbf(cell, node, qp));
                 }
               }
               break;
@@ -835,6 +883,34 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(t
     // to overlap space (npif) -> use scatter method Arguments of scatter are
     // (src, tgt)
     cas_manager->scatter(node_projected_ip_field, npif, Albany::CombineMode::ADD);
+
+    // Tet<10> down-cast projection: the linear Tet<4> projection above solved
+    // for the 4 corner nodes; the 6 mid-side (edge) nodes got zero (empty rows,
+    // regularized above). Fill them by linear interpolation -- each edge node is
+    // the mean of its two endpoint corners -- matching Sierra/Adagio's
+    // interpolateNodalFieldToHONodes (issue #12). Done on the overlap vector so
+    // every local element's corner values are in reach; shared edge nodes get
+    // the same mean on each rank, so the result stays consistent.
+    if (Teuchos::nonnull(quad_mgr_) && quad_mgr_->isTet4Projection()) {
+      static int const edge_ends[6][2] = {{0, 1}, {1, 2}, {0, 2}, {0, 3}, {1, 3}, {2, 3}};
+      auto const&      wsElNodeID      = p_state_mgr_->getDiscretization()->getWsElNodeID();
+      auto             npif_data       = Albany::getNonconstLocalData(npif);
+      int const        ncols           = static_cast<int>(npif_data.size());
+      auto             ovl_indexer     = Albany::createGlobalLocalIndexer(ovl_space);
+      for (auto const& ws : wsElNodeID) {
+        for (auto const& en : ws) {
+          if (en.size() != 10) continue;  // only 10-node tets are down-cast
+          LO c[4];
+          for (int i = 0; i < 4; ++i) c[i] = ovl_indexer->getLocalElement(en[i]);
+          for (int e = 0; e < 6; ++e) {
+            LO const el = ovl_indexer->getLocalElement(en[4 + e]);
+            LO const a = c[edge_ends[e][0]], b = c[edge_ends[e][1]];
+            if (el < 0 || a < 0 || b < 0) continue;
+            for (int col = 0; col < ncols; ++col) npif_data[col][el] = 0.5 * (npif_data[col][a] + npif_data[col][b]);
+          }
+        }
+      }
+    }
     p_state_mgr_->getStateInfoStruct()->getNodalDataBase()->getNodalDataVector()->saveNodalDataState(npif, mgr_->ndb_start);
   }
   bbcc++;

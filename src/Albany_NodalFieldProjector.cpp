@@ -5,6 +5,7 @@
 #include "Albany_NodalFieldProjector.hpp"
 
 #include "Intrepid2_DefaultCubatureFactory.hpp"
+#include "Shards_BasicTopologies.hpp"
 #include "Shards_CellTopology.hpp"
 
 #include "Albany_AbstractDiscretization.hpp"
@@ -71,19 +72,24 @@ NodalFieldProjector::NodalFieldProjector(
   for (int eb = 0; eb < num_blocks; ++eb) {
     auto& ms = *mesh_specs[eb];
 
-    // "Use Composite Tet 10" is a per-block material property. The projection
-    // does not support composite tets (the COMP12 L2 projection does not
-    // recover a linear field; see GitHub issue #12), so forward the flag to the
-    // projection evaluator, which fails loudly rather than emit a silently wrong
-    // nodal field.
+    // "Use Composite Tet 10" is a per-block material property. A 10-node tet
+    // (composite or standard) is projected via the linear Tet<4> down-cast in
+    // the projection evaluator (issue #12); the flag is forwarded so it selects
+    // the composite path. Independently, the field manager here must integrate
+    // on the block's OWN quadrature so the loaded IP states line up with where
+    // assembly saved them: a composite block uses the composite rule (via the
+    // Tetrahedron<11> topology and COMP12 basis, mirroring assembly), otherwise
+    // the standard rule.
     bool const is_ct10 =
         (material_db != Teuchos::null) && ms.ctd.dimension == 3 && ms.ctd.node_count == 10 &&
         material_db->getElementBlockParam<bool>(ms.ebName, "Use Composite Tet 10", false);
 
     // Cubature and basis for this block's cell topology (volume elements).
-    auto intrepid_basis = Albany::getIntrepid2Basis(ms.ctd);
+    auto intrepid_basis = Albany::getIntrepid2Basis(ms.ctd, is_ct10);
 
-    Teuchos::RCP<shards::CellTopology> const cell_type = Teuchos::rcp(new shards::CellTopology(&ms.ctd));
+    Teuchos::RCP<shards::CellTopology> const cell_type =
+        is_ct10 ? Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Tetrahedron<11>>())) :
+                  Teuchos::rcp(new shards::CellTopology(&ms.ctd));
 
     Intrepid2::DefaultCubatureFactory cub_factory;
 

@@ -8,6 +8,7 @@
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>
 
+#include "Albany_Macros.hpp"
 #include "Albany_config.h"
 
 #if defined(ALBANY_TIMER)
@@ -23,8 +24,7 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
       w_bf_(p.get<std::string>("Weighted BF Name"), dl->node_qp_scalar),
       residual_(p.get<std::string>("Residual Name"), dl->node_vector),
       mass_(p.get<std::string>("Analytic Mass Name"), dl->node_vector),
-      have_body_force_(p.isType<bool>("Has Body Force")),
-      density_(p.get<RealType>("Density", 1.0))
+      have_body_force_(p.isType<bool>("Has Body Force"))
 {
   Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
   this->addDependentField(stress_);
@@ -49,6 +49,20 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
     this->addDependentField(acceleration_);
     if (use_analytic_mass_) this->addDependentField(mass_);
   }
+
+  // Density enters the consistent-mass inertia term (density * acceleration).
+  // For a transient solve without the analytic-mass path it must be supplied;
+  // fail loudly rather than fall back to a nonphysical default (issue #10).
+  // The analytic-mass path gets its density in AnalyticMassResidual instead,
+  // and a static solve never touches the inertia term, so neither requires it.
+  bool const solution_is_transient = p.get<bool>("Solution Is Transient", false);
+  bool const needs_density          = solution_is_transient && !use_analytic_mass_;
+  ALBANY_ASSERT(
+      !needs_density || p.isType<RealType>("Density"),
+      "MechanicsResidual: a transient mechanics solve requires the material "
+      "\"Density\" for the inertia term, but none was specified for this "
+      "element block. Add a Density to the material database.");
+  density_ = p.isType<RealType>("Density") ? p.get<RealType>("Density") : 0.0;
 
   this->setName("MechanicsResidual" + PHX::print<EvalT>());
 

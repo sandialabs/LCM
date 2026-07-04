@@ -22,5 +22,6 @@ LCM:
         Value: 7.0e+09
       Saturation Modulus: 0.0
       Saturation Exponent: 0.0
+      Density: 2.70e+03
       Output Cauchy Stress: true
       Output eqps: true

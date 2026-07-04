@@ -353,6 +353,15 @@ MechanicsProblem::constructEvaluators(
       "Solution Method must be Steady, Transient, "
       "Continuation, Eigensolve, or Aeras Hyperviscosity");
 
+  // Any transient solution method engages the inertia (mass) term, so the
+  // material density is required. Both "Transient" and "Transient Tempus"
+  // qualify; the second-order (acceleration) coupling is selected per deck by
+  // the Discretization's "Number Of Time Derivatives", which the problem does
+  // not see here. The mass residual evaluators use this to fail loudly on a
+  // missing density instead of falling back to a nonphysical default (#10).
+  bool const is_transient_mechanics =
+      SolutionType == SolutionMethodType::Transient || SolutionType == SolutionMethodType::TransientTempus;
+
   if (have_mech_eq_) {
     Teuchos::ArrayRCP<std::string> const dof_names(1, "Displacement");
     Teuchos::ArrayRCP<std::string> const dof_names_dot(1, "Velocity");
@@ -1199,7 +1208,11 @@ MechanicsProblem::constructEvaluators(
       p->set<std::string>("Acceleration Name", "Acceleration");
       p->set<std::string>("Weights Name", "Weights");
       // Mechanics residual need value of density for transient analysis.
-      // Get it from material. Assumed constant in element block.
+      // Get it from material. Assumed constant in element block. A missing
+      // density is only an error for a transient (dynamic) solve; the
+      // evaluator enforces that using the flag below, so it is passed
+      // through unconditionally and left unset when absent.
+      p->set<bool>("Solution Is Transient", is_transient_mechanics);
       if (material_db_->isElementBlockParam(eb_name, "Density")) {
         p->set<RealType>("Density", material_db_->getElementBlockParam<RealType>(eb_name, "Density"));
       }
@@ -1244,7 +1257,11 @@ MechanicsProblem::constructEvaluators(
       RealType material_density = 0.0;
 
       // Mechanics residual need value of density for transient analysis.
-      // Get it from material. Assumed constant in element block.
+      // Get it from material. Assumed constant in element block. A missing
+      // density is only an error for a transient (dynamic) solve; the
+      // evaluator enforces that using the flag below, so it is passed
+      // through unconditionally and left unset when absent.
+      p->set<bool>("Solution Is Transient", is_transient_mechanics);
       if (material_db_->isElementBlockParam(eb_name, "Density")) {
         material_density = material_db_->getElementBlockParam<RealType>(eb_name, "Density");
         p->set<RealType>("Density", material_density);

@@ -26,7 +26,12 @@ ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(Teuchos::ParameterList* p, T
     expansion_coeff_  = p->get<RealType>("Thermal Expansion Coefficient", 0.0);
     ref_temperature_  = p->get<RealType>("Reference Temperature", 0.0);
     heat_capacity_    = p->get<RealType>("Heat Capacity", 1.0);
-    density_          = p->get<RealType>("Density", 1.0);
+    // Read without injecting: get(name, default) writes the default back into
+    // the (shared) material list, which would fabricate a Density on materials
+    // that never specified one and defeat the missing-density check the
+    // transient mechanics residual relies on (issue #10). Keep the 1.0 fallback
+    // for the thermal source term when temperature coupling is on.
+    density_ = p->isType<RealType>("Density") ? p->get<RealType>("Density") : 1.0;
   }
 
   if (p->isType<bool>("Have Damage") == true) {

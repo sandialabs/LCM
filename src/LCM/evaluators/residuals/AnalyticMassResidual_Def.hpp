@@ -8,6 +8,8 @@
 #include <Phalanx_DataLayout.hpp>
 #include <Sacado_ParameterRegistration.hpp>
 
+#include "Albany_Macros.hpp"
+
 #if defined(ALBANY_TIMER)
 #include <chrono>
 #endif
@@ -24,12 +26,25 @@ AnalyticMassResidualBase<EvalT, Traits>::AnalyticMassResidualBase(Teuchos::Param
       mass_(p.get<std::string>("Analytic Mass Name"), dl->node_vector),
       out_(Teuchos::VerboseObjectBase::getDefaultOStream())
 {
-  if (p.isParameter("Density")) density_ = p.get<RealType>("Density");
-
   resid_using_cub_    = p.get<bool>("Residual Computed Using Cubature");
   use_composite_tet_  = p.get<bool>("Use Composite Tet 10");
   use_analytic_mass_  = p.get<bool>("Use Analytic Mass");
   lump_analytic_mass_ = p.get<bool>("Lump Analytic Mass");
+
+  // Density scales the analytic mass matrix. It is consumed only when this
+  // evaluator is active: a transient solve using the analytic-mass path.
+  // In that case require it and fail loudly rather than fall back to a
+  // nonphysical default (issue #10).
+  // p is a const ParameterList here, so use the non-injecting const get.
+  bool const solution_is_transient =
+      p.isType<bool>("Solution Is Transient") && p.get<bool>("Solution Is Transient");
+  bool const needs_density = solution_is_transient && use_analytic_mass_;
+  ALBANY_ASSERT(
+      !needs_density || p.isParameter("Density"),
+      "AnalyticMassResidual: a transient mechanics solve with the analytic-mass "
+      "path requires the material \"Density\", but none was specified for this "
+      "element block. Add a Density to the material database.");
+  if (p.isParameter("Density")) density_ = p.get<RealType>("Density");
 
   this->addDependentField(w_bf_);
   this->addDependentField(weights_);

@@ -132,21 +132,21 @@ ProjectIPtoNodalFieldQuadrature::ProjectIPtoNodalFieldQuadrature(
   ref_weights_ = Kokkos::DynRankView<RealType, PHX::Device>("XXX", nqp);
   cubature->getCubature(ref_points_, ref_weights_);
 
-  // Support composite Tet<10> in principle; however, I observe that there
-  // appears to be something wrong with the quadrature setup for composite
-  // Tet<10>, at least at degree 4 and higher. In particular, a linear function
-  // is *not* recovered.
+  // Composite Tet<10> is not supported for the L2 projection: the COMP12 basis
+  // does not recover even a linear field through this projection (a DOF-ordering
+  // / composite-cubature issue; see GitHub issue #12). Fail loudly instead of
+  // returning a silently wrong nodal field. Use "IP to Nodal Field" (no
+  // projection) for composite tets.
   const Teuchos::RCP<Teuchos::ParameterList>& pfp       = p.get<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem", Teuchos::null);
   bool const                                  composite = pfp.is_null() ? false : pfp->get<bool>("Use Composite Tet 10", false);
 
   ALBANY_ASSERT(
       !composite,
-      "\n Project IP to Nodal Field Response not supported with Composite Tet "
-      "10s! \n"
-          << "Re-run with Use Composite Tet 10 = false or with IP to Nodal "
-             "Field Response. \n");
+      "\n Project IP to Nodal Field is not supported with Composite Tet 10s. \n"
+          << "Re-run with Use Composite Tet 10 = false or with the IP to Nodal "
+             "Field response. \n");
 
-  intrepid_basis_ = Albany::getIntrepid2Basis(ctd, composite);
+  intrepid_basis_ = Albany::getIntrepid2Basis(ctd_, composite);
 
   typedef PHX::MDALayout<Cell, Node, QuadPoint> Layout;
   Teuchos::RCP<Layout>                          node_qp_scalar = Teuchos::rcp(new Layout(dl->node_qp_scalar->extent(0), dl->node_qp_scalar->extent(1), nqp));

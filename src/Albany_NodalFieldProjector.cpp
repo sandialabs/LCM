@@ -11,6 +11,7 @@
 #include "Albany_AbstractMeshStruct.hpp"
 #include "Albany_EvaluatorUtils.hpp"
 #include "Albany_Layouts.hpp"
+#include "Albany_MaterialDatabase.hpp"
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_StateManager.hpp"
 #include "Albany_Utils.hpp"
@@ -48,12 +49,36 @@ NodalFieldProjector::NodalFieldProjector(
   auto  mesh_specs    = disc->getMeshStruct()->getMeshSpecs();
   auto  phx_setup     = app_->getPhxSetup();
 
+  // The "Use Composite Tet 10" flag is a per-element-block material property,
+  // so the saved IP states of a composite block were written on the composite
+  // quadrature. Read the same material database the assembly used, so the
+  // projector integrates on the matching quadrature (see per-block handling
+  // below). Absent a material database (non-mechanics problems), no block is
+  // composite.
+  Teuchos::RCP<MaterialDatabase> material_db;
+  {
+    auto problem_pl = app_->getProblemPL();
+    if (problem_pl->isType<std::string>("MaterialDB Filename")) {
+      auto comm   = app_->getComm();
+      material_db = createMaterialDatabase(problem_pl, comm);
+    }
+  }
+
   int const num_blocks = mesh_specs.size();
   fms_.resize(num_blocks);
   eval_names_.resize(num_blocks);
 
   for (int eb = 0; eb < num_blocks; ++eb) {
     auto& ms = *mesh_specs[eb];
+
+    // "Use Composite Tet 10" is a per-block material property. The projection
+    // does not support composite tets (the COMP12 L2 projection does not
+    // recover a linear field; see GitHub issue #12), so forward the flag to the
+    // projection evaluator, which fails loudly rather than emit a silently wrong
+    // nodal field.
+    bool const is_ct10 =
+        (material_db != Teuchos::null) && ms.ctd.dimension == 3 && ms.ctd.node_count == 10 &&
+        material_db->getElementBlockParam<bool>(ms.ebName, "Use Composite Tet 10", false);
 
     // Cubature and basis for this block's cell topology (volume elements).
     auto intrepid_basis = Albany::getIntrepid2Basis(ms.ctd);
@@ -117,9 +142,17 @@ NodalFieldProjector::NodalFieldProjector(
     config->set<bool>("Skip Worker Registration", true);
     param_lists_.push_back(config);
 
+    // Forward "Use Composite Tet 10" so the projection evaluator can fail loudly
+    // on composite blocks instead of emitting a silently wrong nodal field
+    // (mirrors the response path, which passes this through "Parameters From
+    // Problem"). Kept alive in param_lists_ for the field manager's lifetime.
+    auto pfp = Teuchos::rcp(new Teuchos::ParameterList("Parameters From Problem"));
+    pfp->set<bool>("Use Composite Tet 10", is_ct10);
+    param_lists_.push_back(pfp);
+
     auto pp = Teuchos::rcp(new Teuchos::ParameterList("Project IP to Nodal Field"));
     pp->set<Teuchos::ParameterList*>("Parameter List", config.get());
-    pp->set<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem", Teuchos::null);
+    pp->set<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem", pfp);
     pp->set<std::string>("BF Name", "BF");
     pp->set<std::string>("Weighted BF Name", "wBF");
     pp->set<std::string>("Coordinate Vector Name", "Coord Vec");

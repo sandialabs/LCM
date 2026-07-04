@@ -315,6 +315,15 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   // leaves the parallel partition stale (see ACEThermoMechanical loop).
   bool topology_changed_{false};
 
+  // Set true once applyDeathToActivePart has created the mesh's full side
+  // closure (stk::mesh::create_all_sides). Meshes read from Exodus carry
+  // face entities only where the input side sets declared them; the
+  // clone-before-disconnect death surgery operates on face entities, so the
+  // interior faces must exist before the first kill or the dead/live
+  // interface is never disconnected and the "-erodible" side sets never
+  // grow onto the newly exposed surface (GitHub issue #114).
+  bool interior_faces_created_{false};
+
   bool
   topologyChanged() const
   {

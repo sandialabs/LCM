@@ -28,6 +28,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/denudation.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/denudation.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/denudation_gold.e
                ${CMAKE_CURRENT_BINARY_DIR}/denudation_gold.e COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/denudation_np4_gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/denudation_np4_gold.e COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -48,10 +50,17 @@ add_test(
     ${runtest.cmake})
 set_tests_properties(ACE_${testName}_Denudation_Serial PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-# 4-rank parallel test - same gold, exodiff after merging with epu.
-# Guards against regressions in the clone-before-disconnect element-death
-# algorithm (Albany::applyElementDeath) which is what makes parallel
-# erosion work; see doc/element-death.md.
+# 4-rank parallel test - exodiff after merging with epu, against an
+# np4-specific gold. Guards against regressions in the
+# clone-before-disconnect element-death algorithm
+# (Albany::applyElementDeath) which is what makes parallel erosion work;
+# see doc/element-death.md. The np4 gold is separate from the serial one
+# because a death cascade amplifies the epsilon-level differences between
+# serial and parallel reduction order into discrete failure-threshold
+# crossings: serial and np4 agree exactly through the first death waves,
+# then individual cell death times shift by a step. A fixed 4-rank run is
+# reproducible run-to-run, so it regresses against its own gold.
+set(REF_FILE "denudation_np4_gold.e")
 set(runtest_np4.cmake ${CMAKE_CURRENT_SOURCE_DIR}/runtest_np4.cmake)
 add_test(
   NAME ACE_${testName}_Denudation_np4

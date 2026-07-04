@@ -12,6 +12,7 @@
 #include "Teuchos_DefaultMpiComm.hpp"
 #include "stk_mesh/base/BulkData.hpp"
 #include "stk_mesh/base/Part.hpp"
+#include "stk_mesh/base/SkinBoundary.hpp"
 #include "stk_util/parallel/ParallelReduceBool.hpp"
 
 #include "AAdapt_RC_Manager.hpp"
@@ -603,6 +604,13 @@ Application::DBCDescriptor::derivs_at(double time) const
 void
 Application::eliminateConstrainedDOFs()
 {
+  // Re-entrant: a topology-changing element death re-runs this method (from
+  // the ACE coupling loop's between-step rebuild) so the constrained set
+  // tracks the current — possibly grown — "-erodible" node sets. Start from
+  // a clean state; otherwise descriptors and Schwarz couplings accumulate
+  // across runs, and stale descriptors carry overlap LIDs from the
+  // pre-death parallel partition.
+  dbc_state_ = DBCEliminationState{};
 
   auto const& node_set_ids = problem->getNodeSetIDs();
   auto const& bc_names     = problem->getDirichletBCNames();
@@ -1867,6 +1875,23 @@ Application::applyDeathToActivePart()
   // deadlock.
   if (!stk::is_true_on_any_proc(bulkData.parallel(), !killed.empty())) {
     return false;
+  }
+
+  // The clone-before-disconnect surgery in applyElementDeath operates on
+  // face entities: Phase 2 counts element attachments per face, Phase 3
+  // disconnects and clones the dying side, Phase 5 paints the surviving
+  // live-side face into the "-erodible" side sets. A mesh read from Exodus
+  // carries face entities only where the input side sets declared them, so
+  // interior element-element interfaces have none — without them the
+  // surgery has nothing to disconnect, the erodible side sets never grow,
+  // and Dirichlet BCs stay frozen on the t = 0 surface (GitHub issue #114).
+  // Create the full side closure once, at the first death. Collective:
+  // every rank enters together because the early-out above is a global
+  // decision.
+  if (!interior_faces_created_) {
+    stk::mesh::create_all_sides(
+        bulkData, bulkData.mesh_meta_data().universal_part(), stk::mesh::PartVector{}, false);
+    interior_faces_created_ = true;
   }
 
   // Calving: a death this step may have severed a block from the

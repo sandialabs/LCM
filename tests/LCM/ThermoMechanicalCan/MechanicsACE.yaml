@@ -27,14 +27,8 @@ LCM:
       Number: 1
       Parameter 0: Time
     Response Functions:
-      Number: 2
+      Number: 1
       Response 0: Solution Average
-      Response 1: IP to Nodal Field
-      ResponseParams 1:
-        Number of Fields: 1
-        IP Field Name 0: Cauchy_Stress
-        IP Field Layout 0: Tensor
-        Output to File: true
     Nodal Field Projection:
       Number of Fields: 1
       IP Field Name 0: Cauchy_Stress

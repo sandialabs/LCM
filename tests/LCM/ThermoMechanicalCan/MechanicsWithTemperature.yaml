@@ -25,16 +25,8 @@ LCM:
       Number: 1
       Parameter 0: Time
     Response Functions:
-      Number: 2
+      Number: 1
       Response 0: Solution Average
-      Response 1: IP to Nodal Field
-      ResponseParams 1:
-        Number of Fields: 2
-        IP Field Name 0: Cauchy_Stress
-        IP Field Layout 0: Tensor
-        IP Field Name 1: eqps
-        IP Field Layout 1: Scalar
-        Output to File: true
     Nodal Field Projection:
       Number of Fields: 2
       IP Field Name 0: Cauchy_Stress
@@ -53,7 +45,7 @@ LCM:
     Use Serial Mesh: false
   Regression Results:
     Number of Comparisons: 1
-    Test Values: [78.33582203]
+    Test Values: [7.98583556e+01]
     Relative Tolerance: 0.01000000
     Absolute Tolerance: 0.01000000
   Piro:

@@ -22,15 +22,15 @@ LCM:
       Parameter 0: Time
     Solution Method: Transient Tempus
     Response Functions:
-      Number: 1
-      Response 0: IP to Nodal Field
-      ResponseParams 0:
-        Number of Fields: 2
-        IP Field Name 0: Cauchy_Stress
-        IP Field Layout 0: Tensor
-        IP Field Name 1: eqps
-        IP Field Layout 1: Scalar
-        Output to File: true
+      Number: 0
+    Nodal Field Projection:
+      Number of Fields: 2
+      IP Field Name 0: Cauchy_Stress
+      IP Field Layout 0: Tensor
+      IP Field Name 1: eqps
+      IP Field Layout 1: Scalar
+      Mass Matrix Type: Lumped
+      Output to File: true
     Phalanx Graph Visualization Detail: 0
     MaterialDB Filename: materials_parts.yaml
     Dirichlet BCs:

@@ -31,16 +31,16 @@ LCM:
         Coupled Application: clamped_01.yaml
         Coupled Block: fine
     Response Functions:
-      Number: 4
-      Response 0: Project IP to Nodal Field
-      ResponseParams 0:
-        Number of Fields: 1
-        IP Field Name 0: Cauchy_Stress
-        IP Field Layout 0: Tensor
-        Output to File: true
-      Response 1: Solution Average
-      Response 2: Solution Max Value
-      Response 3: Solution Min Value
+      Number: 3
+      Response 0: Solution Average
+      Response 1: Solution Max Value
+      Response 2: Solution Min Value
+    Nodal Field Projection:
+      Number of Fields: 1
+      IP Field Name 0: Cauchy_Stress
+      IP Field Layout 0: Tensor
+      Mass Matrix Type: Full
+      Output to File: true
   Discretization:
     Method: Ioss
     Exodus Input File Name: 'clamped_00.g'

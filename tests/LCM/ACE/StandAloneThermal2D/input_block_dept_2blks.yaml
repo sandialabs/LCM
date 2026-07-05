@@ -16,28 +16,28 @@ LCM:
       Function Expressions: ['250.0']
       #Function Expressions: ['250 * cosh(5.421312110550360e-02*x)']
     Response Functions:
-      Number: 2
-      Response 0: Project IP to Nodal Field
-      ResponseParams 0:
-        Number of Fields: 8
-        IP Field Name 0: ACE_Bluff_Salinity
-        IP Field Layout 0: Scalar
-        IP Field Name 1: ACE_Ice_Saturation
-        IP Field Layout 1: Scalar
-        IP Field Name 2: ACE_Density
-        IP Field Layout 2: Scalar
-        IP Field Name 3: ACE_Heat_Capacity
-        IP Field Layout 3: Scalar
-        IP Field Name 4: ACE_Therm_Cond
-        IP Field Layout 4: Scalar
-        IP Field Name 5: ACE_Thermal_Inertia
-        IP Field Layout 5: Scalar
-        IP Field Name 6: ACE_Water_Saturation
-        IP Field Layout 6: Scalar
-        IP Field Name 7: ACE_Porosity
-        IP Field Layout 7: Scalar
-        Output to File: true
-      Response 1: Solution Average
+      Number: 1
+      Response 0: Solution Average
+    Nodal Field Projection:
+      Number of Fields: 8
+      IP Field Name 0: ACE_Bluff_Salinity
+      IP Field Layout 0: Scalar
+      IP Field Name 1: ACE_Ice_Saturation
+      IP Field Layout 1: Scalar
+      IP Field Name 2: ACE_Density
+      IP Field Layout 2: Scalar
+      IP Field Name 3: ACE_Heat_Capacity
+      IP Field Layout 3: Scalar
+      IP Field Name 4: ACE_Therm_Cond
+      IP Field Layout 4: Scalar
+      IP Field Name 5: ACE_Thermal_Inertia
+      IP Field Layout 5: Scalar
+      IP Field Name 6: ACE_Water_Saturation
+      IP Field Layout 6: Scalar
+      IP Field Name 7: ACE_Porosity
+      IP Field Layout 7: Scalar
+      Mass Matrix Type: Full
+      Output to File: true
   Discretization: 
     Method: Ioss
     Exodus Input File Name: square_2blocks.e
@@ -45,8 +45,8 @@ LCM:
     Separate Evaluators by Element Block: true
     Workset Size: -1
   Regression Results: 
-    Number of Comparisons: 3
-    Test Values: [0.0, 0.0, 2.627514059995e+02]
+    Number of Comparisons: 1
+    Test Values: [2.62751408e+02]
     Relative Tolerance: 1.00000000000000002e-03
     Absolute Tolerance: 1.00000000000000008e-05
   Piro: 

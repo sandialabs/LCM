@@ -26,27 +26,27 @@ LCM:
       Function: Expression Parser
       Function Expressions: ['0.0', '0.0', '0.0', '200.0']
     Response Functions:
-      Number: 2
-      Response 0: Project IP to Nodal Field
-      ResponseParams 0:
-        Number of Fields: 6
-        IP Field Name 0: ACE Temperature
-        IP Field Layout 0: Scalar
-        IP Field Name 1: ACE Temperature Dot
-        IP Field Layout 1: Scalar
-        IP Field Name 2: ACE_Ice_Saturation
-        IP Field Layout 2: Scalar
-        IP Field Name 3: ACE_Water_Saturation
-        IP Field Layout 3: Scalar
-        IP Field Name 4: Cauchy_Stress
-        IP Field Layout 4: Tensor
-        IP Field Name 5: eqps
-        IP Field Layout 5: Scalar
-        Output to File: true
-      Response 1: Solution Average
+      Number: 1
+      Response 0: Solution Average
+    Nodal Field Projection:
+      Number of Fields: 6
+      IP Field Name 0: ACE
+      IP Field Layout 0: Scalar
+      IP Field Name 1: ACE
+      IP Field Layout 1: Scalar
+      IP Field Name 2: ACE_Ice_Saturation
+      IP Field Layout 2: Scalar
+      IP Field Name 3: ACE_Water_Saturation
+      IP Field Layout 3: Scalar
+      IP Field Name 4: Cauchy_Stress
+      IP Field Layout 4: Tensor
+      IP Field Name 5: eqps
+      IP Field Layout 5: Scalar
+      Mass Matrix Type: Full
+      Output to File: true
   Regression Results: 
-    Number of Comparisons: 2
-    Test Values: [0, 5.322885114730e+01]
+    Number of Comparisons: 1
+    Test Values: [5.322885114730e+01]
     Relative Tolerance: 1.00000000000000002e-03
   Discretization:
     Method: Ioss

@@ -32,17 +32,17 @@ ANONYMOUS:
       DBC on NS NodeSet4 for DOF Z: 0.00000000e+00
       DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Response Functions: 
-      Number: 5
-      Response 0: Project IP to Nodal Field
-      ResponseParams 0: 
-        Number of Fields: 1
-        IP Field Name 0: Cauchy_Stress
-        IP Field Layout 0: Tensor
-        Output to File: true
-      Response 1: Solution Average
-      Response 2: Solution Max Value
-      Response 3: Solution Min Value
-      Response 4: Solution Two Norm
+      Number: 4
+      Response 0: Solution Average
+      Response 1: Solution Max Value
+      Response 2: Solution Min Value
+      Response 3: Solution Two Norm
+    Nodal Field Projection:
+      Number of Fields: 1
+      IP Field Name 0: Cauchy_Stress
+      IP Field Layout 0: Tensor
+      Mass Matrix Type: Full
+      Output to File: true
   Discretization: 
     #Method: Exodus
     #Exodus Input File Name: 'clamped.g'
@@ -63,8 +63,8 @@ ANONYMOUS:
     Number Of Time Derivatives: 2
     Exodus Write Interval: 1
   Regression Results: 
-    Number of Comparisons: 5
-    Test Values: [0.000000000000e+00, -1.671841781505e-05, 0.000000000000e+00, 0.000000000000e+00, 6.535238097187e-03]
+    Number of Comparisons: 4
+    Test Values: [-1.671841781505e-05, 0.000000000000e+00, 0.000000000000e+00, 6.535238097187e-03]
   Piro:
     Analysis:
       Compute Sensitivities: false

@@ -18,16 +18,16 @@ LCM:
       DBC on NS NodeSet4 for DOF Z: 0.00000000e+00
       DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
     Response Functions:
-      Number: 4
-      Response 0: Project IP to Nodal Field
-      ResponseParams 0:
-        Number of Fields: 1
-        IP Field Name 0: Cauchy_Stress
-        IP Field Layout 0: Tensor
-        Output to File: true
-      Response 1: Solution Average
-      Response 2: Solution Max Value
-      Response 3: Solution Min Value
+      Number: 3
+      Response 0: Solution Average
+      Response 1: Solution Max Value
+      Response 2: Solution Min Value
+    Nodal Field Projection:
+      Number of Fields: 1
+      IP Field Name 0: Cauchy_Stress
+      IP Field Layout 0: Tensor
+      Mass Matrix Type: Full
+      Output to File: true
   Discretization:
     Method: STK3D
     1D Elements: 1
@@ -47,8 +47,8 @@ LCM:
     Number Of Time Derivatives: 2
     Exodus Write Interval: 10
   Regression Results:
-    Number of Comparisons: 4
-    Test Values: [0.000000000000e+00, -1.442043556017e-05, 3.715203484204e-04, -3.715203339250e-04]
+    Number of Comparisons: 3
+    Test Values: [-1.442043556017e-05, 3.715203484204e-04, -3.715203339250e-04]
     Relative Tolerance: 1.0e-7
     Absolute Tolerance: 1.0e-7
   Piro:

@@ -13,13 +13,13 @@ LCM:
       Function: About Linear Z
       Function Data: [8000.0]
     Response Functions:
-      Number: 1
-      Response 0: Project IP to Nodal Field
-      ResponseParams 0:
-        Number of Fields: 1
-        IP Field Name 0: Cauchy_Stress
-        IP Field Layout 0: Tensor
-        Output to File: true
+      Number: 0
+    Nodal Field Projection:
+      Number of Fields: 1
+      IP Field Name 0: Cauchy_Stress
+      IP Field Layout 0: Tensor
+      Mass Matrix Type: Full
+      Output to File: true
     Dirichlet BCs:
       DBC on NS NodeSet5 for DOF all:
         BC Function: Schwarz

@@ -19,21 +19,20 @@ LCM:
       Number: 1
       Parameter 0: Time
     Response Functions:
-      Number: 3
+      Number: 2
       Response 0: Solution Average
       Response 1: IP to Nodal Field
-      Response 2: Project IP to Nodal Field
       ResponseParams 1:
         Number of Fields: 1
         IP Field Name 0: Cauchy_Stress
         IP Field Layout 0: Tensor
         Output to File: true
-      ResponseParams 2:
-        Number of Fields: 1
-        IP Field Name 0: Cauchy_Stress
-        IP Field Layout 0: Tensor
-        Output to File: true
-        Mass Matrix Type: Full
+    Nodal Field Projection:
+      Number of Fields: 1
+      IP Field Name 0: Cauchy_Stress
+      IP Field Layout 0: Tensor
+      Mass Matrix Type: Full
+      Output to File: true
   Discretization:
     Method: Exodus
     Exodus Input File Name: brick_model_2.g

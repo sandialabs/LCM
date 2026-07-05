@@ -1,0 +1,19 @@
+#  ***************************************************************************
+#  Lumped companion to project_tet10_dyn (GitHub issue #11 + the lumped
+#  recovery path). Same dynamic Tet<10> cube and every-step write, but with
+#  "Mass Matrix Type: Lumped".
+#
+#  A lumped projection is a mass-weighted nodal average, so it does NOT
+#  reproduce a linear field exactly -- proj_nodal_linear is checked relative
+#  against the gold rather than absolute. The regression it guards is still
+#  GitHub #11: if the first computed frame's projected fields drop to zero,
+#  they differ from the gold's non-zero lumped values and the diff fails.
+#  ***************************************************************************
+
+COORDINATES absolute 1.e-6
+
+TIME STEPS relative 1.e-6 floor 0.0
+
+NODAL VARIABLES relative 1.0e-5 floor 1.0e-9
+
+ELEMENT VARIABLES relative 1.0e-5 floor 1.0e-8

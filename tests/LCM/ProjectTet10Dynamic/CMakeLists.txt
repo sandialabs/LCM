@@ -20,18 +20,34 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/project_tet10_dyn.exodiff
                ${CMAKE_CURRENT_BINARY_DIR}/project_tet10_dyn.exodiff COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/project_tet10_dyn_gold.e
                ${CMAKE_CURRENT_BINARY_DIR}/project_tet10_dyn_gold.e COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/project_tet10_dyn_lumped.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/project_tet10_dyn_lumped.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/project_tet10_dyn_lumped.exodiff
+               ${CMAKE_CURRENT_BINARY_DIR}/project_tet10_dyn_lumped.exodiff COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/project_tet10_dyn_lumped_gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/project_tet10_dyn_lumped_gold.e COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest_serial.cmake COPYONLY)
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-set(OUTFILE "project_tet10_dyn.e")
-set(REF_FILE "project_tet10_dyn_gold.e")
+# Consistent (Full) mass matrix: proj_nodal_linear is recovered exactly.
 add_test(
   NAME ${testName}_Serial
   COMMAND
   ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=project_tet10_dyn
     -DTEST_ARGS=project_tet10_dyn.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
-    -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -P
+    -DREF_FILENAME=project_tet10_dyn_gold.e -DOUTPUT_FILENAME=project_tet10_dyn.e -P
     ${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake)
 set_tests_properties(${testName}_Serial PROPERTIES LABELS "LCM;Tpetra;Forward")
+
+# Lumped mass matrix: gold-based (a lumped projection does not reproduce a
+# linear field exactly), still guards the GitHub #11 first-frame regression.
+add_test(
+  NAME ${testName}_Lumped_Serial
+  COMMAND
+  ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=project_tet10_dyn_lumped
+    -DTEST_ARGS=project_tet10_dyn_lumped.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DREF_FILENAME=project_tet10_dyn_lumped_gold.e -DOUTPUT_FILENAME=project_tet10_dyn_lumped.e -P
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake)
+set_tests_properties(${testName}_Lumped_Serial PROPERTIES LABELS "LCM;Tpetra;Forward")

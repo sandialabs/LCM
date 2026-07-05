@@ -206,4 +206,82 @@ NodalFieldProjector::project(double const time) const
   }
 }
 
+void
+registerNodalFieldProjectionStates(
+    Teuchos::RCP<Application> const&                        app,
+    Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> const& mesh_specs,
+    std::vector<NodalFieldProjector::FieldSpec> const&      fields,
+    std::string const&                                      mass_matrix_type,
+    bool const                                              output_to_exodus)
+{
+  using EvalT  = PHAL::AlbanyTraits::Residual;
+  using Traits = PHAL::AlbanyTraits;
+
+  if (fields.empty()) return;
+
+  auto& state_manager = app->getStateMgr();
+
+  Teuchos::RCP<MaterialDatabase> material_db;
+  {
+    auto problem_pl = app->getProblemPL();
+    if (problem_pl->isType<std::string>("MaterialDB Filename")) {
+      auto comm   = app->getComm();
+      material_db = createMaterialDatabase(problem_pl, comm);
+    }
+  }
+
+  for (int eb = 0; eb < static_cast<int>(mesh_specs.size()); ++eb) {
+    auto& ms = *mesh_specs[eb];
+
+    // Same per-block quadrature/basis as the projector (see its ctor); needed so
+    // the registered manager carries the right nodal layout.
+    bool const is_ct10 =
+        (material_db != Teuchos::null) && ms.ctd.dimension == 3 && ms.ctd.node_count == 10 &&
+        material_db->getElementBlockParam<bool>(ms.ebName, "Use Composite Tet 10", false);
+
+    auto                                     intrepid_basis = Albany::getIntrepid2Basis(ms.ctd, is_ct10);
+    Teuchos::RCP<shards::CellTopology> const cell_type =
+        is_ct10 ? Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Tetrahedron<11>>())) :
+                  Teuchos::rcp(new shards::CellTopology(&ms.ctd));
+    Intrepid2::DefaultCubatureFactory              cub_factory;
+    Teuchos::RCP<Intrepid2::Cubature<PHX::Device>> cubature = cub_factory.create<PHX::Device, RealType, RealType>(*cell_type, ms.cubatureDegree);
+
+    int const             num_nodes = intrepid_basis->getCardinality();
+    int const             num_pts   = cubature->getNumPoints();
+    int const             num_dims  = cubature->getDimension();
+    Teuchos::RCP<Layouts> dl        = Teuchos::rcp(new Layouts(ms.worksetSize, num_nodes, num_nodes, num_pts, num_dims));
+
+    auto config = Teuchos::rcp(new Teuchos::ParameterList("Project IP to Nodal Field"));
+    config->set<std::string>("Name", "Project IP to Nodal Field");
+    config->set<int>("Number of Fields", static_cast<int>(fields.size()));
+    for (std::size_t i = 0; i < fields.size(); ++i) {
+      config->set<std::string>(Albany::strint("IP Field Name", i), fields[i].name);
+      config->set<std::string>(Albany::strint("IP Field Layout", i), fields[i].layout);
+    }
+    config->set<std::string>("Mass Matrix Type", mass_matrix_type);
+    config->set<bool>("Output to File", output_to_exodus);
+    // This is the sole registration site: create the manager and register one
+    // worker per block. The observe-time NodalFieldProjector reuses them with
+    // Skip Worker Registration = true.
+    config->set<bool>("Skip Worker Registration", false);
+
+    auto pfp = Teuchos::rcp(new Teuchos::ParameterList("Parameters From Problem"));
+    pfp->set<bool>("Use Composite Tet 10", is_ct10);
+
+    auto pp = Teuchos::rcp(new Teuchos::ParameterList("Project IP to Nodal Field"));
+    pp->set<Teuchos::ParameterList*>("Parameter List", config.get());
+    pp->set<Teuchos::RCP<Teuchos::ParameterList>>("Parameters From Problem", pfp);
+    pp->set<std::string>("BF Name", "BF");
+    pp->set<std::string>("Weighted BF Name", "wBF");
+    pp->set<std::string>("Coordinate Vector Name", "Coord Vec");
+    pp->set<Albany::StateManager*>("State Manager Ptr", &state_manager);
+    pp->set<Teuchos::RCP<PHX::DataLayout>>("Dummy Data Layout", dl->dummy);
+
+    // Constructing the evaluator registers the proj_nodal_* nodal states and the
+    // projection manager (and one worker) as a side effect; we keep nothing.
+    LCM::ProjectIPtoNodalField<EvalT, Traits> registrar(*pp, dl, &ms);
+    (void)registrar;
+  }
+}
+
 }  // namespace Albany

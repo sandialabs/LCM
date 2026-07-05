@@ -42,6 +42,19 @@ ObserverImpl::projectNodalFields(double stamp)
         projectors_.push_back(Teuchos::rcp(new NodalFieldProjector(app_, fields, mass_matrix_type, output_to_exodus)));
       }
     }
+    // The migration target: the "Nodal Field Projection" sublist (states are
+    // registered from Application::buildProblem, no response involved).
+    if (problem_pl->isSublist("Nodal Field Projection")) {
+      auto&     nfp = problem_pl->sublist("Nodal Field Projection");
+      int const nf  = nfp.get<int>("Number of Fields", 0);
+      std::vector<NodalFieldProjector::FieldSpec> fields;
+      for (int f = 0; f < nf; ++f) {
+        fields.push_back({nfp.get<std::string>(Albany::strint("IP Field Name", f)), nfp.get<std::string>(Albany::strint("IP Field Layout", f))});
+      }
+      std::string const mass_matrix_type = nfp.get<std::string>("Mass Matrix Type", "Full");
+      bool const        output_to_exodus = nfp.get<bool>("Output to File", true);
+      projectors_.push_back(Teuchos::rcp(new NodalFieldProjector(app_, fields, mass_matrix_type, output_to_exodus)));
+    }
   }
   for (auto const& projector : projectors_) projector->project(stamp);
 }

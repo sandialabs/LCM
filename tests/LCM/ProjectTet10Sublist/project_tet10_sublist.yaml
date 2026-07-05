@@ -1,0 +1,48 @@
+%YAML 1.1
+---
+LCM:
+  Problem:
+    Name: Mechanics 3D
+    Solution Method: Steady
+    MaterialDB Filename: 'materials.yaml'
+    Dirichlet BCs:
+      DBC on NS nodelist_1 for DOF X: 0.0
+      DBC on NS nodelist_3 for DOF Y: 0.0
+      DBC on NS nodelist_5 for DOF Z: 0.0
+      DBC on NS nodelist_2 for DOF X: 0.01
+    Response Functions:
+      Number: 1
+      Response 0: Solution Average
+    Nodal Field Projection:
+      Number of Fields: 1
+      IP Field Name 0: Cauchy_Stress
+      IP Field Layout 0: Tensor
+      Mass Matrix Type: Full
+      Output to File: true
+  Discretization:
+    Method: Exodus
+    Exodus Input File Name: 'cube-single-tet10.g'
+    Exodus Output File Name: 'project_tet10_sublist.e'
+    Cubature Degree: 2
+  Piro:
+    NOX:
+      Nonlinear Solver: Line Search Based
+      Line Search:
+        Method: Full Step
+      Direction:
+        Method: Newton
+        Newton:
+          Linear Solver: {}
+      Solver Options:
+        Status Test Check Type: Complete
+      Status Tests:
+        Test Type: Combo
+        Combo Type: OR
+        Number of Tests: 2
+        Test 0:
+          Test Type: NormF
+          Tolerance: 1.0e-10
+        Test 1:
+          Test Type: MaxIters
+          Maximum Iterations: 10
+...

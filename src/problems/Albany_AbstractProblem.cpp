@@ -127,6 +127,7 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
   validPL->sublist("Source Functions", false, "");
   validPL->sublist("Absorption", false, "");
   validPL->sublist("Response Functions", false, "");
+  validPL->sublist("Nodal Field Projection", false, "IP-to-nodal L2/lumped projection driven by the solution observer");
   validPL->sublist("Parameters", false, "");
   validPL->sublist("Distributed Parameters", false, "");
   validPL->sublist("Teko", false, "");

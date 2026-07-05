@@ -75,6 +75,22 @@ class NodalFieldProjector
   std::vector<std::string> eval_names_;
 };
 
+// Register the proj_nodal_<name> nodal states and create the projection manager
+// for the given fields, without building the projection field managers. This is
+// the pre-discretization half of the projection: it must run before the state
+// arrays are allocated (i.e. before createDiscretization), where registering
+// new nodal states is still allowed. A NodalFieldProjector built later reuses
+// what this registered. Driven by the problem's "Nodal Field Projection"
+// sublist, it replaces the state-registration side effect of the old
+// "Project IP to Nodal Field" response.
+void
+registerNodalFieldProjectionStates(
+    Teuchos::RCP<Application> const&                        app,
+    Teuchos::ArrayRCP<Teuchos::RCP<MeshSpecsStruct>> const& mesh_specs,
+    std::vector<NodalFieldProjector::FieldSpec> const&      fields,
+    std::string const&                                      mass_matrix_type = "Full",
+    bool const                                             output_to_exodus = true);
+
 }  // namespace Albany
 
 #endif  // ALBANY_NODAL_FIELD_PROJECTOR_HPP

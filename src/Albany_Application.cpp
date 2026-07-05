@@ -3,6 +3,7 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include "Albany_Application.hpp"
+#include "Albany_NodalFieldProjector.hpp"
 
 #include <fstream>
 #include <set>
@@ -408,6 +409,23 @@ Application::buildProblem()
 
   neq               = problem->numEquations();
   spatial_dimension = problem->spatialDimension();
+
+  // Register nodal-field-projection states here, before createDiscretization
+  // allocates the state arrays (new nodal-state registration is only allowed
+  // pre-allocation). This is the standalone replacement for the
+  // state-registration side effect of the old "Project IP to Nodal Field"
+  // response; the observer drives the projection at output time.
+  if (problemParams->isSublist("Nodal Field Projection")) {
+    auto&                                              nfp = problemParams->sublist("Nodal Field Projection");
+    int const                                          nf  = nfp.get<int>("Number of Fields", 0);
+    std::vector<Albany::NodalFieldProjector::FieldSpec> fields;
+    for (int f = 0; f < nf; ++f) {
+      fields.push_back({nfp.get<std::string>(Albany::strint("IP Field Name", f)), nfp.get<std::string>(Albany::strint("IP Field Layout", f))});
+    }
+    std::string const mass_matrix_type = nfp.get<std::string>("Mass Matrix Type", "Full");
+    bool const        output_to_exodus = nfp.get<bool>("Output to File", true);
+    Albany::registerNodalFieldProjectionStates(Teuchos::rcp(this, false), meshSpecs, fields, mass_matrix_type, output_to_exodus);
+  }
 
   // Construct responses
   // This really needs to happen after the discretization is created for

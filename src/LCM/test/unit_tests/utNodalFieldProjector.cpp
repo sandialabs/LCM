@@ -84,15 +84,12 @@ std::string const input_yaml =
     "    Parameters:\n"
     "      Number: 1\n"
     "      Parameter 0: Time\n"
-    "    Response Functions:\n"
-    "      Number: 1\n"
-    "      Response 0: Project IP to Nodal Field\n"
-    "      ResponseParams 0:\n"
-    "        Number of Fields: 1\n"
-    "        IP Field Name 0: Cauchy_Stress\n"
-    "        IP Field Layout 0: Tensor\n"
-    "        Mass Matrix Type: Full\n"
-    "        Output to File: true\n"
+    "    Nodal Field Projection:\n"
+    "      Number of Fields: 1\n"
+    "      IP Field Name 0: Cauchy_Stress\n"
+    "      IP Field Layout 0: Tensor\n"
+    "      Mass Matrix Type: Full\n"
+    "      Output to File: true\n"
     "  Discretization:\n"
     "    1D Elements: 1\n"
     "    2D Elements: 1\n"
@@ -219,8 +216,8 @@ TEUCHOS_UNIT_TEST(NodalFieldProjector, UniaxialTension)
   RCP<Teuchos_Comm const>          comm  = Albany::getDefaultComm();
   RCP<Teuchos::ParameterList>      input = Teuchos::getParametersFromYamlString(input_yaml);
 
-  // Build and solve the uniaxial-tension problem. The deck declares a
-  // "Project IP to Nodal Field" response, which registers the
+  // Build and solve the uniaxial-tension problem. The deck's "Nodal Field
+  // Projection" sublist makes Application::buildProblem register the
   // proj_nodal_Cauchy_Stress nodal state and its projection manager during
   // setup; the projector under test reuses both.
   Albany::SolverFactory                                slvrfctry(input, comm);

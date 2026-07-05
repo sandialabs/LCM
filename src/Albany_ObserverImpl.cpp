@@ -18,32 +18,13 @@ namespace Albany {
 void
 ObserverImpl::projectNodalFields(double stamp)
 {
-  // Build the projectors once, from every "Project IP to Nodal Field" response
-  // the problem declares (same field list the response used). They read the
-  // saved quadrature-point states and write the proj_nodal_* nodal states the
-  // response already registered, so nothing here depends on the response ever
-  // being evaluated.
+  // Build the projectors once, from the problem's "Nodal Field Projection"
+  // sublist. Each reads the saved quadrature-point states and writes the
+  // proj_nodal_* nodal states that Application::buildProblem registered, so the
+  // projection is fully decoupled from the (now removed) response path.
   if (!projectors_built_) {
     projectors_built_ = true;
     auto problem_pl   = app_->getProblemPL();
-    if (problem_pl->isSublist("Response Functions")) {
-      auto&     rf       = problem_pl->sublist("Response Functions");
-      int const num_resp = rf.get<int>("Number", 0);
-      for (int r = 0; r < num_resp; ++r) {
-        if (rf.get<std::string>(Albany::strint("Response", r), "") != "Project IP to Nodal Field") continue;
-        auto&     rp = rf.sublist(Albany::strint("ResponseParams", r));
-        int const nf = rp.get<int>("Number of Fields", 0);
-        std::vector<NodalFieldProjector::FieldSpec> fields;
-        for (int f = 0; f < nf; ++f) {
-          fields.push_back({rp.get<std::string>(Albany::strint("IP Field Name", f)), rp.get<std::string>(Albany::strint("IP Field Layout", f))});
-        }
-        std::string const mass_matrix_type = rp.get<std::string>("Mass Matrix Type", "Full");
-        bool const        output_to_exodus = rp.get<bool>("Output to File", true);
-        projectors_.push_back(Teuchos::rcp(new NodalFieldProjector(app_, fields, mass_matrix_type, output_to_exodus)));
-      }
-    }
-    // The migration target: the "Nodal Field Projection" sublist (states are
-    // registered from Application::buildProblem, no response involved).
     if (problem_pl->isSublist("Nodal Field Projection")) {
       auto&     nfp = problem_pl->sublist("Nodal Field Projection");
       int const nf  = nfp.get<int>("Number of Fields", 0);

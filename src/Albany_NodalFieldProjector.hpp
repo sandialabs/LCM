@@ -49,8 +49,8 @@ class NodalFieldProjector
   // Builds one projection field manager per element block. `fields` lists the
   // saved QP states to project; `mass_matrix_type` is "Full" (L2) or "Lumped".
   // The projected nodal states must already be registered (the projector reuses
-  // them; registration is idempotent), which holds whenever the corresponding
-  // "Project IP to Nodal Field" response was declared.
+  // them; registration is idempotent), which registerNodalFieldProjectionStates
+  // does from Application::buildProblem for the "Nodal Field Projection" sublist.
   NodalFieldProjector(
       Teuchos::RCP<Application> const& app,
       std::vector<FieldSpec> const&    fields,

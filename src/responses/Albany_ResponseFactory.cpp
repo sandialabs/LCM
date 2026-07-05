@@ -115,18 +115,7 @@ Albany::ResponseFactory::createResponseFunction(
     }
   }
 
-  else if (name == "IP to Nodal Field" || name == "Project IP to Nodal Field") {
-    responseParams.set("Name", name);
-    for (int i = 0; i < meshSpecs.size(); i++) {
-      // Skip if dealing with interface block
-      // if (meshSpecs[i]->ebName == "Surface Element") continue;
-      // For these RFs, default to true for this parm.
-      char const* reb_parm = "Restrict to Element Block";
-      if (!responseParams.isType<bool>(reb_parm) && (name == "IP to Nodal Field" || name == "Project IP to Nodal Field"))
-        responseParams.set<bool>(reb_parm, true);
-      responses.push_back(rcp(new Albany::FieldManagerResidualOnlyResponseFunction(app, prob, meshSpecs[i], stateMgr, responseParams)));
-    }
-  } else if (name == "Solution") {
+  else if (name == "Solution") {
     responses.push_back(rcp(new Albany::SolutionResponseFunction(app, responseParams)));
   } else if (name == "KL") {
     Array<RCP<AbstractResponseFunction>> base_responses;

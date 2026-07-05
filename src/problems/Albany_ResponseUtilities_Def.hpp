@@ -4,13 +4,11 @@
 #include "Adapt_ElementSizeField.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
-#include "IPtoNodalField.hpp"
 #include "PHAL_ResponseFieldIntegral.hpp"
 #include "PHAL_ResponseSquaredL2Difference.hpp"
 #include "PHAL_ResponseSquaredL2DifferenceSide.hpp"
 #include "PHAL_ResponseThermalEnergy.hpp"
 #include "PHAL_SaveNodalField.hpp"
-#include "ProjectIPtoNodalField.hpp"
 
 template <typename EvalT, typename Traits>
 Albany::ResponseUtilities<EvalT, Traits>::ResponseUtilities(Teuchos::RCP<Albany::Layouts> dl_) : dl(dl_)
@@ -88,18 +86,6 @@ Albany::ResponseUtilities<EvalT, Traits>::constructResponses(
     p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
 
     res_ev = rcp(new PHAL::SaveNodalField<EvalT, Traits>(*p, dl));
-  } else if (responseName == "IP to Nodal Field") {
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-    p->set<RCP<DataLayout>>("Dummy Data Layout", dl->dummy);
-    res_ev = rcp(new LCM::IPtoNodalField<EvalT, Traits>(*p, dl, meshSpecs));
-  } else if (responseName == "Project IP to Nodal Field") {
-    p->set<Albany::StateManager*>("State Manager Ptr", &stateMgr);
-    p->set<RCP<DataLayout>>("Dummy Data Layout", dl->dummy);
-    p->set<std::string>("BF Name", "BF");
-    p->set<std::string>("Weighted BF Name", "wBF");
-    p->set<std::string>("Coordinate Vector Name", "Coord Vec");
-
-    res_ev = rcp(new LCM::ProjectIPtoNodalField<EvalT, Traits>(*p, dl, meshSpecs));
   }
 
   else

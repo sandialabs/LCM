@@ -1,0 +1,787 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.19)  1 JUL 2026 09:15
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**cap-plasticity.tex
+(./cap-plasticity.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-03-20>
+(/home/amota/texlive/2026/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(/home/amota/texlive/2026/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count275
+\c@section=\count276
+\c@subsection=\count277
+\c@subsubsection=\count278
+\c@paragraph=\count279
+\c@subparagraph=\count280
+\c@figure=\count281
+\c@table=\count282
+\abovecaptionskip=\skip49
+\belowcaptionskip=\skip50
+\bibindent=\dimen150
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/algorithms/algorithmic.sty
+Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks17
+)
+\c@ALC@unique=\count283
+\c@ALC@line=\count284
+\c@ALC@rem=\count285
+\c@ALC@depth=\count286
+\ALC@tlm=\skip51
+\algorithmicindent=\skip52
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/algorithms/algorithm.sty
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
+nment
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count287
+\float@exts=\toks18
+\float@box=\box53
+\@float@everytoks=\toks19
+\@floatcapt=\box54
+)
+\@float@every@algorithm=\toks20
+\c@algorithm=\count288
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks21
+\ex@=\dimen151
+)
+\pmbraise@=\dimen152
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2025/07/09 v2.17z AMS math features
+\@mathmargin=\skip53
+
+For additional information on amsmath, use the `?' option.
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2024/11/17 v2.01 AMS text
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2022/04/08 v2.04 operator names
+)
+\inf@bad=\count289
+LaTeX Info: Redefining \frac on input line 233.
+\uproot@=\count290
+\leftroot@=\count291
+LaTeX Info: Redefining \overline on input line 398.
+LaTeX Info: Redefining \colon on input line 409.
+\classnum@=\count292
+\DOTSCASE@=\count293
+LaTeX Info: Redefining \ldots on input line 495.
+LaTeX Info: Redefining \dots on input line 498.
+LaTeX Info: Redefining \cdots on input line 619.
+\Mathstrutbox@=\box55
+\strutbox@=\box56
+LaTeX Info: Redefining \big on input line 721.
+LaTeX Info: Redefining \Big on input line 722.
+LaTeX Info: Redefining \bigg on input line 723.
+LaTeX Info: Redefining \Bigg on input line 724.
+\big@size=\dimen153
+LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
+\macc@depth=\count294
+LaTeX Info: Redefining \bmod on input line 904.
+LaTeX Info: Redefining \pmod on input line 909.
+LaTeX Info: Redefining \smash on input line 939.
+LaTeX Info: Redefining \relbar on input line 969.
+LaTeX Info: Redefining \Relbar on input line 970.
+\c@MaxMatrixCols=\count295
+\dotsspace@=\muskip17
+\c@parentequation=\count296
+\dspbrk@lvl=\count297
+\tag@help=\toks22
+\row@=\count298
+\column@=\count299
+\maxfields@=\count300
+\andhelp@=\toks23
+\eqnshift@=\dimen154
+\alignsep@=\dimen155
+\tagshift@=\dimen156
+\tagwidth@=\dimen157
+\totwidth@=\dimen158
+\lineht@=\dimen159
+\@envbody=\toks24
+\multlinegap=\skip54
+\multlinetaggap=\skip55
+\mathdisplay@stack=\toks25
+LaTeX Info: Redefining \[ on input line 2950.
+LaTeX Info: Redefining \] on input line 2951.
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amscls/amsthm.sty
+Package: amsthm 2020/05/29 v2.20.6
+\thm@style=\toks26
+\thm@bodyfont=\toks27
+\thm@headfont=\toks28
+\thm@notefont=\toks29
+\thm@headpunct=\toks30
+\thm@preskip=\skip56
+\thm@postskip=\skip57
+\thm@headsep=\skip58
+\dth@everypar=\toks31
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/tools/array.sty
+Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
+\col@sep=\dimen160
+\ar@mcellbox=\box57
+\extrarowheight=\dimen161
+\NC@list=\toks32
+\extratabsurround=\skip59
+\backup@length=\skip60
+\ar@cellbox=\box58
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen162
+\lightrulewidth=\dimen163
+\cmidrulewidth=\dimen164
+\belowrulesep=\dimen165
+\belowbottomsep=\dimen166
+\aboverulesep=\dimen167
+\abovetopsep=\dimen168
+\cmidrulesep=\dimen169
+\cmidrulekern=\dimen170
+\defaultaddspace=\dimen171
+\@cmidla=\count301
+\@cmidlb=\count302
+\@aboverulesep=\dimen172
+\@belowrulesep=\dimen173
+\@thisruleclass=\count303
+\@lastruleclass=\count304
+\@thisrulewidth=\dimen174
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics/epsfig.sty
+Package: epsfig 2024/01/14 v1.7b (e)psfig emulation (SPQR)
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 106.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen175
+\Gin@req@width=\dimen176
+)
+\epsfxsize=\dimen177
+\epsfysize=\dimen178
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
+
+\f@nch@headwidth=\skip61
+\f@nch@offset@elh=\skip62
+\f@nch@offset@erh=\skip63
+\f@nch@offset@olh=\skip64
+\f@nch@offset@orh=\skip65
+\f@nch@offset@elf=\skip66
+\f@nch@offset@erf=\skip67
+\f@nch@offset@olf=\skip68
+\f@nch@offset@orf=\skip69
+\f@nch@height=\skip70
+\f@nch@footalignment=\skip71
+\f@nch@widthL=\skip72
+\f@nch@widthC=\skip73
+\f@nch@widthR=\skip74
+\@temptokenb=\toks33
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/preprint/fullpage.sty
+Package: fullpage 1999/02/23 1.1 (PWD)
+\FP@margin=\skip75
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/psnfss/times.sty
+Package: times 2020/03/25 PSNFSS-v9.3 (SPQR) 
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/tools/xspace.sty
+Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2026-01-29 v7.01p Hypertext links for LaTeX
+
+(/home/amota/texlive/2026/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2024/12/12 v1.0g TeX engine tests
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
+)
+(/home/amota/texlive/2026/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+) (/home/amota/texlive/2026/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+
+(/home/amota/texlive/2026/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
+)
+(/home/amota/texlive/2026/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/home/amota/texlive/2026/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+))
+(/home/amota/texlive/2026/texmf-dist/tex/latex/hycolor/hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2026-01-29 v2.58 Cross-referencing by name of section
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/refcount/refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+)
+(/home/amota/texlive/2026/texmf-dist/tex/generic/gettitlestring/gettitlestring.
+sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+ (/home/amota/texlive/2026/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+))
+\c@section@level=\count305
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count306
+)
+(/home/amota/texlive/2026/texmf-dist/tex/generic/stringenc/stringenc.sty
+Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
+)
+)
+\@linkdim=\dimen179
+\Hy@linkcounter=\count307
+\Hy@pagecounter=\count308
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2026-01-29 v7.01p Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+(/home/amota/texlive/2026/texmf-dist/tex/generic/intcalc/intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+\Hy@SavedSpaceFactor=\count309
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2026-01-29 v7.01p Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Option `colorlinks' set `true' on input line 4072.
+Package hyperref Info: Hyper figures OFF on input line 4201.
+Package hyperref Info: Link nesting OFF on input line 4206.
+Package hyperref Info: Hyper index ON on input line 4209.
+Package hyperref Info: Plain pages OFF on input line 4216.
+Package hyperref Info: Backreferencing OFF on input line 4221.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4468.
+\c@Hy@tempcnt=\count310
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip18
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 4807.
+\XeTeXLinkMargin=\dimen180
+
+(/home/amota/texlive/2026/texmf-dist/tex/generic/bitset/bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+
+(/home/amota/texlive/2026/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count311
+\Field@Width=\dimen181
+\Fld@charsize=\dimen182
+Package hyperref Info: Hyper figures OFF on input line 6084.
+Package hyperref Info: Link nesting OFF on input line 6089.
+Package hyperref Info: Hyper index ON on input line 6092.
+Package hyperref Info: backreferencing OFF on input line 6099.
+Package hyperref Info: Link coloring ON on input line 6102.
+Package hyperref Info: Link coloring with OCG OFF on input line 6109.
+Package hyperref Info: PDF/A mode OFF on input line 6114.
+\Hy@abspage=\count312
+\c@Item=\count313
+\c@Hfootnote=\count314
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2026-01-29 v7.01p Hyperref driver for pdfTeX
+\Fld@listcount=\count315
+\c@bookmark@seq@number=\count316
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.st
+y
+Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
+
+(/home/amota/texlive/2026/texmf-dist/tex/generic/uniquecounter/uniquecounter.st
+y
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+84.
+)
+\Hy@SectionHShift=\skip76
+) (/home/amota/texlive/2026/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip77
+\bibsep=\skip78
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count317
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
+LaTeX Font Info:    Trying to load font information for T1+ptm on input line 11
+6.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/psnfss/t1ptm.fd
+File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
+))
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/lmodern.sty
+Package: lmodern 2015/05/01 v1.6.1 Latin Modern Fonts
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/lmr/m/n on input line 22.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/lmm/m/it on input line 23.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/lmsy/m/n on input line 24.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/lmex/m/n on input line 25.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 26.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/lmm/b/it on input line 27.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/lmsy/b/n on input line 28.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/lmex/m/n on input line 29.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 31.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
+(Font)                  OT1/cmss/m/n --> OT1/lmss/m/n on input line 32.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/lmr/m/it on input line 33.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/cmss/bx/n --> OT1/lmss/bx/n on input line 36.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/lmr/bx/it on input line 37.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 38.
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/boldtensors/boldtensors.sty
+Package: boldtensors 1995/01/10 boldtensors
+
+Document Style Option `boldtensors' 
+\symcmtensor=\mathgroup6
+\symcmoperator=\mathgroup7
+\symcmsymbols=\mathgroup8
+\symcmbboard=\mathgroup9
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/microtype/microtype.sty
+Package: microtype 2026/03/01 v3.2d Micro-typographical refinements (RS)
+\MT@toks=\toks34
+\MT@tempbox=\box59
+\MT@count=\count318
+LaTeX Info: Redefining \noprotrusionifhmode on input line 1084.
+LaTeX Info: Redefining \leftprotrusion on input line 1085.
+\MT@prot@toks=\toks35
+LaTeX Info: Redefining \rightprotrusion on input line 1104.
+LaTeX Info: Redefining \textls on input line 1449.
+\MT@outer@kern=\dimen183
+LaTeX Info: Redefining \microtypecontext on input line 2053.
+LaTeX Info: Redefining \textmicrotypecontext on input line 2070.
+\MT@listname@count=\count319
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/microtype/microtype-pdftex.def
+File: microtype-pdftex.def 2026/03/01 v3.2d Definitions specific to pdftex (RS)
+
+LaTeX Info: Redefining \lsstyle on input line 944.
+LaTeX Info: Redefining \lslig on input line 944.
+\MT@outer@space=\skip79
+)
+Package microtype Info: Loading configuration file microtype.cfg.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/microtype/microtype.cfg
+File: microtype.cfg 2026/03/01 v3.2d microtype main configuration file (RS)
+)
+LaTeX Info: Redefining \microtypesetup on input line 3065.
+)
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 61
+.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/t1lmr.fd
+File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2026-02-18 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count320
+)
+(./cap-plasticity.aux)
+\openout1 = `cap-plasticity.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+
+(/home/amota/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count321
+\scratchdimen=\dimen184
+\scratchbox=\box60
+\nofMPsegments=\count322
+\nofMParguments=\count323
+\everyMPshowfont=\toks36
+\MPscratchCnt=\count324
+\MPscratchDim=\dimen185
+\MPnumerator=\count325
+\makeMPintoPDFobject=\count326
+\everyMPtoPDFconversion=\toks37
+) (/home/amota/texlive/2026/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+(/home/amota/texlive/2026/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2025/01/14 v1.3e Standard LaTeX Color (DPC)
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: pdftex.def on input line 149.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+Package hyperref Info: Link coloring ON on input line 61.
+
+(./cap-plasticity.out) (./cap-plasticity.out)
+\@outlinefile=\write3
+\openout3 = `cap-plasticity.out'.
+
+LaTeX Info: Redefining \microtypecontext on input line 61.
+Package microtype Info: Applying patch `item' on input line 61.
+Package microtype Info: Applying patch `toc' on input line 61.
+Package microtype Info: Applying patch `eqnum' on input line 61.
+Package microtype Info: Applying patch `footnote' on input line 61.
+Package microtype Info: Applying patch `verbatim' on input line 61.
+LaTeX Info: Redefining \microtypesetup on input line 61.
+Package microtype Info: Generating PDF output.
+Package microtype Info: Character protrusion enabled (level 2).
+Package microtype Info: Using default protrusion set `alltext'.
+Package microtype Info: Automatic font expansion enabled (level 2),
+(microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
+Package microtype Info: Using default expansion set `alltext-nott'.
+Package microtype Info: Patching command `\showhyphens'.
+Package microtype Info: No adjustment of tracking.
+Package microtype Info: No adjustment of interword spacing.
+Package microtype Info: No adjustment of character kerning.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/microtype/mt-cmr.cfg
+File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
+(RS)
+)
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 9
+0.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/ot1lmr.fd
+File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 9
+0.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/omllmm.fd
+File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
+90.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/omslmsy.fd
+File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
+90.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/omxlmex.fd
+File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <14.4> on input line 90.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 90.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 90.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 90.
+
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/microtype/mt-msa.cfg
+File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 90.
+
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+(/home/amota/texlive/2026/texmf-dist/tex/latex/microtype/mt-msb.cfg
+File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+)
+LaTeX Font Info:    External font `cmmib10 at14.4pt' loaded for size
+(Font)              <14> on input line 90.
+LaTeX Font Info:    External font `cmmib10 at10pt' loaded for size
+(Font)              <10> on input line 90.
+LaTeX Font Info:    External font `cmmib7 at7.67pt' loaded for size
+(Font)              <7> on input line 90.
+LaTeX Font Info:    External font `cmbx12 at14.4pt' loaded for size
+(Font)              <14> on input line 90.
+LaTeX Font Info:    External font `cmbx10 at10pt' loaded for size
+(Font)              <10> on input line 90.
+LaTeX Font Info:    External font `cmbx7 at7.67pt' loaded for size
+(Font)              <7> on input line 90.
+LaTeX Font Info:    External font `cmbsy10 at14.4pt' loaded for size
+(Font)              <14> on input line 90.
+LaTeX Font Info:    External font `cmbsy10 at10pt' loaded for size
+(Font)              <10> on input line 90.
+LaTeX Font Info:    External font `cmbsy7 at7.67pt' loaded for size
+(Font)              <7> on input line 90.
+LaTeX Font Info:    External font `bbold12 at14.4pt' loaded for size
+(Font)              <14> on input line 90.
+LaTeX Font Info:    External font `bbold10 at10pt' loaded for size
+(Font)              <10> on input line 90.
+LaTeX Font Info:    External font `bbold7 at7pt' loaded for size
+(Font)              <7> on input line 90.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 9
+0.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 90.
+LaTeX Font Info:    External font `cmmib5 at5.48pt' loaded for size
+(Font)              <5> on input line 90.
+LaTeX Font Info:    External font `cmbx5 at5.48pt' loaded for size
+(Font)              <5> on input line 90.
+LaTeX Font Info:    External font `cmbsy5 at5.48pt' loaded for size
+(Font)              <5> on input line 90.
+LaTeX Font Info:    External font `bbold5 at5pt' loaded for size
+(Font)              <5> on input line 90.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 9
+4.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `lmtt' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+
+Underfull \hbox (badness 10000) in paragraph at lines 93--115
+
+ []
+
+
+Underfull \hbox (badness 1348) in paragraph at lines 93--115
+\T1/lmr/m/n/10.95 (+20) Keywords: Cap plas-tic-ity, three-invariant yield sur-f
+ace, kine-matic hard-en-ing,
+ []
+
+[1
+
+{/home/amota/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/home/a
+mota/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/home/amota/texlive/
+2026/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/home/amota/texlive/2026/texmf-di
+st/fonts/enc/dvips/lm/lm-ts1.enc}]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <12> on input line 154.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 154.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 154.
+LaTeX Font Info:    External font `cmmib10 at12pt' loaded for size
+(Font)              <12> on input line 154.
+LaTeX Font Info:    External font `cmmib8 at8.76pt' loaded for size
+(Font)              <8> on input line 154.
+LaTeX Font Info:    External font `cmmib6 at6.57pt' loaded for size
+(Font)              <6> on input line 154.
+LaTeX Font Info:    External font `cmbx12 at12pt' loaded for size
+(Font)              <12> on input line 154.
+LaTeX Font Info:    External font `cmbx8 at8.76pt' loaded for size
+(Font)              <8> on input line 154.
+LaTeX Font Info:    External font `cmbx6 at6.57pt' loaded for size
+(Font)              <6> on input line 154.
+LaTeX Font Info:    External font `cmbsy10 at12pt' loaded for size
+(Font)              <12> on input line 154.
+LaTeX Font Info:    External font `cmbsy8 at8.76pt' loaded for size
+(Font)              <8> on input line 154.
+LaTeX Font Info:    External font `cmbsy6 at6.57pt' loaded for size
+(Font)              <6> on input line 154.
+LaTeX Font Info:    External font `bbold12 at12pt' loaded for size
+(Font)              <12> on input line 154.
+LaTeX Font Info:    External font `bbold8 at8pt' loaded for size
+(Font)              <8> on input line 154.
+LaTeX Font Info:    External font `bbold6 at6pt' loaded for size
+(Font)              <6> on input line 154.
+LaTeX Font Info:    Trying to load font information for OT1+lmss on input line 
+159.
+
+(/home/amota/texlive/2026/texmf-dist/tex/latex/lm/ot1lmss.fd
+File: ot1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `lmss' (encoding: OT1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+ [2{/home/amota/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/home
+/amota/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [3{/home/amot
+a/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [4] [5]
+Underfull \hbox (badness 1910) in paragraph at lines 486--491
+[]\T1/lmr/m/n/12 (+20) If $\OML/lmm/m/it/12 R > []$ \T1/lmr/m/n/12 (+20) and $\
+OT1/lmr/m/n/12 (+20) ^^A\OML/lmm/m/it/12 T > \OT1/lmr/m/n/12 (+20) ^^A\OML/lmm/
+m/it/12 T[]$\T1/lmr/m/n/12 (+20) : re-ject, set $\OT1/lmr/m/n/12 (+20) ^^A\OML/
+lmm/m/it/12 T \OMS/lmsy/m/n/12  
+ []
+
+[6] [7] [8] [9]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 741.
+LaTeX Font Info:    External font `cmmib10 at10.95pt' loaded for size
+(Font)              <11> on input line 741.
+LaTeX Font Info:    External font `cmbx10 at10.95pt' loaded for size
+(Font)              <11> on input line 741.
+LaTeX Font Info:    External font `cmbsy10 at10.95pt' loaded for size
+(Font)              <11> on input line 741.
+LaTeX Font Info:    External font `bbold10 at10.95pt' loaded for size
+(Font)              <11> on input line 741.
+
+Underfull \hbox (badness 10000) in paragraph at lines 749--749
+[]|\T1/lmr/m/n/10.95 (+20) unequal nor-mal
+ []
+
+
+Underfull \hbox (badness 1596) in paragraph at lines 750--750
+[]|$\OML/lmm/m/it/10.95   \OT1/lmr/m/n/10.95 (+20) = 0\OML/lmm/m/it/10.95 :\OT1
+/lmr/m/n/10.95 (+20) 8$ \T1/lmr/m/n/10.95 (+20) (Lode), non-
+ []
+
+[10]
+Underfull \hbox (badness 1546) in paragraph at lines 795--796
+[]|\T1/lmr/m/n/10.95 (+20) triaxial ex-ten-sion/compression
+ []
+
+[11] [12] [13]
+<figures/yield-surface-permafrost.pdf, id=276, 735.3126pt x 321.75581pt>
+File: figures/yield-surface-permafrost.pdf Graphic file (type pdf)
+<use figures/yield-surface-permafrost.pdf>
+Package pdftex.def Info: figures/yield-surface-permafrost.pdf  used on input li
+ne 997.
+(pdftex.def)             Requested size: 469.75502pt x 205.5597pt.
+ [14] [15 <./figures/yield-surface-permafrost.pdf>] [16] [17]
+[18]
+Overfull \hbox (101.9691pt too wide) in paragraph at lines 1257--1299
+ [] 
+ []
+
+[19] [20] [21] (./cap-plasticity.aux)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-03-20>
+ ***********
+Package rerunfilecheck Info: File `cap-plasticity.out' has not changed.
+(rerunfilecheck)             Checksum: 9AA0FC743F4DDF9473728847EF013DA8;2576.
+ ) 
+Here is how much of TeX's memory you used:
+ 14409 strings out of 467349
+ 224322 string characters out of 5415114
+ 666531 words of memory out of 5000000
+ 42796 multiletter control sequences out of 15000+600000
+ 739000 words of font info for 295 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 75i,12n,79p,1011b,586s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</home/amota/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.p
+fb></home/amota/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmm
+ib8.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><
+/home/amota/texlive/2026/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></home/amo
+ta/texlive/2026/texmf-dist/fonts/type1/public/lm/lmex10.pfb></home/amota/texliv
+e/2026/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></home/amota/texlive/2026/te
+xmf-dist/fonts/type1/public/lm/lmmi12.pfb></home/amota/texlive/2026/texmf-dist/
+fonts/type1/public/lm/lmmi8.pfb></home/amota/texlive/2026/texmf-dist/fonts/type
+1/public/lm/lmr10.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/public/l
+m/lmr12.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr17.pf
+b></home/amota/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr6.pfb></home/am
+ota/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr7.pfb></home/amota/texlive
+/2026/texmf-dist/fonts/type1/public/lm/lmr8.pfb></home/amota/texlive/2026/texmf
+-dist/fonts/type1/public/lm/lmri12.pfb></home/amota/texlive/2026/texmf-dist/fon
+ts/type1/public/lm/lmsy10.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/
+public/lm/lmsy8.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/public/lm/
+lmtt10.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt12.pf
+b>
+Output written on cap-plasticity.pdf (21 pages, 824869 bytes).
+PDF statistics:
+ 532 PDF objects out of 1000 (max. 8388607)
+ 416 compressed objects within 5 object streams
+ 127 named destinations out of 1000 (max. 500000)
+ 59502 words of extra memory for PDF output out of 61914 (max. 10000000)
+

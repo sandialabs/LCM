@@ -299,11 +299,13 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   // the ACE solver at the START of each mechanical step -- the SAME instant
   // death_status_vecs_ is snapshotted. zeroResidualAtDeadNodes /
   // fixOrphanNodesForElementDeath impose the hold-in-place Dirichlet on these.
-  // Using the frozen step-start set (rather than a live getDeadNodeDOFGids
-  // recompute mid-fill) keeps the Dirichlet active set consistent with the
-  // scatter skip: a cell that dies mid-Newton (in-place death) is handled by
-  // the scatter next step, not pinned mid-solve (which would thrash the
-  // active set). Empty in non-ACE runs (the exact-zero orphan fix still runs).
+  // The frozen step-start set is now consistent with the scatter skip by
+  // construction: constitutive models declare new deaths only in the
+  // post-convergence state pass (Workset::allow_death_propagation), so the
+  // death set cannot change within a Newton solve -- the scatter-skip set and
+  // this pinned set stay identical for the whole solve (Adagio-style
+  // between-solve death; GitHub #114). Empty in non-ACE runs (the exact-zero
+  // orphan fix still runs).
   std::vector<GO> frozen_dead_dof_gids_;
 
   // Set true by applyDeathToActivePart when a clone-before-disconnect death

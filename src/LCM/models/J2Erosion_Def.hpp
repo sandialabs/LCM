@@ -221,12 +221,15 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   Fp_old_            = (*workset.stateArrayPtr)[Fp_str + "_old"];
   eqps_old_          = (*workset.stateArrayPtr)[eqps_str + "_old"];
   failure_modes_old_ = (*workset.stateArrayPtr)["failure_modes_old"];
-  // Read death status from the workset.  The ACE solver populates this
-  // at the start of each step from the prior converged state, and
-  // J2Erosion's operator() writes into it live when new failures occur
-  // during a Newton iteration.  The scatter evaluator reads it to skip
-  // dead cells in assembly.
+  // Read death status from the workset.  The ACE solver populates this at the
+  // start of each step from the prior converged state; it is held FROZEN through
+  // the step's Newton solves, and J2Erosion declares any new deaths into it only
+  // in the post-convergence state pass (allow_death_propagation_).  The scatter
+  // evaluator reads it to skip dead cells in assembly.
   has_failed_old_ = false;
+  // Deaths are declared only in the post-convergence state pass, so the active
+  // set is frozen through a Newton solve (Adagio-style between-solve death).
+  allow_death_propagation_ = workset.allow_death_propagation;
   if (workset.death_status_vec != Teuchos::null) {
     death_status_vec_ = workset.death_status_vec;
     has_failed_old_   = true;
@@ -765,7 +768,13 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   //
   // When disable_erosion_ is true, trips above are no-ops, so no pt
   // ever has a bit set and the predicate cannot trigger.
-  if (pt == num_pts_ - 1 && has_failed_old_) {
+  //
+  // allow_death_propagation_ restricts the declaration of a NEW death to the
+  // post-convergence state pass: within a Newton solve the death set is frozen,
+  // so the scatter-skip set and the driver's dead-DOF pin set stay identical and
+  // no cell can die mid-iteration (which would leave an unpinned singular tangent
+  // and let a garbage step self-certify a whole-mesh death -- GitHub #114).
+  if (pt == num_pts_ - 1 && has_failed_old_ && allow_death_propagation_) {
     int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
                           (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
                                                                                     num_failed_pts_for_death_);

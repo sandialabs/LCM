@@ -129,6 +129,8 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   // state, written here when a cell dies mid-fill.
   Teuchos::RCP<std::vector<double>> death_status_vec_;
   bool                              has_failed_old_{false};
+  // True only in the post-convergence state pass; permits declaring new deaths.
+  bool                              allow_death_propagation_{false};
 
   // Finite-deformation (exponential/logarithmic map) kinematics flag
   bool finite_deformation_;

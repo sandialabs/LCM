@@ -89,6 +89,8 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray eqps_old_;
   Teuchos::RCP<std::vector<double>> death_status_vec_;
   bool            has_failed_old_{false};
+  // True only in the post-convergence state pass; permits declaring new deaths.
+  bool            allow_death_propagation_{false};
 
   // Per-(cell, pt) failure-mode bitmask, carried as an STK-backed element
   // state so it follows each cell correctly when the discretization

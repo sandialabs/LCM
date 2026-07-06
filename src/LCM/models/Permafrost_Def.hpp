@@ -396,13 +396,17 @@ PermafrostKernel<EvalT, Traits>::init(
   ice_sat_state_old_    = (*workset.stateArrayPtr)["Ice_Saturation_State_old"];
   failure_modes_old_    = (*workset.stateArrayPtr)["failure_modes_old"];
 
-  // Read death status from the workset. The ACE solver populates this at
-  // the start of each step from the prior converged cell_death state, and
-  // operator() writes into it live when new failures occur during a
-  // Newton iteration. The scatter evaluator reads it to skip dead cells
-  // in assembly. In a plain mechanics run it is null: failure states are
+  // Read death status from the workset. The ACE solver populates this at the
+  // start of each step from the prior converged cell_death state; it is held
+  // FROZEN through the step's Newton solves, and operator() declares any new
+  // deaths into it only in the post-convergence state pass
+  // (allow_death_propagation_). The scatter evaluator reads it to skip dead
+  // cells in assembly. In a plain mechanics run it is null: failure states are
   // still tracked, but no cell is removed from assembly.
   has_failed_old_ = false;
+  // Deaths are declared only in the post-convergence state pass, so the active
+  // set is frozen through a Newton solve (Adagio-style between-solve death).
+  allow_death_propagation_ = workset.allow_death_propagation;
   if (workset.death_status_vec != Teuchos::null) {
     death_status_vec_ = workset.death_status_vec;
     has_failed_old_   = true;
@@ -871,16 +875,23 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // rebuilds.
     failure_modes_(cell, pt) = static_cast<double>(mask);
 
-    // Live death propagation: when the last pt of a cell is processed,
-    // check whether enough pts now have at least one failure bit set to
-    // meet the death threshold. If so, mark the cell dead so the scatter
-    // evaluator sees it as dead in this same fill -- without this,
-    // Newton keeps assembling nonphysical stress for condemned cells
-    // through a death cascade. Points are processed in order, so at the
-    // last pt every failure_modes_(cell, p) is current. The threshold
-    // must match the one used by init() so the seed and the live update
-    // are consistent.
-    if (pt == num_pts_ - 1 && (has_failed_old_ || gradual_death_)) {
+    // Death propagation: when the last pt of a cell is processed, check whether
+    // enough pts now have a failure bit set to meet the death threshold, advance
+    // the gradual-decay state, and (when fully dead) mark the cell dead. Points
+    // are processed in order, so at the last pt every failure_modes_(cell, p) is
+    // current. The threshold must match the one used by init() so the seed and
+    // the update are consistent.
+    //
+    // allow_death_propagation_ restricts this to the post-convergence state
+    // pass: within a Newton solve the death set is frozen (dead_ keeps its
+    // step-start seed and the stress decay uses the frozen death_decay_old_), so
+    // no cell can die mid-iteration -- which would leave an unpinned singular
+    // tangent and let a garbage step self-certify a whole-mesh death (GitHub
+    // #114). The one-step free-fall the eager live write below used to guard
+    // against no longer arises: a cell that reaches decay 0 in this pass is
+    // marked dead here and skipped by the driver at the next step's start,
+    // never assembled at zero stiffness.
+    if (pt == num_pts_ - 1 && allow_death_propagation_ && (has_failed_old_ || gradual_death_)) {
       int const threshold = num_failed_pts_for_death_ <= 0 ? num_pts_ :
                             (num_failed_pts_for_death_ > static_cast<int>(num_pts_) ? static_cast<int>(num_pts_) :
                                                                                       num_failed_pts_for_death_);

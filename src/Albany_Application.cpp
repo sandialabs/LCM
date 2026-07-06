@@ -2533,6 +2533,12 @@ Application::evaluateStateFieldManager(
   loadBasicWorksetInfo(workset, current_time);
   workset.f = overlapped_f;
 
+  // This is the post-convergence state pass -- the only place a constitutive
+  // model may declare a NEW element death. Residual/Jacobian fills leave this
+  // false, so the death set stays frozen through a Newton solve (Adagio-style
+  // between-solve death; GitHub #114).
+  workset.allow_death_propagation = true;
+
   // Perform fill via field manager
   if (Teuchos::nonnull(rc_mgr)) rc_mgr->beginEvaluatingSfm();
   for (int ws = 0; ws < numWorksets; ws++) {

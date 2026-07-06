@@ -128,6 +128,13 @@ struct Workset
   // Read by the scatter evaluator to skip dead elements.
   Teuchos::RCP<std::vector<double>> death_status_vec{Teuchos::null};
 
+  // When true, constitutive models may declare NEW element deaths (write
+  // cell_death / death_status_vec) during this fill. It is set only in the
+  // post-convergence state-field-manager evaluation, so death is decided on
+  // converged data and the active set stays frozen through a Newton solve
+  // (Adagio-style between-solve death). Residual/Jacobian fills leave it false.
+  bool allow_death_propagation{false};
+
   Teuchos::RCP<Tpetra_MultiVector> auxDataPtrT;
 
   bool transientTerms{false};

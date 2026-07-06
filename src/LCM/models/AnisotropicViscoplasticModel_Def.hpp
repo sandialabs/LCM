@@ -15,14 +15,14 @@ AnisotropicViscoplasticModel<EvalT, Traits>::AnisotropicViscoplasticModel(Teucho
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
   // retrive appropriate field name strings
-  std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string     = (*field_name_map_)["Fp"];
-  std::string eqps_string   = (*field_name_map_)["eqps"];
-  std::string ess_string    = (*field_name_map_)["ess"];
-  std::string kappa_string  = (*field_name_map_)["iso_Hardening"];
-  std::string source_string = (*field_name_map_)["Mechanical_Source"];
-  std::string F_string      = (*field_name_map_)["F"];
-  std::string J_string      = (*field_name_map_)["J"];
+  std::string cauchy_string = stateName("Cauchy_Stress");
+  std::string Fp_string     = stateName("Fp");
+  std::string eqps_string   = stateName("eqps");
+  std::string ess_string    = stateName("ess");
+  std::string kappa_string  = stateName("iso_Hardening");
+  std::string source_string = stateName("Mechanical_Source");
+  std::string F_string      = stateName("F");
+  std::string J_string      = stateName("J");
 
   // define the dependent fields
   this->dep_field_map_.insert(std::make_pair(F_string, dl->qp_tensor));
@@ -101,14 +101,14 @@ template <typename EvalT, typename Traits>
 void
 AnisotropicViscoplasticModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
-  std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string     = (*field_name_map_)["Fp"];
-  std::string eqps_string   = (*field_name_map_)["eqps"];
-  std::string ess_string    = (*field_name_map_)["ess"];
-  std::string kappa_string  = (*field_name_map_)["iso_Hardening"];
-  std::string source_string = (*field_name_map_)["Mechanical_Source"];
-  std::string F_string      = (*field_name_map_)["F"];
-  std::string J_string      = (*field_name_map_)["J"];
+  std::string cauchy_string = stateName("Cauchy_Stress");
+  std::string Fp_string     = stateName("Fp");
+  std::string eqps_string   = stateName("eqps");
+  std::string ess_string    = stateName("ess");
+  std::string kappa_string  = stateName("iso_Hardening");
+  std::string source_string = stateName("Mechanical_Source");
+  std::string F_string      = stateName("F");
+  std::string J_string      = stateName("J");
 
   // extract dependent MDFields
   auto def_grad          = *dep_fields[F_string];

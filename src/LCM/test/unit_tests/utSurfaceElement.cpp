@@ -7,7 +7,6 @@
 #include "Albany_config.h"
 #include "ConstitutiveModelInterface.hpp"
 #include "ConstitutiveModelParameters.hpp"
-#include "FieldNameMap.hpp"
 #include "Intrepid2_DefaultCubatureFactory.hpp"
 #include "MiniTensor.h"
 #include "PHAL_AlbanyTraits.hpp"
@@ -1217,8 +1216,6 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   RCP<LCM::SurfaceVectorGradient<Residual, Traits>> svg = rcp(new LCM::SurfaceVectorGradient<Residual, Traits>(svgPL, dl));
 
   // create field name strings
-  LCM::FieldNameMap                                field_name_map(false);
-  Teuchos::RCP<std::map<std::string, std::string>> fnm = field_name_map.getMap();
 
   // Constitutive Model Parameters
   Teuchos::ParameterList  paramList("Material Parameters");
@@ -1231,7 +1228,7 @@ TEUCHOS_UNIT_TEST(SurfaceElement, Complete)
   prList.set("Poissons Ratio Type", "Constant");
   prList.set("Value", 0.0);
   Teuchos::ParameterList cmpPL;
-  paramList.set<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map", fnm);
+  paramList.set<bool>("Is Surface Element Block", false);
   cmpPL.set<Teuchos::ParameterList*>("Material Parameters", &paramList);
   std::cout << paramList;
   RCP<LCM::ConstitutiveModelParameters<Residual, Traits>> CMP = rcp(new LCM::ConstitutiveModelParameters<Residual, Traits>(cmpPL, dl));

@@ -30,7 +30,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
   // Dimension of problem, e.g., 2 -> 2D, 3 -> 3D
   using BaseKernel::num_dims_;
 
-  using BaseKernel::field_name_map_;
+  using BaseKernel::stateName;
   using BaseKernel::num_pts_;
 
   // optional temperature support
@@ -226,27 +226,27 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
   std::vector<Teuchos::RCP<ScalarField>> shears_;
 
   // Field strings
-  std::string const eqps_string_ = field_name_map_["eqps"];
+  std::string const eqps_string_ = stateName("eqps");
 
-  std::string const Re_string_ = field_name_map_["Re"];
+  std::string const Re_string_ = stateName("Re");
 
-  std::string const cauchy_string_ = field_name_map_["Cauchy_Stress"];
+  std::string const cauchy_string_ = stateName("Cauchy_Stress");
 
-  std::string const Fp_string_ = field_name_map_["Fp"];
+  std::string const Fp_string_ = stateName("Fp");
 
-  std::string const L_string_ = field_name_map_["Velocity_Gradient"];
+  std::string const L_string_ = stateName("Velocity_Gradient");
 
-  std::string const Lp_string_ = field_name_map_["Velocity_Gradient_Plastic"];
+  std::string const Lp_string_ = stateName("Velocity_Gradient_Plastic");
 
-  std::string const residual_string_ = field_name_map_["CP_Residual"];
+  std::string const residual_string_ = stateName("CP_Residual");
 
-  std::string const residual_iter_string_ = field_name_map_["CP_Residual_Iter"];
+  std::string const residual_iter_string_ = stateName("CP_Residual_Iter");
 
-  std::string const source_string_ = field_name_map_["Mechanical_Source"];
+  std::string const source_string_ = stateName("Mechanical_Source");
 
-  std::string const F_string_ = field_name_map_["F"];
+  std::string const F_string_ = stateName("F");
 
-  std::string const J_string_ = field_name_map_["J"];
+  std::string const J_string_ = stateName("J");
 
   std::string const time_string_ = "Time";
 

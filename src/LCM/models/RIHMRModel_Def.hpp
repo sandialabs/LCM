@@ -26,10 +26,10 @@ RIHMRModel<EvalT, Traits>::RIHMRModel(Teuchos::ParameterList* p, const Teuchos::
   this->dep_field_map_.insert(std::make_pair("Recovery Modulus", dl->qp_scalar));
 
   // retrieve appropriate field name strings
-  std::string cauchy_string       = (*field_name_map_)["Cauchy_Stress"];
-  std::string logFp_string        = (*field_name_map_)["logFp"];
-  std::string eqps_string         = (*field_name_map_)["eqps"];
-  std::string isoHardening_string = (*field_name_map_)["isotropic_hardening"];
+  std::string cauchy_string       = stateName("Cauchy_Stress");
+  std::string logFp_string        = stateName("logFp");
+  std::string eqps_string         = stateName("eqps");
+  std::string isoHardening_string = stateName("isotropic_hardening");
 
   // define evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
@@ -85,10 +85,10 @@ RIHMRModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFi
   auto recovery_modulus  = *dep_fields["Recovery Modulus"];
 
   // retrieve appropriate field name strings
-  std::string cauchy_string       = (*field_name_map_)["Cauchy_Stress"];
-  std::string logFp_string        = (*field_name_map_)["logFp"];
-  std::string eqps_string         = (*field_name_map_)["eqps"];
-  std::string isoHardening_string = (*field_name_map_)["isotropic_hardening"];
+  std::string cauchy_string       = stateName("Cauchy_Stress");
+  std::string logFp_string        = stateName("logFp");
+  std::string eqps_string         = stateName("eqps");
+  std::string isoHardening_string = stateName("isotropic_hardening");
   // extract evaluated MDFields
   auto stress       = *eval_fields[cauchy_string];
   auto logFp        = *eval_fields[logFp_string];

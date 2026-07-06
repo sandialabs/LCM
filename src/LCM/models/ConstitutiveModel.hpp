@@ -155,10 +155,13 @@ class ConstitutiveModel
   /// Deal with fields
   ///
 
-  Teuchos::RCP<std::map<std::string, std::string>>
-  getFieldNameMap()
+  /// Output state name for a base field name. Surface-element blocks get a
+  /// "surf_" prefix so their states do not collide with the volume blocks'
+  /// same-named states (which carry a different number of integration points).
+  std::string
+  stateName(std::string const& base) const
   {
-    return field_name_map_;
+    return surface_element_ ? "surf_" + base : base;
   }
 
   DataLayoutMap
@@ -182,7 +185,7 @@ class ConstitutiveModel
   void
   setDependentFieldFromNameMap(std::string const& name_key, Teuchos::RCP<PHX::DataLayout> const& field)
   {
-    std::string const name = (*field_name_map_)[name_key];
+    std::string const name = stateName(name_key);
     setDependentField(name, field);
   }
 
@@ -195,7 +198,7 @@ class ConstitutiveModel
   void
   setEvaluatedFieldFromNameMap(std::string const& name_key, Teuchos::RCP<PHX::DataLayout> const& field)
   {
-    std::string const name = (*field_name_map_)[name_key];
+    std::string const name = stateName(name_key);
     setEvaluatedField(name, field);
   }
 
@@ -324,9 +327,8 @@ class ConstitutiveModel
   std::vector<bool> state_var_output_flags_;
 
   ///
-  /// Map of field names
-  ///
-  Teuchos::RCP<std::map<std::string, std::string>> field_name_map_;
+  /// True for surface-element blocks; selects the "surf_" state-name prefix.
+  bool surface_element_{false};
 
   DataLayoutMap dep_field_map_;
 

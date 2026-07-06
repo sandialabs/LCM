@@ -28,8 +28,8 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::AnisotropicHyperelasticDamage
       direction_f1_(p->get<Teuchos::Array<RealType>>("Fiber 1 Orientation Vector").toVector()),
       direction_f2_(p->get<Teuchos::Array<RealType>>("Fiber 2 Orientation Vector").toVector())
 {
-  std::string F_string = (*field_name_map_)["F"];
-  std::string J_string = (*field_name_map_)["J"];
+  std::string F_string = stateName("F");
+  std::string J_string = stateName("J");
 
   // define the dependent fields
   this->dep_field_map_.insert(std::make_pair(F_string, dl->qp_tensor));
@@ -38,13 +38,13 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::AnisotropicHyperelasticDamage
   this->dep_field_map_.insert(std::make_pair("Elastic Modulus", dl->qp_scalar));
 
   // retrive appropriate field name strings
-  std::string cauchy_string        = (*field_name_map_)["Cauchy_Stress"];
-  std::string matrix_energy_string = (*field_name_map_)["Matrix_Energy"];
-  std::string f1_energy_string     = (*field_name_map_)["F1_Energy"];
-  std::string f2_energy_string     = (*field_name_map_)["F2_Energy"];
-  std::string matrix_damage_string = (*field_name_map_)["Matrix_Damage"];
-  std::string f1_damage_string     = (*field_name_map_)["F1_Damage"];
-  std::string f2_damage_string     = (*field_name_map_)["F2_Damage"];
+  std::string cauchy_string        = stateName("Cauchy_Stress");
+  std::string matrix_energy_string = stateName("Matrix_Energy");
+  std::string f1_energy_string     = stateName("F1_Energy");
+  std::string f2_energy_string     = stateName("F2_Energy");
+  std::string matrix_damage_string = stateName("Matrix_Damage");
+  std::string f1_damage_string     = stateName("F1_Damage");
+  std::string f2_damage_string     = stateName("F2_Damage");
 
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
@@ -122,15 +122,15 @@ AnisotropicHyperelasticDamageModel<EvalT, Traits>::computeState(typename Traits:
   // cout.precision(15);
 
   // retrive appropriate field name strings
-  std::string F_string             = (*field_name_map_)["F"];
-  std::string J_string             = (*field_name_map_)["J"];
-  std::string cauchy_string        = (*field_name_map_)["Cauchy_Stress"];
-  std::string matrix_energy_string = (*field_name_map_)["Matrix_Energy"];
-  std::string f1_energy_string     = (*field_name_map_)["F1_Energy"];
-  std::string f2_energy_string     = (*field_name_map_)["F2_Energy"];
-  std::string matrix_damage_string = (*field_name_map_)["Matrix_Damage"];
-  std::string f1_damage_string     = (*field_name_map_)["F1_Damage"];
-  std::string f2_damage_string     = (*field_name_map_)["F2_Damage"];
+  std::string F_string             = stateName("F");
+  std::string J_string             = stateName("J");
+  std::string cauchy_string        = stateName("Cauchy_Stress");
+  std::string matrix_energy_string = stateName("Matrix_Energy");
+  std::string f1_energy_string     = stateName("F1_Energy");
+  std::string f2_energy_string     = stateName("F2_Energy");
+  std::string matrix_damage_string = stateName("Matrix_Damage");
+  std::string f1_damage_string     = stateName("F1_Damage");
+  std::string f2_damage_string     = stateName("F2_Damage");
 
   // extract dependent MDFields
   auto def_grad        = *dep_fields[F_string];

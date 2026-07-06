@@ -22,7 +22,7 @@ LinearElasticVolDevModel<EvalT, Traits>::LinearElasticVolDevModel(Teuchos::Param
   this->dep_field_map_.insert(std::make_pair("Strain", dl->qp_tensor));
 
   // define the evaluated fields
-  std::string cauchy = (*field_name_map_)["Cauchy_Stress"];
+  std::string cauchy = stateName("Cauchy_Stress");
   this->eval_field_map_.insert(std::make_pair(cauchy, dl->qp_tensor));
 
   // define the state variables
@@ -47,7 +47,7 @@ LinearElasticVolDevModel<EvalT, Traits>::computeState(typename Traits::EvalData 
   auto strain = *dep_fields["Strain"];
 
   // extract evaluated MDFields
-  std::string cauchy = (*field_name_map_)["Cauchy_Stress"];
+  std::string cauchy = stateName("Cauchy_Stress");
   auto        stress = *eval_fields[cauchy];
 
   minitensor::Tensor<ScalarT> eps(num_dims_), sigma(num_dims_);

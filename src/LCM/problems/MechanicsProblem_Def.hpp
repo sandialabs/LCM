@@ -11,7 +11,6 @@
 #include "AnalyticMassResidual.hpp"
 #include "BodyForce.hpp"
 #include "CurrentCoords.hpp"
-#include "FieldNameMap.hpp"
 #include "MechanicsResidual.hpp"
 #include "MeshSizeField.hpp"
 #include "PHAL_NSMaterialProperty.hpp"
@@ -302,48 +301,47 @@ MechanicsProblem::constructEvaluators(
   }
   // Define Field Names
   // generate the field name map to deal with outputing surface element info
-  LCM::FieldNameMap field_name_map(surface_element);
+  // Surface-element blocks output their states under a "surf_" prefix so they
+  // do not collide with the volume blocks' same-named states (which carry a
+  // different number of integration points).
+  auto fnm = [surface_element](std::string const& s) { return surface_element ? "surf_" + s : s; };
 
-  Teuchos::RCP<std::map<std::string, std::string>> fnm_rcp = field_name_map.getMap();
-
-  auto fnm = (*fnm_rcp);
-
-  std::string cauchy          = fnm["Cauchy_Stress"];
-  std::string firstPK         = fnm["FirstPK"];
-  std::string Fp              = fnm["Fp"];
-  std::string eqps            = fnm["eqps"];
-  std::string temperature     = fnm["Temperature"];
-  std::string ace_temperature = fnm["ACE Temperature"];
-  std::string pressure        = fnm["Pressure"];
-  std::string mech_source     = fnm["Mechanical_Source"];
-  std::string defgrad         = fnm["F"];
-  std::string J               = fnm["J"];
+  std::string cauchy          = fnm("Cauchy_Stress");
+  std::string firstPK         = fnm("FirstPK");
+  std::string Fp              = fnm("Fp");
+  std::string eqps            = fnm("eqps");
+  std::string temperature     = fnm("Temperature");
+  std::string ace_temperature = fnm("ACE Temperature");
+  std::string pressure        = fnm("Pressure");
+  std::string mech_source     = fnm("Mechanical_Source");
+  std::string defgrad         = fnm("F");
+  std::string J               = fnm("J");
 
   // Poromechanics variables
-  std::string totStress    = fnm["Total_Stress"];
-  std::string kcPerm       = fnm["KCPermeability"];
-  std::string biotModulus  = fnm["Biot_Modulus"];
-  std::string biotCoeff    = fnm["Biot_Coefficient"];
-  std::string porosity     = fnm["Porosity"];
-  std::string porePressure = fnm["Pore_Pressure"];
+  std::string totStress    = fnm("Total_Stress");
+  std::string kcPerm       = fnm("KCPermeability");
+  std::string biotModulus  = fnm("Biot_Modulus");
+  std::string biotCoeff    = fnm("Biot_Coefficient");
+  std::string porosity     = fnm("Porosity");
+  std::string porePressure = fnm("Pore_Pressure");
 
   // Hydrogen diffusion variable
-  std::string transport               = fnm["Transport"];
-  std::string hydroStress             = fnm["HydroStress"];
-  std::string diffusionCoefficient    = fnm["Diffusion_Coefficient"];
-  std::string convectionCoefficient   = fnm["Tau_Contribution"];
-  std::string trappedConcentration    = fnm["Trapped_Concentration"];
-  std::string totalConcentration      = fnm["Total_Concentration"];
-  std::string effectiveDiffusivity    = fnm["Effective_Diffusivity"];
-  std::string trappedSolvent          = fnm["Trapped_Solvent"];
-  std::string strainRateFactor        = fnm["Strain_Rate_Factor"];
-  std::string equilibrium_param       = fnm["Concentration_Equilibrium_Parameter"];
-  std::string gradient_element_length = fnm["Gradient_Element_Length"];
+  std::string transport               = fnm("Transport");
+  std::string hydroStress             = fnm("HydroStress");
+  std::string diffusionCoefficient    = fnm("Diffusion_Coefficient");
+  std::string convectionCoefficient   = fnm("Tau_Contribution");
+  std::string trappedConcentration    = fnm("Trapped_Concentration");
+  std::string totalConcentration      = fnm("Total_Concentration");
+  std::string effectiveDiffusivity    = fnm("Effective_Diffusivity");
+  std::string trappedSolvent          = fnm("Trapped_Solvent");
+  std::string strainRateFactor        = fnm("Strain_Rate_Factor");
+  std::string equilibrium_param       = fnm("Concentration_Equilibrium_Parameter");
+  std::string gradient_element_length = fnm("Gradient_Element_Length");
 
   // Helium bubble evolution
-  std::string he_concentration       = fnm["He_Concentration"];
-  std::string total_bubble_density   = fnm["Total_Bubble_Density"];
-  std::string bubble_volume_fraction = fnm["Bubble_Volume_Fraction"];
+  std::string he_concentration       = fnm("He_Concentration");
+  std::string total_bubble_density   = fnm("Total_Bubble_Density");
+  std::string bubble_volume_fraction = fnm("Bubble_Volume_Fraction");
 
   // Get the solution method type
   SolutionMethodType SolutionType = getSolutionMethod();
@@ -813,7 +811,7 @@ MechanicsProblem::constructEvaluators(
       param_list.set<RealType>("Helium Radius", param_list.sublist("Tritium Coefficients").get<RealType>("Helium Radius", 0.0));
     }
 
-    param_list.set<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map", fnm_rcp);
+    param_list.set<bool>("Is Surface Element Block", surface_element);
     p->set<Teuchos::ParameterList*>("Material Parameters", &param_list);
     p->set<bool>("Volume Average Pressure", volume_average_pressure);
     if (volume_average_pressure) {
@@ -1582,7 +1580,7 @@ MechanicsProblem::constructEvaluators(
 
     p->set<bool>("Weighted Volume Average J", volume_average_j);
     p->set<RealType>("Average J Stabilization Parameter", volume_average_stabilization_param);
-    p->set<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map", fnm_rcp);
+    p->set<bool>("Is Surface Element Block", surface_element);
 
     // Output
     p->set<std::string>("Trapped Concentration Name", trappedConcentration);

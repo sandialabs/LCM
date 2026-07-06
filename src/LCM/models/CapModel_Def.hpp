@@ -58,15 +58,15 @@ CapModelKernel<EvalT, Traits>::CapModelKernel(
   finite_deformation_ = p->get<bool>("Finite Deformation", false);
 
   // retrieve appropriate field name strings
-  std::string const cauchy_string           = field_name_map_["Cauchy_Stress"];
-  std::string const backStress_string       = field_name_map_["Back_Stress"];
-  std::string const capParameter_string     = field_name_map_["Cap_Parameter"];
-  std::string const eqps_string             = field_name_map_["eqps"];
-  std::string const volPlasticStrain_string = field_name_map_["volPlastic_Strain"];
-  std::string const strain_string           = field_name_map_["Strain"];
-  std::string const F_string                = field_name_map_["F"];
-  std::string const J_string                = field_name_map_["J"];
-  std::string const Fp_string               = field_name_map_["Fp"];
+  std::string const cauchy_string           = stateName("Cauchy_Stress");
+  std::string const backStress_string       = stateName("Back_Stress");
+  std::string const capParameter_string     = stateName("Cap_Parameter");
+  std::string const eqps_string             = stateName("eqps");
+  std::string const volPlasticStrain_string = stateName("volPlastic_Strain");
+  std::string const strain_string           = stateName("Strain");
+  std::string const F_string                = stateName("F");
+  std::string const J_string                = stateName("J");
+  std::string const Fp_string               = stateName("Fp");
 
   // define the dependent fields
   setDependentField("Poissons Ratio", dl->qp_scalar);
@@ -122,15 +122,15 @@ CapModelKernel<EvalT, Traits>::init(
     FieldMap<ScalarT const>& dep_fields,
     FieldMap<ScalarT>&       eval_fields)
 {
-  std::string cauchy_string           = field_name_map_["Cauchy_Stress"];
-  std::string backStress_string       = field_name_map_["Back_Stress"];
-  std::string capParameter_string     = field_name_map_["Cap_Parameter"];
-  std::string eqps_string             = field_name_map_["eqps"];
-  std::string volPlasticStrain_string = field_name_map_["volPlastic_Strain"];
-  std::string strain_string           = field_name_map_["Strain"];
-  std::string F_string                = field_name_map_["F"];
-  std::string J_string                = field_name_map_["J"];
-  std::string Fp_string               = field_name_map_["Fp"];
+  std::string cauchy_string           = stateName("Cauchy_Stress");
+  std::string backStress_string       = stateName("Back_Stress");
+  std::string capParameter_string     = stateName("Cap_Parameter");
+  std::string eqps_string             = stateName("eqps");
+  std::string volPlasticStrain_string = stateName("volPlastic_Strain");
+  std::string strain_string           = stateName("Strain");
+  std::string F_string                = stateName("F");
+  std::string J_string                = stateName("J");
+  std::string Fp_string               = stateName("Fp");
 
   // extract dependent MDFields
   elastic_modulus_ = *dep_fields["Elastic Modulus"];

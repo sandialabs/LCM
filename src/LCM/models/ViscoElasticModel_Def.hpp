@@ -38,15 +38,15 @@ ViscoElasticModel<EvalT, Traits>::ViscoElasticModel(Teuchos::ParameterList* p, c
   e_list = p->sublist("Gas Constant");
   R_     = e_list.get<RealType>("R");
 
-  std::string F_string = (*field_name_map_)["F"];
-  std::string J_string = (*field_name_map_)["J"];
-  std::string cauchy   = (*field_name_map_)["Cauchy_Stress"];
+  std::string F_string = stateName("F");
+  std::string J_string = stateName("J");
+  std::string cauchy   = stateName("Cauchy_Stress");
   // this variable will store the instantaneous stress
-  std::string S0_string = (*field_name_map_)["Instantaneous Stress"];
+  std::string S0_string = stateName("Instantaneous Stress");
   // This variable is used to store state variable H
-  std::string H1_string = (*field_name_map_)["H_1"];
-  std::string H2_string = (*field_name_map_)["H_2"];
-  std::string H3_string = (*field_name_map_)["H_3"];
+  std::string H1_string = stateName("H_1");
+  std::string H2_string = stateName("H_2");
+  std::string H3_string = stateName("H_3");
 
   // define the dependent fields
   this->dep_field_map_.insert(std::make_pair(F_string, dl->qp_tensor));
@@ -112,13 +112,13 @@ void
 ViscoElasticModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   // Get names
-  std::string F_string  = (*field_name_map_)["F"];
-  std::string J_string  = (*field_name_map_)["J"];
-  std::string cauchy    = (*field_name_map_)["Cauchy_Stress"];
-  std::string S0_string = (*field_name_map_)["Instantaneous Stress"];
-  std::string H1_string = (*field_name_map_)["H_1"];
-  std::string H2_string = (*field_name_map_)["H_2"];
-  std::string H3_string = (*field_name_map_)["H_3"];
+  std::string F_string  = stateName("F");
+  std::string J_string  = stateName("J");
+  std::string cauchy    = stateName("Cauchy_Stress");
+  std::string S0_string = stateName("Instantaneous Stress");
+  std::string H1_string = stateName("H_1");
+  std::string H2_string = stateName("H_2");
+  std::string H3_string = stateName("H_3");
 
   // std::cout << workset.current_time << std::endl;
   // std::cout << workset.previous_time << std::endl;

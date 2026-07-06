@@ -37,10 +37,6 @@ class ConstitutiveDriverProblem : public Albany::AbstractProblem
   virtual ~ConstitutiveDriverProblem();
 
   ///
-  Teuchos::RCP<std::map<std::string, std::string>>
-  constructFieldNameMap(bool surface_flag);
-
-  ///
   /// Return number of spatial dimensions
   ///
   virtual int
@@ -168,7 +164,6 @@ class ConstitutiveDriverProblem : public Albany::AbstractProblem
 #include "Albany_ProblemUtils.hpp"
 #include "Albany_ResponseUtilities.hpp"
 #include "Albany_Utils.hpp"
-#include "FieldNameMap.hpp"
 #include "PHAL_NSMaterialProperty.hpp"
 #include "PHAL_SaveStateField.hpp"
 #include "PHAL_ScatterResidual.hpp"
@@ -219,19 +214,18 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
   bool                                              supports_transient = true;
   int                                               offset             = 0;
 
-  // Define Field Names
-  // generate the field name map to deal with outputing surface element info
-  LCM::FieldNameMap                                field_name_map(false);
-  Teuchos::RCP<std::map<std::string, std::string>> fnm         = field_name_map.getMap();
-  std::string                                      cauchy      = (*fnm)["Cauchy_Stress"];
-  std::string                                      firstPK     = (*fnm)["FirstPK"];
-  std::string                                      Fp          = (*fnm)["Fp"];
-  std::string                                      eqps        = (*fnm)["eqps"];
-  std::string                                      temperature = (*fnm)["Temperature"];
-  std::string                                      pressure    = (*fnm)["Pressure"];
-  std::string                                      mech_source = (*fnm)["Mechanical_Source"];
-  std::string                                      defgrad     = (*fnm)["F"];
-  std::string                                      J           = (*fnm)["J"];
+  // Define Field Names. The constitutive driver has no surface-element blocks,
+  // so state names are used verbatim (identity).
+  auto        fnm    = [](std::string const& s) { return s; };
+  std::string cauchy = fnm("Cauchy_Stress");
+  std::string                                      firstPK     = fnm("FirstPK");
+  std::string                                      Fp          = fnm("Fp");
+  std::string                                      eqps        = fnm("eqps");
+  std::string                                      temperature = fnm("Temperature");
+  std::string                                      pressure    = fnm("Pressure");
+  std::string                                      mech_source = fnm("Mechanical_Source");
+  std::string                                      defgrad     = fnm("F");
+  std::string                                      J           = fnm("J");
 
   // Temporary variable used numerous times below
   Teuchos::RCP<PHX::Evaluator<PHAL::AlbanyTraits>> ev;
@@ -312,7 +306,7 @@ Albany::ConstitutiveDriverProblem::constructEvaluators(
       param_list.set<bool>("Have Temperature", true);
     }
 
-    param_list.set<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map", fnm);
+    param_list.set<bool>("Is Surface Element Block", false);
     p->set<Teuchos::ParameterList*>("Material Parameters", &param_list);
 
     Teuchos::RCP<LCM::ConstitutiveModelInterface<EvalT, PHAL::AlbanyTraits>> cmiEv =

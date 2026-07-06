@@ -209,24 +209,24 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   if (have_height_) this->setIntegrationPointLocationFlag(true);
 
   // retrieve appropriate field name strings
-  std::string const cauchy_string           = field_name_map_["Cauchy_Stress"];
-  std::string const backStress_string       = field_name_map_["Back_Stress"];
-  std::string const capParameter_string     = field_name_map_["Cap_Parameter"];
-  std::string const eqps_string             = field_name_map_["eqps"];
-  std::string const volPlasticStrain_string = field_name_map_["volPlastic_Strain"];
-  std::string const strain_string           = field_name_map_["Strain"];
-  std::string const F_string                = field_name_map_["F"];
-  std::string const J_string                = field_name_map_["J"];
-  std::string const Fp_string               = field_name_map_["Fp"];
+  std::string const cauchy_string           = stateName("Cauchy_Stress");
+  std::string const backStress_string       = stateName("Back_Stress");
+  std::string const capParameter_string     = stateName("Cap_Parameter");
+  std::string const eqps_string             = stateName("eqps");
+  std::string const volPlasticStrain_string = stateName("volPlastic_Strain");
+  std::string const strain_string           = stateName("Strain");
+  std::string const F_string                = stateName("F");
+  std::string const J_string                = stateName("J");
+  std::string const Fp_string               = stateName("Fp");
 
-  std::string const tension_indicator_string      = field_name_map_["Tension_Indicator"];
-  std::string const backstress_indicator_string   = field_name_map_["Backstress_Indicator"];
-  std::string const crush_indicator_string        = field_name_map_["Crush_Indicator"];
-  std::string const eqps_indicator_string         = field_name_map_["Eqps_Indicator"];
-  std::string const angle_indicator_string        = field_name_map_["Angle_Indicator"];
-  std::string const displacement_indicator_string = field_name_map_["Displacement_Indicator"];
-  std::string const strain_indicator_string       = field_name_map_["Strain_Indicator"];
-  std::string const tilt_angle_string             = field_name_map_["Tilt_Angle"];
+  std::string const tension_indicator_string      = stateName("Tension_Indicator");
+  std::string const backstress_indicator_string   = stateName("Backstress_Indicator");
+  std::string const crush_indicator_string        = stateName("Crush_Indicator");
+  std::string const eqps_indicator_string         = stateName("Eqps_Indicator");
+  std::string const angle_indicator_string        = stateName("Angle_Indicator");
+  std::string const displacement_indicator_string = stateName("Displacement_Indicator");
+  std::string const strain_indicator_string       = stateName("Strain_Indicator");
+  std::string const tilt_angle_string             = stateName("Tilt_Angle");
 
   // define the dependent fields. Elasticity is computed internally from
   // the end-member (K, G) pairs, so there is no dependence on the
@@ -326,24 +326,24 @@ PermafrostKernel<EvalT, Traits>::init(
     FieldMap<ScalarT const>& dep_fields,
     FieldMap<ScalarT>&       eval_fields)
 {
-  std::string cauchy_string           = field_name_map_["Cauchy_Stress"];
-  std::string backStress_string       = field_name_map_["Back_Stress"];
-  std::string capParameter_string     = field_name_map_["Cap_Parameter"];
-  std::string eqps_string             = field_name_map_["eqps"];
-  std::string volPlasticStrain_string = field_name_map_["volPlastic_Strain"];
-  std::string strain_string           = field_name_map_["Strain"];
-  std::string F_string                = field_name_map_["F"];
-  std::string J_string                = field_name_map_["J"];
-  std::string Fp_string               = field_name_map_["Fp"];
+  std::string cauchy_string           = stateName("Cauchy_Stress");
+  std::string backStress_string       = stateName("Back_Stress");
+  std::string capParameter_string     = stateName("Cap_Parameter");
+  std::string eqps_string             = stateName("eqps");
+  std::string volPlasticStrain_string = stateName("volPlastic_Strain");
+  std::string strain_string           = stateName("Strain");
+  std::string F_string                = stateName("F");
+  std::string J_string                = stateName("J");
+  std::string Fp_string               = stateName("Fp");
 
-  std::string tension_indicator_string      = field_name_map_["Tension_Indicator"];
-  std::string backstress_indicator_string   = field_name_map_["Backstress_Indicator"];
-  std::string crush_indicator_string        = field_name_map_["Crush_Indicator"];
-  std::string eqps_indicator_string         = field_name_map_["Eqps_Indicator"];
-  std::string angle_indicator_string        = field_name_map_["Angle_Indicator"];
-  std::string displacement_indicator_string = field_name_map_["Displacement_Indicator"];
-  std::string strain_indicator_string       = field_name_map_["Strain_Indicator"];
-  std::string tilt_angle_string             = field_name_map_["Tilt_Angle"];
+  std::string tension_indicator_string      = stateName("Tension_Indicator");
+  std::string backstress_indicator_string   = stateName("Backstress_Indicator");
+  std::string crush_indicator_string        = stateName("Crush_Indicator");
+  std::string eqps_indicator_string         = stateName("Eqps_Indicator");
+  std::string angle_indicator_string        = stateName("Angle_Indicator");
+  std::string displacement_indicator_string = stateName("Displacement_Indicator");
+  std::string strain_indicator_string       = stateName("Strain_Indicator");
+  std::string tilt_angle_string             = stateName("Tilt_Angle");
 
   // extract dependent MDFields
   if (have_ice_field_) ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];

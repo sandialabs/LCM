@@ -34,15 +34,15 @@ ElastoViscoplasticModel<EvalT, Traits>::ElastoViscoplasticModel(Teuchos::Paramet
       print_(p->get<bool>("Output Convergence", false))
 {
   // retrive appropriate field name strings
-  std::string cauchy_string               = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string                   = (*field_name_map_)["Fp"];
-  std::string eqps_string                 = (*field_name_map_)["eqps"];
-  std::string eps_ss_string               = (*field_name_map_)["eps_ss"];
-  std::string kappa_string                = (*field_name_map_)["isotropic_hardening"];
-  std::string source_string               = (*field_name_map_)["Mechanical_Source"];
-  std::string F_string                    = (*field_name_map_)["F"];
-  std::string J_string                    = (*field_name_map_)["J"];
-  std::string void_volume_fraction_string = (*field_name_map_)["void_volume_fraction"];
+  std::string cauchy_string               = stateName("Cauchy_Stress");
+  std::string Fp_string                   = stateName("Fp");
+  std::string eqps_string                 = stateName("eqps");
+  std::string eps_ss_string               = stateName("eps_ss");
+  std::string kappa_string                = stateName("isotropic_hardening");
+  std::string source_string               = stateName("Mechanical_Source");
+  std::string F_string                    = stateName("F");
+  std::string J_string                    = stateName("J");
+  std::string void_volume_fraction_string = stateName("void_volume_fraction");
 
   // define the dependent fields
   this->dep_field_map_.insert(std::make_pair(F_string, dl->qp_tensor));
@@ -266,16 +266,16 @@ template <typename EvalT, typename Traits>
 void
 ElastoViscoplasticModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
-  // get strings from field_name_map in order to extract MDFields
-  std::string cauchy_string               = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string                   = (*field_name_map_)["Fp"];
-  std::string eqps_string                 = (*field_name_map_)["eqps"];
-  std::string eps_ss_string               = (*field_name_map_)["eps_ss"];
-  std::string kappa_string                = (*field_name_map_)["isotropic_hardening"];
-  std::string source_string               = (*field_name_map_)["Mechanical_Source"];
-  std::string F_string                    = (*field_name_map_)["F"];
-  std::string J_string                    = (*field_name_map_)["J"];
-  std::string void_volume_fraction_string = (*field_name_map_)["void_volume_fraction"];
+  // get state-name strings in order to extract MDFields
+  std::string cauchy_string               = stateName("Cauchy_Stress");
+  std::string Fp_string                   = stateName("Fp");
+  std::string eqps_string                 = stateName("eqps");
+  std::string eps_ss_string               = stateName("eps_ss");
+  std::string kappa_string                = stateName("isotropic_hardening");
+  std::string source_string               = stateName("Mechanical_Source");
+  std::string F_string                    = stateName("F");
+  std::string J_string                    = stateName("J");
+  std::string void_volume_fraction_string = stateName("void_volume_fraction");
 
   // extract dependent MDFields
   auto def_grad_field    = *dep_fields[F_string];

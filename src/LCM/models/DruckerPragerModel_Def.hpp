@@ -30,10 +30,10 @@ DruckerPragerModel<EvalT, Traits>::DruckerPragerModel(Teuchos::ParameterList* p,
   this->dep_field_map_.insert(std::make_pair("Elastic Modulus", dl->qp_scalar));
 
   // retrieve appropriate field name strings
-  std::string cauchy_string   = (*field_name_map_)["Cauchy_Stress"];
-  std::string strain_string   = (*field_name_map_)["Strain"];
-  std::string eqps_string     = (*field_name_map_)["eqps"];
-  std::string friction_string = (*field_name_map_)["Friction_Parameter"];
+  std::string cauchy_string   = stateName("Cauchy_Stress");
+  std::string strain_string   = stateName("Strain");
+  std::string eqps_string     = stateName("eqps");
+  std::string friction_string = stateName("Friction_Parameter");
 
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
@@ -85,10 +85,10 @@ DruckerPragerModel<EvalT, Traits>::computeState(typename Traits::EvalData workse
   auto elastic_modulus = *dep_fields["Elastic Modulus"];
 
   // retrieve appropriate field name strings
-  std::string cauchy_string   = (*field_name_map_)["Cauchy_Stress"];
-  std::string strain_string   = (*field_name_map_)["Strain"];
-  std::string eqps_string     = (*field_name_map_)["eqps"];
-  std::string friction_string = (*field_name_map_)["Friction_Parameter"];
+  std::string cauchy_string   = stateName("Cauchy_Stress");
+  std::string strain_string   = stateName("Strain");
+  std::string eqps_string     = stateName("eqps");
+  std::string friction_string = stateName("Friction_Parameter");
 
   // extract evaluated MDFields
   auto stress   = *eval_fields[cauchy_string];

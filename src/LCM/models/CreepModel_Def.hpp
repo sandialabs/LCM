@@ -33,12 +33,12 @@ CreepModel<EvalT, Traits>::CreepModel(Teuchos::ParameterList* p, const Teuchos::
 
 {
   // retrive appropriate field name strings
-  std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string     = (*field_name_map_)["Fp"];
-  std::string eqps_string   = (*field_name_map_)["eqps"];
-  std::string source_string = (*field_name_map_)["Mechanical_Source"];
-  std::string F_string      = (*field_name_map_)["F"];
-  std::string J_string      = (*field_name_map_)["J"];
+  std::string cauchy_string = stateName("Cauchy_Stress");
+  std::string Fp_string     = stateName("Fp");
+  std::string eqps_string   = stateName("eqps");
+  std::string source_string = stateName("Mechanical_Source");
+  std::string F_string      = stateName("F");
+  std::string J_string      = stateName("J");
 
   // define the dependent fields
   this->dep_field_map_.insert(std::make_pair(F_string, dl->qp_tensor));
@@ -112,12 +112,12 @@ void
 CreepModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
   static int  times_called  = 0;
-  std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string     = (*field_name_map_)["Fp"];
-  std::string eqps_string   = (*field_name_map_)["eqps"];
-  std::string source_string = (*field_name_map_)["Mechanical_Source"];
-  std::string F_string      = (*field_name_map_)["F"];
-  std::string J_string      = (*field_name_map_)["J"];
+  std::string cauchy_string = stateName("Cauchy_Stress");
+  std::string Fp_string     = stateName("Fp");
+  std::string eqps_string   = stateName("eqps");
+  std::string source_string = stateName("Mechanical_Source");
+  std::string F_string      = stateName("F");
+  std::string J_string      = stateName("J");
 
   // extract dependent MDFields
   auto def_grad          = *dep_fields[F_string];

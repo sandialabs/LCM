@@ -21,10 +21,10 @@ ElasticDamageModel<EvalT, Traits>::ElasticDamageModel(Teuchos::ParameterList* p,
   this->dep_field_map_.insert(std::make_pair("Elastic Modulus", dl->qp_scalar));
 
   // retrieve appropriate field name strings
-  std::string cauchy_string  = (*field_name_map_)["Cauchy_Stress"];
-  std::string energy_string  = (*field_name_map_)["Matrix_Energy"];
-  std::string damage_string  = (*field_name_map_)["Matrix_Damage"];
-  std::string tangent_string = (*field_name_map_)["Material Tangent"];
+  std::string cauchy_string  = stateName("Cauchy_Stress");
+  std::string energy_string  = stateName("Matrix_Energy");
+  std::string damage_string  = stateName("Matrix_Damage");
+  std::string tangent_string = stateName("Material Tangent");
 
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
@@ -75,10 +75,10 @@ ElasticDamageModel<EvalT, Traits>::computeState(typename Traits::EvalData workse
   auto elastic_modulus = *dep_fields["Elastic Modulus"];
 
   // retrieve appropriate field name strings
-  std::string cauchy_string  = (*field_name_map_)["Cauchy_Stress"];
-  std::string energy_string  = (*field_name_map_)["Matrix_Energy"];
-  std::string damage_string  = (*field_name_map_)["Matrix_Damage"];
-  std::string tangent_string = (*field_name_map_)["Material Tangent"];
+  std::string cauchy_string  = stateName("Cauchy_Stress");
+  std::string energy_string  = stateName("Matrix_Energy");
+  std::string damage_string  = stateName("Matrix_Damage");
+  std::string tangent_string = stateName("Material Tangent");
 
   // extract evaluated MDFields
   auto                  stress = *eval_fields[cauchy_string];

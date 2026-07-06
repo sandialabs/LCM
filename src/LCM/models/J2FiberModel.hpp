@@ -28,7 +28,7 @@ class J2FiberModel : public LCM::ConstitutiveModel<EvalT, Traits>
 
   using ConstitutiveModel<EvalT, Traits>::num_dims_;
   using ConstitutiveModel<EvalT, Traits>::num_pts_;
-  using ConstitutiveModel<EvalT, Traits>::field_name_map_;
+  using ConstitutiveModel<EvalT, Traits>::stateName;
   using ConstitutiveModel<EvalT, Traits>::need_integration_pt_locations_;
 
   ///

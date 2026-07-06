@@ -40,7 +40,7 @@ class AbstractModel
     num_pts_  = dims[1];
     num_dims_ = dims[2];
 
-    field_name_map_ = p->get<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map");
+    surface_element_ = p->get<bool>("Is Surface Element Block", false);
 
     return;
   }
@@ -128,10 +128,10 @@ class AbstractModel
   /// Deal with fields
   ///
 
-  Teuchos::RCP<std::map<std::string, std::string>>
-  getFieldNameMap()
+  std::string
+  stateName(std::string const& base) const
   {
-    return field_name_map_;
+    return surface_element_ ? "surf_" + base : base;
   }
 
   DataLayoutMap
@@ -182,9 +182,9 @@ class AbstractModel
   std::vector<bool> state_var_output_flags_;
 
   ///
-  /// Map of field names
+  /// True for surface-element blocks; selects the "surf_" state-name prefix.
   ///
-  Teuchos::RCP<std::map<std::string, std::string>> field_name_map_;
+  bool surface_element_{false};
 
   DataLayoutMap dep_field_map_;
 

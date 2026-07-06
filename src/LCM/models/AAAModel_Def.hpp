@@ -19,7 +19,7 @@ AAAModel<EvalT, Traits>::AAAModel(Teuchos::ParameterList* p, const Teuchos::RCP<
   this->dep_field_map_.insert(std::make_pair("J", dl->qp_scalar));
 
   // define the evaluated fields
-  std::string cauchy = (*field_name_map_)["Cauchy_Stress"];
+  std::string cauchy = stateName("Cauchy_Stress");
   this->eval_field_map_.insert(std::make_pair(cauchy, dl->qp_tensor));
 
   // define the state variables
@@ -40,7 +40,7 @@ AAAModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFiel
   auto defGrad = *dep_fields["F"];
   auto J       = *dep_fields["J"];
   // extract evaluated MDFields
-  std::string cauchy = (*field_name_map_)["Cauchy_Stress"];
+  std::string cauchy = stateName("Cauchy_Stress");
   auto        stress = *eval_fields[cauchy];
 
   minitensor::Tensor<ScalarT> F(num_dims_);

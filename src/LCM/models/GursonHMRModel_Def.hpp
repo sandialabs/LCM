@@ -36,12 +36,12 @@ GursonHMRModel<EvalT, Traits>::GursonHMRModel(Teuchos::ParameterList* p, const T
   this->dep_field_map_.insert(std::make_pair("Recovery Modulus", dl->qp_scalar));
 
   // retrieve appropriate field name strings
-  std::string cauchy_string       = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string           = (*field_name_map_)["Fp"];
-  std::string eqps_string         = (*field_name_map_)["eqps"];
-  std::string ess_string          = (*field_name_map_)["ess"];
-  std::string isoHardening_string = (*field_name_map_)["isotropic_hardening"];
-  std::string void_string         = (*field_name_map_)["Void_Volume"];
+  std::string cauchy_string       = stateName("Cauchy_Stress");
+  std::string Fp_string           = stateName("Fp");
+  std::string eqps_string         = stateName("eqps");
+  std::string ess_string          = stateName("ess");
+  std::string isoHardening_string = stateName("isotropic_hardening");
+  std::string void_string         = stateName("Void_Volume");
 
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
@@ -115,12 +115,12 @@ GursonHMRModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, D
   auto recovery_modulus  = *dep_fields["Recovery Modulus"];
 
   // retrieve appropriate field name strings
-  std::string cauchy_string       = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string           = (*field_name_map_)["Fp"];
-  std::string eqps_string         = (*field_name_map_)["eqps"];
-  std::string ess_string          = (*field_name_map_)["ess"];
-  std::string isoHardening_string = (*field_name_map_)["isoHardening"];
-  std::string void_string         = (*field_name_map_)["Void_Volume"];
+  std::string cauchy_string       = stateName("Cauchy_Stress");
+  std::string Fp_string           = stateName("Fp");
+  std::string eqps_string         = stateName("eqps");
+  std::string ess_string          = stateName("ess");
+  std::string isoHardening_string = stateName("isoHardening");
+  std::string void_string         = stateName("Void_Volume");
 
   // extract evaluated MDFields
   auto stress       = *eval_fields[cauchy_string];

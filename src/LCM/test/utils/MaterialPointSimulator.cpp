@@ -26,7 +26,6 @@
 #include "BifurcationCheck.hpp"
 #include "ConstitutiveModelInterface.hpp"
 #include "ConstitutiveModelParameters.hpp"
-#include "FieldNameMap.hpp"
 #include "Kokkos_Core.hpp"
 #include "ParallelSetField.hpp"
 #include "SetField.hpp"
@@ -125,8 +124,6 @@ main(int ac, char* av[])
   const Teuchos::RCP<Albany::Layouts> dl           = Teuchos::rcp(new Albany::Layouts(workset_size, num_vertices, num_nodes, num_pts, num_dims));
 
   // create field name strings
-  LCM::FieldNameMap                                field_name_map(false);
-  Teuchos::RCP<std::map<std::string, std::string>> fnm = field_name_map.getMap();
 
   // Deformation gradient
   // initially set the deformation gradient to the identity
@@ -251,7 +248,7 @@ main(int ac, char* av[])
   // std::cout << "// Constitutive Model Parameters"
   //<< std::endl;
   Teuchos::ParameterList cmpPL;
-  paramList.set<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map", fnm);
+  paramList.set<bool>("Is Surface Element Block", false);
   cmpPL.set<Teuchos::ParameterList*>("Material Parameters", &paramList);
   if (have_temperature) {
     cmpPL.set<std::string>("Temperature Name", "Temperature");

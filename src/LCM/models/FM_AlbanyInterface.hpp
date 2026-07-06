@@ -32,7 +32,7 @@ class FerroicDriver : public LCM::ConstitutiveModel<EvalT, Traits>
 
   using LCM::ConstitutiveModel<EvalT, Traits>::num_dims_;
   using LCM::ConstitutiveModel<EvalT, Traits>::num_pts_;
-  using LCM::ConstitutiveModel<EvalT, Traits>::field_name_map_;
+  using LCM::ConstitutiveModel<EvalT, Traits>::stateName;
   using LCM::ConstitutiveModel<EvalT, Traits>::weights_;
 
   ///

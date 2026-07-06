@@ -12,14 +12,12 @@ set(problem-sources
     "${LCM_DIR}/problems/ConstitutiveDriverProblem.cpp"
     "${LCM_DIR}/problems/ElasticityProblem.cpp"
     "${LCM_DIR}/problems/ACEThermalProblem.cpp"
-    "${LCM_DIR}/problems/FieldNameMap.cpp"
     "${LCM_DIR}/problems/MechanicsProblem.cpp"
     "${LCM_DIR}/problems/ThermoElasticityProblem.cpp")
 set(problem-headers
     "${LCM_DIR}/problems/ConstitutiveDriverProblem.hpp"
     "${LCM_DIR}/problems/ElasticityProblem.hpp"
     "${LCM_DIR}/problems/ACEThermalProblem.hpp"
-    "${LCM_DIR}/problems/FieldNameMap.hpp"
     "${LCM_DIR}/problems/MechanicsProblem.hpp"
     "${LCM_DIR}/problems/ThermoElasticityProblem.hpp")
 

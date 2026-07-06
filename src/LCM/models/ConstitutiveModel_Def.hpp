@@ -19,7 +19,7 @@ ConstitutiveModel<EvalT, Traits>::ConstitutiveModel(Teuchos::ParameterList* p, T
   num_pts_  = dims[1];
   num_dims_ = dims[2];
 
-  field_name_map_ = p->get<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map");
+  surface_element_ = p->get<bool>("Is Surface Element Block", false);
 
   if (p->isType<bool>("Have Temperature") == true) {
     have_temperature_ = p->get<bool>("Have Temperature");
@@ -120,7 +120,7 @@ ConstitutiveModel<EvalT, Traits>::computeVolumeAverage(Workset workset, DepField
 
   int const& num_pts = this->num_pts_;
 
-  std::string                 cauchy = (*this->field_name_map_)["Cauchy_Stress"];
+  std::string                 cauchy = this->stateName("Cauchy_Stress");
   PHX::MDField<ScalarT>       stress = *eval_fields[cauchy];
   minitensor::Tensor<ScalarT> sig(num_dims);
   minitensor::Tensor<ScalarT> I(minitensor::eye<ScalarT>(num_dims));

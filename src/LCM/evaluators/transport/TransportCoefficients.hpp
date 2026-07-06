@@ -184,9 +184,16 @@ class TransportCoefficients : public PHX::EvaluatorWithBaseImpl<Traits>, public 
   bool have_eqps_;
 
   ///
-  /// Map of field names
+  /// True for surface-element blocks; selects the "surf_" state-name prefix.
   ///
-  Teuchos::RCP<std::map<std::string, std::string>> field_name_map_;
+  bool surface_element_{false};
+
+  /// Output state name for a base field name (see ConstitutiveModel::stateName).
+  std::string
+  stateName(std::string const& base) const
+  {
+    return surface_element_ ? "surf_" + base : base;
+  }
 };
 }  // namespace LCM
 

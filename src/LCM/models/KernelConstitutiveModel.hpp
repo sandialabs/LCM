@@ -32,7 +32,7 @@ struct ParallelKernel
  protected:
   ParallelKernel(ConstitutiveModel<EvalT, Traits>& model)
       : model_(model),
-        field_name_map_(*model.field_name_map_),
+        surface_element_(model.surface_element_),
         dep_field_map_(model.dep_field_map_),
         eval_field_map_(model.eval_field_map_),
         num_dims_(model.num_dims_),
@@ -119,10 +119,15 @@ struct ParallelKernel
     need_integration_pt_locations_ = iplf;
     coord_vec_                     = model_.coord_vec_;
   }
-  ///
-  /// Map of field names
-  ///
-  NameMap& field_name_map_;
+  /// True for surface-element blocks; selects the "surf_" state-name prefix.
+  bool surface_element_;
+
+  /// Output state name for a base field name (see ConstitutiveModel::stateName).
+  std::string
+  stateName(std::string const& base) const
+  {
+    return surface_element_ ? "surf_" + base : base;
+  }
 
   DataLayoutMap& dep_field_map_;
 

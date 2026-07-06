@@ -86,25 +86,25 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   // retrieve appropriate field name strings
 
   // retrieve appropriate field name strings
-  std::string const cauchy_str     = field_name_map_["Cauchy_Stress"];
-  std::string const Fp_str         = field_name_map_["Fp"];
-  std::string const eqps_str       = field_name_map_["eqps"];
-  std::string const yield_surf_str = field_name_map_["Yield_Surface"];
-  std::string const j2_stress_str  = field_name_map_["J2_Stress"];
-  std::string const tilt_angle_str = field_name_map_["Tilt_Angle"];
-  std::string const source_str     = field_name_map_["Mechanical_Source"];
-  std::string const F_str          = field_name_map_["F"];
-  std::string const J_str          = field_name_map_["J"];
+  std::string const cauchy_str     = stateName("Cauchy_Stress");
+  std::string const Fp_str         = stateName("Fp");
+  std::string const eqps_str       = stateName("eqps");
+  std::string const yield_surf_str = stateName("Yield_Surface");
+  std::string const j2_stress_str  = stateName("J2_Stress");
+  std::string const tilt_angle_str = stateName("Tilt_Angle");
+  std::string const source_str     = stateName("Mechanical_Source");
+  std::string const F_str          = stateName("F");
+  std::string const J_str          = stateName("J");
 
   // failure indicators just for output
-  std::string const yield_indicator_str        = field_name_map_["Yield_Indicator"];
-  std::string const tensile_indicator_str      = field_name_map_["Tensile_Indicator"];
-  std::string const strain_indicator_str       = field_name_map_["Strain_Indicator"];
-  std::string const angle_indicator_str        = field_name_map_["Angle_Indicator"];
-  std::string const displacement_indicator_str = field_name_map_["Displacement_Indicator"];
+  std::string const yield_indicator_str        = stateName("Yield_Indicator");
+  std::string const tensile_indicator_str      = stateName("Tensile_Indicator");
+  std::string const strain_indicator_str       = stateName("Strain_Indicator");
+  std::string const angle_indicator_str        = stateName("Angle_Indicator");
+  std::string const displacement_indicator_str = stateName("Displacement_Indicator");
 
   // Elastic modulus used (for output)
-  std::string const elastic_modulus_str = field_name_map_["Elastic_Modulus_Used"];
+  std::string const elastic_modulus_str = stateName("Elastic_Modulus_Used");
 
   // define the dependent fields
   setDependentField(F_str, dl->qp_tensor);
@@ -167,22 +167,22 @@ template <typename EvalT, typename Traits>
 void
 J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields)
 {
-  std::string const cauchy_str                 = field_name_map_["Cauchy_Stress"];
-  std::string const Fp_str                     = field_name_map_["Fp"];
-  std::string const eqps_str                   = field_name_map_["eqps"];
-  std::string const ct_str                     = field_name_map_["Cumulative_Time"];
-  std::string const yield_surf_str             = field_name_map_["Yield_Surface"];
-  std::string const j2_stress_str              = field_name_map_["J2_Stress"];
-  std::string const tilt_angle_str             = field_name_map_["Tilt_Angle"];
-  std::string const source_str                 = field_name_map_["Mechanical_Source"];
-  std::string const F_str                      = field_name_map_["F"];
-  std::string const J_str                      = field_name_map_["J"];
-  std::string const yield_indicator_str        = field_name_map_["Yield_Indicator"];
-  std::string const tensile_indicator_str      = field_name_map_["Tensile_Indicator"];
-  std::string const strain_indicator_str       = field_name_map_["Strain_Indicator"];
-  std::string const angle_indicator_str        = field_name_map_["Angle_Indicator"];
-  std::string const displacement_indicator_str = field_name_map_["Displacement_Indicator"];
-  std::string const elastic_modulus_str        = field_name_map_["Elastic_Modulus_Used"];
+  std::string const cauchy_str                 = stateName("Cauchy_Stress");
+  std::string const Fp_str                     = stateName("Fp");
+  std::string const eqps_str                   = stateName("eqps");
+  std::string const ct_str                     = stateName("Cumulative_Time");
+  std::string const yield_surf_str             = stateName("Yield_Surface");
+  std::string const j2_stress_str              = stateName("J2_Stress");
+  std::string const tilt_angle_str             = stateName("Tilt_Angle");
+  std::string const source_str                 = stateName("Mechanical_Source");
+  std::string const F_str                      = stateName("F");
+  std::string const J_str                      = stateName("J");
+  std::string const yield_indicator_str        = stateName("Yield_Indicator");
+  std::string const tensile_indicator_str      = stateName("Tensile_Indicator");
+  std::string const strain_indicator_str       = stateName("Strain_Indicator");
+  std::string const angle_indicator_str        = stateName("Angle_Indicator");
+  std::string const displacement_indicator_str = stateName("Displacement_Indicator");
+  std::string const elastic_modulus_str        = stateName("Elastic_Modulus_Used");
 
   // extract dependent MDFields
   def_grad_          = *dep_fields[F_str];

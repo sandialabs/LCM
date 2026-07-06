@@ -23,7 +23,7 @@ HyperelasticDamageModel<EvalT, Traits>::HyperelasticDamageModel(Teuchos::Paramet
   this->dep_field_map_.insert(std::make_pair("Delta Time", dl->workset_scalar));
 
   // define the evaluated fields
-  std::string cauchy = (*field_name_map_)["Cauchy_Stress"];
+  std::string cauchy = stateName("Cauchy_Stress");
   this->eval_field_map_.insert(std::make_pair(cauchy, dl->qp_tensor));
   this->eval_field_map_.insert(std::make_pair("Damage_Source", dl->qp_scalar));
   this->eval_field_map_.insert(std::make_pair("alpha", dl->qp_scalar));
@@ -62,7 +62,7 @@ HyperelasticDamageModel<EvalT, Traits>::computeState(typename Traits::EvalData w
   auto elastic_modulus = *dep_fields["Elastic Modulus"];
   auto delta_time      = *dep_fields["Delta Time"];
   // extract evaluated MDFields
-  std::string           cauchy = (*field_name_map_)["Cauchy_Stress"];
+  std::string           cauchy = stateName("Cauchy_Stress");
   auto                  stress = *eval_fields[cauchy];
   auto                  alpha  = *eval_fields["alpha"];
   PHX::MDField<ScalarT> damage;

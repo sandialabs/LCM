@@ -12,13 +12,13 @@ J2MiniKernel<EvalT, Traits>::J2MiniKernel(ConstitutiveModel<EvalT, Traits>& mode
     : BaseKernel(model), sat_mod_(p->get<RealType>("Saturation Modulus", 0.0)), sat_exp_(p->get<RealType>("Saturation Exponent", 0.0))
 {
   // retrieve appropriate field name strings
-  std::string const cauchy_string       = field_name_map_["Cauchy_Stress"];
-  std::string const Fp_string           = field_name_map_["Fp"];
-  std::string const eqps_string         = field_name_map_["eqps"];
-  std::string const yieldSurface_string = field_name_map_["Yield_Surface"];
-  std::string const source_string       = field_name_map_["Mechanical_Source"];
-  std::string const F_string            = field_name_map_["F"];
-  std::string const J_string            = field_name_map_["J"];
+  std::string const cauchy_string       = stateName("Cauchy_Stress");
+  std::string const Fp_string           = stateName("Fp");
+  std::string const eqps_string         = stateName("eqps");
+  std::string const yieldSurface_string = stateName("Yield_Surface");
+  std::string const source_string       = stateName("Mechanical_Source");
+  std::string const F_string            = stateName("F");
+  std::string const J_string            = stateName("J");
 
   // define the dependent fields
   setDependentField(F_string, dl->qp_tensor);
@@ -64,13 +64,13 @@ template <typename EvalT, typename Traits>
 void
 J2MiniKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& dep_fields, FieldMap<ScalarT>& eval_fields)
 {
-  std::string cauchy_string       = field_name_map_["Cauchy_Stress"];
-  std::string Fp_string           = field_name_map_["Fp"];
-  std::string eqps_string         = field_name_map_["eqps"];
-  std::string yieldSurface_string = field_name_map_["Yield_Surface"];
-  std::string source_string       = field_name_map_["Mechanical_Source"];
-  std::string F_string            = field_name_map_["F"];
-  std::string J_string            = field_name_map_["J"];
+  std::string cauchy_string       = stateName("Cauchy_Stress");
+  std::string Fp_string           = stateName("Fp");
+  std::string eqps_string         = stateName("eqps");
+  std::string yieldSurface_string = stateName("Yield_Surface");
+  std::string source_string       = stateName("Mechanical_Source");
+  std::string F_string            = stateName("F");
+  std::string J_string            = stateName("J");
 
   // extract dependent MDFields
   def_grad_          = *dep_fields[F_string];

@@ -18,7 +18,7 @@ MooneyRivlinModel<EvalT, Traits>::MooneyRivlinModel(Teuchos::ParameterList* p, c
   this->dep_field_map_.insert(std::make_pair("J", dl->qp_scalar));
 
   // define the evaluated fields
-  std::string cauchy = (*field_name_map_)["Cauchy_Stress"];
+  std::string cauchy = stateName("Cauchy_Stress");
   this->eval_field_map_.insert(std::make_pair(cauchy, dl->qp_tensor));
 
   // define the state variables
@@ -38,7 +38,7 @@ MooneyRivlinModel<EvalT, Traits>::computeState(typename Traits::EvalData workset
   auto defGrad = *dep_fields["F"];
   auto J       = *dep_fields["J"];
   // extract evaluated MDFields
-  std::string cauchy = (*field_name_map_)["Cauchy_Stress"];
+  std::string cauchy = stateName("Cauchy_Stress");
   auto        stress = *eval_fields[cauchy];
 
   minitensor::Tensor<ScalarT> F(num_dims_), C(num_dims_);

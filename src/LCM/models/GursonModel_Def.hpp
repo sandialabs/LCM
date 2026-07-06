@@ -35,10 +35,10 @@ GursonModel<EvalT, Traits>::GursonModel(Teuchos::ParameterList* p, const Teuchos
   this->dep_field_map_.insert(std::make_pair("Hardening Modulus", dl->qp_scalar));
 
   // retrieve appropriate field name strings
-  std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string     = (*field_name_map_)["Fp"];
-  std::string eqps_string   = (*field_name_map_)["eqps"];
-  std::string void_string   = (*field_name_map_)["void_volume_fraction"];
+  std::string cauchy_string = stateName("Cauchy_Stress");
+  std::string Fp_string     = stateName("Fp");
+  std::string eqps_string   = stateName("eqps");
+  std::string void_string   = stateName("void_volume_fraction");
 
   // define the evaluated fields
   this->eval_field_map_.insert(std::make_pair(cauchy_string, dl->qp_tensor));
@@ -93,10 +93,10 @@ GursonModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepF
   auto hardening_modulus = *dep_fields["Hardening Modulus"];
 
   // retrieve appropriate field name strings
-  std::string cauchy_string = (*field_name_map_)["Cauchy_Stress"];
-  std::string Fp_string     = (*field_name_map_)["Fp"];
-  std::string eqps_string   = (*field_name_map_)["eqps"];
-  std::string void_string   = (*field_name_map_)["void_volume_fraction"];
+  std::string cauchy_string = stateName("Cauchy_Stress");
+  std::string Fp_string     = stateName("Fp");
+  std::string eqps_string   = stateName("eqps");
+  std::string void_string   = stateName("void_volume_fraction");
 
   // extract evaluated MDFields
   auto stress      = *eval_fields[cauchy_string];

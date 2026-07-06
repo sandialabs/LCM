@@ -30,7 +30,7 @@ TransportCoefficients<EvalT, Traits>::TransportCoefficients(Teuchos::ParameterLi
       weighted_average_(p.get<bool>("Weighted Volume Average J", false)),
       alpha_(p.get<RealType>("Average J Stabilization Parameter", 0.0))
 {
-  field_name_map_ = p.get<Teuchos::RCP<std::map<std::string, std::string>>>("Name Map");
+  surface_element_ = p.get<bool>("Is Surface Element Block", false);
 
   // get the material parameter list
   Teuchos::ParameterList* mat_params = p.get<Teuchos::ParameterList*>("Material Parameters");
@@ -107,7 +107,7 @@ TransportCoefficients<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
   // Use the previous iterate of eqps to avoid circular dependency issue
   Albany::MDArray eqps;
   if (have_eqps_) {
-    std::string eqps_string = (*field_name_map_)["eqps"];
+    std::string eqps_string = stateName("eqps");
     eqps                    = (*workset.stateArrayPtr)[eqps_string + "_old"];
   }
 

@@ -79,7 +79,7 @@ ParallelKernel<EvalT, Traits>::extractEvaluatedFieldArray(
   for (std::size_t i = 0; i < num; ++i) {
     std::string const id = Albany::strint(field_name, i + 1, '_');
 
-    std::string const name = field_name_map_[id];
+    std::string const name = stateName(id);
 
     state.emplace_back(eval_fields[name]);
     old_state.emplace_back(&((*workset.stateArrayPtr)[name + "_old"]));
@@ -100,7 +100,7 @@ ParallelKernel<EvalT, Traits>::extractEvaluatedFieldArray(
   for (std::size_t i = 0; i < num; ++i) {
     std::string const id = Albany::strint(field_name, i + 1, '_');
 
-    std::string const name = field_name_map_[id];
+    std::string const name = stateName(id);
 
     state.emplace_back(eval_fields[name]);
   }

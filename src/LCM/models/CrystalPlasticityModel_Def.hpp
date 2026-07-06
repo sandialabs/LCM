@@ -285,7 +285,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
   for (int num_ss = 0; num_ss < num_slip_; ++num_ss) {
     std::string const g = Albany::strint("gamma", num_ss + 1, '_');
 
-    std::string const gamma_string = field_name_map_[g];
+    std::string const gamma_string = stateName(g);
 
     std::string const output_gamma_string = "Output " + gamma_string;
 
@@ -297,7 +297,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
   for (int num_ss = 0; num_ss < num_slip_; ++num_ss) {
     std::string const g_dot = Albany::strint("gamma_dot", num_ss + 1, '_');
 
-    std::string const gamma_dot_string = field_name_map_[g_dot];
+    std::string const gamma_dot_string = stateName(g_dot);
 
     setEvaluatedField(gamma_dot_string, dl->qp_scalar);
 
@@ -310,7 +310,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
   for (int num_ss = 0; num_ss < num_slip_; ++num_ss) {
     std::string const t_h = Albany::strint("tau_hard", num_ss + 1, '_');
 
-    std::string const tau_hard_string = field_name_map_[t_h];
+    std::string const tau_hard_string = stateName(t_h);
 
     auto const initial = slip_systems_.at(num_ss).state_hardening_initial_;
 
@@ -325,7 +325,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
   for (int num_ss = 0; num_ss < num_slip_; ++num_ss) {
     std::string const t = Albany::strint("tau", num_ss + 1, '_');
 
-    std::string const tau_string = field_name_map_[t];
+    std::string const tau_string = stateName(t);
 
     setEvaluatedField(tau_string, dl->qp_scalar);
 

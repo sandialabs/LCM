@@ -36,7 +36,7 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   using BaseKernel       = ParallelKernel<EvalT, Traits>;
   using Workset          = typename BaseKernel::Workset;
 
-  using BaseKernel::field_name_map_;
+  using BaseKernel::stateName;
   using BaseKernel::num_dims_;
   using BaseKernel::num_pts_;
 

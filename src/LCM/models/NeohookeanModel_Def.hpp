@@ -13,9 +13,9 @@ template <typename EvalT, typename Traits>
 NeohookeanModel<EvalT, Traits>::NeohookeanModel(Teuchos::ParameterList* p, const Teuchos::RCP<Albany::Layouts>& dl)
     : LCM::ConstitutiveModel<EvalT, Traits>(p, dl)
 {
-  std::string F_string = (*field_name_map_)["F"];
-  std::string J_string = (*field_name_map_)["J"];
-  std::string cauchy   = (*field_name_map_)["Cauchy_Stress"];
+  std::string F_string = stateName("F");
+  std::string J_string = stateName("J");
+  std::string cauchy   = stateName("Cauchy_Stress");
 
   // define the dependent fields
   this->dep_field_map_.insert(std::make_pair(F_string, dl->qp_tensor));
@@ -42,9 +42,9 @@ template <typename EvalT, typename Traits>
 void
 NeohookeanModel<EvalT, Traits>::computeState(typename Traits::EvalData workset, DepFieldMap dep_fields, FieldMap eval_fields)
 {
-  std::string F_string = (*field_name_map_)["F"];
-  std::string J_string = (*field_name_map_)["J"];
-  std::string cauchy   = (*field_name_map_)["Cauchy_Stress"];
+  std::string F_string = stateName("F");
+  std::string J_string = stateName("J");
+  std::string cauchy   = stateName("Cauchy_Stress");
 
   // extract dependent MDFields
   auto def_grad        = *dep_fields[F_string];

@@ -104,6 +104,21 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray failure_modes_old_;
   ScalarField     failure_modes_;
 
+  // Gradual death (outer death iteration): when Death Steps > 1 a failing cell's
+  // stiffness is faded to zero over that many increments (death_decay 1 -> 0)
+  // instead of vanishing in one step; the stored stress -- residual force and,
+  // via the AD seeds, the consistent tangent -- is scaled by death_decay_old_,
+  // so a re-solve sees only a 1/N stiffness perturbation instead of a
+  // near-singular stiffness cliff. death_decay_ is written every fill;
+  // death_decay_old_ is the frozen start-of-iteration value it is computed from
+  // (idempotent within a solve). cell_death flips to 1 only when the fade
+  // reaches 0. Stored per qp for a reliable nonzero old-state buffer; the value
+  // is uniform across a cell's points.
+  ScalarField     death_decay_;
+  Albany::MDArray death_decay_old_;
+  int             death_steps_{1};
+  bool            gradual_death_{false};
+
   // Per-cell flag for "*-erodible" side-set membership. Phase B
   // replacement for the old cell_boundary_indicator-based check.
   Teuchos::ArrayRCP<std::uint8_t> cell_is_erodible_;

@@ -28,6 +28,13 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   disable_erosion_          = p->get<bool>("Disable Erosion", false);
   num_failed_pts_for_death_ = p->get<int>("ACE Failed Integration Points For Death", 0);
 
+  // Outer death iteration: fade a failing cell's stiffness to zero over this
+  // many increments instead of removing it in one step. 1 (the default) keeps
+  // the historical instant-removal behavior bit-for-bit.
+  death_steps_ = p->get<int>("Death Steps", 1);
+  ALBANY_ASSERT(death_steps_ >= 1, "J2Erosion: Death Steps must be >= 1");
+  gradual_death_ = death_steps_ > 1;
+
   if (p->isParameter("ACE Strain Limit")) {
     strain_limit_ = p->get<RealType>("ACE Strain Limit");
   } else {
@@ -121,6 +128,10 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   setEvaluatedField("failure_state", dl->cell_scalar2);
   setEvaluatedField("cell_death", dl->cell_scalar2);
   setEvaluatedField("failure_modes", dl->qp_scalar);
+  // Stored per quadrature point (qp_scalar) rather than per cell: the qp_scalar
+  // old-state buffer is the proven path for a nonzero initial value. The value
+  // is uniform across a cell's points.
+  if (gradual_death_) setEvaluatedField("death_decay", dl->qp_scalar);
   setEvaluatedField(cauchy_str, dl->qp_tensor);
   setEvaluatedField(Fp_str, dl->qp_tensor);
   setEvaluatedField(eqps_str, dl->qp_scalar);
@@ -156,6 +167,10 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
   addStateVariable("cell_death", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Cell Death", false));
   addStateVariable("failure_modes", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Failure Modes", false));
+  // Decay factor: needs its old state (it persists and advances one increment
+  // per death iteration via the new->old rotation). Initialized to 1.0 (intact).
+  if (gradual_death_)
+    addStateVariable("death_decay", dl->qp_scalar, "scalar", 1.0, true, p->get<bool>("Output Death Decay", false));
 
   if (have_temperature_ == true) {
     addStateVariable("Temperature", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Temperature", false));
@@ -211,6 +226,10 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   failed_                 = *eval_fields["failure_state"];
   dead_                   = *eval_fields["cell_death"];
   failure_modes_          = *eval_fields["failure_modes"];
+  if (gradual_death_) {
+    death_decay_     = *eval_fields["death_decay"];
+    death_decay_old_ = (*workset.stateArrayPtr)["death_decay_old"];
+  }
 
   if (have_temperature_ == true) {
     source_      = *eval_fields[source_str];
@@ -277,7 +296,15 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
       if (m != 0u) ++num_failed_pts;
     }
     failed_(cell, 0) = seed;
-    dead_(cell, 0)   = num_failed_pts >= threshold ? 1.0 : 0.0;
+    // cell_death marks the cell as fully gone: in gradual mode that is when the
+    // fade has reached 0; otherwise when enough points have failed (instant
+    // removal). The fully-dead set is what the scatter, calving, and dead-DOF
+    // rate zeroing consume.
+    if (gradual_death_) {
+      dead_(cell, 0) = death_decay_old_(cell, 0) <= 0.0 ? 1.0 : 0.0;
+    } else {
+      dead_(cell, 0) = num_failed_pts >= threshold ? 1.0 : 0.0;
+    }
   }
 }
 
@@ -484,6 +511,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     // Carry the failure-mode bitmask forward unchanged: a dead cell never
     // trips new bits, but the state must still be written every fill.
     failure_modes_(cell, pt) = failure_modes_old_(cell, pt);
+    if (gradual_death_) death_decay_(cell, pt) = 0.0;
     return;
   }
 
@@ -677,9 +705,16 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   // compute stress
   sigma = p * I + s / J_(cell, pt);
 
+  // Gradual death: scale the stored stress -- the cell's residual force and,
+  // since sigma carries the AD seeds, its consistent tangent -- by the frozen
+  // start-of-iteration decay so a failing cell sheds load smoothly over Death
+  // Steps rather than in a single iterate. The internal state (Fp, eqps) below
+  // is stored UNSCALED, so the cell keeps a valid material state until it is
+  // fully faded. decay == 1 when the cell is intact.
+  ScalarT const decay = gradual_death_ ? ScalarT(death_decay_old_(cell, pt)) : ScalarT(1.0);
   for (int i(0); i < num_dims_; ++i) {
     for (int j(0); j < num_dims_; ++j) {
-      stress_(cell, pt, i, j) = sigma(i, j);
+      stress_(cell, pt, i, j) = decay * sigma(i, j);
     }
   }
 
@@ -784,7 +819,38 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
         ++num_failed_pts;
       }
     }
-    if (num_failed_pts >= threshold && (*death_status_vec_)[cell] == 0.0) {
+    bool const marked = num_failed_pts >= threshold;
+    if (gradual_death_) {
+      // Advance the fade one increment per death iteration. Computing it from
+      // the frozen start-of-iteration value (death_decay_old_) makes the write
+      // idempotent across the iteration's fills; the new->old rotation then
+      // advances it exactly once per iteration. cell_death flips to 1 only when
+      // the fade reaches 0 -- the fully-dead signal the scatter, calving, and
+      // dead-DOF rate zeroing consume.
+      //
+      // Self-latching: a cell already fading (death_decay_old_ < 1) keeps fading
+      // even if its criterion no longer trips on the re-equilibrated stress, so
+      // it can never stall part-faded and hang the outer death iteration.
+      double const d_old = death_decay_old_(cell, 0);
+      double       d_new = d_old;
+      if ((marked || d_old < 1.0) && d_old > 0.0) {
+        d_new = d_old - 1.0 / static_cast<double>(death_steps_);
+        if (d_new < 0.0) d_new = 0.0;
+      }
+      // The decay is per cell; store it at every quadrature point (the value is
+      // uniform across the cell).
+      for (int q = 0; q < num_pts_; ++q) death_decay_(cell, q) = d_new;
+      bool const now_fully_dead = d_new <= 0.0;
+      dead_(cell, 0)            = now_fully_dead ? 1.0 : 0.0;
+      // The iteration a cell's fade reaches 0, skip it from assembly at once
+      // (its row goes exactly zero and the orphan fix pins it here) rather than
+      // waiting for the next step's scatter snapshot -- no one-step free-fall.
+      if (now_fully_dead && (*death_status_vec_)[cell] == 0.0) {
+        (*death_status_vec_)[cell] = 1.0;
+      }
+    } else if (marked && (*death_status_vec_)[cell] == 0.0) {
+      // Instant removal (historical behavior): mark the cell dead in the shared
+      // scatter signal so it is skipped for the rest of this fill.
       (*death_status_vec_)[cell] = 1.0;
       dead_(cell, 0)             = 1.0;
     }

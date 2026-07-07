@@ -140,7 +140,23 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   AdvanceThermalDynamics(int const subdomain, bool const is_initial_state, double const current_time, double const next_time, double const time_step) const;
 
   void
-  AdvanceMechanicalDynamics(int const subdomain, bool const is_initial_state, double const current_time, double const next_time, double const time_step) const;
+  AdvanceMechanicalDynamics(
+      int const    subdomain,
+      bool const   is_initial_state,
+      double const current_time,
+      double const next_time,
+      double const time_step,
+      bool const   death_resolve = false) const;
+
+  // Reseed the mechanical solve's initial condition to the step-start state
+  // (x_n, v_n, a_n) before every solve of the step -- solve #0, every outer
+  // death-iteration re-solve, and every dt-cut retry. Each re-solve is then a
+  // clean replay of the same time window with softer material, advancing only
+  // the death state; the trapezoid decorator can no longer ratchet fictitious
+  // velocity/acceleration across re-solves, and a diverged solve's poisoned
+  // rate buffers are overwritten before the next attempt. Also reseeds the
+  // decorator's acceleration IC buffer, which the solver reads directly.
+  void reseedMechIC(int subdomain) const;
 
   bool
   continueSolve() const;
@@ -209,6 +225,13 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_x_;
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdot_;
   mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     this_xdotdot_;
+  // Step-start integrator state (x_n, v_n, a_n), snapshotted once per attempted
+  // time step before solve #0. reseedMechIC restores the mechanical solve to
+  // this state before every solve/re-solve/retry so each outer death-iteration
+  // re-solve replays the same window from a clean initial condition.
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     step_start_x_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     step_start_xdot_;
+  mutable std::vector<Teuchos::RCP<Thyra::VectorBase<ST>>>     step_start_xdotdot_;
 
   // Snapshot of every element-rank double field on the shared STK mesh
   // at the start of each global time step, restored when a subdomain
@@ -219,10 +242,37 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   // element ID -- NOT by workset position: rebuildWorksets re-packs the
   // buckets between snapshot and restore, so positional copies (the
   // Schwarz fromTo idiom) are not layout-safe here.
-  mutable std::map<std::string, std::unordered_map<stk::mesh::EntityId, std::vector<double>>> pre_step_states_;
+  using SharedStateStore = std::map<std::string, std::unordered_map<stk::mesh::EntityId, std::vector<double>>>;
+  mutable SharedStateStore pre_step_states_;
 
+  // Second snapshot, taken AFTER the thermal solve and BEFORE the first
+  // mechanical solve of the step. The outer death iteration re-solves the
+  // mechanical equilibrium at fixed time, rewinding the mechanical physics to
+  // this post-thermal state (restoreMechStates(keep_death=true)) between
+  // re-solves while keeping the committed deaths. It must be post-thermal so a
+  // re-solve judges failure on the step's warmed strength, not the step-start
+  // (pre-thermal) strength.
+  mutable SharedStateStore pre_mech_states_;
+
+  void snapshotStatesInto(SharedStateStore& out) const;
+  void restoreStatesFrom(SharedStateStore const& in, bool keep_death) const;
   void snapshotSharedMeshStates() const;
+  void snapshotMechStates() const;
   void restoreSharedMeshStates() const;
+  // Rewind the mechanical physics to the post-thermal snapshot for an outer
+  // death-iteration re-solve; keep_death preserves the element-death bookkeeping
+  // so deaths committed so far survive the rewind.
+  void restoreMechStates(bool keep_death) const;
+
+  // Read cell_death into the mechanical app's death_status_vecs_ and capture the
+  // fully-dead node DOFs for the hold-in-place Dirichlet. Called before each
+  // mechanical solve (initial and each outer-death-iteration re-solve) so newly
+  // fully-faded cells are scatter-skipped and pinned on the next solve.
+  void populateDeathStatus(int subdomain) const;
+
+  // True if any owned cell is mid-fade (0 < death_decay_old < 1); the outer
+  // death iteration's convergence test. Collective (MAX reduce).
+  bool anyCellMidFade(int subdomain) const;
 
   //! Global number of owned elements still in the active part; "alive"
   //! when no active-part machinery exists. Drives the all-elements-dead

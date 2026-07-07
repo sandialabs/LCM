@@ -46,7 +46,7 @@ LCM:
         Method: Newton
         Newton:
           Forcing Term Method: Constant
-          Rescue Bad Newton Solve: true
+          Rescue Bad Newton Solve: false
           Linear Solver:
             Tolerance: 1.0e-6
           Stratimikos Linear Solver:

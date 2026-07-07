@@ -1872,6 +1872,108 @@ Application::applyDeathToActivePart()
   // that are still live members of activePart -- together with the failure
   // magnitude used to rank them for the throttle below.
   auto& esa = getStateMgr().getStateArrays().elemStateArrays;
+
+  // Partition-deterministic global top-K selector. Every rank all-gathers its
+  // local top-K (ranked by largest measure, ties broken by lowest global id) so
+  // all ranks form the identical global top-K set. Committing clear winners (far
+  // past threshold) rather than a whole near-threshold batch keeps the death set
+  // from flipping under the ~1e-6 partition-dependent solver drift -- the
+  // serial==parallel lever (GitHub #114).
+  auto select_topk = [&](std::vector<std::pair<double, GO>>& local, int K) {
+    GO const  GO_MAX = std::numeric_limits<GO>::max();
+    int const nranks = comm->getSize();
+    auto      by_key = [](std::pair<double, GO> const& a, std::pair<double, GO> const& b) {
+      return a.first > b.first || (a.first == b.first && a.second < b.second);
+    };
+    std::sort(local.begin(), local.end(), by_key);
+    std::vector<double> send_meas(K, -1.0);
+    std::vector<GO>     send_gid(K, GO_MAX);
+    int const           local_n = std::min<int>(K, static_cast<int>(local.size()));
+    for (int i = 0; i < local_n; ++i) {
+      send_meas[i] = local[i].first;
+      send_gid[i]  = local[i].second;
+    }
+    std::vector<double> all_meas(static_cast<size_t>(nranks) * K);
+    std::vector<GO>     all_gid(static_cast<size_t>(nranks) * K);
+    Teuchos::gatherAll(*comm, K, send_meas.data(), nranks * K, all_meas.data());
+    Teuchos::gatherAll(*comm, K, send_gid.data(), nranks * K, all_gid.data());
+    std::vector<std::pair<double, GO>> global;
+    for (size_t i = 0; i < all_gid.size(); ++i)
+      if (all_gid[i] != GO_MAX) global.emplace_back(all_meas[i], all_gid[i]);
+    std::sort(global.begin(), global.end(), by_key);
+    std::set<GO> topk;
+    for (int i = 0; i < std::min<int>(K, static_cast<int>(global.size())); ++i) topk.insert(global[i].second);
+    return topk;
+  };
+
+  // ===== Outer death iteration: throttle which cells BEGIN fading =====
+  //
+  // A re-solve just advanced the gradual-decay state, so a cell that met the
+  // failure threshold this iteration has started fading (death_decay_old < 1).
+  // Commit only the K globally-most-failed of the NEWLY started cells and
+  // un-start the rest, so only clear winners begin fading; a committed cell
+  // latches (keeps fading to completion) and is never re-throttled. Return
+  // WITHOUT the clone-death surgery -- the topology is unchanged, so the driver
+  // re-solves equilibrium on the same map; the deferred surgery runs once (defer
+  // off) when the loop converges. cell_death flags only FADE-COMPLETE cells under
+  // gradual decay, so a fade start is read from death_decay_old, not
+  // death_status_vecs_.
+  if (defer_death_surgery_) {
+    struct StartCand {
+      int    ws;
+      int    lid;
+      GO     gid;
+    };
+    std::vector<StartCand>             starts;
+    std::vector<std::pair<double, GO>> local;
+    int const                          num_ws = static_cast<int>(death_status_vecs_.size());
+    for (auto const& [gid, lid] : elemGIDws) {
+      if (lid.ws >= num_ws) continue;
+      auto const dd = esa[lid.ws].find("death_decay_old");
+      if (dd == esa[lid.ws].end()) continue;  // instant-death model: no fade to throttle
+      if (dd->second.dimension(1) <= 0) continue;
+      double const decay = dd->second(lid.LID, 0);
+      if (decay >= 1.0 || decay <= 0.0) continue;             // not started, or already fully faded
+      if (committed_deaths_this_step_.count(gid) != 0u) continue;  // already committed; latched
+      double     measure = 0.0;
+      auto const fs      = esa[lid.ws].find("failure_state");
+      if (fs != esa[lid.ws].end() && lid.LID < static_cast<int>(fs->second.size())) measure = fs->second[lid.LID];
+      starts.push_back({lid.ws, lid.LID, gid});
+      local.emplace_back(measure, gid);
+    }
+    int const    K    = std::max(1, problemParams->get<int>("Max Element Deaths Per Step", 8));
+    std::set<GO> topk = select_topk(local, K);
+    auto         reset_field = [&](int ws, int lid, char const* name, double v) {
+      auto it = esa[ws].find(name);
+      if (it == esa[ws].end()) return;
+      if (it->second.dimension(1) > 0) {
+        int const n = it->second.dimension(1);
+        for (int p = 0; p < n; ++p) it->second(lid, p) = v;
+      } else if (lid < static_cast<int>(it->second.size())) {
+        it->second[lid] = v;
+      }
+    };
+    for (auto const& c : starts) {
+      if (topk.count(c.gid) != 0u) {
+        committed_deaths_this_step_.insert(c.gid);  // latch: fades to completion
+      } else {
+        // Un-start: full both-copies reset so the cell is intact again and its
+        // fade does not resume until it re-crosses threshold on a later re-solve.
+        reset_field(c.ws, c.lid, "death_decay", 1.0);
+        reset_field(c.ws, c.lid, "death_decay_old", 1.0);
+        reset_field(c.ws, c.lid, "failure_modes", 0.0);
+        reset_field(c.ws, c.lid, "failure_modes_old", 0.0);
+        reset_field(c.ws, c.lid, "cell_death", 0.0);
+        reset_field(c.ws, c.lid, "failure_state", 0.0);
+        if (death_status_vecs_[c.ws] != Teuchos::null && c.lid < static_cast<int>(death_status_vecs_[c.ws]->size()))
+          (*death_status_vecs_[c.ws])[c.lid] = 0.0;
+      }
+    }
+    // topk is global and identical on every rank -> collective-safe count.
+    n_started_last_pass_ = static_cast<int>(topk.size());
+    return !topk.empty();
+  }
+
   struct DeathCand {
     stk::mesh::Entity cell;
     int               ws;
@@ -1927,48 +2029,19 @@ Application::applyDeathToActivePart()
   };
 
   stk::mesh::EntityVector killed;
-  bool const throttle = problemParams->get<bool>("Throttle Element Death", true);
+  // Throttle the SURGERY set only when the outer death iteration did not already
+  // decide it: with gradual decay the driver runs applyDeathToActivePart in defer
+  // mode (which throttled the fade STARTS above) and then calls it once with the
+  // flag off to surgery the whole committed, fully-faded set -- already decided,
+  // so no throttle. In the legacy single-pass path (committed set empty) still
+  // throttle so a lone call cannot commit a whole near-threshold batch.
+  bool const throttle = problemParams->get<bool>("Throttle Element Death", true) && committed_deaths_this_step_.empty();
   if (throttle) {
-    // Commit at most K deaths this step, the K globally-most-failed candidates,
-    // ranked by the partition-deterministic key (largest failure magnitude,
-    // ties broken by lowest global id). Every rank computes the identical global
-    // top-K set from an all-gather of each rank's local top-K, so serial and np4
-    // commit the same deaths. K > 1 (vs strict one-at-a-time) trades a little of
-    // that determinism margin for far fewer time steps.
-    int const K      = std::max(1, problemParams->get<int>("Max Element Deaths Per Step", 8));
-    int const nranks = comm->getSize();
-    GO const  GO_MAX = std::numeric_limits<GO>::max();
-
-    auto by_key = [](std::pair<double, GO> const& a, std::pair<double, GO> const& b) {
-      return a.first > b.first || (a.first == b.first && a.second < b.second);
-    };
-
-    // This rank's local top-K, padded to K with sentinels for the fixed-size gather.
+    int const                          K = std::max(1, problemParams->get<int>("Max Element Deaths Per Step", 8));
     std::vector<std::pair<double, GO>> local;
     local.reserve(cands.size());
     for (auto const& c : cands) local.emplace_back(c.measure, c.gid);
-    std::sort(local.begin(), local.end(), by_key);
-    std::vector<double> send_meas(K, -1.0);
-    std::vector<GO>     send_gid(K, GO_MAX);
-    int const           local_n = std::min<int>(K, static_cast<int>(local.size()));
-    for (int i = 0; i < local_n; ++i) {
-      send_meas[i] = local[i].first;
-      send_gid[i]  = local[i].second;
-    }
-
-    std::vector<double> all_meas(static_cast<size_t>(nranks) * K);
-    std::vector<GO>     all_gid(static_cast<size_t>(nranks) * K);
-    Teuchos::gatherAll(*comm, K, send_meas.data(), nranks * K, all_meas.data());
-    Teuchos::gatherAll(*comm, K, send_gid.data(), nranks * K, all_gid.data());
-
-    std::vector<std::pair<double, GO>> global;
-    for (size_t i = 0; i < all_gid.size(); ++i) {
-      if (all_gid[i] != GO_MAX) global.emplace_back(all_meas[i], all_gid[i]);
-    }
-    std::sort(global.begin(), global.end(), by_key);
-    std::set<GO> topk;
-    for (int i = 0; i < std::min<int>(K, static_cast<int>(global.size())); ++i) topk.insert(global[i].second);
-
+    std::set<GO> topk = select_topk(local, K);
     for (auto const& c : cands) {
       if (topk.count(c.gid) != 0u) {
         killed.push_back(c.cell);
@@ -2080,6 +2153,10 @@ Application::applyDeathToActivePart()
   // the change and let the driving solver do the full rebuild + solution
   // migration at a clean between-step point.
   topology_changed_ = true;
+
+  // The committed fully-faded set has been surgeried; reset it for the next step.
+  committed_deaths_this_step_.clear();
+  n_started_last_pass_ = 0;
 
   return true;
 }

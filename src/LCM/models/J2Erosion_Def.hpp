@@ -296,6 +296,15 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
       if (m != 0u) ++num_failed_pts;
     }
     failed_(cell, 0) = seed;
+    // Seed the decay of an intact cell (no failure history) to 1.0. The
+    // qp_scalar old-state buffer is NOT reliably initialized to the registered
+    // value on the first step -- a 0 there would scale the cell's stress to zero
+    // and (via the fully-dead test below) mark every cell dead at t=0. Guarded on
+    // num_failed_pts == 0 so a genuinely fading or dead cell (which has failure
+    // history) keeps its advanced decay.
+    if (gradual_death_ && num_failed_pts == 0) {
+      for (auto pt = 0; pt < num_pts_; ++pt) death_decay_old_(cell, pt) = 1.0;
+    }
     // cell_death marks the cell as fully gone: in gradual mode that is when the
     // fade has reached 0; otherwise when enough points have failed (instant
     // removal). The fully-dead set is what the scatter, calving, and dead-DOF

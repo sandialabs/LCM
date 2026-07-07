@@ -311,6 +311,29 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   }
   int death_pass_countdown_{0};
 
+  //! Outer death iteration (ACE driver). When defer_death_surgery_ is true,
+  //! applyDeathToActivePart THROTTLES which cells BEGIN fading this iteration --
+  //! it commits the K globally-most-failed newly-started cells and un-starts the
+  //! rest (resets their decay and failure state) -- and returns WITHOUT the
+  //! clone-death surgery, so the driver can re-solve equilibrium on the unchanged
+  //! map. committed_deaths_this_step_ holds the gids already committed (fading)
+  //! this step so they are not re-throttled on the next re-solve; a committed
+  //! cell latches and keeps fading to completion. n_started_last_pass_ is how
+  //! many NEW cells the last defer-mode call committed (0 => the outer loop
+  //! started nothing new, a convergence signal). When the loop converges the
+  //! driver clears the flag and calls applyDeathToActivePart once (defer off) to
+  //! run the deferred surgery on the whole fully-faded committed set.
+  void setDeferDeathSurgery(bool b) { defer_death_surgery_ = b; }
+  void clearCommittedDeaths()
+  {
+    committed_deaths_this_step_.clear();
+    n_started_last_pass_ = 0;
+  }
+  int  nStartedLastPass() const { return n_started_last_pass_; }
+  bool defer_death_surgery_{false};
+  std::set<GO> committed_deaths_this_step_;
+  int          n_started_last_pass_{0};
+
   // Element death status per workset, set by the ACE solver.
   // death_status_vecs_[ws] is a vector of per-cell death indicators.
   std::vector<Teuchos::RCP<std::vector<double>>> death_status_vecs_;

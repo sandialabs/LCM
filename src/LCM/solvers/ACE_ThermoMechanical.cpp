@@ -770,6 +770,12 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
     // fills, so a diverged solve leaves poisoned states behind.
     snapshotSharedMeshStates();
 
+    // Outer death iteration: the mechanical subdomain whose equilibrium is
+    // re-solved as failing cells fade (identified once per step).
+    int mech_sub = -1;
+    for (auto s = 0; s < num_subdomains_; ++s)
+      if (prob_types_[s] == MECHANICAL) mech_sub = s;
+
     // Coupling loop
     do {
       bool const is_initial_state = stop == 0 && num_iter_ == 0;
@@ -816,46 +822,51 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
         }
         if (prob_type == MECHANICAL && failed_ == false) {
           *fos_ << "Problem            :Mechanical\n";
-          // Set death status on the Application for scatter skip and orphan
-          // fix. Read the per-cell `cell_death` state variable, which
-          // J2Erosion sets to 1.0 once every integration point in the cell
-          // has failed (in any mode) and 0.0 otherwise. cell_death is a
-          // cell-scalar so there is no qp dimension to skip past. The
-          // mechanical app's live element-state arrays are read directly:
-          // states persist in the shared STK mesh between steps, so no
-          // snapshot restore is needed.
-          {
-            auto& app = *apps_[subdomain];
-            auto& esa = app.getStateMgr().getStateArrays().elemStateArrays;
-            app.death_status_vecs_.resize(esa.size());
-            for (size_t ws = 0; ws < esa.size(); ++ws) {
-              auto it = esa[ws].find("cell_death");
-              if (it != esa[ws].end()) {
-                auto&     flat      = it->second;
-                int const num_cells = flat.size();
-                auto      ds        = Teuchos::rcp(new std::vector<double>(num_cells, 0.0));
-                for (int c = 0; c < num_cells; ++c) {
-                  (*ds)[c] = flat[c];
-                }
-                app.death_status_vecs_[ws] = ds;
-              }
-            }
-            // Capture the fully-dead node DOFs at this same (step-start) instant
-            // for the hold-in-place Dirichlet (Application::zeroResidualAtDeadNodes
-            // + fixOrphanNodesForElementDeath). Frozen here -- consistent with the
-            // death_status_vecs_ scatter snapshot -- so a cell that dies mid-Newton
-            // is not pinned until the next step, matching the scatter skip.
-            auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discs_[subdomain]);
-            app.frozen_dead_dof_gids_ = stk_disc.getDeadNodeDOFGids();
+          // Snapshot the post-thermal mechanical states: the outer death
+          // iteration rewinds the mechanical physics to here between re-solves
+          // (keeping committed deaths), so failure is re-judged on the step's
+          // warmed strength, not the step-start (pre-thermal) strength.
+          snapshotMechStates();
+
+          // Snapshot the step-start integrator state (x_n, v_n, a_n) so every
+          // solve of this step -- solve #0, each re-solve, each dt-cut retry --
+          // replays the same window from a clean initial condition (reseedMechIC).
+          step_start_x_.resize(num_subdomains_);
+          step_start_xdot_.resize(num_subdomains_);
+          step_start_xdotdot_.resize(num_subdomains_);
+          if (Teuchos::nonnull(this_x_[subdomain]) && Teuchos::nonnull(this_xdot_[subdomain]) &&
+              Teuchos::nonnull(this_xdotdot_[subdomain])) {
+            step_start_x_[subdomain]       = this_x_[subdomain]->clone_v();
+            step_start_xdot_[subdomain]    = this_xdot_[subdomain]->clone_v();
+            step_start_xdotdot_[subdomain] = this_xdotdot_[subdomain]->clone_v();
+          } else {
+            step_start_x_[subdomain] = Teuchos::null;
           }
+
+          // Arm the outer death iteration: defer the clone-death surgery so this
+          // solve's declared deaths are committed IN PLACE (topology unchanged)
+          // and re-judged on the redistributed stress across the re-solves; the
+          // surgery for the whole committed set runs once when the loop
+          // converges. clearCommittedDeaths resets the per-step committed set.
+          apps_[subdomain]->setDeferDeathSurgery(true);
+          apps_[subdomain]->clearCommittedDeaths();
+
+          // Clean initial condition for solve #0 (also clears any decorator rate
+          // buffers left poisoned by a prior failed step).
+          reseedMechIC(subdomain);
+
+          // Set the death status (scatter-skip + dead-DOF pin) from the current
+          // cell_death, then solve. Deaths are declared only in the post-
+          // convergence state pass, so the active set is frozen through this
+          // solve's Newton iterations.
+          populateDeathStatus(subdomain);
           {
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Solve"));
             AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
-          if (failed_ == false) {
-            Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Output"));
-            doDynamicInitialOutput(next_time, subdomain);
-          }
+          // Mechanical output is written AFTER the outer death iteration
+          // converges (below), so the frame carries the settled post-cascade
+          // state rather than the pre-cascade solve.
         }
         if (failed_ == true) {
           // Break out of the subdomain loop
@@ -869,12 +880,58 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       }
     } while (continueSolve() == true);
 
+    // ===== Outer death iteration (reference ControlFailure) =====
+    // Solve #0 above ran with the surgery deferred, so any deaths it declared
+    // started fading in place (topology unchanged). Re-solve the mechanical
+    // equilibrium QUASI-STATICALLY at fixed time -- rewinding the mechanical
+    // physics to the post-thermal snapshot but KEEPING the committed deaths, and
+    // warm-starting from the last converged solution -- advancing each committed
+    // cell's fade one increment per re-solve, until a full re-solve starts no new
+    // death and no cell is left mid-fade. The topology is unchanged through the
+    // loop, so every re-solve is on the same map; the deferred surgery for the
+    // whole fully-faded set runs once below.
+    int death_iter = 0;
+    if (failed_ == false && mech_sub >= 0) {
+      int const max_death_iterations = 100;
+      while (true) {
+        bool const started  = apps_[mech_sub]->nStartedLastPass() > 0;
+        bool const mid_fade = anyCellMidFade(mech_sub);
+        if (!started && !mid_fade) break;  // converged: nothing new, nothing fading
+        if (++death_iter > max_death_iterations) {
+          *fos_ << "INFO: element-death iteration limit reached; reducing the step.\n";
+          failed_ = true;
+          break;
+        }
+        restoreMechStates(/*keep_death=*/true);
+        reseedMechIC(mech_sub);
+        populateDeathStatus(mech_sub);
+        {
+          Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Death Re-solve"));
+          AdvanceMechanicalDynamics(mech_sub, false, current_time, next_time, time_step, /*death_resolve=*/true);
+        }
+        if (failed_ == true) break;
+      }
+      if (death_iter > 0 && failed_ == false)
+        *fos_ << "INFO: outer death iteration converged in " << death_iter << " re-solve(s).\n";
+    }
+
     // One of the subdomains failed to solve. Reduce step.
     if (failed_ == true) {
+      // A failed step discards this step's tentative deaths entirely: drop defer
+      // mode and the committed set so the full restore below un-commits them
+      // along with the physics.
+      if (mech_sub >= 0) {
+        apps_[mech_sub]->setDeferDeathSurgery(false);
+        apps_[mech_sub]->clearCommittedDeaths();
+      }
       // Restore the pre-step element states: the failed solve's residual
       // fills have already written its (possibly NaN) iterates into the
       // shared mesh's states.
       restoreSharedMeshStates();
+
+      // Reseed the mechanical initial condition to step-start so the reduced-step
+      // retry does not inherit the failed solve's poisoned solution/rate buffers.
+      if (mech_sub >= 0) reseedMechIC(mech_sub);
 
       auto const reduced_step = reduction_factor_ * time_step;
 
@@ -900,8 +957,26 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       continue;
     }
 
-    // Element death this step (clone-before-disconnect, fired in the
-    // mechanical observer) changed the shared mesh topology: cloned nodes
+    // Outer death iteration converged: run the deferred clone-death surgery for
+    // the whole committed, fully-faded set once, here at the clean between-step
+    // point (topology change unsafe mid-evalModel). This sets topology_changed_,
+    // consumed by the rebuild below. During the loop above the surgery was
+    // deferred, so the deaths were held in place with the topology unchanged.
+    if (mech_sub >= 0) {
+      apps_[mech_sub]->setDeferDeathSurgery(false);
+      populateDeathStatus(mech_sub);
+      apps_[mech_sub]->applyDeathToActivePart();
+    }
+
+    // Mechanical output, written now that the cascade has settled and the dead
+    // cells have been surgeried -- so the frame is the post-cascade eroded state.
+    if (mech_sub >= 0) {
+      Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Output"));
+      doDynamicInitialOutput(next_time, mech_sub);
+    }
+
+    // Element death this step (clone-before-disconnect) changed the shared mesh
+    // topology: cloned nodes
     // grew the owned/overlap DOF maps and, in parallel, modification_end may
     // have migrated ownership of boundary nodes across ranks. The observer
     // could only refresh worksets (rebuilding the maps mid-evalModel would
@@ -1085,18 +1160,18 @@ ACEThermoMechanical::countActiveElements() const
 }
 
 void
-ACEThermoMechanical::snapshotSharedMeshStates() const
+ACEThermoMechanical::snapshotStatesInto(SharedStateStore& out) const
 {
-  pre_step_states_.clear();
-  auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(discs_[0], true);
-  auto& bulk    = *stk_disc->getSTKMeshStruct()->bulkData;
-  auto& meta    = bulk.mesh_meta_data();
+  out.clear();
+  auto  stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(discs_[0], true);
+  auto& bulk     = *stk_disc->getSTKMeshStruct()->bulkData;
+  auto& meta     = bulk.mesh_meta_data();
 
   stk::mesh::Selector const owned = meta.locally_owned_part();
   for (auto* fb : meta.get_fields(stk::topology::ELEMENT_RANK)) {
     auto* field = dynamic_cast<stk::mesh::Field<double>*>(fb);
     if (field == nullptr) continue;
-    auto& store = pre_step_states_[field->name()];
+    auto& store = out[field->name()];
     for (auto* bucket : bulk.get_buckets(stk::topology::ELEMENT_RANK, owned & stk::mesh::selectField(*field))) {
       unsigned const ncomp = stk::mesh::field_scalars_per_entity(*field, *bucket);
       if (ncomp == 0) continue;
@@ -1110,18 +1185,28 @@ ACEThermoMechanical::snapshotSharedMeshStates() const
 }
 
 void
-ACEThermoMechanical::restoreSharedMeshStates() const
+ACEThermoMechanical::restoreStatesFrom(SharedStateStore const& in, bool keep_death) const
 {
-  auto stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(discs_[0], true);
-  auto& bulk    = *stk_disc->getSTKMeshStruct()->bulkData;
-  auto& meta    = bulk.mesh_meta_data();
+  auto  stk_disc = Teuchos::rcp_dynamic_cast<Albany::STKDiscretization>(discs_[0], true);
+  auto& bulk     = *stk_disc->getSTKMeshStruct()->bulkData;
+  auto& meta     = bulk.mesh_meta_data();
 
   stk::mesh::Selector const owned = meta.locally_owned_part();
   for (auto* fb : meta.get_fields(stk::topology::ELEMENT_RANK)) {
     auto* field = dynamic_cast<stk::mesh::Field<double>*>(fb);
     if (field == nullptr) continue;
-    auto const it = pre_step_states_.find(field->name());
-    if (it == pre_step_states_.end()) continue;
+    // In an outer death-iteration re-solve, rewind the physics but KEEP the
+    // element-death bookkeeping (cell_death / failure_state / failure_modes /
+    // death_decay and their _old copies) so deaths committed so far survive the
+    // rewind. The substring match catches both the new and _old field names.
+    if (keep_death) {
+      std::string const& fn = field->name();
+      if (fn.find("cell_death") != std::string::npos || fn.find("failure_state") != std::string::npos ||
+          fn.find("failure_modes") != std::string::npos || fn.find("death_decay") != std::string::npos)
+        continue;
+    }
+    auto const it = in.find(field->name());
+    if (it == in.end()) continue;
     auto const& store = it->second;
     for (auto* bucket : bulk.get_buckets(stk::topology::ELEMENT_RANK, owned & stk::mesh::selectField(*field))) {
       unsigned const ncomp = stk::mesh::field_scalars_per_entity(*field, *bucket);
@@ -1130,7 +1215,7 @@ ACEThermoMechanical::restoreSharedMeshStates() const
       for (size_t i = 0; i < bucket->size(); ++i) {
         auto const vit = store.find(bulk.identifier((*bucket)[i]));
         if (vit == store.end()) continue;
-        auto const& v = vit->second;
+        auto const&  v = vit->second;
         size_t const n = std::min<size_t>(v.size(), ncomp);
         std::copy(v.begin(), v.begin() + n, data + i * ncomp);
       }
@@ -1142,6 +1227,130 @@ ACEThermoMechanical::restoreSharedMeshStates() const
   // restored data with the current bucket layout.
   for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
     discs_[subdomain]->rebuildWorksets();
+  }
+}
+
+void
+ACEThermoMechanical::snapshotSharedMeshStates() const
+{
+  snapshotStatesInto(pre_step_states_);
+}
+
+void
+ACEThermoMechanical::snapshotMechStates() const
+{
+  snapshotStatesInto(pre_mech_states_);
+}
+
+void
+ACEThermoMechanical::restoreSharedMeshStates() const
+{
+  restoreStatesFrom(pre_step_states_, /*keep_death=*/false);
+}
+
+void
+ACEThermoMechanical::restoreMechStates(bool keep_death) const
+{
+  restoreStatesFrom(pre_mech_states_, keep_death);
+}
+
+void
+ACEThermoMechanical::populateDeathStatus(int subdomain) const
+{
+  // Set death status on the mechanical Application for the scatter skip and
+  // orphan fix. Read the per-cell cell_death state, which the model sets to 1.0
+  // once a cell is fully dead (all integration points failed, or -- under
+  // gradual decay -- the fade has reached 0). cell_death is a cell-scalar so
+  // there is no qp dimension to skip past. The live element-state arrays are
+  // read directly: states persist in the shared STK mesh between solves.
+  auto& app = *apps_[subdomain];
+  auto& esa = app.getStateMgr().getStateArrays().elemStateArrays;
+  app.death_status_vecs_.resize(esa.size());
+  for (size_t ws = 0; ws < esa.size(); ++ws) {
+    auto it = esa[ws].find("cell_death");
+    if (it != esa[ws].end()) {
+      auto&     flat      = it->second;
+      int const num_cells = flat.size();
+      auto      ds        = Teuchos::rcp(new std::vector<double>(num_cells, 0.0));
+      for (int c = 0; c < num_cells; ++c) (*ds)[c] = flat[c];
+      app.death_status_vecs_[ws] = ds;
+    }
+  }
+  // Capture the fully-dead node DOFs at this instant for the hold-in-place
+  // Dirichlet (Application::zeroResidualAtDeadNodes / fixOrphanNodesForElement-
+  // Death). Frozen here -- consistent with the death_status_vecs_ scatter
+  // snapshot -- so a cell that dies mid-Newton is not pinned until the next
+  // solve, matching the scatter skip.
+  auto& stk_disc            = static_cast<Albany::STKDiscretization&>(*discs_[subdomain]);
+  app.frozen_dead_dof_gids_ = stk_disc.getDeadNodeDOFGids();
+}
+
+bool
+ACEThermoMechanical::anyCellMidFade(int subdomain) const
+{
+  // True if any owned cell is part-way through its gradual-death fade
+  // (0 < death_decay_old < 1). The outer death iteration must keep re-solving
+  // until every committed cell has faded fully (to 0) -- otherwise the step is
+  // accepted with cells half-faded and the fade smears across time steps, making
+  // the erosion pattern step-size dependent. Instant-death models have no
+  // death_decay field, so this is always false for them. Collective (MAX reduce)
+  // so the loop's exit decision is identical on every rank.
+  auto&     app   = *apps_[subdomain];
+  auto&     esa   = app.getStateMgr().getStateArrays().elemStateArrays;
+  int       local = 0;
+  for (size_t ws = 0; ws < esa.size() && local == 0; ++ws) {
+    auto it = esa[ws].find("death_decay_old");
+    if (it == esa[ws].end()) continue;
+    auto&     fld    = it->second;
+    int const ncells = fld.dimension(0);
+    int const npts   = fld.dimension(1);
+    if (npts <= 0) continue;
+    for (int c = 0; c < ncells; ++c) {
+      double const d = fld(c, 0);
+      if (d > 0.0 && d < 1.0) {
+        local = 1;
+        break;
+      }
+    }
+  }
+  int global = 0;
+  Teuchos::reduceAll(*comm_, Teuchos::REDUCE_MAX, 1, &local, &global);
+  return global != 0;
+}
+
+void
+ACEThermoMechanical::reseedMechIC(int subdomain) const
+{
+  // Nothing to restore before the first solve of the run (no step-start state
+  // saved yet); the normal first-step initialization handles that case.
+  if (subdomain >= static_cast<int>(step_start_x_.size()) || Teuchos::is_null(step_start_x_[subdomain])) return;
+
+  auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
+  // Restore the solution + rate vectors to the step-start state.
+  Thyra::copy(*step_start_x_[subdomain], this_x_[subdomain].ptr());
+  Thyra::copy(*step_start_xdot_[subdomain], this_xdot_[subdomain].ptr());
+  Thyra::copy(*step_start_xdotdot_[subdomain], this_xdotdot_[subdomain].ptr());
+
+  // Feed the x and v initial conditions the TrapezoidRule solver reads from the
+  // model's nominal values at the start of each evalModel.
+  auto nv = me.getNominalValues();
+  nv.set_x(this_x_[subdomain]);
+  nv.set_x_dot(this_xdot_[subdomain]);
+  me.setNominalValues(nv);
+
+  auto& app = *apps_[subdomain];
+  app.setX(this_x_[subdomain]);
+  app.setXdot(this_xdot_[subdomain]);
+  app.setXdotdot(this_xdotdot_[subdomain]);
+
+  // The acceleration IC is read by the solver directly from the transient
+  // decorator's live x_dotdot buffer (not from nominal values), so overwrite it
+  // too -- this is what clears a diverged re-solve's poisoned acceleration.
+  if (mechanical_solver_ == MechanicalSolver::TrapezoidRule) {
+    auto& piro_tr = dynamic_cast<Piro::TrapezoidRuleSolver<ST>&>(*solvers_[subdomain]);
+    auto  a_buf   = Teuchos::rcp_const_cast<Thyra_Vector>(piro_tr.getDecorator()->get_x_dotdot());
+    if (Teuchos::nonnull(a_buf)) Thyra::copy(*this_xdotdot_[subdomain], a_buf.ptr());
   }
 }
 
@@ -1257,7 +1466,8 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     bool const   is_initial_state,
     double const current_time,
     double const next_time,
-    double const time_step) const
+    double const time_step,
+    bool const   death_resolve) const
 {
   failed_ = false;
 
@@ -1271,6 +1481,13 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
   // spins up over the same window. At t >= 0 the gate clears and the normal
   // dynamic schedule resumes. The flag lives on the mechanical Application,
   // so only this coupled solver ever activates it.
+  //
+  // An outer death-iteration re-solve is NOT quasi-static: for a gravity-driven
+  // eroding body, once a softening front frees a block there is no static
+  // equilibrium, so a quasi-static tangent is singular. The dynamic tangent
+  // (4/dt^2) M + sum(decay * K) stays SPD for any decay (the mass term keeps a
+  // detached block at finite acceleration), so the re-solve replays the same
+  // dynamic window with softer material. Inertia is dropped only for the preload.
   apps_[subdomain]->setSuppressDynamics(current_time < 0.0);
 
   // No time shift: both mechanical solvers now carry global coupling time
@@ -1391,9 +1608,12 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     *fos_ << "Final time         :" << next_time << '\n';
     *fos_ << "Time step          :" << time_step << '\n';
     *fos_ << delim << std::endl;
-    // Disable initial acceleration solve unless in initial time-step.
-    // This should speed up code by ~2x.
-    if (current_time != initial_time_) {
+    // Disable initial acceleration solve unless in initial time-step. An outer
+    // death-iteration re-solve (death_resolve) always disables it too: the
+    // acceleration IC comes from the step-start snapshot (reseedMechIC), not the
+    // heuristic, and re-running it on every re-solve of a first-step cascade is
+    // wasteful and a source of transient noise. This should speed up code by ~2x.
+    if (current_time != initial_time_ || death_resolve) {
       piro_tr_solver.disableCalcInitAccel();
       piro_tr_solver.disableStaticInitSolve();
     } else if (static_equilibrium_init_ == true) {

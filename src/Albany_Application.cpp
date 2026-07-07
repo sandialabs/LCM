@@ -5,6 +5,8 @@
 #include "Albany_Application.hpp"
 #include "Albany_NodalFieldProjector.hpp"
 
+#include <utility>
+#include <algorithm>
 #include <fstream>
 #include <set>
 #include <sstream>
@@ -1866,8 +1868,19 @@ Application::applyDeathToActivePart()
   // Gather killed cells: those flagged dead in death_status_vecs_ that
   // are still members of activePart. Mirrors the workset/cell scan in
   // fixOrphanNodesForElementDeath.
-  stk::mesh::EntityVector killed;
-  int const num_worksets = static_cast<int>(death_status_vecs_.size());
+  // Gather this step's death candidates -- cells flagged in death_status_vecs_
+  // that are still live members of activePart -- together with the failure
+  // magnitude used to rank them for the throttle below.
+  auto& esa = getStateMgr().getStateArrays().elemStateArrays;
+  struct DeathCand {
+    stk::mesh::Entity cell;
+    int               ws;
+    int               lid;
+    GO                gid;
+    double            measure;
+  };
+  std::vector<DeathCand> cands;
+  int const              num_worksets = static_cast<int>(death_status_vecs_.size());
   for (auto const& [gid, lid] : elemGIDws) {
     if (lid.ws >= num_worksets) continue;
     if (death_status_vecs_[lid.ws] == Teuchos::null) continue;
@@ -1882,7 +1895,89 @@ Application::applyDeathToActivePart()
     // does not remove from activePart), so dedup against deadCellsPart.
     if (bulkData.bucket(cell).member(*deadCellsPart)) continue;
 
-    killed.push_back(cell);
+    double      measure = 0.0;
+    auto const  fs      = esa[lid.ws].find("failure_state");
+    if (fs != esa[lid.ws].end() && lid.LID < static_cast<int>(fs->second.size())) {
+      measure = fs->second[lid.LID];
+    }
+    cands.push_back({cell, lid.ws, lid.LID, gid, measure});
+  }
+
+  // One-death-per-step throttle (Adagio ControlFailure invariant #4): of all the
+  // cells that met the death threshold this step, commit only the single
+  // globally-most-failed one and UN-MARK the rest, so the next step re-judges
+  // them on the redistributed stress. Killing one clear winner at a time --
+  // chosen by a partition-deterministic key (largest failure magnitude, ties
+  // broken by lowest global id) -- keeps the death decision from flipping under
+  // partition-dependent solver noise, which is what forks the serial vs np4
+  // erosion pattern (GitHub #114). A whole near-threshold batch, by contrast,
+  // is full of cells any of which can cross first depending on ~1e-6 solver drift.
+  // Defer a candidate: drop its death flag and clear its failure seed so the
+  // next step re-evaluates it from scratch on the redistributed stress (Adagio
+  // re-judges survivors after each death).
+  auto defer = [&](DeathCand const& c) {
+    (*death_status_vecs_[c.ws])[c.lid] = 0.0;
+    auto cd = esa[c.ws].find("cell_death");
+    if (cd != esa[c.ws].end() && c.lid < static_cast<int>(cd->second.size())) cd->second[c.lid] = 0.0;
+    auto fm = esa[c.ws].find("failure_modes_old");
+    if (fm != esa[c.ws].end()) {
+      int const npts = fm->second.dimension(1);
+      for (int pt = 0; pt < npts; ++pt) fm->second(c.lid, pt) = 0.0;
+    }
+  };
+
+  stk::mesh::EntityVector killed;
+  bool const throttle = problemParams->get<bool>("Throttle Element Death", true);
+  if (throttle) {
+    // Commit at most K deaths this step, the K globally-most-failed candidates,
+    // ranked by the partition-deterministic key (largest failure magnitude,
+    // ties broken by lowest global id). Every rank computes the identical global
+    // top-K set from an all-gather of each rank's local top-K, so serial and np4
+    // commit the same deaths. K > 1 (vs strict one-at-a-time) trades a little of
+    // that determinism margin for far fewer time steps.
+    int const K      = std::max(1, problemParams->get<int>("Max Element Deaths Per Step", 8));
+    int const nranks = comm->getSize();
+    GO const  GO_MAX = std::numeric_limits<GO>::max();
+
+    auto by_key = [](std::pair<double, GO> const& a, std::pair<double, GO> const& b) {
+      return a.first > b.first || (a.first == b.first && a.second < b.second);
+    };
+
+    // This rank's local top-K, padded to K with sentinels for the fixed-size gather.
+    std::vector<std::pair<double, GO>> local;
+    local.reserve(cands.size());
+    for (auto const& c : cands) local.emplace_back(c.measure, c.gid);
+    std::sort(local.begin(), local.end(), by_key);
+    std::vector<double> send_meas(K, -1.0);
+    std::vector<GO>     send_gid(K, GO_MAX);
+    int const           local_n = std::min<int>(K, static_cast<int>(local.size()));
+    for (int i = 0; i < local_n; ++i) {
+      send_meas[i] = local[i].first;
+      send_gid[i]  = local[i].second;
+    }
+
+    std::vector<double> all_meas(static_cast<size_t>(nranks) * K);
+    std::vector<GO>     all_gid(static_cast<size_t>(nranks) * K);
+    Teuchos::gatherAll(*comm, K, send_meas.data(), nranks * K, all_meas.data());
+    Teuchos::gatherAll(*comm, K, send_gid.data(), nranks * K, all_gid.data());
+
+    std::vector<std::pair<double, GO>> global;
+    for (size_t i = 0; i < all_gid.size(); ++i) {
+      if (all_gid[i] != GO_MAX) global.emplace_back(all_meas[i], all_gid[i]);
+    }
+    std::sort(global.begin(), global.end(), by_key);
+    std::set<GO> topk;
+    for (int i = 0; i < std::min<int>(K, static_cast<int>(global.size())); ++i) topk.insert(global[i].second);
+
+    for (auto const& c : cands) {
+      if (topk.count(c.gid) != 0u) {
+        killed.push_back(c.cell);
+      } else {
+        defer(c);
+      }
+    }
+  } else {
+    for (auto const& c : cands) killed.push_back(c.cell);
   }
 
   // applyElementDeath -- and the collective calls inside it

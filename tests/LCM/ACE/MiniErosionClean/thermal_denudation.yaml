@@ -1,0 +1,119 @@
+LCM:
+
+  Debug Output: 
+    Write Jacobian to MatrixMarket: 0
+    Write Residual to MatrixMarket: 0
+    Write Solution to MatrixMarket: 0
+    
+  Problem: 
+    Name: ACE Thermal 3D
+    Solution Method: Transient Tempus
+    MaterialDB Filename: './materials_thermal_denudation.yaml'
+    
+    # Staggered top-down thaw front (clean parallel-consistency vehicle).
+    # Each interval-erodible nodeset is a full horizontal node-plane; together
+    # they tile every z-plane, so temperature-with-depth is imposed directly
+    # (diffusion is nearly irrelevant). Groups thaw top-down at well-separated
+    # times so the failure front recedes one band at a time. Bottom band
+    # (interval1, z=0..0.5) stays frozen forever -> domain stays partly intact.
+    #   Cold (frozen, ice_sat~1, E stiff)  = 270 K
+    #   Warm (thawed, ice_sat~0, E->residual 1e4, collapses under gravity) = 300 K
+    #   Wave 1 @ ~1500 s : z+ , interval4 (z=1.75,2.0)  -> layer L8
+    #   Wave 2 @ ~3900 s : interval3 (z=1.25,1.5)        -> layers L7,L6
+    #   Wave 3 @ ~6300 s : interval2 (z=0.75,1.0)        -> layers L5,L4
+    #   never          : interval1 (z=0,0.25,0.5)        -> L1,L2,L3 survive
+    Dirichlet BCs:
+      DBC on NS z+ for DOF T:
+        BC Function: Array
+        Number of points: 4
+        Time Values: [0.0, 1200.0, 1500.0, 900000.0]
+        BC Values: [270.0, 270.0, 300.0, 300.0]
+      DBC on NS interval4-erodible for DOF T:
+        BC Function: Array
+        Number of points: 4
+        Time Values: [0.0, 1200.0, 1500.0, 900000.0]
+        BC Values: [270.0, 270.0, 300.0, 300.0]
+      DBC on NS interval3-erodible for DOF T:
+        BC Function: Array
+        Number of points: 4
+        Time Values: [0.0, 3600.0, 3900.0, 900000.0]
+        BC Values: [270.0, 270.0, 300.0, 300.0]
+      DBC on NS interval2-erodible for DOF T:
+        BC Function: Array
+        Number of points: 4
+        Time Values: [0.0, 6000.0, 6300.0, 900000.0]
+        BC Values: [270.0, 270.0, 300.0, 300.0]
+      DBC on NS interval1-erodible for DOF T:
+        BC Function: Array
+        Number of points: 2
+        Time Values: [0.0, 900000.0]
+        BC Values: [270.0, 270.0]
+    
+    Neumann BCs:
+      Time Dependent NBC on SS bottom for DOF T set dudn:
+        Number of points: 2
+        Time Values: [0.0, 3600000.0]
+        BC Values: [[8.0e-02], [8.0e-02]] # [W/m2] geothermal heat flux
+    
+    Initial Condition:
+      Function: Constant
+      Function Data: [270.0]
+
+    Response Functions:
+      Number: 1
+      Response 0: Solution Average
+      
+    Nodal Field Projection:
+      Number of Fields: 8
+      IP Field Name 0: ACE_Bluff_Salinity
+      IP Field Layout 0: Scalar
+      IP Field Name 1: ACE_Ice_Saturation
+      IP Field Layout 1: Scalar
+      IP Field Name 2: ACE_Density
+      IP Field Layout 2: Scalar
+      IP Field Name 3: ACE_Heat_Capacity
+      IP Field Layout 3: Scalar
+      IP Field Name 4: ACE_Therm_Cond
+      IP Field Layout 4: Scalar
+      IP Field Name 5: ACE_Thermal_Inertia
+      IP Field Layout 5: Scalar
+      IP Field Name 6: ACE_Water_Saturation
+      IP Field Layout 6: Scalar
+      IP Field Name 7: ACE_Porosity
+      IP Field Layout 7: Scalar
+      Mass Matrix Type: Full
+      Output to File: true
+  Discretization: 
+    Method: Ioss
+    Exodus Input File Name: 'grid/cuboid_denudation.g'
+    Exodus Output File Name: './thermal_denudation.e'
+    Separate Evaluators by Element Block: true
+    Workset Size: -1
+    Disable Exodus Output Initial Time: true
+
+  Piro:
+    Tempus: 
+      Integrator Name: Tempus Integrator
+      #Invert Mass Matrix: true
+      Lump Mass Matrix: true
+      Tempus Integrator: 
+        Integrator Type: Integrator Basic
+        Screen Output Index List: '1'
+        Screen Output Index Interval: 100
+        Stepper Name: Tempus Stepper
+        Solution History: 
+          Storage Type: Unlimited
+          Storage Limit: 20
+        Time Step Control: 
+          Initial Time Index: 0
+          Final Time Index: 10000000
+          Maximum Absolute Error: 1.00000000000000002e-08
+          Maximum Relative Error: 1.00000000000000002e-08
+          Output Time List: ''
+          Output Index List: ''
+          #Output Time Interval: 1.00000000000000000e+01
+          Output Index Interval: 1000
+          Maximum Number of Stepper Failures: 10
+          Maximum Number of Consecutive Stepper Failures: 5
+      Tempus Stepper: 
+        Stepper Type: Forward Euler

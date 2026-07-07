@@ -1412,6 +1412,13 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     auto       gx_out = Thyra::createMember(solver.get_g_space(num_g));
     out_args.set_g(num_g, gx_out);
 
+    // The TrapezoidRule solver fires the solution observer twice during this
+    // evalModel -- once on the initial condition (before the Newton solve) and
+    // once on the completed step. Element death must advance only on the
+    // completed-step firing, so skip the first (see setDeathPassCountdown). Reset
+    // every solve, including each outer-death-iteration re-solve.
+    apps_[subdomain]->setDeathPassCountdown(1);
+
     // Wrap evalModel so that a thrown NOX runtime error (e.g.
     // "NOX::Direction::Newton::compute - Unable to solve Newton system"
     // when Rescue Bad Newton Solve is off and GMRES diverges) maps to a

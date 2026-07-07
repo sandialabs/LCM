@@ -71,6 +71,15 @@ ObserverImpl::observeSolution(
     const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDot,
     const Teuchos::Ptr<Thyra_Vector const>& nonOverlappedSolutionDotDot)
 {
+  // Is this the death-evaluating observer firing? The TrapezoidRule mechanical
+  // solver fires the observer once on the initial condition (before the Newton
+  // solve) and once on the completed step; death is decided/advanced and the
+  // clone-death surgery run only on the completed-step firing. Captured BEFORE
+  // evaluateStateFieldManager, which reads the same countdown to gate death
+  // propagation (see Application::setDeathPassCountdown). Always true on non-ACE
+  // paths (countdown left at 0), preserving the death-every-firing behavior.
+  bool const death_firing = app_->deathPassActive();
+
   app_->evaluateStateFieldManager(stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
 
   app_->getStateMgr().updateStates();
@@ -93,6 +102,14 @@ ObserverImpl::observeSolution(
 
   StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution, nonOverlappedSolutionDot, nonOverlappedSolutionDotDot);
 
+  if (!death_firing) {
+    // Leading (initial-condition) firing: consume it and do not run the death
+    // surgery. The map rebuild that the surgery needs only happens between steps.
+    app_->consumeSkippedDeathPass();
+    if (rebuildWorksetsEnabled()) app_->getDiscretization()->rebuildWorksets();
+    return;
+  }
+
   // M3a: activePart-based element death is on by default. The function
   // returns immediately if no cells died this step. It rebuilds worksets
   // internally when it does kill cells, so the Phase 0 test-only rebuild
@@ -106,6 +123,12 @@ ObserverImpl::observeSolution(
 void
 ObserverImpl::observeSolution(double stamp, const Thyra_MultiVector& nonOverlappedSolution)
 {
+  // See the vector overload: the TrapezoidRule solver fires the observer on the
+  // initial condition (before the solve) and on the completed step; death is
+  // evaluated only on the completed-step firing. Captured before eSFM, which
+  // reads the same countdown.
+  bool const death_firing = app_->deathPassActive();
+
   app_->evaluateStateFieldManager(stamp, nonOverlappedSolution);
   app_->getStateMgr().updateStates();
   // See the vector overload: project before the write so the MultiVector
@@ -113,6 +136,13 @@ ObserverImpl::observeSolution(double stamp, const Thyra_MultiVector& nonOverlapp
   // gets non-zero proj_nodal_* fields (GitHub #11).
   projectNodalFields(stamp);
   StatelessObserverImpl::observeSolution(stamp, nonOverlappedSolution);
+
+  if (!death_firing) {
+    // Leading (initial-condition) firing: consume it, skip the death surgery.
+    app_->consumeSkippedDeathPass();
+    if (rebuildWorksetsEnabled()) app_->getDiscretization()->rebuildWorksets();
+    return;
+  }
 
   // M3a: activePart-based element death is on by default. The function
   // returns immediately if no cells died this step. It rebuilds worksets

@@ -2631,8 +2631,12 @@ Application::evaluateStateFieldManager(
   // This is the post-convergence state pass -- the only place a constitutive
   // model may declare a NEW element death. Residual/Jacobian fills leave this
   // false, so the death set stays frozen through a Newton solve (Adagio-style
-  // between-solve death; GitHub #114).
-  workset.allow_death_propagation = true;
+  // between-solve death; GitHub #114). It is further gated to the completed-step
+  // observer firing (death_pass_countdown_ == 0): the TrapezoidRule solver also
+  // fires the observer once on the initial condition before the solve, which
+  // must not advance the death state (see setDeathPassCountdown). Countdown is 0
+  // on non-ACE paths, so this stays true there.
+  workset.allow_death_propagation = deathPassActive();
 
   // Perform fill via field manager
   if (Teuchos::nonnull(rc_mgr)) rc_mgr->beginEvaluatingSfm();

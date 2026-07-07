@@ -291,6 +291,26 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   bool
   applyDeathToActivePart();
 
+  //! Death-pass gating for the coupled ACE driver. The TrapezoidRule mechanical
+  //! solver fires the solution observer TWICE per evalModel -- once on the
+  //! initial condition BEFORE the Newton solve (on stale step-start state, mid-
+  //! evalModel, before the driver has rebuilt maps) and once on the completed
+  //! step. Element death must be decided/advanced (and the clone-death surgery
+  //! run) only on the completed-step firing. The driver sets this to the number
+  //! of leading observer firings to skip (1 for the single-substep TrapezoidRule)
+  //! before every mechanical solve, including each outer-death-iteration re-solve.
+  //! evaluateStateFieldManager enables death propagation only when it is 0; the
+  //! observer decrements it (instead of running the death pass) on a skipped
+  //! firing. Left at 0 on non-ACE paths, which then behave exactly as before
+  //! (death evaluated on every firing).
+  void setDeathPassCountdown(int n) { death_pass_countdown_ = n; }
+  bool deathPassActive() const { return death_pass_countdown_ == 0; }
+  void consumeSkippedDeathPass()
+  {
+    if (death_pass_countdown_ > 0) --death_pass_countdown_;
+  }
+  int death_pass_countdown_{0};
+
   // Element death status per workset, set by the ACE solver.
   // death_status_vecs_[ws] is a vector of per-cell death indicators.
   std::vector<Teuchos::RCP<std::vector<double>>> death_status_vecs_;

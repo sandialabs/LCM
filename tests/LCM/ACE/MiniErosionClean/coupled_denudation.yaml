@@ -12,7 +12,7 @@ LCM:
     Maximum Time Step: 225.0 # [sec]
     Reduction Factor: 0.5
     Amplification Factor: 1.1
-    Exodus Write Interval: 1
+    Exodus Write Interval: 10
     Exodus ACE Output File Initial Index: 0
   Problem:
     Solution Method: ACE Sequential Thermo-Mechanical

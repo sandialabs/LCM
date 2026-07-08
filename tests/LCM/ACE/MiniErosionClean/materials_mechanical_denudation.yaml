@@ -11,6 +11,12 @@ LCM:
       Disable Erosion: false
       Output Failure State: true
       Output Cell Death: true
+      # Gradual element death: a failing cell fades its stiffness (and, in the
+      # displacement residual, its self-weight) to zero over this many
+      # fixed-time re-solve iterations, so a failure cascade is resolved at one
+      # instant. This exercises the full outer death iteration; the eroded set
+      # is the same top-5-layer clean front as instant death.
+      Death Steps: 5
       Material Model:
         Model Name: J2 Erosion
       Elastic Modulus:

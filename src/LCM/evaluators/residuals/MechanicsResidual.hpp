@@ -84,6 +84,13 @@ class MechanicsResidual : public PHX::EvaluatorWithBaseImpl<Traits>, public PHX:
   PHX::MDField<ScalarT, Cell, QuadPoint> ice_saturation_;
 
   ///
+  /// Optional: per-cell gradual-death decay factor. When present, the body
+  /// force is scaled by it so a fading cell sheds its self-weight as it fades.
+  ///
+  PHX::MDField<ScalarT const, Cell, QuadPoint> death_decay_;
+  bool                                         scale_body_force_by_decay_{false};
+
+  ///
   /// Output: Residual Forces
   ///
   PHX::MDField<ScalarT, Cell, Node, Dim> residual_;

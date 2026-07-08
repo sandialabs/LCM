@@ -71,6 +71,16 @@ MechanicsResidual<EvalT, Traits>::MechanicsResidual(Teuchos::ParameterList& p, c
     this->addDependentField(body_force_);
   }
 
+  // Gradual element death: scale the body force by the per-cell decay so a
+  // fading cell sheds its self-weight as it fades (its stress is already scaled
+  // in the constitutive model; the inertia is left at full mass to keep the
+  // dynamic tangent SPD). Only meaningful together with a body force.
+  scale_body_force_by_decay_ = have_body_force_ && p.get<bool>("Scale Body Force By Death Decay", false);
+  if (scale_body_force_by_decay_) {
+    death_decay_ = decltype(death_decay_)(p.get<std::string>("Death Decay Name"), dl->qp_scalar);
+    this->addDependentField(death_decay_);
+  }
+
   std::vector<PHX::DataLayout::size_type> dims;
   w_grad_bf_.fieldTag().dataLayout().dimensions(dims);
   num_nodes_ = dims[1];
@@ -95,6 +105,9 @@ MechanicsResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
   }
   if (have_body_force_) {
     this->utils.setFieldData(body_force_, fm);
+  }
+  if (scale_body_force_by_decay_) {
+    this->utils.setFieldData(death_decay_, fm);
   }
   if (enable_dynamics_) {
     this->utils.setFieldData(acceleration_, fm);
@@ -131,8 +144,9 @@ MechanicsResidual<EvalT, Traits>::compute_BodyForce(int const i) const
 {
   for (int node = 0; node < num_nodes_; ++node) {
     for (int pt = 0; pt < num_pts_; ++pt) {
+      ScalarT const decay = scale_body_force_by_decay_ ? death_decay_(i, pt) : ScalarT(1.0);
       for (int dim = 0; dim < num_dims_; ++dim) {
-        residual_(i, node, dim) -= w_bf_(i, node, pt) * body_force_(i, pt, dim);
+        residual_(i, node, dim) -= decay * w_bf_(i, node, pt) * body_force_(i, pt, dim);
       }
     }
   }
@@ -227,8 +241,9 @@ MechanicsResidual<EvalT, Traits>::evaluateFields(typename Traits::EvalData works
     for (int cell = 0; cell < workset.numCells; ++cell) {
       for (int node = 0; node < num_nodes_; ++node) {
         for (int pt = 0; pt < num_pts_; ++pt) {
+          ScalarT const decay = scale_body_force_by_decay_ ? death_decay_(cell, pt) : ScalarT(1.0);
           for (int dim = 0; dim < num_dims_; ++dim) {
-            residual_(cell, node, dim) -= w_bf_(cell, node, pt) * body_force_(cell, pt, dim);
+            residual_(cell, node, dim) -= decay * w_bf_(cell, node, pt) * body_force_(cell, pt, dim);
           }
         }
       }

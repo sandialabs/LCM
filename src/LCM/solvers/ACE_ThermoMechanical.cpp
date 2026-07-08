@@ -815,6 +815,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Solve"));
             AdvanceThermalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
+          globalizeFailed();
           if (failed_ == false) {
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Thermal Output"));
             doDynamicInitialOutput(next_time, subdomain);
@@ -864,6 +865,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
             Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Solve"));
             AdvanceMechanicalDynamics(subdomain, is_initial_state, current_time, next_time, time_step);
           }
+          globalizeFailed();
           // Mechanical output is written AFTER the outer death iteration
           // converges (below), so the frame carries the settled post-cascade
           // state rather than the pre-cascade solve.
@@ -909,6 +911,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
           Teuchos::TimeMonitor t(*Teuchos::TimeMonitor::getNewTimer("ACE: Mechanical Death Re-solve"));
           AdvanceMechanicalDynamics(mech_sub, false, current_time, next_time, time_step, /*death_resolve=*/true);
         }
+        globalizeFailed();
         if (failed_ == true) break;
       }
       if (death_iter > 0 && failed_ == false)
@@ -1319,6 +1322,15 @@ ACEThermoMechanical::anyCellMidFade(int subdomain) const
 }
 
 void
+ACEThermoMechanical::globalizeFailed() const
+{
+  int const lf = failed_ ? 1 : 0;
+  int       gf = 0;
+  Teuchos::reduceAll(*comm_, Teuchos::REDUCE_MAX, 1, &lf, &gf);
+  failed_ = (gf != 0);
+}
+
+void
 ACEThermoMechanical::reseedMechIC(int subdomain) const
 {
   // Nothing to restore before the first solve of the run (no step-start state
@@ -1648,21 +1660,30 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     } catch (std::exception const& e) {
       *fos_ << "\nINFO: Mechanical solver threw — treating as failed: " << e.what() << '\n';
       failed_ = true;
-      return;
     }
 
-    // Check whether solver did OK.
-    auto&      tr_nox_solver              = *(piro_tr_solver.getNOXSolver());
-    auto&      thyra_nox_nonlinear_solver = *(tr_nox_solver.getSolver());
-    auto&      const_nox_generic_solver   = *(thyra_nox_nonlinear_solver.getNOXSolver());
-    auto&      nox_generic_solver         = const_cast<NOX::Solver::Generic&>(const_nox_generic_solver);
-    auto const status                     = nox_generic_solver.getStatus();
-
-    if (status == NOX::StatusTest::Failed) {
-      *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
-      failed_ = true;
-      return;
+    // Check whether solver did OK (only when evalModel did not throw; a thrown
+    // solve leaves the NOX solver state unusable).
+    if (failed_ == false) {
+      auto&      tr_nox_solver              = *(piro_tr_solver.getNOXSolver());
+      auto&      thyra_nox_nonlinear_solver = *(tr_nox_solver.getSolver());
+      auto&      const_nox_generic_solver   = *(thyra_nox_nonlinear_solver.getNOXSolver());
+      auto&      nox_generic_solver         = const_cast<NOX::Solver::Generic&>(const_nox_generic_solver);
+      auto const status                     = nox_generic_solver.getStatus();
+      if (status == NOX::StatusTest::Failed) {
+        *fos_ << "\nINFO: Unable to solve Mechanical problem for subdomain " << subdomain << '\n';
+        failed_ = true;
+      }
     }
+
+    // Make the failure a GLOBAL decision BEFORE the early return: with Rescue Bad
+    // Newton Solve off a linear-solve failure can throw on only some ranks, and
+    // zeroDeadNodeRates + the solution extraction below are collective. If some
+    // ranks return here while the rest run those collectives, the ranks that
+    // reach them deadlock. Globalizing here makes all ranks skip (on failure) or
+    // all run (on success) the remainder together.
+    globalizeFailed();
+    if (failed_ == true) return;
 
     // Obtain the solution from the response and time derivatives from
     // the decorator.  Note: tr_decorator.get_x() returns the predictor,
@@ -1817,7 +1838,15 @@ ACEThermoMechanical::zeroDeadNodeRates(int const subdomain) const
   auto& abs_disc = *discs_[subdomain];
   auto& stk_disc = static_cast<Albany::STKDiscretization&>(abs_disc);
   auto const dead_dof_gids = stk_disc.getDeadNodeDOFGids();
-  if (dead_dof_gids.empty()) return;
+  // createGlobalLocalIndexer below builds a Tpetra directory (a collective), so
+  // the early-out on "no dead nodes" must be a GLOBAL decision: a rank that owns
+  // no dead node would otherwise return while the ranks that do enter the
+  // collective, deadlocking. Return only when NO rank has any dead node; when
+  // some do, every rank builds the indexer (its local zeroing loop is just empty).
+  int const local_has_dead = dead_dof_gids.empty() ? 0 : 1;
+  int       global_has_dead = 0;
+  Teuchos::reduceAll(*comm_, Teuchos::REDUCE_MAX, 1, &local_has_dead, &global_has_dead);
+  if (global_has_dead == 0) return;
 
   auto       sol_indexer  = Albany::createGlobalLocalIndexer(this_xdot_[subdomain]->space());
   auto       xdot_data    = Albany::getNonconstLocalData(this_xdot_[subdomain]);

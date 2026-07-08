@@ -726,6 +726,15 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
       stress_(cell, pt, i, j) = decay * sigma(i, j);
     }
   }
+  // Publish the frozen decay factor into the death_decay evaluated field every
+  // residual fill so the displacement residual can scale the BODY FORCE by it
+  // too: a fading cell keeps full mass (for the SPD dynamic tangent) but must
+  // shed its self-weight as it fades, or its unsupported weight sags on the
+  // faded stiffness and collapses the column. The death-declaration block below
+  // overwrites this with the advanced value in the post-convergence pass (which
+  // the residual fill never runs), so the fade still advances one step per
+  // iteration.
+  if (gradual_death_) death_decay_(cell, pt) = decay;
 
   // Per-(cell, pt) OR-accumulation: add each mode's decimal magnitude to
   // `failed` exactly the first time that mode trips at this integration

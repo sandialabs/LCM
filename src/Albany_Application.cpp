@@ -2035,7 +2035,16 @@ Application::applyDeathToActivePart()
   // flag off to surgery the whole committed, fully-faded set -- already decided,
   // so no throttle. In the legacy single-pass path (committed set empty) still
   // throttle so a lone call cannot commit a whole near-threshold batch.
-  bool const throttle = problemParams->get<bool>("Throttle Element Death", true) && committed_deaths_this_step_.empty();
+  //
+  // committed_deaths_this_step_ is a PER-RANK set: when the eroding front lies
+  // entirely on one rank, only that rank has committed deaths, so this predicate
+  // (and hence whether select_topk's collective below runs) would diverge across
+  // ranks and deadlock. Make it a GLOBAL decision: if ANY rank committed deaths
+  // this step, the outer loop drove it and NO rank throttles.
+  int const local_committed = committed_deaths_this_step_.empty() ? 0 : 1;
+  int       any_committed   = 0;
+  Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 1, &local_committed, &any_committed);
+  bool const throttle = problemParams->get<bool>("Throttle Element Death", true) && (any_committed == 0);
   if (throttle) {
     int const                          K = std::max(1, problemParams->get<int>("Max Element Deaths Per Step", 8));
     std::vector<std::pair<double, GO>> local;

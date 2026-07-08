@@ -1275,6 +1275,16 @@ MechanicsProblem::constructEvaluators(
         fm0.template registerEvaluator<EvalT>(ev);
       }
 
+      // Gradual element death: let the displacement residual scale the body
+      // force by the per-cell death decay, so a fading cell sheds its self-weight
+      // as it fades. Without this, the fading cell keeps full weight on faded
+      // stiffness, sags, and collapses the column (see MechanicsResidual). Gated
+      // on Death Steps > 1 -- the same key that turns on the decay in the model.
+      if (param_list.get<int>("Death Steps", 1) > 1) {
+        p->set<bool>("Scale Body Force By Death Decay", true);
+        p->set<std::string>("Death Decay Name", "death_decay");
+      }
+
       p->set<Teuchos::RCP<ParamLib>>("Parameter Library", paramLib);
       // Output
       p->set<std::string>("Residual Name", "Displacement Residual");

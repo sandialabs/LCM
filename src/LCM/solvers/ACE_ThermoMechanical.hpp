@@ -161,6 +161,14 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   bool
   continueSolve() const;
 
+  // All-reduce the per-solve failure flag so every rank agrees on it. A solve
+  // that fails on only some ranks (e.g. a gradual-death re-solve that goes
+  // singular on the subdomain owning the softening front) would otherwise send
+  // those ranks down the step-cut/restore branch while the rest proceed --
+  // desynchronizing the collective workset rebuilds and deadlocking. Must be
+  // called after every mechanical solve, before any rank branches on failed_.
+  void globalizeFailed() const;
+
   void
   createPersistentApps();
 

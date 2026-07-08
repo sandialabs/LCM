@@ -19,8 +19,8 @@ namespace Albany {
 /// LCM's element-death implementation.
 ///
 /// Drives the active/dead-interface update for a set of newly-killed
-/// elements using a clone-before-disconnect pattern (modeled on Adagio's
-/// Apst_ElemDeath::disconnectElements). The pattern sidesteps an STK
+/// elements using a clone-before-disconnect pattern (modeled on a reference
+/// element-death implementation's disconnect step). The pattern sidesteps an STK
 /// bug in make_mesh_parallel_consistent_after_element_death that
 /// corrupts {SHARES} buckets when 3+ ranks simultaneously kill cells
 /// whose deaths cross shared face boundaries. See

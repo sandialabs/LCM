@@ -346,8 +346,8 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   // construction: constitutive models declare new deaths only in the
   // post-convergence state pass (Workset::allow_death_propagation), so the
   // death set cannot change within a Newton solve -- the scatter-skip set and
-  // this pinned set stay identical for the whole solve (Adagio-style
-  // between-solve death; GitHub #114). Empty in non-ACE runs (the exact-zero
+  // this pinned set stay identical for the whole solve (between-solve
+  // element death; GitHub #114). Empty in non-ACE runs (the exact-zero
   // orphan fix still runs).
   std::vector<GO> frozen_dead_dof_gids_;
 

@@ -96,7 +96,7 @@ class ProjectIPtoNodalFieldQuadrature
   // the quadrature carries the 4-node linear basis, evaluated at the element's
   // own integration points, so the projection lands on the 4 corner nodes and
   // the 6 edge nodes are filled by interpolation afterward (issue #12; mirrors
-  // Sierra/Adagio's getExtrapolationMasterElement).
+  // a reference implementation's extrapolation-master-element step).
   bool tet4_projection_{false};
 
  public:
@@ -147,7 +147,7 @@ ProjectIPtoNodalFieldQuadrature::ProjectIPtoNodalFieldQuadrature(
 
   // A 10-node tet -- composite or standard quadratic -- is projected using the
   // linear Tet<4> basis (issue #12; the composite COMP12 L2 projection does not
-  // recover even a linear field, and Sierra/Adagio down-casts to Tet<4> for all
+  // recover even a linear field, and the reference implementation down-casts to Tet<4> for all
   // tet10s). The IP field values live at the element's own integration points,
   // so the cubature must be the element's: Tetrahedron<11> yields the composite
   // rule, Tetrahedron<10> the standard rule. The Jacobian (element measure) is
@@ -887,8 +887,8 @@ void ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::postEvaluate(t
     // Tet<10> down-cast projection: the linear Tet<4> projection above solved
     // for the 4 corner nodes; the 6 mid-side (edge) nodes got zero (empty rows,
     // regularized above). Fill them by linear interpolation -- each edge node is
-    // the mean of its two endpoint corners -- matching Sierra/Adagio's
-    // interpolateNodalFieldToHONodes (issue #12). Done on the overlap vector so
+    // the mean of its two endpoint corners -- matching a reference
+    // implementation's higher-order-node interpolation (issue #12). Done on the overlap vector so
     // every local element's corner values are in reach; shared edge nodes get
     // the same mean on each rank, so the result stays consistent.
     if (Teuchos::nonnull(quad_mgr_) && quad_mgr_->isTet4Projection()) {

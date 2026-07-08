@@ -2005,7 +2005,7 @@ Application::applyDeathToActivePart()
     cands.push_back({cell, lid.ws, lid.LID, gid, measure});
   }
 
-  // One-death-per-step throttle (Adagio ControlFailure invariant #4): of all the
+  // One-death-per-step throttle (the outer death iteration clear-winner rule): of all the
   // cells that met the death threshold this step, commit only the single
   // globally-most-failed one and UN-MARK the rest, so the next step re-judges
   // them on the redistributed stress. Killing one clear winner at a time --
@@ -2015,8 +2015,8 @@ Application::applyDeathToActivePart()
   // erosion pattern (GitHub #114). A whole near-threshold batch, by contrast,
   // is full of cells any of which can cross first depending on ~1e-6 solver drift.
   // Defer a candidate: drop its death flag and clear its failure seed so the
-  // next step re-evaluates it from scratch on the redistributed stress (Adagio
-  // re-judges survivors after each death).
+  // next step re-evaluates it from scratch on the redistributed stress
+  // (survivors are re-judged after each death).
   auto defer = [&](DeathCand const& c) {
     (*death_status_vecs_[c.ws])[c.lid] = 0.0;
     auto cd = esa[c.ws].find("cell_death");
@@ -2135,7 +2135,7 @@ Application::applyDeathToActivePart()
   }
 
   // Drive the active/dead interface update. applyElementDeath uses the
-  // clone-before-disconnect algorithm (Adagio-style), which sidesteps
+  // clone-before-disconnect algorithm, which sidesteps
   // an STK multi-rank harmonization bug in
   // make_mesh_parallel_consistent_after_element_death. See
   // doc/element-death.md (section "Implementation reference") for the
@@ -2716,8 +2716,8 @@ Application::evaluateStateFieldManager(
 
   // This is the post-convergence state pass -- the only place a constitutive
   // model may declare a NEW element death. Residual/Jacobian fills leave this
-  // false, so the death set stays frozen through a Newton solve (Adagio-style
-  // between-solve death; GitHub #114). It is further gated to the completed-step
+  // false, so the death set stays frozen through a Newton solve (between-solve
+  // element death; GitHub #114). It is further gated to the completed-step
   // observer firing (death_pass_countdown_ == 0): the TrapezoidRule solver also
   // fires the observer once on the initial condition before the solve, which
   // must not advance the death state (see setDeathPassCountdown). Countdown is 0

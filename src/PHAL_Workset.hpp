@@ -132,7 +132,7 @@ struct Workset
   // cell_death / death_status_vec) during this fill. It is set only in the
   // post-convergence state-field-manager evaluation, so death is decided on
   // converged data and the active set stays frozen through a Newton solve
-  // (Adagio-style between-solve death). Residual/Jacobian fills leave it false.
+  // (between-solve element death). Residual/Jacobian fills leave it false.
   bool allow_death_propagation{false};
 
   Teuchos::RCP<Tpetra_MultiVector> auxDataPtrT;

@@ -247,7 +247,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   // evaluator reads it to skip dead cells in assembly.
   has_failed_old_ = false;
   // Deaths are declared only in the post-convergence state pass, so the active
-  // set is frozen through a Newton solve (Adagio-style between-solve death).
+  // set is frozen through a Newton solve (between-solve element death).
   allow_death_propagation_ = workset.allow_death_propagation;
   if (workset.death_status_vec != Teuchos::null) {
     death_status_vec_ = workset.death_status_vec;

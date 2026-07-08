@@ -1,17 +1,17 @@
-# Scope: Port Adagio's element-death algorithm to LCM
+# Scope: Port the reference implementation's element-death algorithm to LCM
 
-Branch: `adagio-element-death`. Status: SCOPE (no implementation yet).
+Original scope note (the plan below has since been implemented).
 
 ## Why
 
 Element death in LCM has been fixed in partial increments for weeks (erodible-BC
 propagation, map rebuild for serial==parallel, dead-node Dirichlet, gradual
 death in Permafrost, the stop-7139 wall). Each fix has converged on the same
-place: **Sierra/Adagio's proven element-death algorithm.** The GH #114
+place: **the reference implementation's proven element-death algorithm.** The GH #114
 investigation made this explicit — the two live defects (mid-Newton death
 "schism" between the live scatter-skip set and the frozen pin set; and a
 self-certifying kill-all where a garbage Newton step annihilates the residual)
-are exactly the failure modes Adagio's *between-solve death + reset-on-cutback*
+are exactly the failure modes the reference implementation's *between-solve death + reset-on-cutback*
 are built to prevent. So: stop patching, port the algorithm.
 
 Good news from the study: **LCM already owns the hard pieces.** The remaining
@@ -19,9 +19,9 @@ work is architectural refactoring, not new numerics.
 
 ---
 
-## The target: Adagio's algorithm (condensed)
+## The target: the reference implementation's algorithm (condensed)
 
-Adagio's implicit `ControlFailure` mode is a **coupled equilibrium + death
+the reference implementation's implicit the outer death-control loop mode is a **coupled equilibrium + death
 fixed-point loop** sitting *above* the Newton solver:
 
 ```
@@ -39,7 +39,7 @@ per load step:
       reset tentative deaths; restore state; cut dt   # reset-on-cutback
 ```
 
-Seven invariants to replicate (each verified in adagio source):
+Seven invariants to replicate (each verified in the reference source):
 
 1. **Active set is constant within a Newton solve** — death only writes status
    fields; the mesh part-change happens strictly between solves.
@@ -58,7 +58,7 @@ Seven invariants to replicate (each verified in adagio source):
    are preserved.
 7. **Newly-exposed surface inherits BCs/contact.**
 
-Adagio also has a simpler `performDeathDuringSolve` mode (no outer loop; death
+The reference algorithm also has a simpler an in-solve death mode mode (no outer loop; death
 evaluated once at step start + once at converged) — a useful fallback for the
 first landing.
 
@@ -66,18 +66,18 @@ first landing.
 
 ## LCM today: KEEP / REPLACE / ADD
 
-**KEEP — LCM already has these, and several are already Adagio-modeled:**
+**KEEP — LCM already has these, and several are already reference-modeled:**
 
 | Piece | Where |
 |---|---|
-| Clone-before-disconnect surgery (== Adagio `perform_element_death`) | `Albany_ElementDeath.cpp`, `Application::applyDeathToActivePart` (Application.cpp ~1837) |
+| Clone-before-disconnect surgery (== the reference clone-before-disconnect surgery) | `Albany_ElementDeath.cpp`, `Application::applyDeathToActivePart` (Application.cpp ~1837) |
 | `-erodible` side/node-set tracking + calving reachability | `Application.cpp` ~1949; `STKDiscretization::computeNodeSets`, `findDetachedCells` ~2911 |
 | SPD hold-in-place pin + connectivity-dead query | `fixOrphanNodesForElementDeath`/`zeroResidualAtDeadNodes` (Application.cpp ~1738/1814); `getDeadNodeDOFGids` (STKDiscretization ~3061) |
 | Post-convergence state pass (natural "evaluate death at converged" hook) | `ObserverImpl::observeSolution` (ObserverImpl.cpp ~74) — used by ACE, Piro, Schwarz |
 | State snapshot/restore | `snapshot/restoreSharedMeshStates` (ACE_ThermoMechanical.cpp ~1088/1113) |
 | dt cutback | ACE_ThermoMechanical.cpp ~873 |
 | Map/graph rebuild + solution migration after death | ACE_ThermoMechanical.cpp ~931; `rebuildAfterTopologyChange` (STKDiscretization ~2876) |
-| **Gradual-decay prototype** (closest thing to Adagio's stiffness ramp) | Permafrost `death_steps_`/`death_decay_` (Permafrost_Def.hpp ~895-924) |
+| **Gradual-decay prototype** (closest thing to the reference implementation's stiffness ramp) | Permafrost `death_steps_`/`death_decay_` (Permafrost_Def.hpp ~895-924) |
 
 **REPLACE:**
 
@@ -91,7 +91,7 @@ first landing.
 **ADD (genuinely new):**
 
 - Outer death-iteration loop with a **death-fraction / iteration limit** (none today).
-- **One-death-per-iteration** global single-winner throttle for softening materials (Adagio invariant #4).
+- **One-death-per-iteration** global single-winner throttle for softening materials (reference invariant #4).
 - Generic, model-agnostic **gradual stiffness decay** (promote Permafrost's).
 - **Piro/Tempus step-rejection death hook** so standard (non-ACE) problems get death.
 - **Quasistatic ACE death** — `ThermoMechanicalLoopQuasistatics` is an empty stub.
@@ -152,7 +152,7 @@ developer.
 **Phase 2 — Generic manager + gradual decay + throttle. [L]**
 - Extract `ElementDeathManager`; move `death_status_vecs_`/`frozen_dead_dof_gids_`/
   rebuild into it; make it driver-agnostic.
-- Promote Permafrost's decay to a model-agnostic decay scale (Adagio
+- Promote Permafrost's decay to a model-agnostic decay scale (the reference element-death algorithm
   `HOURGLASS_DECAY`) applied at assembly; `Num Death Steps` knob.
 - Add the one-softening-element-per-iteration global single-winner selection.
 - Models reduced to emitting `failure_modes` + honoring the decay scale.
@@ -168,7 +168,7 @@ developer.
 
 **Phase 4 — Driver-agnostic Piro/Tempus death hook. [M]**
 - Tempus step-rejection observer that rejects on `numMarked>0` -> Tempus cutback
-  + re-solve, so standard problems get Adagio death without a hand-rolled loop.
+  + re-solve, so standard problems get reference element death without a hand-rolled loop.
 
 **Phase 5 — Quasistatic ACE death + parity. [M]**
 - Implement `ThermoMechanicalLoopQuasistatics` death (currently a stub); ensure
@@ -184,7 +184,7 @@ developer.
   holds after the death-timing change.
 
 Incremental value: **Phases 0-1 subsume the #114 point fix and can land first.**
-Phases 2-5 are the true "clone Adagio" generalization. Phase 6 is continuous.
+Phases 2-5 are the true "clone the reference algorithm" generalization. Phase 6 is continuous.
 
 ---
 
@@ -215,7 +215,7 @@ Phases 2-5 are the true "clone Adagio" generalization. Phase 6 is continuous.
 ## Recommendation
 
 Land **Phase 0 + Phase 1 (with the conservative topology fallback)** first as
-the `adagio-element-death` v1 — it fixes #114's degenerate solve and
+the element-death v1 — it fixes #114's degenerate solve and
 whole-mesh-death artifact using the between-solve/reset-on-cutback core, with
 minimal blast radius. Then generalize into the shared manager, gradual decay,
 throttle, driver-agnostic hook, and quasistatic path (Phases 2-5), rebaselining

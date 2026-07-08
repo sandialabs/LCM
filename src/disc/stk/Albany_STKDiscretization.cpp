@@ -2203,6 +2203,53 @@ STKDiscretization::computeWorksetInfoErodibleCells()
     have_erodible_surface = true;
   }
 
+  // The per-cell face-membership test below is rank-LOCAL, and that is
+  // not safe in parallel. When a death paints a newly-exposed face into
+  // an "-erodible" side-set, only the face OWNER changes the part
+  // membership (Albany_ElementDeath.cpp, Phase 5). A live cell on
+  // ANOTHER rank references that same face, but its copy's erodible
+  // part membership can be stale -- so the owner rank of the live cell
+  // sees the face as non-erodible and mis-classifies the cell. Because
+  // cell_is_erodible drives the ACE ocean-exposure branch
+  // (ACEThermalParameters: a submerged erodible cell latches its bluff
+  // salinity to the ocean value, changing melt temperature, ice
+  // saturation, and thermal conductivity), a single mis-classified
+  // boundary cell forks the thermal solution and cascades into
+  // divergent erosion. This is the same rank-locality that
+  // computeNodeSets already guards for the erodible DBC clipping; mirror
+  // it here by gathering the erodible-surface FACE global ids across
+  // ranks (owners are authoritative), then classify by that global set
+  // so the result is processor-independent. (GitHub issue #115.)
+  std::set<GO> erodible_face_gids;
+  if (have_erodible_surface) {
+    std::vector<stk::mesh::Entity> local_faces;
+    stk::mesh::Selector            select_local_erodible_faces =
+        erodible_surface & (stk::mesh::Selector(metaData.locally_owned_part()) | stk::mesh::Selector(metaData.globally_shared_part()));
+    stk::mesh::get_selected_entities(select_local_erodible_faces, bulkData.buckets(metaData.side_rank()), local_faces);
+    std::vector<GO> local_gids;
+    local_gids.reserve(local_faces.size());
+    for (auto const& f : local_faces) local_gids.push_back(gid(f));
+
+    int const num_procs = comm->getSize();
+    if (num_procs > 1) {
+      int const        local_count = static_cast<int>(local_gids.size());
+      std::vector<int> counts(num_procs);
+      Teuchos::gatherAll(*comm, 1, &local_count, num_procs, counts.data());
+      std::vector<int> displs(num_procs, 0);
+      for (int i = 1; i < num_procs; ++i) displs[i] = displs[i - 1] + counts[i - 1];
+      int const       total = displs[num_procs - 1] + counts[num_procs - 1];
+      std::vector<GO> all_gids(total);
+      auto const*     mpi_comm = dynamic_cast<Teuchos::MpiComm<int> const*>(comm.get());
+      MPI_Allgatherv(
+          local_gids.data(), local_count, MPI_LONG_LONG,
+          all_gids.data(), counts.data(), displs.data(), MPI_LONG_LONG,
+          *mpi_comm->getRawMpiComm());
+      erodible_face_gids.insert(all_gids.begin(), all_gids.end());
+    } else {
+      erodible_face_gids.insert(local_gids.begin(), local_gids.end());
+    }
+  }
+
   stk::mesh::Selector select_owned_in_part = stk::mesh::Selector(metaData.universal_part()) & stk::mesh::Selector(metaData.locally_owned_part());
   auto*               active_part_ws       = stkMeshStruct->getActivePart();
   if (active_part_ws != nullptr) {
@@ -2223,7 +2270,7 @@ STKDiscretization::computeWorksetInfoErodibleCells()
       auto const num_faces  = bulkData.num_faces(cell);
       auto const face_begin = bulkData.begin_faces(cell);
       for (unsigned f = 0; f < num_faces; ++f) {
-        if (erodible_surface(bulkData.bucket(face_begin[f]))) {
+        if (erodible_face_gids.count(gid(face_begin[f])) > 0) {
           cell_is_erodible[b][i] = 1;
           break;
         }

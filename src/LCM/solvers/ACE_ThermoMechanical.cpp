@@ -732,7 +732,66 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   // ice saturation, salinity, ...). Skipped for a preload start
   // (initial_time_ < 0) unless preload output is requested, matching the
   // in-loop preload gating below.
-  if (initial_time_ >= 0.0 || output_preload_ == true) {
+  // With Static Equilibrium Initialization, EQUILIBRATE before any dynamics so
+  // the t=0 frame is the true initial condition: the thermal IC and the
+  // self-weight static equilibrium under it -- not a pre-solve snapshot (all
+  // zeros). A negligible equilibration advance (eq_dt) establishes temperature
+  // at ~IC and populates the derived thermal element state (ice saturation,
+  // salinity, ...) that the mechanical model reads to form K(T); the mechanical
+  // solve then runs its static K x = f (v = a = 0) equilibrium. The settled
+  // frame is stamped at initial_time_, and equilibrated_ suppresses a redundant
+  // static solve in the first dynamic step (which warm-starts from here). The
+  // downstream dynamic frames are unaffected -- only frame 0 changes from
+  // zeros to the real settled state. A preload start (initial_time_ < 0)
+  // instead ramps self-weight to a settled t=0 frame over the preload window,
+  // so it uses the plain-output path below.
+  if (static_equilibrium_init_ == true && initial_time_ >= 0.0) {
+    int thermal_sub = -1;
+    int mech_sub0   = -1;
+    for (auto s = 0; s < num_subdomains_; ++s) {
+      if (prob_types_[s] == THERMAL) thermal_sub = s;
+      if (prob_types_[s] == MECHANICAL) mech_sub0 = s;
+    }
+    ST const eq_dt   = min_time_step_;  // negligible: leaves temperature at ~IC
+    ST const eq_next = initial_time_ + eq_dt;
+    // Snapshot the pristine initial element states so the equilibration's
+    // effect on the shared mesh -- notably the ratcheted ACE thermal states
+    // (bluff salinity, ice saturation, ...) the first real step reads as its
+    // "old" values -- can be undone below. Without this the equilibration
+    // perturbs the thermal trajectory and every downstream frame drifts.
+    snapshotSharedMeshStates();
+    if (thermal_sub >= 0) {
+      Teuchos::TimeMonitor tm(*Teuchos::TimeMonitor::getNewTimer("ACE: t=0 Equilibration (Thermal IC)"));
+      AdvanceThermalDynamics(thermal_sub, true, initial_time_, eq_next, eq_dt);
+      globalizeFailed();
+    }
+    if (mech_sub0 >= 0 && failed_ == false) {
+      Teuchos::TimeMonitor tm(*Teuchos::TimeMonitor::getNewTimer("ACE: t=0 Equilibration (Self-Weight)"));
+      // static-init fires: current_time == initial_time_, death_resolve false,
+      // equilibrated_ still false (see the AdvanceMechanicalDynamics gate).
+      AdvanceMechanicalDynamics(mech_sub0, true, initial_time_, eq_next, eq_dt);
+      globalizeFailed();
+      if (failed_ == false) {
+        do_outputs_[mech_sub0] = true;
+        static_cast<Albany::STKDiscretization&>(*discs_[mech_sub0]).outputExodusSolutionInitialTime(true);
+        doDynamicInitialOutput(initial_time_, mech_sub0);
+      }
+    }
+    // Undo the equilibration's shared-mesh state changes, and discard its
+    // warm-start / rate buffers -- in particular the near-singular acceleration
+    // the negligible eq_dt advance leaves in the trapezoid rate buffer -- so
+    // the first dynamic step starts EXACTLY as it would without this pass: from
+    // pristine initial states and the nominal-values IC with its own
+    // static-init solve. Every frame from initial_time_+dt onward is then
+    // bit-identical to the no-equilibration behavior; only frame 0 changes,
+    // from zeros to the settled state.
+    restoreSharedMeshStates();
+    for (auto s = 0; s < num_subdomains_; ++s) {
+      this_x_[s]       = Teuchos::null;
+      this_xdot_[s]    = Teuchos::null;
+      this_xdotdot_[s] = Teuchos::null;
+    }
+  } else if (initial_time_ >= 0.0 || output_preload_ == true) {
     for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
       // Force the write on, exactly as the loop does for is_initial_state
       // below (do_outputs_init_ tracks the observer's Exodus flag, which is

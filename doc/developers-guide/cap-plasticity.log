@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.19)  1 JUL 2026 09:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.4.19)  10 JUL 2026 13:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -697,11 +697,13 @@ Package microtype Info: Loading generic protrusion settings for font family
  [2{/home/amota/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/home
 /amota/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [3{/home/amot
 a/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [4] [5]
-Underfull \hbox (badness 1910) in paragraph at lines 486--491
-[]\T1/lmr/m/n/12 (+20) If $\OML/lmm/m/it/12 R > []$ \T1/lmr/m/n/12 (+20) and $\
-OT1/lmr/m/n/12 (+20) ^^A\OML/lmm/m/it/12 T > \OT1/lmr/m/n/12 (+20) ^^A\OML/lmm/
-m/it/12 T[]$\T1/lmr/m/n/12 (+20) : re-ject, set $\OT1/lmr/m/n/12 (+20) ^^A\OML/
-lmm/m/it/12 T \OMS/lmsy/m/n/12  
+Overfull \hbox (51.352pt too wide) in paragraph at lines 486--491
+[]\T1/lmr/m/n/12 (-20) If $\OML/lmm/m/it/12 ^^Q > []$ \T1/lmr/m/n/12 (-20) and 
+$\OT1/lmr/m/n/12 (-20) ^^A\OML/lmm/m/it/12 T > \OT1/lmr/m/n/12 (-20) ^^A\OML/lm
+m/m/it/12 T[]$\T1/lmr/m/n/12 (-20) : re-ject, set $\OT1/lmr/m/n/12 (-20) ^^A\OM
+L/lmm/m/it/12 T \OMS/lmsy/m/n/12   [][]\OT1/lmr/m/n/12 (-20) 0\OML/lmm/m/it/12 
+:\OT1/lmr/m/n/12 (-20) 9[]\OML/lmm/m/it/12 ;  \OT1/lmr/m/n/12 (-20) 0\OML/lmm/m
+/it/12 :\OT1/lmr/m/n/12 (-20) 1[] ^^A\OML/lmm/m/it/12 T$
  []
 
 [6] [7] [8] [9]
@@ -753,11 +755,11 @@ Package rerunfilecheck Info: File `cap-plasticity.out' has not changed.
 (rerunfilecheck)             Checksum: 9AA0FC743F4DDF9473728847EF013DA8;2576.
  ) 
 Here is how much of TeX's memory you used:
- 14409 strings out of 467349
- 224322 string characters out of 5415114
- 666531 words of memory out of 5000000
+ 14405 strings out of 467349
+ 224282 string characters out of 5415114
+ 665531 words of memory out of 5000000
  42796 multiletter control sequences out of 15000+600000
- 739000 words of font info for 295 fonts, out of 8000000 for 9000
+ 738826 words of font info for 293 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,12n,79p,1011b,586s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/amota/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.p
@@ -778,7 +780,7 @@ ts/type1/public/lm/lmsy10.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/
 public/lm/lmsy8.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/public/lm/
 lmtt10.pfb></home/amota/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt12.pf
 b>
-Output written on cap-plasticity.pdf (21 pages, 824869 bytes).
+Output written on cap-plasticity.pdf (21 pages, 825811 bytes).
 PDF statistics:
  532 PDF objects out of 1000 (max. 8388607)
  416 compressed objects within 5 object streams

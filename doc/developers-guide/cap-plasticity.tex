@@ -479,19 +479,19 @@ increment $\strainincr$:
       \item Form the modified-Euler state from the average of the two
             increment sets, and the relative error estimate
             \begin{equation}
-              R \;=\; \frac{\|\Delta\stress_2 - \Delta\stress_1\|}
+              \eta \;=\; \frac{\|\Delta\stress_2 - \Delta\stress_1\|}
                            {2\,\max(\|\stress_{\mathrm{new}}\|,\,
                             \epsilon)} .
             \end{equation}
-      \item If $R > \texttt{Substep Tolerance}$ and
+      \item If $\eta > \texttt{Substep Tolerance}$ and
             $\Delta T > \Delta T_{\min}$: reject, set
             $\Delta T \leftarrow
-            \max\bigl(0.9\sqrt{\mathrm{STOL}/R},\,0.1\bigr)\,\Delta T$
+            \max\bigl(0.9\sqrt{\mathrm{STOL}/\eta},\,0.1\bigr)\,\Delta T$
             (floored at $\Delta T_{\min}$), retry.
       \item Otherwise accept: apply the drift correction below,
             advance $T \leftarrow T + \Delta T$, and grow
             $\Delta T \leftarrow
-            \min\bigl(0.9\sqrt{\mathrm{STOL}/R},\,1.1\bigr)\,\Delta T$,
+            \min\bigl(0.9\sqrt{\mathrm{STOL}/\eta},\,1.1\bigr)\,\Delta T$,
             capped at $1 - T$.
       \end{enumerate}
 \item \emph{Plastic strain increment} recovered through elastic
@@ -571,8 +571,8 @@ $\sim 10^{-15}$.
 Two consistency requirements accompany evolving parameters. First, the
 elastic strain, not the stress, is the state: when the moduli change
 between steps, the stored stress must be re-expressed through the
-current stiffness, $\stress_n \leftarrow \Celast(f) :
-[\Celast(f_{\mathrm{old}})]^{-1} : \stress_n$, before integrating (the
+current stiffness, $\stress_n \leftarrow \Celast :
+\Celast_{\mathrm{old}}^{-1} : \stress_n$, before integrating (the
 finite-deformation path does this by construction, recovering the
 elastic logarithmic strain from the stored plastic geometry). Second,
 the previous step's parameter state must be available; the Permafrost
@@ -962,8 +962,8 @@ in the ACE Arctic coastal-erosion application
 \citep{Frederick.etal:2021}, and replaces the \texttt{J2Erosion}
 model there. \texttt{J2Erosion} extends $J_2$ plasticity with an
 ice-saturation--dependent yield stress
-($\sigma_0 = \sigma^{\mathrm{sed}} + f(T)\,
-\sigma^{\mathrm{ice-sed}}$, with $f(T) \in [0,1]$ the ice saturation
+($\sigma_0 = \sigma^{\mathrm{sed}} + S\,
+\sigma^{\mathrm{ice-sed}}$, with $S \in [0,1]$ the ice saturation
 from the sediment freezing curve) and, over time, accumulated five
 failure criteria and several empirical adjustments (polynomial fits
 of stiffness and strength in ice saturation and porosity,
@@ -1002,7 +1002,7 @@ effective-porosity profiles the ACE model already carries.
   $\psi = 1$ and $D \approx 0$, so the surface is a near-linear
   Drucker--Prager cone of circular cross-section closed by an
   elliptical cap --- a body of revolution about the hydrostatic axis
-  (dashed). \textbf{(a)} The frozen surface ($f = 1$) in
+  (dashed). \textbf{(a)} The frozen surface ($S = 1$) in
   principal-stress space. \textbf{(b)} Meridian profiles
   $q = \sqrt{3 J_2}$ against $p = I_1/3$ for both end members on common
   axes: the cone opens from the tensile apex ($F_f = N$, at
@@ -1024,9 +1024,9 @@ laws (Section~\ref{sec:flow}) are used verbatim; no governing equation
 acquires an explicit saturation term. This is the same device as
 temperature--dependent yield in metal plasticity --- the constitutive
 structure is fixed and the environment acts only through the
-coefficients. Let $f \in [0,1]$ be the ice saturation, with $f = 1$
-fully frozen and $f = 0$ fully thawed. At each integration point the
-kernel evaluates every cap parameter as a function of $f$ and hands the
+coefficients. Let $S \in [0,1]$ be the ice saturation, with $S = 1$
+fully frozen and $S = 0$ fully thawed. At each integration point the
+kernel evaluates every cap parameter as a function of $S$ and hands the
 resulting parameter set to the shared integrator of
 Section~\ref{sec:integration}.
 
@@ -1036,30 +1036,30 @@ sublists, and the saturation interpolates between them with one
 rule per strength mechanism:
 \begin{itemize}
 \item \emph{Cohesion and bonding} ($A$, $C$, $N$, $c^\alpha$):
-  linear in $f$ --- ice cementation, the direct analogue of the
+  linear in $S$ --- ice cementation, the direct analogue of the
   \texttt{J2Erosion} rule
-  $c(f) = c^{\mathrm{sed}} + f\,c^{\mathrm{ice}}$.
-\item \emph{Pore collapse} ($\kappa_0$, $W$, $D_1$): linear in $f$
+  $c(S) = c^{\mathrm{sed}} + S\,c^{\mathrm{ice}}$.
+\item \emph{Pore collapse} ($\kappa_0$, $W$, $D_1$): linear in $S$
   --- ice filling the pores resists crushing.
 \item \emph{Friction and shape} ($D$, $\theta$, $L$, $\phi$, $R$,
   $Q$, $\psi$, $D_2$): properties of the sediment skeleton, taken
-  from the thawed sublist and independent of $f$.
+  from the thawed sublist and independent of $S$.
 \item \emph{Elasticity}: the $(K, G)$ split described below.
 \end{itemize}
-Writing $p_{\mathrm f}$ and $p_{\mathrm t}$ for the frozen and thawed
+Writing $y_{\mathrm f}$ and $y_{\mathrm t}$ for the frozen and thawed
 values of a parameter, these rules are
 \begin{equation*}
-  p(f) = (1-f)\,p_{\mathrm t} + f\,p_{\mathrm f}
-  \quad\text{for } p \in \{A,\,C,\,N,\,\kappa_0,\,W,\,D_1,\,c^\alpha,\,K\},
+  y(S) = (1-S)\,y_{\mathrm t} + S\,y_{\mathrm f}
+  \quad\text{for } y \in \{A,\,C,\,N,\,\kappa_0,\,W,\,D_1,\,c^\alpha,\,K\},
   \qquad
-  G(f) = G_{\mathrm t}^{\,1-f}\,G_{\mathrm f}^{\,f},
+  G(S) = G_{\mathrm t}^{\,1-S}\,G_{\mathrm f}^{\,S},
 \end{equation*}
 while the friction and shape parameters
 $\{D,\,\theta,\,L,\,\phi,\,R,\,Q,\,\psi,\,D_2\}$ are held at their
 thawed (skeleton) values. The shear modulus interpolates geometrically
 rather than linearly because $G$ spans two orders of magnitude across
 the transition (see below). At the end members the map returns the
-frozen ($f = 1$) or thawed ($f = 0$) sublist exactly, so either limit
+frozen ($S = 1$) or thawed ($S = 0$) sublist exactly, so either limit
 is a standard \texttt{Cap} material. The saturation is clamped to
 $[0, 1]$ before use. Figure~\ref{fig:permafrost-yield} shows the
 resulting surface at both end members.
@@ -1077,7 +1077,7 @@ Section~\ref{sec:integration}, without which thaw-under-load
 trajectories are hypersensitive to roundoff. Because the elastic
 strain, not the stress, is the state, the stored stress is
 re-expressed through the current stiffness when the moduli change
-($\stress_n \leftarrow \Celast(f) : \Celast(f_{\mathrm{old}})^{-1}
+($\stress_n \leftarrow \Celast(S) : \Celast(S_{\mathrm{old}})^{-1}
 : \stress_n$; the finite-deformation path does this by construction).
 In the finite-deformation path the thermal stretch is removed from
 $\Fdef$ before the mechanical response is evaluated.
@@ -1087,7 +1087,7 @@ $\Fdef$ before the mechanical response is evaluated.
 fixed Poisson's ratio, which scales $K$ and $G$ together. The
 underlying mechanism is sound --- permafrost stiffness is governed by
 what fills the pores and whether it bonds the grains, so the moduli
-are properly functions of $f$ (temperature acts only through the
+are properly functions of $S$ (temperature acts only through the
 freezing curve) --- but the partition between the elastic constants
 must differ. The thaw transition replaces pore ice
 ($G \approx 3.5$~GPa, $K \approx 9$~GPa) with pore water ($G = 0$,
@@ -1123,9 +1123,9 @@ contributor to the large displacements that motivated
 \texttt{J2Erosion}'s displacement-norm failure criterion.
 
 Accordingly, each end member carries its own $(K, G)$ pair in place
-of modulus-multiplier fits. $G(f)$ interpolates geometrically
+of modulus-multiplier fits. $G(S)$ interpolates geometrically
 (log-linearly --- the range spans two orders of magnitude, so linear
-interpolation in $f$ overweights the frozen value) and $K(f)$
+interpolation in $S$ overweights the frozen value) and $K(S)$
 linearly. The Wood-mixture bound is calibration guidance for the
 thawed $K$, not a kernel computation: until pore pressure is
 resolved (the $u$--$p$ extension below), the calibrated thawed
@@ -1142,8 +1142,8 @@ moves toward the origin, which would violate the
 $\Delta\kappa \le 0$ clamp if it were imposed on $\kappa$. As with
 temperature-dependent yield in metals, $\kappa$ stores only the
 plastic compaction history while the surfaces are built from
-$f$-dependent parameters evaluated fresh each step. A corollary for
-calibration: because $\kappa$ is plastic memory while $\kappa_0(f)$
+$S$-dependent parameters evaluated fresh each step. A corollary for
+calibration: because $\kappa$ is plastic memory while $\kappa_0(S)$
 is a parameter, a state integrated under frozen parameters and then
 read under thawed ones sits far inside the thawed crush curve ---
 reinterpreted as heavily precompacted. End members should be
@@ -1264,10 +1264,10 @@ Input name & Default & Meaning \\
   cap on the effective $\nu$, preserving $G$ \\
 \midrule
 \texttt{Have ACE Ice Saturation} & false &
-  read $f$ from the coupled thermal field \\
+  read $S$ from the coupled thermal field \\
 \texttt{Ice Saturation Time Values}/\texttt{Values} & --- &
-  time-table source for $f$ \\
-\texttt{Ice Saturation} & 1.0 & constant source for $f$ \\
+  time-table source for $S$ \\
+\texttt{Ice Saturation} & 1.0 & constant source for $S$ \\
 \midrule
 \texttt{Tension Indicator Threshold}    & 0 (off) & see failure criteria \\
 \texttt{Backstress Indicator Threshold} & 0 (off) & '' \\
@@ -1325,8 +1325,8 @@ The \texttt{Permafrost} battery extends the methodology of
 Section~\ref{sec:verification}, with the reference implementation
 mirroring the saturation map, the parameter ramping, and the failure
 indicators. Trajectory tests: equivalence with \texttt{Cap} at
-$f = 1$, the full map at constant $f = 0.5$ (the $\nu$ cap active),
-and thaw under load ($f: 1 \to 0.3$ during confined compression) all
+$S = 1$, the full map at constant $S = 0.5$ (the $\nu$ cap active),
+and thaw under load ($S: 1 \to 0.3$ during confined compression) all
 match at machine precision. The porosity-profile test drives the two
 Gauss-point depth groups of a single element as independent material
 points against two reference runs. Five per-mode death tests verify

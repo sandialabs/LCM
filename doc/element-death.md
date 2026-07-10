@@ -944,22 +944,67 @@ neither of which has a direct Adagio analogue.
 
 ## F. The STK bug this code routes around
 
-Full diagnosis: `~/LCM/stk_findings_draft.txt`.
-
-Short version. The naïve approach is
-`stk::mesh::process_killed_elements`, which internally calls
+The naïve approach is `stk::mesh::process_killed_elements`, which
+internally calls
 `BulkData::make_mesh_parallel_consistent_after_element_death`. That
 function fails when three or more MPI ranks simultaneously pass
 non-empty `killed` lists whose deaths create or destroy faces at
-shared rank boundaries: a stale `Entity` handle is left in a
-`{SHARES}` partition's bucket and the next bucket sort trips
-`Requirement(m_mesh.is_valid(curr_entity))` at `Partition.cpp:404`.
+shared rank boundaries. (Diagnosed 2026-05-22 against the STK snapshot
+in our Trilinos tree, GCC 15, while bringing up parallel runs of the ACE
+thermo-mechanical solver.)
 
-Adagio's clone-before-disconnect pattern sidesteps the trigger by
-ensuring no shared face is ever destroyed or modified while still
-referenced by a live cell on another rank. All STK destructions
-operate on entities that are local-only at destruction time, so the
-broken harmonization path is never exercised.
+**Symptom.** In an STK built with libstdc++ assertions (debug), the next
+bucket sort after the bad death trips
+
+    Requirement( m_mesh.is_valid(curr_entity) ) FAILED   at Partition.cpp:404
+
+reached via `Partition::default_sort_if_needed -> Partition::sort`. In a
+release build the same condition becomes a null/garbage dereference inside
+the bucket sort and surfaces as a SIGSEGV. Serial runs, and *sequential*
+rank-by-rank kills within one step, both work — which is exactly the
+coverage of STK's own element-death unit tests; they never exercise 3+
+ranks killing simultaneously. It reproduces on `tests/LCM/ACE/MiniErosion`
+(`coupled_denudation.yaml`) under `mpirun -n 4`, on the first
+`process_killed_elements` call where three ranks each have a non-empty
+`killed` list whose newly-exposed faces span their shared boundaries.
+
+**Root cause.** The `{SHARES}` partition (shared, but in no user parts)
+ends up holding a bucket slot with a handle to an entity that no longer
+lives in that partition. A parallel sharing-resolution path — inside
+`internal_resolve_sharing_and_ghosting_for_sides`
+(`BulkData.cpp:5402`) and the `internal_resolve_shared_modify_delete` /
+`destroy_entity` sequence it drives (`MeshModification.cpp:604`) — moves
+the entity out of `{SHARES}` by mutating its `mesh_index` directly,
+without going through `Partition::move_to`. The stale `{SHARES}` slot is
+therefore never cleared. When the entity is later destroyed, cleanup runs
+on its *current* (post-move) bucket; the stale slot survives, and the next
+sort of the `{SHARES}` bucket finds an invalid handle and aborts. LCM
+cannot drive an STK fix on its own schedule, and the offending seam was
+not pinned to an exact callsite — that layer is what needs an STK-side
+audit.
+
+**A dead-end and a real LCM partial fix.** Re-arming
+`set_remove_mode_tracking()` before the harmonization had no effect. A
+`deadCellsPart` dedup so each `process_killed_elements` carries only
+newly-killed entities (not the cumulative set) *is* a genuine LCM fix — it
+removed a separate cumulative-kills pathway — but only bought one more step
+before the same `{SHARES}` assertion. The structural cure is to stop using
+`process_killed_elements` altogether.
+
+**Why the clone-before-disconnect pattern sidesteps it.** Adagio's pattern
+(§4, §E) ensures no shared face is ever destroyed or modified while still
+referenced by a live cell on another rank. Every STK destruction operates
+on an entity that is local-only at destruction time, so the broken
+harmonization path is never entered.
+
+**Secondary STK bug (separate, noted in passing).** `Partition::add_entity`
+(`Partition.cpp:139`) flips `m_removeMode` to `FILL_HOLE_THEN_SORT`
+without first compacting pending `TRACK_THEN_SLIDE` removes — unlike
+`Partition::add_bucket` (`Partition.cpp:264`), which calls
+`clear_pending_removes_by_filling_from_end()` first. This can strand
+tracked-removed slots as invalid handles. It did not cause the crash
+above (a different code path), but it is a real bug worth fixing on its
+own.
 
 ---
 

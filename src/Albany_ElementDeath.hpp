@@ -25,8 +25,7 @@ namespace Albany {
 /// corrupts {SHARES} buckets when 3+ ranks simultaneously kill cells
 /// whose deaths cross shared face boundaries. See
 /// doc/element-death.md (section "Implementation reference") for the
-/// full algorithm and ~/LCM/stk_findings_draft.txt for the STK-bug
-/// diagnosis.
+/// full algorithm and its section F for the STK-bug diagnosis.
 ///
 /// Called only when the ALBANY_NEW_ELEMENT_DEATH env var is set;
 /// otherwise Application::applyDeathToActivePart calls

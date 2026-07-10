@@ -2147,8 +2147,7 @@ Application::applyDeathToActivePart()
   // an STK multi-rank harmonization bug in
   // make_mesh_parallel_consistent_after_element_death. See
   // doc/element-death.md (section "Implementation reference") for the
-  // algorithm and ~/LCM/stk_findings_draft.txt for the STK-bug
-  // diagnosis.
+  // algorithm and its section F for the STK-bug diagnosis.
   applyElementDeath(
       bulkData, *activePart, *deadCellsPart,
       killed, side_parts, bc_mesh_parts);

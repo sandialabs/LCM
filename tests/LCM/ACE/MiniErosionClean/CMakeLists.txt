@@ -37,7 +37,9 @@
 add_subdirectory(grid)
 add_subdirectory(external_files)
 
-# python3 for the position-based comparison; must have netCDF4 available.
+# python3 for the position-based comparison. The comparison reads the exodus
+# (classic netCDF) output with netCDF4 if present, else scipy.io.netcdf_file, so
+# it only needs the numpy/scipy stack -- not netCDF4 -- to be available.
 find_program(PYTHON3_EXE NAMES python3 python)
 
 # Stage input decks, comparison assets, and the golds into the build dir.

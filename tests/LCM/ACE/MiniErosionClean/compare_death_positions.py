@@ -19,18 +19,57 @@
 #     together, so comparing cell_death by element id is meaningless. Centroid
 #     position is the partition-invariant identity of a cell.
 #
-# An exodus file is a netCDF file, so we read it directly with netCDF4:
-# read the last-time-step `cell_death` element variable for every block, mark a
-# cell dead when cell_death >= THRESHOLD, compute its centroid from
-# connect<blk> + coordx/coordy/coordz, and require the two dead-centroid SETS to
-# be equal.
+# An exodus file is a netCDF file, so we read it directly: read the last-time-
+# step `cell_death` element variable for every block, mark a cell dead when
+# cell_death >= THRESHOLD, compute its centroid from connect<blk> +
+# coordx/coordy/coordz, and require the two dead-centroid SETS to be equal.
+#
+# The exodus output is classic (64-bit-offset) netCDF, so we read it with
+# whichever reader is available: netCDF4 if installed (developer machines), else
+# scipy.io.netcdf_file, which ships with the numpy/scipy stack the nightly
+# already has. Requiring netCDF4 made this test fail spuriously on hosts that
+# lack it (the import error was reported as an erosion-set mismatch).
 #
 # Usage:  compare_death_positions.py <serial.e> <parallel_epu.e>
 # Exit 0 if the dead-cell sets match, non-zero (with a diff report) otherwise.
 
 import sys
 import numpy as np
-import netCDF4
+
+
+class _Exo:
+    """Minimal read-only exodus/netCDF accessor over netCDF4 or scipy.
+
+    Exposes .var(name) -> ndarray, .has(name) -> bool, and .num_el_blk -> int,
+    normalizing the small API differences between the two backends.
+    """
+
+    def __init__(self, path):
+        self._backend = None
+        try:
+            import netCDF4  # noqa: F401
+            self._d = netCDF4.Dataset(path)
+            self._backend = "netCDF4"
+        except ImportError:
+            from scipy.io import netcdf_file
+            # mmap=False so arrays stay valid after the file is closed.
+            self._d = netcdf_file(path, "r", mmap=False)
+            self._backend = "scipy"
+
+    def has(self, name):
+        return name in self._d.variables
+
+    def var(self, name):
+        return np.asarray(self._d.variables[name][:])
+
+    @property
+    def num_el_blk(self):
+        dim = self._d.dimensions["num_el_blk"]
+        # netCDF4 returns a Dimension object; scipy returns a plain int.
+        return dim.size if hasattr(dim, "size") else int(dim)
+
+    def close(self):
+        self._d.close()
 
 # A cell is "dead" once cell_death crosses this value. cell_death is written as
 # a hard 0/1 flag in this problem, so 0.5 is a safe midpoint that also tolerates
@@ -45,29 +84,29 @@ ROUND_DECIMALS = 6
 
 def dead_centroids(path):
     """Return the set of (x, y, z) centroids of all dead cells at the last step."""
-    d = netCDF4.Dataset(path)
+    d = _Exo(path)
     try:
         names = [
             b"".join(r).decode("ascii", "ignore").strip().strip("\x00")
-            for r in d.variables["name_elem_var"][:]
+            for r in d.var("name_elem_var")
         ]
         if "cell_death" not in names:
             raise SystemExit("FATAL: 'cell_death' element variable not found in %s" % path)
         ci = names.index("cell_death") + 1  # exodus var arrays are 1-based
 
-        x = np.asarray(d.variables["coordx"][:])
-        y = np.asarray(d.variables["coordy"][:])
-        z = np.asarray(d.variables["coordz"][:])
+        x = d.var("coordx")
+        y = d.var("coordy")
+        z = d.var("coordz")
 
-        nblk = d.dimensions["num_el_blk"].size
+        nblk = d.num_el_blk
         dead = set()
         for b in range(1, nblk + 1):
             vname = "vals_elem_var%deb%d" % (ci, b)
-            if vname not in d.variables:
+            if not d.has(vname):
                 # Block may not carry this variable per the elem-var truth table.
                 continue
-            conn = np.asarray(d.variables["connect%d" % b][:])  # (nel, npe), 1-based
-            vals = np.asarray(d.variables[vname][-1, :])        # last time step
+            conn = d.var("connect%d" % b)         # (nel, npe), 1-based
+            vals = d.var(vname)[-1, :]             # last time step
             for e in range(conn.shape[0]):
                 if vals[e] >= THRESHOLD:
                     nodes = conn[e, :] - 1

@@ -30,18 +30,26 @@ different time scales:
   and Jacobian assembly, so it contributes nothing to the global
   system. The cell is still a member of the active part and still in
   the worksets. (The `Permafrost` model can instead fade a failing
-  cell's stiffness out over several steps before the skip — see [§3.1
-  Gradual death](#31-gradual-death-optional-fading-stiffness-over-death-steps).)
-- **Between steps** — once per accepted step, the structural update
-  moves dead cells out of the active part into a dead-cells part, STK
-  creates the newly-exposed boundary faces, and the worksets are
-  rebuilt so dead cells are excluded permanently.
+  cell's stiffness out over several fixed-time re-solves before the skip
+  — see [§3.1 Gradual death](#31-gradual-death-optional-fading-stiffness-over-death-steps).)
+- **Between steps** — after each accepted step, the structural update
+  moves the cells *committed* to die this step out of the active part
+  into a dead-cells part, STK creates the newly-exposed boundary faces,
+  and the worksets are rebuilt so those cells are excluded permanently.
+  How many cells are committed per step, and (for gradual death) how the
+  decision is iterated at fixed time before the surgery runs, is governed
+  by the throttle and the outer death iteration of
+  [§3.2](#32-throttling-and-the-outer-death-iteration).
 
 So the mesh *topology* is preserved (no entity is destroyed), but the
 mesh *is* modified between steps: cells change part membership and new
-face entities appear on the eroding surface. Death therefore lags by
-one step — a cell flagged during step N is skipped in assembly that
-same step and is structurally removed by the step-N observer.
+face entities appear on the eroding surface. Death therefore lags by one
+step — a cell flagged during step N is skipped in assembly that same step
+and is structurally removed after the step-N solve. A whole batch of
+cells that fail together does **not** all die at once: to keep the
+erosion pattern **bit-identical in serial and in parallel**, only a
+bounded, partition-deterministic subset is committed per step and the
+rest are re-judged on the redistributed stress the next step (§3.2).
 
 The death decision is made by the constitutive model, per integration
 point. Two ACE models implement it: `J2Erosion` (the five criteria of
@@ -153,7 +161,7 @@ It is enabled by the mechanics material YAML key:
 
 | YAML parameter | Effect |
 |----------------|--------|
-| `Death Steps`  | number of accepted steps over which a failing cell sheds its load. Default `1` = instant death, bit-identical to the original behavior. `> 1` enables gradual death. |
+| `Death Steps`  | number of fixed-time re-solves over which a committed cell sheds its load. Default `1` = instant death, bit-identical to the original behavior. `> 1` enables gradual death, driven by the outer death iteration (§3.2). |
 
 The mechanism is a per-cell **decay factor** in `[0, 1]`, stored as the
 integration-point state `death_decay` (with an old-state companion, so
@@ -161,48 +169,121 @@ it survives the workset rebuilds of §4 — see §A):
 
 - **State.** `death_decay` starts at `1.0` (fully alive). It is a
   per-cell value written to every quadrature point of the cell.
-- **Per-step advance.** The first accepted step a cell meets the death
-  predicate, and every accepted step after, the decay is decremented by
-  `1 / Death Steps` (clamped at `0`). The new value is computed from the
-  *start-of-step* value (`death_decay_old`), so the write is idempotent
-  across the fills of a step; the new→old state rotation advances it
-  exactly once per accepted step.
+- **Per-re-solve advance.** Once a cell is *committed* to die (§3.2), the
+  decay is decremented by `1 / Death Steps` (clamped at `0`) on each
+  re-solve of the outer death iteration. The fade runs entirely within
+  the accepted step, at **fixed simulation time**: the iteration re-solves
+  mechanical equilibrium repeatedly at the same time, advancing the fade
+  one increment per re-solve until every committed cell reaches `0`. The
+  new value is computed from the *start-of-re-solve* value
+  (`death_decay_old`), so the write is idempotent across the fills of a
+  re-solve; the new→old state rotation advances it exactly once per
+  re-solve.
 - **Stress scaling.** During assembly the cell's stored stress — which
   is both its residual force and, through the AD seeds, its consistent
-  tangent — is multiplied by the start-of-step decay factor (constant
-  over the step's fills). So a failing cell sheds its load smoothly over
-  `Death Steps` rather than in one iterate. The cell's *internal* state
-  (plastic deformation gradient `Fp`, back stress, `kappa`) is computed
-  and stored **unscaled**, so the material state stays valid right up to
-  full death.
+  tangent — is multiplied by the start-of-re-solve decay factor (constant
+  over that solve's fills). So a committed cell sheds its load smoothly
+  over `Death Steps` re-solves rather than in one iterate. The cell's
+  *internal* state (plastic deformation gradient `Fp`, back stress,
+  `kappa`) is computed and stored **unscaled**, so the material state
+  stays valid right up to full death.
 - **Full death.** `cell_death` flips to `1.0` only when the decay
   reaches `0`. That is the single "fully dead" signal that the assembly
   skip (§3), calving (§D.1), the dead-node Dirichlet (§6), and the
   warm-start rate zeroing (§6) all consume — a decaying-but-not-yet-zero
   cell is still alive to all of them.
-- **Skip on the zeroing step.** The step the decay reaches `0`, the cell
-  sets `death_status_vec` in place so it is skipped from assembly that
-  *same* step (the same-fill propagation of §B.3). Otherwise it would be
-  assembled once more at ~zero stiffness, and a calved cell would
-  free-fall one step (~½·g·Δt²) before the next step's Dirichlet pin
-  (§6) caught it. Its row goes exactly zero this step instead, and the
-  orphan/dead-node fix pins it here. This fires once per cell (the decay
-  is monotone to `0`), so it does not thrash the active set the way an
-  eager skip of still-decaying cells would.
+- **Skip on the zeroing re-solve.** The re-solve the decay reaches `0`,
+  the cell sets `death_status_vec` in place so it is skipped from assembly
+  that *same* solve (the same-fill propagation of §B.3). Otherwise it
+  would be assembled once more at ~zero stiffness, and a calved cell would
+  free-fall (~½·g·Δt²) before the Dirichlet pin (§6) caught it. Its row
+  goes exactly zero this solve instead, and the orphan/dead-node fix pins
+  it here. This fires once per cell (the decay is monotone to `0`), so it
+  does not thrash the active set the way an eager skip of still-decaying
+  cells would.
 
 Gradual death changes only *how a condemned cell sheds its load*; the
 death predicate, the criteria, the bitmask, the structural update, and
 the BC machinery are all unchanged.
 
+### 3.2 Throttling and the outer death iteration
+
+A step can flag many cells at once — a face-calving cascade fails a whole
+band in one solve. Committing all of them blindly has two problems: the
+death set becomes sensitive to which cells cross threshold *first*, which
+in parallel depends on ~1e-6 partition-dependent solver drift (so serial
+and parallel erode differently); and, for gradual death, a batch dropped
+in a single iterate re-creates the very cliff §3.1 exists to avoid. Two
+mechanisms address this. Both are problem-level (the `Problem` sublist of
+the input deck, **not** material YAML):
+
+| Problem parameter | Default | Effect |
+|-------------------|---------|--------|
+| `Throttle Element Death`     | `true` | commit only a bounded subset of the failed cells per step (see below); the rest are deferred and re-judged next step. |
+| `Max Element Deaths Per Step`| `8`    | the bound `K`: at most `K` cells are committed per step (per re-solve, for gradual death). |
+
+**Partition-deterministic top-K.** Of all the cells that met the death
+predicate this step, the throttle commits only the `K` globally
+most-failed, ranked by `failure_state` magnitude with ties broken by
+lowest global element id. Each rank all-gathers its local top-`K`
+`(measure, gid)` pairs and every rank re-sorts the same global list, so
+all ranks select the identical set regardless of partition. A committed
+cell is surgeried (instant death) or begins fading (gradual). A deferred
+cell has its death flag dropped **and** its `failure_modes_old` seed
+cleared, so the next step re-evaluates it from scratch on the
+redistributed stress. Committing clear winners — cells far past threshold,
+whose ranking is stable — rather than a whole near-threshold batch is what
+makes the eroding front bit-identical in serial and parallel (GitHub
+issues [#114](https://github.com/sandialabs/LCM/issues/114),
+[#115](https://github.com/sandialabs/LCM/issues/115)).
+
+**The outer death iteration (gradual death only).** With `Death Steps > 1`
+the fade must complete *within* the accepted step, at fixed time, so the
+step's output frame carries the settled post-cascade state. The ACE solver
+drives this as an outer loop around the mechanical solve
+(`ACEThermoMechanical::ThermoMechanicalLoopDynamics`), mirroring the
+failure-control loop Adagio wraps around its solve (§E):
+
+1. **Solve #0** runs with the clone-death surgery **deferred**
+   (`setDeferDeathSurgery(true)`). Deaths it declares start fading *in
+   place* — the topology is unchanged — and the throttle commits only the
+   `K` most-failed newly-started fades, un-starting the rest (a full reset
+   of both `death_decay` copies and the failure seed, so an un-started
+   cell is intact again). A committed cell **latches**: it is recorded in
+   the per-step committed set and fades to completion, never re-throttled.
+2. **Re-solve** the mechanical equilibrium quasi-statically at the same
+   time, rewinding the mechanical physics to the post-thermal snapshot but
+   **keeping** the committed deaths and warm-starting from the last
+   converged solution. Each re-solve advances every committed cell's fade
+   one `1 / Death Steps` increment (§3.1) and may start — and throttle —
+   newly-failed cells.
+3. **Converge** when a full re-solve starts no new death
+   (`nStartedLastPass() == 0`) and no cell is left mid-fade
+   (`anyCellMidFade() == false`). The topology was unchanged throughout,
+   so every re-solve ran on the same map. An iteration cap (100) trips a
+   step reduction if the cascade will not settle.
+4. **Surgery once.** With the loop converged, `setDeferDeathSurgery(false)`
+   and a single `applyDeathToActivePart` call performs the
+   clone-before-disconnect surgery (§4) for the whole committed, fully-faded
+   set, at the clean between-step point where a topology change is safe.
+   The mechanical output frame is written *after* this, so it shows the
+   post-cascade eroded state.
+
+For instant death (`Death Steps` = 1, the `J2Erosion` default) there is no
+fade and no outer loop: `applyDeathToActivePart` is called once, the
+throttle picks the `K` most-failed cells, and they are surgeried
+immediately (the deferred cells wait for the next step).
+
 ---
 
 ## 4. Between-step: clone-before-disconnect structural update
 
-After each accepted step, the observer runs the structural update. It
-turns the *flags* set during the step into a *structural* change of the
-mesh: dead cells are moved out of the active part, the worksets are
-rebuilt, and STK creates the new faces that have just been exposed at
-the death boundary.
+After each accepted step, the structural update runs (once the outer
+death iteration of §3.2 has converged, for gradual death). It turns the
+*flags* set during the step into a *structural* change of the mesh: the
+cells committed to die this step (§3.2) are moved out of the active part,
+the worksets are rebuilt, and STK creates the new faces that have just
+been exposed at the death boundary.
 
 ### 4.1 Why clone-before-disconnect
 
@@ -712,12 +793,41 @@ itself (§B.3).
 ## D. Structural update: `applyDeathToActivePart` and `applyElementDeath`
 
 `Application::applyDeathToActivePart`
-(`src/Albany_Application.cpp`) is called once per accepted step from
-the observer. It scans `death_status_vecs_` for cells flagged dead
-that still belong to `activePart` (deduplicating against
-`deadCellsPart`), builds the side-set and boundary-side-set
-`PartVector`s required by §5, then delegates to
-`Albany::applyElementDeath` (`src/Albany_ElementDeath.cpp`).
+(`src/Albany_Application.cpp`) is called once per accepted step (after the
+outer death iteration converges, for gradual death — §3.2). It scans
+`death_status_vecs_` for cells flagged dead that still belong to
+`activePart` (deduplicating against `deadCellsPart`), applies the
+partition-deterministic top-K throttle (§3.2) to pick the cells to commit,
+builds the side-set and boundary-side-set `PartVector`s required by §5,
+then delegates the committed set to `Albany::applyElementDeath`
+(`src/Albany_ElementDeath.cpp`). It has two modes, selected by
+`defer_death_surgery_`:
+
+- **Defer mode** (`setDeferDeathSurgery(true)`, gradual death's re-solves):
+  it throttles which newly-started *fades* to commit and returns
+  **without** surgery, so the topology is unchanged and the driver can
+  re-solve on the same map. `nStartedLastPass()` reports how many fades it
+  committed, which the outer loop uses to detect convergence.
+- **Surgery mode** (the default): it throttles the failed cells (unless the
+  outer loop already committed the set) and runs the clone-before-disconnect
+  surgery on the committed cells.
+
+**Id-space convention (GitHub #115).** The candidate scan walks
+`getElemGIDws()`, whose keys are Albany **0-based** gids
+(`STKDiscretization::gid()` returns `bulkData.identifier(entity) - 1`).
+`bulkData.get_entity(ELEMENT_RANK, id)` takes the **1-based** STK
+identifier, so the lookup must add one:
+
+```cpp
+stk::mesh::Entity cell = bulkData.get_entity(stk::topology::ELEMENT_RANK, gid + 1);
+```
+
+Without the `+ 1` every kill lands on the cell numbered one below the
+flagged one — usually an invisible off-by-one onto an adjacent neighbor,
+but at a block boundary an arbitrary far cell, and in parallel (where that
+entity often lives on another rank) `is_valid` fails and the kill is
+silently dropped, so serial kills the wrong cell while parallel kills
+nothing. This is a live correctness invariant (see §H.1).
 
 `applyElementDeath` is the clone-before-disconnect implementation
 described in §4.2. The five phases use these STK primitives:
@@ -799,7 +909,7 @@ itself prevented by the dead-node hold-in-place Dirichlet (§6): once the
 block's nodes are connectivity-dead they are pinned (row = identity,
 `r = 0`) and their velocity/acceleration zeroed, so they stay put rather
 than free-falling. With the `Permafrost` gradual fade (§3.1) the cell is
-additionally skipped the very step its decay reaches zero, so it never
+additionally skipped the very re-solve its decay reaches zero, so it never
 gets the one free-fall iterate at near-zero stiffness.
 
 ---
@@ -823,6 +933,12 @@ A more granular Fmwk-to-STK call map is preserved in the git history
 (commit message of the original port doc); it's not reproduced here
 because the LCM code only uses the STK side and the Fmwk references
 date code that LCM never linked against.
+
+The outer death iteration (§3.2) likewise mirrors the failure-control
+loop Adagio runs around its solve — re-equilibrating at fixed time as
+failed elements shed load before advancing time. The LCM version couples
+it to the `death_decay` fade and the partition-deterministic throttle,
+neither of which has a direct Adagio analogue.
 
 ---
 
@@ -857,17 +973,22 @@ broken harmonization path is never exercised.
   own criteria and the optional gradual fade (`Death Steps`,
   `death_decay`, §3.1).
 - `src/LCM/solvers/ACE_ThermoMechanical.cpp` — the per-step seeding
-  of `death_status_vec` from the mechanical mesh state (§C); the
+  of `death_status_vec` from the mechanical mesh state (§C); the outer
+  death iteration that re-solves at fixed time for gradual death (§3.2:
+  `setDeferDeathSurgery`, `clearCommittedDeaths`, `nStartedLastPass`,
+  `anyCellMidFade`, `snapshotMechStates`/`restoreMechStates`); the
   start-of-step capture of `frozen_dead_dof_gids_` (§6.3); and
   `zeroDeadNodeRates`, the warm-start velocity/acceleration zeroing
   (§6.4).
 - `src/evaluators/scatter/PHAL_ScatterResidual_Def.hpp` — the
   assembly-time skip of dead cells (`death_status_(cell) > 0.0`).
 - `src/Albany_Application.cpp` — `applyDeathToActivePart`: the
-  observer entry point, dedup against `deadCellsPart`, `side_parts`
-  and `bc_mesh_parts` construction; `fixOrphanNodesForElementDeath`
-  (the Jacobian row pin, §6.1) and `zeroResidualAtDeadNodes` (the
-  residual companion, §6.2).
+  between-step entry point, the partition-deterministic top-K throttle
+  and defer-mode outer-iteration branch (§3.2), the `gid + 1` id-space
+  convention (§D), dedup against `deadCellsPart`, `side_parts` and
+  `bc_mesh_parts` construction; `fixOrphanNodesForElementDeath` (the
+  Jacobian row pin, §6.1) and `zeroResidualAtDeadNodes` (the residual
+  companion, §6.2).
 - `src/Albany_ElementDeath.hpp` / `Albany_ElementDeath.cpp` — the
   clone-before-disconnect implementation (`applyElementDeath` and
   helpers).
@@ -904,6 +1025,10 @@ Common modifications and where to make them:
   changing code, unless the shape of the predicate itself needs to
   change (e.g. require a *fraction* rather than a count, or weight
   modes differently).
+- **Change how many cells die per step** — the `Problem`-sublist keys
+  `Max Element Deaths Per Step` (the bound `K`, default `8`) and
+  `Throttle Element Death` (default `true`); the selector itself is
+  `select_topk` in `applyDeathToActivePart` (§3.2). No material change.
 - **Change what counts as dead at assembly time** — the scatter skip
   test in `PHAL_ScatterResidual_Def.hpp`
   (`death_status_(cell) > 0.0`).
@@ -931,4 +1056,17 @@ Common modifications and where to make them:
   mutually consistent. `init()` rebuilds the two cell-scalar fields
   from the bitmask every fill, so the bitmask is authoritative.
 - Death is monotonic: a cell that is dead stays dead. Nothing in the
-  current algorithm resurrects a cell.
+  current algorithm resurrects a cell. (A *deferred* candidate — one the
+  throttle did not commit, §3.2 — is not a dead cell that came back; it
+  never died. Its flag is dropped before any structural change.)
+- **Serial and parallel must erode identically.** The death set is
+  committed by a partition-deterministic key (largest `failure_state`,
+  ties by lowest global id) via an all-gather every rank re-sorts (§3.2).
+  Any change to how the kill set is selected must preserve this: a
+  selection that depends on partition-local ordering or on a
+  near-threshold tie decided by solver drift reintroduces the serial-vs-
+  parallel fork of GitHub #114.
+- **The `gid + 1` id-space conversion is mandatory.** `elemGIDws` keys
+  are 0-based Albany gids; `get_entity` wants the 1-based STK identifier
+  (§D). Dropping the `+ 1` silently kills the wrong cell in serial and
+  nothing in parallel (GitHub #115).

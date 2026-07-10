@@ -1990,7 +1990,15 @@ Application::applyDeathToActivePart()
     if (lid.LID >= static_cast<int>(ds.size())) continue;
     if (ds[lid.LID] <= 0.0) continue;
 
-    stk::mesh::Entity cell = bulkData.get_entity(stk::topology::ELEMENT_RANK, gid);
+    // elemGIDws keys are Albany 0-based gids (STKDiscretization::gid() =
+    // identifier - 1); get_entity takes the 1-based STK identifier. Without
+    // the +1 every kill lands on the cell numbered one below the flagged
+    // one: usually an invisible off-by-one onto an adjacent neighbor, but at
+    // a block boundary it kills an arbitrary far-away cell, and in parallel
+    // -- where the entity with identifier == gid lives on another rank --
+    // is_valid fails and the kill is silently dropped. Serial then kills the
+    // wrong cell while parallel kills nothing (GitHub issue #115).
+    stk::mesh::Entity cell = bulkData.get_entity(stk::topology::ELEMENT_RANK, gid + 1);
     if (!bulkData.is_valid(cell)) continue;
     if (!bulkData.bucket(cell).member(*activePart)) continue;
     // Killed cells stay in activePart (Step B1 adds to deadCellsPart but

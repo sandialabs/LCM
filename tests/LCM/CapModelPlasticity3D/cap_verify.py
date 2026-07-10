@@ -15,14 +15,30 @@ Exit code 0 on PASS.
 
 import sys
 import numpy as np
-import netCDF4
 
 import cap_reference as ref
 
 
+def _open_exo(fname):
+    """Open an exodus (classic netCDF) file with whichever backend is present:
+    netCDF4 on developer machines, else scipy.io.netcdf_file, which the nightly's
+    numpy/scipy stack already provides. Both expose ds.variables[name][:] as
+    ndarrays. Requiring netCDF4 made these tests silently skip on hosts that
+    lack it; the scipy fallback lets them run there too."""
+    try:
+        import netCDF4
+        return netCDF4.Dataset(fname)
+    except ImportError:
+        from scipy.io import netcdf_file
+        # mmap=False so the arrays stay valid after the file object is closed.
+        return netcdf_file(fname, "r", mmap=False)
+
+
 def exo_open(fname):
-    ds = netCDF4.Dataset(fname)
-    names = [''.join(c.decode() for c in row if c != b'')
+    ds = _open_exo(fname)
+    # name_elem_var is an (nvar, len) char array; join each row to bytes and
+    # strip the null/space padding (scipy hands back the raw padded record).
+    names = [b"".join(row).decode('ascii', 'ignore').strip().strip('\x00')
              for row in ds.variables['name_elem_var'][:]]
     idx = {n: i for i, n in enumerate(names)}
 

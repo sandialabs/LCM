@@ -19,8 +19,9 @@
 #                 (exponential/logarithmic map) kinematics; the
 #                 reference mirrors the kinematics exactly.
 #
-# The comparisons require python3 with numpy and netCDF4; the tests are
-# skipped (with a status message) when unavailable.
+# The comparisons require python3 with numpy and an exodus (classic netCDF)
+# reader -- netCDF4 if installed, else scipy.io.netcdf_file; the tests are
+# skipped (with a status message) when neither is available.
 
 foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           input_confined_coarse.yaml input_confined_fd.yaml
@@ -48,7 +49,8 @@ endforeach()
 find_program(PYTHON3_FOR_CAP python3)
 set(CAP_PY_OK FALSE)
 if (PYTHON3_FOR_CAP)
-  execute_process(COMMAND ${PYTHON3_FOR_CAP} -c "import numpy, netCDF4"
+  execute_process(COMMAND ${PYTHON3_FOR_CAP} -c
+                  "import numpy, importlib.util as u; assert u.find_spec('netCDF4') or u.find_spec('scipy')"
                   RESULT_VARIABLE _cap_py_res
                   OUTPUT_QUIET ERROR_QUIET)
   if (_cap_py_res EQUAL 0)

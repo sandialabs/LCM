@@ -1,8 +1,12 @@
-getting-started.toc
-getting-started.lot
-getting-started.log
-getting-started.lof
-getting-started.dvi
-getting-started.aux
-getting-started.pdf
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.lot
+*.lof
+*.dvi
+missfont.log
 
+# getting-started is not distributed as a PDF
+getting-started.pdf

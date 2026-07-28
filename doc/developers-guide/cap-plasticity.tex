@@ -181,7 +181,7 @@ must represent simultaneously. At low to moderate pressure the
 dominant mechanism is frictional sliding and growth of microcracks:
 shear resistance grows with confinement, producing a pressure-dependent
 \emph{shear failure envelope} that, unlike a Drucker--Prager cone,
-saturates once the cracks are squeezed shut. At high pressure a
+saturates once the cracks are closed by the confining pressure. At high pressure a
 porous material yields under hydrostatic load alone by irreversible
 \emph{pore collapse}; representing this requires closing the yield
 surface on the compressive end with a \emph{cap}, which moves outward
@@ -289,7 +289,7 @@ one to zero, closing the surface at $I_1 = X$. At $I_1 = \kappa$
 both $F_c = 1$ and $\partial F_c/\partial I_1 = 0$, so the surface is
 $C^1$ across the branch point: there is no corner where cap meets
 envelope. The strength at zero pressure is $A - C$; as compression
-grows the exponential dies and strength saturates toward
+grows the exponential term vanishes and strength saturates toward
 $A - \theta I_1$. $R$ is the cap aspect ratio (its extent in $I_1$
 per unit of $F_f$), and $N$ offsets the initial yield surface below
 the failure envelope, leaving room for kinematic hardening.
@@ -416,8 +416,8 @@ apply wherever $\kappa$ is updated:
       $|\varepsilon_v^p(\kappa)| \ge W$ the crush curve is exhausted,
       its slope vanishes, and $h^\kappa$ as written diverges.
       Following the reference, $h^\kappa$ is then set to
-      $-0.01\,K^2$ ($K$ the bulk modulus), which races the cap toward
-      $-\infty$ so that pore-collapse plasticity shuts off rather
+      $-0.01\,K^2$ ($K$ the bulk modulus), which drives the cap
+      rapidly toward $-\infty$ so that pore-collapse plasticity shuts off rather
       than stalling against an immobile cap.
 \end{itemize}
 
@@ -559,7 +559,7 @@ Permafrost model's ice saturation --- and it is not merely an accuracy
 refinement. If instead the parameters jump once per step, a softening
 step leaves the stored stress far outside the shrunken yield surface,
 and the entire correction is delivered by the drift projection, whose
-consistent/normal fallback decision then sits on a knife edge: in a
+consistent/normal fallback decision then becomes critically sensitive: in a
 thaw-under-load verification study the resulting trajectories were
 hypersensitive to roundoff (relative perturbations of $10^{-16}$ in the
 moduli grew to order-one trajectory differences, with two distinct
@@ -858,7 +858,7 @@ tested pressure range is narrow.
 The ratio of triaxial-extension to triaxial-compression strength at
 the same mean stress, requiring \emph{triaxial extension} tests
 (axial stress reduced below the confinement). These are harder to
-run, so $\psi$ is often the first parameter sacrificed; $\psi = 1$
+run, so $\psi$ is often the first parameter omitted; $\psi = 1$
 switches the Lode dependence off entirely. Convexity of the
 Gudehus-type $\Gamma(\beta)$ in Eq.~\eqref{eq:Gamma} requires
 $\psi \ge 7/9 \approx 0.778$; do not fit below that bound.
@@ -1130,7 +1130,7 @@ linearly. The Wood-mixture bound is calibration guidance for the
 thawed $K$, not a kernel computation: until pore pressure is
 resolved (the $u$--$p$ extension below), the calibrated thawed
 member uses drained-skeleton moduli, since an undrained $K$ would
-make thawed mush bulk-stiffer than frozen soil. One numerical guard
+make thawed sediment bulk-stiffer than frozen soil. One numerical guard
 is built in: the thawed saturated limit $\nu \to 0.499$
 volumetrically locks low-order hexahedra, so the effective Poisson
 ratio is capped (\texttt{Maximum Poissons Ratio}, default 0.45) by

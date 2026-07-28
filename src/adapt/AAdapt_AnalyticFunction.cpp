@@ -4,6 +4,8 @@
 
 #include "AAdapt_AnalyticFunction.hpp"
 
+#include <unistd.h>
+
 #include <cmath>
 #include <cstdlib>
 #include <ctime>

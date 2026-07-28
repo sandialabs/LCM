@@ -6,6 +6,10 @@
 # Build directories
 /build*/
 
+# CMake artifacts from accidental in-tree configures
+CMakeCache.txt
+CMakeFiles/
+
 # Editor and IDE files
 \#*\#
 .\#*

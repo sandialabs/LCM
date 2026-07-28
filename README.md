@@ -41,7 +41,7 @@ Optional (for clang builds):
 sudo dnf install clang clang-devel
 ```
 
-CMake 3.27+ is required. If your system cmake is older:
+CMake 3.27 or newer (including 4.x) is required. If your system cmake is older:
 ```bash
 spack install cmake@3.27
 ```
@@ -83,23 +83,30 @@ Currently only GCC builds are supported on CEE (module `serial-gcc-release`).
 ```bash
 mkdir ~/LCM && cd ~/LCM
 
-git clone git@github.com:trilinos/Trilinos.git
-git clone git@github.com:sandialabs/LCM.git
+git clone -b develop https://github.com/trilinos/Trilinos.git
+git clone https://github.com/sandialabs/LCM.git
 ```
 
-### 2. Set up environment
+LCM builds against the `develop` branch of Trilinos, tracking its head
+rather than any pinned commit.
 
-Add to `~/.bashrc`:
+### 2. Set up environment (optional, for interactive use only)
+
+The `lcm` build script is self-contained: it auto-detects `LCM_DIR`, sets
+`MODULEPATH`, sources the Environment Modules init script, and loads the
+requested build module itself (default: `release`). **No `.bashrc` changes
+are needed to build.**
+
+Environment Modules setup is only needed for interactive use — that is,
+running `module load` yourself so that `Albany` and the Trilinos tools
+(`decomp`, `epu`, `exodiff`) are on your `PATH`. For that, add to
+`~/.bashrc`:
 ```bash
 export LCM_DIR=~/LCM
 module use $LCM_DIR/LCM/doc/lcm/modulefiles
 ```
 
 Log out and back in, or `source ~/.bashrc`.
-
-On CEE LAN machines, `module use` requires Environment Modules to be
-available. If `module` is not found, the `lcm` script will locate and source
-the init script automatically, so `.bashrc` changes are optional on CEE.
 
 ### 3. Create the `lcm` symlink
 
@@ -112,7 +119,6 @@ ln -s LCM/doc/lcm/build/lcm .
 
 ```bash
 cd ~/LCM
-module load release           # loads serial-gcc-release environment
 
 ./lcm clean trilinos          # clean previous builds
 ./lcm config trilinos 16      # configure Trilinos (16 = parallel threads)
@@ -153,10 +159,16 @@ Modules configure the compiler, architecture, and build type. Available configur
 
 The `release` module is an alias for `serial-gcc-release`.
 
-Load a module before building:
+Select a configuration for a build with the `--module` flag (the `lcm`
+script loads the module itself):
+```bash
+./lcm all 16 --module=serial-clang-release
+```
+
+For interactive use (running `Albany` and Trilinos tools from `PATH`), load
+the module in your shell instead:
 ```bash
 module load serial-clang-release
-./lcm all 16 --module=serial-clang-release
 ```
 
 Build directories are named by configuration, e.g. `lcm-build-serial-gcc-release`.
@@ -189,9 +201,18 @@ Many tests run in parallel using up to 4 MPI ranks.
 
 ## Nightly Tests
 
-The `clone-build-test-dash.sh` script (in the workspace root) clones
-Trilinos and LCM from scratch, builds with each supported compiler, and
-submits results to CDash. It is typically run via cron:
+The `clone-build-test-dash.sh` script clones Trilinos and LCM from scratch,
+builds with each supported compiler, and submits results to CDash. It lives
+at `LCM/doc/lcm/test/clone-build-test-dash.sh` but must be run from a copy
+in the workspace root: it sets `LCM_DIR` to the current directory and
+deletes and re-clones the `LCM` repository, so it cannot run from inside
+the repository itself. Copy it into place once:
+
+```bash
+cp LCM/doc/lcm/test/clone-build-test-dash.sh ~/LCM/
+```
+
+It is typically run via cron:
 
 ```bash
 # In crontab:

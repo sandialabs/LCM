@@ -8,7 +8,7 @@
 
 #include "Albany_Macros.hpp"
 #include "MiniTensor.h"
-#include "MiniTensor_Definitions.h"
+#include "MiniTensor_Traits.h"
 #include "Phalanx_DataLayout.hpp"
 
 namespace LCM {

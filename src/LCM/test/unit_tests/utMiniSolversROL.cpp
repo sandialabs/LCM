@@ -3,7 +3,7 @@
 // in the file license.txt in the top-level Albany directory.
 #include "MiniNonlinearSolver.hpp"
 #include "MiniSolvers.hpp"
-#include "MiniTensor_FunctionSet.h"
+#include "MiniTensor_TestFunctions.h"
 #include "ROL_MiniTensor_MiniSolver.hpp"
 
 #include <cassert>

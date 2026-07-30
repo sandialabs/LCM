@@ -10,7 +10,7 @@
 #include "Albany_Layouts.hpp"
 #include "ConstitutiveModel.hpp"
 #include "MiniTensor.h"
-#include "MiniTensor_Definitions.h"
+#include "MiniTensor_Traits.h"
 #include "Phalanx_DataLayout.hpp"
 #include "Phalanx_Evaluator_Derived.hpp"
 #include "Phalanx_Evaluator_WithBaseImpl.hpp"

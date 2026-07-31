@@ -1123,11 +1123,15 @@ contributor to the large displacements that motivated
 \texttt{J2Erosion}'s displacement-norm failure criterion.
 
 Accordingly, each end member carries its own $(K, G)$ pair in place
-of modulus-multiplier fits. $G(S)$ interpolates geometrically
-(log-linearly --- the range spans two orders of magnitude, so linear
-interpolation in $S$ overweights the frozen value) and $K(S)$
-linearly. The Wood-mixture bound is calibration guidance for the
-thawed $K$, not a kernel computation: until pore pressure is
+of modulus-multiplier fits. Both moduli interpolate geometrically
+(log-linearly) in $S$. For $G$ the range spans two orders of
+magnitude, so linear interpolation in $S$ overweights the frozen
+value; for $K$, review of the frozen-soil experimental literature
+(models, experiments and data examined July 2026) shows the bulk
+modulus following the same geometric trend with ice saturation, so
+the interpolation was changed from the linear form originally
+assumed to match the observed behavior. The Wood-mixture bound is
+calibration guidance for the thawed $K$, not a kernel computation: until pore pressure is
 resolved (the $u$--$p$ extension below), the calibrated thawed
 member uses drained-skeleton moduli, since an undrained $K$ would
 make thawed sediment bulk-stiffer than frozen soil. One numerical guard

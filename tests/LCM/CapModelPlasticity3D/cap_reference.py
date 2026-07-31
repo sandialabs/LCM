@@ -408,10 +408,10 @@ def ce_apply(P, eps):
 def permafrost_map(f, frozen, thawed, shared, nu_max=0.45):
     """Saturation-to-parameter map, mirroring the Permafrost kernel
     exactly: cohesion/bonding and crush parameters linear between end
-    members; friction/shape from the (thawed) sediment skeleton; G
-    log-linear; K linear with the effective Poisson ratio capped at
-    nu_max preserving G; lame = K - 2G/3, mu = G."""
-    K = (1.0 - f) * thawed['K'] + f * frozen['K']
+    members; friction/shape from the (thawed) sediment skeleton; G and
+    K log-linear with the effective Poisson ratio capped at nu_max
+    preserving G; lame = K - 2G/3, mu = G."""
+    K = np.exp((1.0 - f) * np.log(thawed['K']) + f * np.log(frozen['K']))
     G = np.exp((1.0 - f) * np.log(thawed['G']) + f * np.log(frozen['G']))
     nu = (3.0 * K - 2.0 * G) / (2.0 * (3.0 * K + G))
     if nu > nu_max:

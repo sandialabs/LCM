@@ -17,7 +17,7 @@
 //   crush             kappa0, W, D1       linear between end members
 //   friction/shape    D, theta, L, phi,   thawed (sediment skeleton)
 //                     R, Q, psi, D2       values, f-independent
-//   elasticity        G(f) log-linear; K(f) linear; effective nu
+//   elasticity        G(f) and K(f) log-linear; effective nu
 //                     capped at nu_max (default 0.45) preserving G
 //
 // Ice saturation comes from the ACE_Ice_Saturation field
@@ -554,15 +554,15 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // Saturation-to-parameter map (see the file banner). Elasticity from
-  // the (K, G) split: the shear modulus carries the order-of-magnitude
-  // ice-bonding dependence (log-linear); the bulk modulus is bounded
-  // below by the saturated mixture (linear between end members, with the
-  // thawed K chosen at the Wood bound during calibration). The effective
-  // Poisson ratio is capped at nu_max, preserving G (the trusted
-  // physics) and reducing K.
+  // the (K, G) split: both moduli interpolate geometrically
+  // (log-linearly) between the end members, the ice-bonding dependence
+  // the frozen-soil experimental literature shows for the shear AND the
+  // bulk modulus. The Wood-mixture bound remains calibration guidance
+  // for the thawed K. The effective Poisson ratio is capped at nu_max,
+  // preserving G (the trusted physics) and reducing K.
   auto map_params = [&](ScalarT const& f) {
     CapParameters<ScalarT> P;
-    ScalarT Kmod = (1.0 - f) * thawed_.K + f * frozen_.K;
+    ScalarT Kmod = std::exp((1.0 - f) * std::log(ScalarT(thawed_.K)) + f * std::log(ScalarT(frozen_.K)));
     ScalarT const Gmod = std::exp((1.0 - f) * std::log(ScalarT(thawed_.G)) + f * std::log(ScalarT(frozen_.G)));
     ScalarT nu = (3.0 * Kmod - 2.0 * Gmod) / (2.0 * (3.0 * Kmod + Gmod));
     if (nu > nu_max_) {

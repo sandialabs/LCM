@@ -1873,12 +1873,21 @@ Application::applyDeathToActivePart()
   // magnitude used to rank them for the throttle below.
   auto& esa = getStateMgr().getStateArrays().elemStateArrays;
 
-  // Partition-deterministic global top-K selector. Every rank all-gathers its
-  // local top-K (ranked by largest measure, ties broken by lowest global id) so
-  // all ranks form the identical global top-K set. Committing clear winners (far
-  // past threshold) rather than a whole near-threshold batch keeps the death set
-  // from flipping under the ~1e-6 partition-dependent solver drift -- the
-  // serial==parallel lever (GitHub #114).
+  // Partition-deterministic, tie-inclusive global top-K selector. Every rank
+  // all-gathers ALL of its candidates (padded to the global max count, so the
+  // exchange stays a fixed-width gatherAll) and every rank forms the identical
+  // globally sorted list (largest measure first, equal measures by lowest
+  // global id). The commit set is the top K PLUS every candidate whose measure
+  // exactly ties the K-th winner's. Committing clear winners rather than a
+  // whole near-threshold batch keeps the death set from flipping under the
+  // ~1e-6 partition-dependent solver drift -- the serial==parallel lever
+  // (GitHub #114). The tie extension preserves the symmetries of the problem:
+  // the measure is the discrete failure_state encoding (exact integer-valued
+  // counts, not drift-prone floats), so symmetry-equivalent cells carry
+  // exactly equal measures and die together instead of being split by the id
+  // tie-break into a mesh-numbering-dependent, symmetry-breaking subset
+  // (GitHub #116). Truncating each rank's send at K would silently drop
+  // remote ties at the cut, so the gather must carry every candidate.
   auto select_topk = [&](std::vector<std::pair<double, GO>>& local, int K) {
     GO const  GO_MAX = std::numeric_limits<GO>::max();
     int const nranks = comm->getSize();
@@ -1886,23 +1895,34 @@ Application::applyDeathToActivePart()
       return a.first > b.first || (a.first == b.first && a.second < b.second);
     };
     std::sort(local.begin(), local.end(), by_key);
-    std::vector<double> send_meas(K, -1.0);
-    std::vector<GO>     send_gid(K, GO_MAX);
-    int const           local_n = std::min<int>(K, static_cast<int>(local.size()));
+    int const local_n = static_cast<int>(local.size());
+    int       width   = 0;
+    Teuchos::reduceAll(*comm, Teuchos::REDUCE_MAX, 1, &local_n, &width);
+    std::set<GO> topk;
+    if (width == 0) return topk;
+    std::vector<double> send_meas(width, -1.0);
+    std::vector<GO>     send_gid(width, GO_MAX);
     for (int i = 0; i < local_n; ++i) {
       send_meas[i] = local[i].first;
       send_gid[i]  = local[i].second;
     }
-    std::vector<double> all_meas(static_cast<size_t>(nranks) * K);
-    std::vector<GO>     all_gid(static_cast<size_t>(nranks) * K);
-    Teuchos::gatherAll(*comm, K, send_meas.data(), nranks * K, all_meas.data());
-    Teuchos::gatherAll(*comm, K, send_gid.data(), nranks * K, all_gid.data());
+    std::vector<double> all_meas(static_cast<size_t>(nranks) * width);
+    std::vector<GO>     all_gid(static_cast<size_t>(nranks) * width);
+    Teuchos::gatherAll(*comm, width, send_meas.data(), nranks * width, all_meas.data());
+    Teuchos::gatherAll(*comm, width, send_gid.data(), nranks * width, all_gid.data());
     std::vector<std::pair<double, GO>> global;
     for (size_t i = 0; i < all_gid.size(); ++i)
       if (all_gid[i] != GO_MAX) global.emplace_back(all_meas[i], all_gid[i]);
     std::sort(global.begin(), global.end(), by_key);
-    std::set<GO> topk;
-    for (int i = 0; i < std::min<int>(K, static_cast<int>(global.size())); ++i) topk.insert(global[i].second);
+    int const n_global = static_cast<int>(global.size());
+    int       n_commit = std::min(K, n_global);
+    // Tie extension: admit every candidate whose measure equals the K-th
+    // winner's, so exact ties are all-or-none.
+    while (n_commit > 0 && n_commit < n_global &&
+           global[n_commit].first == global[n_commit - 1].first) {
+      ++n_commit;
+    }
+    for (int i = 0; i < n_commit; ++i) topk.insert(global[i].second);
     return topk;
   };
 
@@ -1910,7 +1930,8 @@ Application::applyDeathToActivePart()
   //
   // A re-solve just advanced the gradual-decay state, so a cell that met the
   // failure threshold this iteration has started fading (death_decay_old < 1).
-  // Commit only the K globally-most-failed of the NEWLY started cells and
+  // Commit only the K globally-most-failed of the NEWLY started cells (plus
+  // exact ties with the K-th, so symmetry-equivalent cells start together) and
   // un-start the rest, so only clear winners begin fading; a committed cell
   // latches (keeps fading to completion) and is never re-throttled. Return
   // WITHOUT the clone-death surgery -- the topology is unchanged, so the driver
@@ -2013,12 +2034,14 @@ Application::applyDeathToActivePart()
     cands.push_back({cell, lid.ws, lid.LID, gid, measure});
   }
 
-  // One-death-per-step throttle (the outer death iteration clear-winner rule): of all the
-  // cells that met the death threshold this step, commit only the single
-  // globally-most-failed one and UN-MARK the rest, so the next step re-judges
-  // them on the redistributed stress. Killing one clear winner at a time --
-  // chosen by a partition-deterministic key (largest failure magnitude, ties
-  // broken by lowest global id) -- keeps the death decision from flipping under
+  // Death throttle (the outer death iteration clear-winner rule): of all the
+  // cells that met the death threshold this step, commit only the K
+  // globally-most-failed -- plus exact ties with the K-th, so
+  // symmetry-equivalent cells (identical discrete failure_state) die together
+  // rather than being split by the id tie-break into a mesh-numbering-dependent
+  // subset (GitHub #116) -- and UN-MARK the rest, so the next step re-judges
+  // them on the redistributed stress. Killing clear winners chosen by a
+  // partition-deterministic key keeps the death decision from flipping under
   // partition-dependent solver noise, which is what forks the serial vs np4
   // erosion pattern (GitHub #114). A whole near-threshold batch, by contrast,
   // is full of cells any of which can cross first depending on ~1e-6 solver drift.

@@ -764,6 +764,14 @@ ModelEvaluator::createInArgsImpl() const
   if (supports_xdotdot) {
     result.setSupports(Thyra_ModelEvaluator::IN_ARG_x_dot_dot, true);
     result.setSupports(Thyra_ModelEvaluator::IN_ARG_W_x_dot_dot_coeff, true);
+    // Give the second-order coefficient a defined default. Thyra zero-inits t,
+    // alpha, beta and step_size, but not W_x_dot_dot_coeff; a caller that leaves
+    // it unset (e.g. Piro's converged-response evaluation) otherwise makes
+    // evalModelImpl read an uninitialized omega, whose garbage value
+    // nondeterministically selects the x_dotdot branch. That is the source of
+    // the intermittent extra t=0 Exodus output frame in the alternating Schwarz
+    // dynamics tests.
+    result.set_W_x_dot_dot_coeff(0.0);
   }
   result.set_Np(num_param_vecs + num_dist_param_vecs);
 

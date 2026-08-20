@@ -208,7 +208,11 @@ Albany::StateManager::registerStateVariable(
       nodalDataBase->registerVectorState(stateName, stateRef.dim[1] * stateRef.dim[2]);
   }
 
-  stateRef.output              = outputToExodus;
+  // A state with an "_old" companion is read back by the model on the next
+  // step, so it is part of the restart state whether or not anyone wanted to
+  // look at it. Under "Restartable Output" write those to Exodus too, so the
+  // file is enough to continue the run from.
+  stateRef.output              = outputToExodus || (registerOldState && restartable_output_);
   stateRef.responseIDtoRequire = responseIDtoRequire;
 
   // If space is needed for old state
@@ -793,6 +797,47 @@ Albany::StateManager::printStates(std::string const& where) const
 // ============================================= PRIVATE METHODS
 // =============================================== //
 
+namespace {
+
+// Copy one state array's values into another. The arrays are views onto the
+// discretization's field data, so assigning them (a shallow shards::Array
+// assignment) would only rebind the destination onto the source's memory: the
+// destination's own field would keep whatever it had, and the aliasing would
+// last exactly until the state arrays are rebuilt -- which element death does,
+// on the next topology change, at which point the destination reads as zero.
+void
+copyStateArrayValues(Albany::MDArray& dst, Albany::MDArray const& src)
+{
+  Albany::StateStruct::FieldDims dims;
+  dst.dimensions(dims);
+  ALBANY_PANIC(
+      dst.size() != src.size(),
+      "State array size mismatch while copying a restarted parent state: " << dst.size() << " vs " << src.size() << std::endl);
+  switch (dims.size()) {
+    case 1:
+      for (int c = 0; c < dims[0]; ++c) dst(c) = src(c);
+      break;
+    case 2:
+      for (int c = 0; c < dims[0]; ++c)
+        for (int q = 0; q < dims[1]; ++q) dst(c, q) = src(c, q);
+      break;
+    case 3:
+      for (int c = 0; c < dims[0]; ++c)
+        for (int q = 0; q < dims[1]; ++q)
+          for (int i = 0; i < dims[2]; ++i) dst(c, q, i) = src(c, q, i);
+      break;
+    case 4:
+      for (int c = 0; c < dims[0]; ++c)
+        for (int q = 0; q < dims[1]; ++q)
+          for (int i = 0; i < dims[2]; ++i)
+            for (int j = 0; j < dims[3]; ++j) dst(c, q, i, j) = src(c, q, i, j);
+      break;
+    default: ALBANY_ABORT("Unsupported state rank in copyStateArrayValues: " << dims.size() << std::endl);
+  }
+}
+
+}  // anonymous namespace
+
 void
 Albany::StateManager::doSetStateArrays(const Teuchos::RCP<Albany::AbstractDiscretization>& disc, const Teuchos::RCP<StateInfoStruct>& stateInfoPtr)
 {
@@ -844,7 +889,8 @@ Albany::StateManager::doSetStateArrays(const Teuchos::RCP<Albany::AbstractDiscre
           // If we are restarting, my parent is initialized from exodus file
           // Copy over parent's state
 
-          for (int ws = 0; ws < numElemWorksets; ws++) esa[ws][stateName] = esa[ws][pParentStruct->name];
+          for (int ws = 0; ws < numElemWorksets; ws++)
+            copyStateArrayValues(esa[ws][stateName], esa[ws][pParentStruct->name]);
 
           continue;
         } else if (init_type == "scalar")
@@ -937,7 +983,8 @@ Albany::StateManager::doSetStateArrays(const Teuchos::RCP<Albany::AbstractDiscre
           // If we are restarting, my parent is initialized from exodus file
           // Copy over parent's state
 
-          for (int ws = 0; ws < numNodeWorksets; ws++) nsa[ws][stateName] = nsa[ws][pParentStruct->name];
+          for (int ws = 0; ws < numNodeWorksets; ws++)
+            copyStateArrayValues(nsa[ws][stateName], nsa[ws][pParentStruct->name]);
 
           continue;
         } else if (init_type == "scalar")

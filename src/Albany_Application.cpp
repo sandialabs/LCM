@@ -209,6 +209,9 @@ Application::initialSetUp(const RCP<Teuchos::ParameterList>& params)
   // Validate Problem parameters against list for this specific problem
   problemParams->validateParameters(*(problem->getValidProblemParameters()), 0);
 
+  // Must be set before buildProblem registers the states.
+  stateMgr.setRestartableOutput(problemParams->get<bool>("Restartable Output", false));
+
   try {
     tangent_deriv_dim = calcTangentDerivDimension(problemParams);
   } catch (...) {

@@ -250,6 +250,17 @@ class StateManager
     return stateVarsAreAllocated;
   }
 
+  //! Also write to Exodus every state that carries an "_old" companion, i.e.
+  //! everything the models read back from the previous step. These are exactly
+  //! the states a restart has to reload, and most of them are not interesting
+  //! enough to be requested for output on their own. Must be set before the
+  //! problem registers its states.
+  void
+  setRestartableOutput(bool const b)
+  {
+    restartable_output_ = b;
+  }
+
  private:
   /// Private to prohibit copying
   StateManager(const StateManager&);
@@ -266,6 +277,9 @@ class StateManager
   /// boolean to enforce that allocate gets called once, and after registration
   /// and befor gets
   bool stateVarsAreAllocated;
+
+  /// See setRestartableOutput.
+  bool restartable_output_{false};
 
   /// Container to hold the states that have been registered, by element block,
   /// to be allocated later

@@ -5,6 +5,7 @@
 #include "AAdapt_InitialCondition.hpp"
 
 #include <Teuchos_CommHelpers.hpp>
+#include <Teuchos_VerboseObject.hpp>
 #include <cmath>
 
 #include "AAdapt_AnalyticFunction.hpp"
@@ -67,6 +68,18 @@ InitialConditions(
 
   if (name == "Restart") {
     return;
+  }
+
+  // An explicit Function still wins over the restart -- the user asked for it.
+  // Say so, though: a deck carried over from a cold start keeps its "Constant"
+  // initial condition, which then silently overwrites the solution just read
+  // from the restart file, and the run looks like it restarted from zero.
+  if (hasRestartSolution) {
+    *Teuchos::VerboseObjectBase::getDefaultOStream()
+        << "  *** WARNING *** Restart solution was read, but Initial Condition "
+        << "Function \"" << name << "\" is specified and overwrites it. "
+        << "Remove the Initial Condition sublist (or set Function: Restart) to "
+        << "continue from the restart state.\n";
   }
   // Handle element block specific constant data
   if (name == "EBPerturb" || name == "EBPerturbGaussian" || name == "EBConstant") {

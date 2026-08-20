@@ -629,6 +629,16 @@ ACEThermoMechanical::createPersistentApps()
   shared_mesh->commitAndPopulate(
       comm_, first_disc_params, apps_[0]->getStateMgr().getStateInfoStruct());
 
+  // On a restart, commitAndPopulate only marked the FIRST subdomain's states
+  // as restored -- it is handed one StateInfoStruct and knows nothing of the
+  // other Applications sharing this mesh. Every other subdomain's states
+  // (the mechanical stress, plastic strain, failure state, ...) would then be
+  // overwritten with their initialization values during finalizePostCommit,
+  // silently discarding the restart. Mark them here, before that runs.
+  for (int s = 1; s < num_subdomains_; ++s) {
+    shared_mesh->markRestartStates(apps_[s]->getStateMgr().getStateInfoStruct());
+  }
+
   // ----- Finalize each app: runs disc->updateMesh() + finalSetUp -----
   for (int s = 0; s < num_subdomains_; ++s) {
     apps_[s]->finalizePostCommit();
@@ -648,6 +658,8 @@ ACEThermoMechanical::createPersistentApps()
 
     do_outputs_[s]      = stk_mesh_structs_[s]->exoOutput;
     do_outputs_init_[s] = stk_mesh_structs_[s]->exoOutput;
+
+    if (stk_disc->hasRestartSolution()) restarted_ = true;
 
     model_evaluators_[s] = solver_factories_[s]->returnModel();
 
@@ -745,7 +757,9 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   // zeros to the real settled state. A preload start (initial_time_ < 0)
   // instead ramps self-weight to a settled t=0 frame over the preload window,
   // so it uses the plain-output path below.
-  if (static_equilibrium_init_ == true && initial_time_ >= 0.0) {
+  // Skipped on a restart: the state read from the file already is the settled
+  // state this pass would recompute, and recomputing it would overwrite it.
+  if (static_equilibrium_init_ == true && initial_time_ >= 0.0 && restarted_ == false) {
     int thermal_sub = -1;
     int mech_sub0   = -1;
     for (auto s = 0; s < num_subdomains_; ++s) {
@@ -1684,7 +1698,12 @@ ACEThermoMechanical::AdvanceMechanicalDynamics(
     // acceleration IC comes from the step-start snapshot (reseedMechIC), not the
     // heuristic, and re-running it on every re-solve of a first-step cascade is
     // wasteful and a source of transient noise. This should speed up code by ~2x.
-    if (current_time != initial_time_ || death_resolve) {
+    // A restart is never an initial state in this sense either: the restart
+    // file supplies x, v AND a, so re-deriving the acceleration (or re-solving
+    // for static equilibrium) discards the acceleration that was read and
+    // starts the continuation on a different dynamic trajectory than the run
+    // being continued.
+    if (current_time != initial_time_ || death_resolve || restarted_) {
       piro_tr_solver.disableCalcInitAccel();
       piro_tr_solver.disableStaticInitSolve();
     } else if (static_equilibrium_init_ == true) {

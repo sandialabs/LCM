@@ -167,6 +167,13 @@ Albany::AbstractProblem::getGenericProblemParams(std::string listname) const
   validPL->set<double>("Homotopy Restart Step", 1., "Flag for LandIce Homotopy Restart Step");
   validPL->set<std::string>("Second Order", "No", "Flag to indicate that a transient problem has two time derivs");
   validPL->set<bool>("Print Response Expansion", true, "");
+  validPL->set<bool>(
+      "Restartable Output",
+      false,
+      "Also write to Exodus every state the model reads back as \"_old\", so that the "
+      "output file can be restarted from. Without it, states that are not explicitly "
+      "requested for output (plastic strain, failure history, ...) are absent from the "
+      "file and a restart silently continues from their initialization values");
 
   // Deprecated parameters, kept solely for backward compatibility
   validPL->set<bool>(

@@ -429,10 +429,14 @@ Albany::IossSTKMeshStruct::commitAndPopulate(
 
       // Read solution from exodus file.
       if (index >= 0) {  // User has specified a time step to restart at
-        *out << "Restart Index set, reading solution index : " << index << std::endl;
         mesh_data->read_defined_input_fields(index, &missing);
         m_restartDataTime    = region.get_state_time(index);
         m_hasRestartSolution = true;
+        // Report the time as well as the index: the index is 1-based, which is
+        // easy to be off by one about, and the time is what has to line up with
+        // the analysis start time.
+        *out << "Restart Index set, reading solution index : " << index << " (time " << m_restartDataTime << ")"
+             << std::endl;
       } else if (res_time >= 0) {  // User has specified a time to restart at
         *out << "Restart solution time set, reading solution time : " << res_time << std::endl;
         mesh_data->read_defined_input_fields(res_time, &missing);
@@ -472,10 +476,14 @@ Albany::IossSTKMeshStruct::commitAndPopulate(
     if (!usePamgen) {
       // Read solution from exodus file.
       if (index >= 0) {  // User has specified a time step to restart at
-        *out << "Restart Index set, reading solution index : " << index << std::endl;
         mesh_data->read_defined_input_fields(index, &missing);
         m_restartDataTime    = region.get_state_time(index);
         m_hasRestartSolution = true;
+        // Report the time as well as the index: the index is 1-based, which is
+        // easy to be off by one about, and the time is what has to line up with
+        // the analysis start time.
+        *out << "Restart Index set, reading solution index : " << index << " (time " << m_restartDataTime << ")"
+             << std::endl;
       } else if (res_time >= 0) {  // User has specified a time to restart at
         *out << "Restart solution time set, reading solution time : " << res_time << std::endl;
         mesh_data->read_defined_input_fields(res_time, &missing);
@@ -491,36 +499,7 @@ Albany::IossSTKMeshStruct::commitAndPopulate(
   }  // End Parallel Read - or running in serial
 
   if (m_hasRestartSolution) {
-    Teuchos::Array<std::string> default_field;
-    default_field.push_back("solution");
-    Teuchos::Array<std::string> restart_fields = params->get<Teuchos::Array<std::string>>("Restart Fields", default_field);
-
-    // Get the fields to be used for restart
-
-    // See what state data was initialized from the stk::io request
-    // This should be propagated into stk::io
-    const Ioss::ElementBlockContainer& elem_blocks = region.get_element_blocks();
-
-    /*
-    // Uncomment to print what fields are in the exodus file
-    Ioss::NameList exo_fld_names;
-    elem_blocks[0]->field_describe(&exo_fld_names);
-    for(std::size_t i = 0; i < exo_fld_names.size(); i++){
-    *out << "Found field \"" << exo_fld_names[i] << "\" in exodus file" <<
-    std::endl; } */
-
-    for (std::size_t i = 0; i < sis->size(); i++) {
-      Albany::StateStruct& st = *((*sis)[i]);
-      if (elem_blocks[0]->field_exists(st.name))
-
-        for (std::size_t j = 0; j < restart_fields.size(); j++)
-
-          if (iequals(st.name, restart_fields[j])) {
-            *out << "Restarting from field \"" << st.name << "\" found in exodus file." << std::endl;
-            st.restartDataAvailable = true;
-            break;
-          }
-    }
+    markRestartStates(sis);
 
     // Read global mesh variables. Should we emit warnings at all?
     for (auto& it : fieldContainer->getMeshVectorStates()) {
@@ -561,6 +540,21 @@ Albany::IossSTKMeshStruct::commitAndPopulate(
       //      TODO, when compiler allows, replace following with this for
       //      performance: missing.emplace_back(fields[i],fields[i]->name());
       missing.push_back(stk::io::MeshField(fields[i], fields[i]->name()));
+    }
+  }
+
+  // Report what the restart file did not supply. read_defined_input_fields
+  // fills `missing` with every declared field it could not find, and until now
+  // that list was consumed only to detect the side maps -- so a state that the
+  // file simply does not carry was skipped in silence and the run continued
+  // from its initialization value.
+  if (m_hasRestartSolution) {
+    for (auto const& it : missing) {
+      std::string const& fname = it.field()->name();
+      if (fname == "side_to_cell_map" || fname == "side_nodes_ids") continue;
+      *out << "  *** WARNING *** Field '" << fname
+           << "' is declared by the problem but is not in the restart file; it keeps its "
+              "initialization value.\n";
     }
   }
 
@@ -612,6 +606,95 @@ Albany::IossSTKMeshStruct::commitAndPopulate(
   this->finalizeSideSetMeshStructs(commT, side_set_req, side_set_sis, worksetSize);
 
   fieldAndBulkDataSet = true;
+}
+
+void
+Albany::IossSTKMeshStruct::markRestartStates(const Teuchos::RCP<Albany::StateInfoStruct>& sis)
+{
+  // Tell the StateManager which of these states already hold their restart
+  // values, so that initStateArrays leaves them alone instead of overwriting
+  // them with the model's initialization value. The values themselves are
+  // already in place: read_defined_input_fields above read EVERY field the
+  // mesh declares, this marking only decides what survives initialization.
+  //
+  // Separate from commitAndPopulate so that an orchestrator sharing one mesh
+  // among several Applications (ACE thermo-mechanical) can mark each one's
+  // states; commitAndPopulate only ever sees the first Application's.
+  if (!hasRestartSolution() || Teuchos::is_null(sis)) return;
+
+  Ioss::Region const&                bare_region = *(mesh_data->get_input_ioss_region());
+  Ioss::ElementBlockContainer const& elem_blocks = bare_region.get_element_blocks();
+
+  // A state lives on one element block, which need not be the first, so look
+  // through all of them.
+  auto in_file = [&elem_blocks](std::string const& name) {
+    for (auto const* block : elem_blocks)
+      if (block->field_exists(name)) return true;
+    return false;
+  };
+
+  // "Restart Fields" restricts what is restored; unset means restore
+  // everything the file has. Restoring nothing but the solution -- the old
+  // default -- silently dropped the entire material state (stress, plastic
+  // strain, ice saturation, ...) and restarted from a fresh initialization,
+  // which is not a restart in any useful sense.
+  bool const                  restrict_fields = params->isParameter("Restart Fields");
+  Teuchos::Array<std::string> restart_fields;
+  if (restrict_fields) restart_fields = params->get<Teuchos::Array<std::string>>("Restart Fields");
+
+  for (std::size_t i = 0; i < sis->size(); i++) {
+    Albany::StateStruct& st = *((*sis)[i]);
+    if (st.restartDataAvailable) continue;
+    if (!in_file(st.name)) continue;
+    if (restrict_fields) {
+      bool listed = false;
+      for (std::size_t j = 0; j < restart_fields.size(); j++)
+        if (iequals(st.name, restart_fields[j])) {
+          listed = true;
+          break;
+        }
+      if (!listed) continue;
+    }
+    *out << "Restarting from field \"" << st.name << "\" found in exodus file." << std::endl;
+    st.restartDataAvailable = true;
+  }
+
+  // Every state the model reads back as "_old" is part of the state being
+  // continued. If one of them is not in the file, the restart silently
+  // continues from that state's initialization value instead -- for an
+  // eroding J2 model that means the plastic and failure history is thrown
+  // away, and the run keeps going and looks plausible. Refuse instead, and
+  // name what is missing. An explicit "Restart Fields" is taken as the user
+  // deliberately restarting a subset, so it turns the check off.
+  if (restrict_fields) return;
+
+  std::vector<std::string> missing;
+  for (std::size_t i = 0; i < sis->size(); i++) {
+    Albany::StateStruct const& st = *((*sis)[i]);
+    if (!st.saveOldState) continue;
+    if (st.restartDataAvailable) continue;
+    bool const on_elements = st.entity == Albany::StateStruct::QuadPoint ||
+                             st.entity == Albany::StateStruct::ElemData ||
+                             st.entity == Albany::StateStruct::ElemNode;
+    if (!on_elements) continue;
+    if (std::find(missing.begin(), missing.end(), st.name) == missing.end()) missing.push_back(st.name);
+  }
+
+  if (!missing.empty()) {
+    std::ostringstream msg;
+    msg << "Restart from \"" << params->get<std::string>("Exodus Input File Name", "<input file>")
+        << "\" is incomplete. These states are read back by the model each step but are\n"
+        << "not in the file, so the restart would continue from their initialization\n"
+        << "values rather than from the state being continued:\n";
+    for (auto const& name : missing) msg << "    " << name << "\n";
+    msg << "Re-run the case that produces the restart file with\n"
+        << "    Problem:\n"
+        << "      Restartable Output: true\n"
+        << "(or request each of the states above for output individually in the material\n"
+        << "database). To restart from a subset on purpose, list the fields explicitly in\n"
+        << "the Discretization sublist as \"Restart Fields\", which disables this check.\n";
+    ALBANY_ABORT(msg.str());
+  }
 }
 
 double

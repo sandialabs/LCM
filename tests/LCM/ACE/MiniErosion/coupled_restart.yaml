@@ -1,0 +1,23 @@
+# Restart test, part 2: continue the reference run from its tenth
+# frame (t = 4050 s, Exodus index 10 -- indices are 1-based) and
+# run out to the same final time. The final state must match the
+# reference run's, which it only can if the restart restores the
+# solution, its time derivatives AND the whole element state
+# (stress, plastic strain, failure history, thermal state).
+LCM:
+  Alternating System:
+    Model Input Files: ['thermal_restart.yaml', 'mechanical_restart.yaml']
+    Initial Time: 4050.0 # [sec] restart frame (Exodus index 10)
+    Final Time: 9000.0 #  [sec] (full run: 64800.0)
+    Initial Time Step: 450.0 # [sec]
+    Maximum Steps: 10000
+    Minimum Time Step: 1.0e-04 # [sec]
+    Maximum Time Step: 450.0 # [sec]
+    Reduction Factor: 0.5
+    Amplification Factor: 1.1
+    Exodus Write Interval: 1
+    Exodus ACE Output File Initial Index: 0
+  Problem:
+    Solution Method: ACE Sequential Thermo-Mechanical
+    Phalanx Graph Visualization Detail: 0
+...

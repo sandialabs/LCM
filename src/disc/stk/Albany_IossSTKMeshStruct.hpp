@@ -63,6 +63,13 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
       const Teuchos::RCP<Teuchos::ParameterList>&  params,
       const Teuchos::RCP<Albany::StateInfoStruct>& sis) override;
 
+  //! Mark, in sis, the states whose values were read from the restart file
+  //! so that state initialization does not overwrite them. Called by
+  //! commitAndPopulate for the first Application; an orchestrator that
+  //! shares one mesh among several Applications must call it for the rest.
+  void
+  markRestartStates(const Teuchos::RCP<Albany::StateInfoStruct>& sis);
+
   int
   getSolutionFieldHistoryDepth() const
   {
@@ -74,9 +81,17 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
   loadSolutionFieldHistory(int step);
 
   //! Flag if solution has a restart values -- used in Init Cond
+  //! A borrowing instance never opens the Exodus file itself: the donor
+  //! reads it, and reads it once for everyone, in commitAndPopulate --
+  //! which runs AFTER this instance is constructed. So defer to the donor
+  //! rather than caching its answer at construction time, when the donor
+  //! has not read the file yet. Without this a borrowing subdomain reports
+  //! "no restart solution" and its initial condition overwrites the
+  //! solution just read from the restart file.
   bool
   hasRestartSolution() const
   {
+    if (Teuchos::nonnull(donor_for_borrowed_)) return donor_for_borrowed_->hasRestartSolution();
     return m_hasRestartSolution;
   }
 
@@ -84,6 +99,7 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
   double
   restartDataTime() const
   {
+    if (Teuchos::nonnull(donor_for_borrowed_)) return donor_for_borrowed_->restartDataTime();
     return m_restartDataTime;
   }
 

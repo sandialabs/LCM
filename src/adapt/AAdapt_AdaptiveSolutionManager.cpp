@@ -99,7 +99,7 @@ AdaptiveSolutionManager::AdaptiveSolutionManager(
       cas_manager->scatter(current_soln->col(2), overlapped_soln->col(2), Albany::CombineMode::INSERT);
       InitialConditions(
           overlapped_soln->col(2), wsElNodeEqID, wsEBNames, coords, neq, numDim, pbParams->sublist("Initial Condition DotDot"), disc_->hasRestartSolution());
-      cas_manager->combine(overlapped_soln->col(1), current_soln->col(1), Albany::CombineMode::INSERT);
+      cas_manager->combine(overlapped_soln->col(2), current_soln->col(2), Albany::CombineMode::INSERT);
     }
   }
 }
@@ -193,6 +193,17 @@ AdaptiveSolutionManager::resizeMeshDataArrays(const Teuchos::RCP<const Albany::A
   overlapped_soln = Thyra::createMembers(overlapped_vs, num_time_deriv + 1);
   overlapped_f    = Thyra::createMember(overlapped_vs);
   overlapped_jac  = disc->createOverlapJacobianOp();
+
+  // Start from zero rather than from whatever the allocator handed us. Not
+  // every entry is guaranteed to be written afterwards: scattering the owned
+  // solution reaches only the DOFs the owned space still contains, and DBC
+  // elimination removes the constrained ones from it, so those entries stay
+  // at their initial value. InitialConditions used to cover them, but it
+  // returns immediately on a restart -- which left uninitialized memory in
+  // the overlap vector, and from there in the first Exodus frame of every
+  // restarted run.
+  overlapped_soln->assign(0.0);
+  overlapped_f->assign(0.0);
 
   // This call allocates the non-overlapped MV
   current_soln = disc_->getSolutionMV();

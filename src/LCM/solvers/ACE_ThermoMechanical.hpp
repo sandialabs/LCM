@@ -304,6 +304,11 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   // enableStaticInitSolve.
   bool static_equilibrium_init_{false};
 
+  //! True when the mesh was populated from a restart file, so the solution,
+  //! its time derivatives and the element states all carry real values and
+  //! must not be re-derived from scratch. Set in createPersistentApps.
+  bool restarted_{false};
+
   enum PROB_TYPE
   {
     THERMAL,

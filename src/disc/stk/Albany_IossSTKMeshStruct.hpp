@@ -63,6 +63,14 @@ class IossSTKMeshStruct : public GenericSTKMeshStruct
       const Teuchos::RCP<Teuchos::ParameterList>&  params,
       const Teuchos::RCP<Albany::StateInfoStruct>& sis) override;
 
+  //! Re-read every declared input field at the given (1-based) Exodus time
+  //! index. Used by the restart death-history replay to step the cell_death
+  //! field through the frames before the restart frame; note it re-reads ALL
+  //! fields, so the caller must re-read the restart frame afterwards to
+  //! restore the full state.
+  void
+  readInputFieldsAtIndex(int index);
+
   //! Mark, in sis, the states whose values were read from the restart file
   //! so that state initialization does not overwrite them. Called by
   //! commitAndPopulate for the first Application; an orchestrator that

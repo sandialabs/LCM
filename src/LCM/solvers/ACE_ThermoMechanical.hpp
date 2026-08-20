@@ -287,6 +287,14 @@ class ACEThermoMechanical : public Thyra::ResponseOnlyModelEvaluatorBase<ST>
   //! stop in the time loop.
   long long countActiveElements() const;
 
+  //! Rebuild every subdomain's parallel state after a shared-mesh topology
+  //! change: discretization maps/graph, DBC elimination, solution-manager
+  //! comms, warm-start vectors migrated through STK, and the Piro solver +
+  //! model evaluator stack. Used between time steps when element death
+  //! changed the topology, and at the start of a RESTARTED run to replay the
+  //! restored death set (see the restart block in ThermoMechanicalLoopDynamics).
+  void rebuildAfterTopologyChangeAll() const;
+
   mutable std::vector<bool> do_outputs_;
   mutable std::vector<bool> do_outputs_init_;
 

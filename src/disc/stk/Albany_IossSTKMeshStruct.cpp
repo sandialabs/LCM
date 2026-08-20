@@ -609,6 +609,13 @@ Albany::IossSTKMeshStruct::commitAndPopulate(
 }
 
 void
+Albany::IossSTKMeshStruct::readInputFieldsAtIndex(int index)
+{
+  std::vector<stk::io::MeshField> missing;
+  mesh_data->read_defined_input_fields(index, &missing);
+}
+
+void
 Albany::IossSTKMeshStruct::markRestartStates(const Teuchos::RCP<Albany::StateInfoStruct>& sis)
 {
   // Tell the StateManager which of these states already hold their restart

@@ -701,6 +701,69 @@ ACEThermoMechanical::createPersistentApps()
   }
 }
 
+void
+ACEThermoMechanical::rebuildAfterTopologyChangeAll() const
+{
+    for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
+      auto& app      = *apps_[subdomain];
+      auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discs_[subdomain]);
+
+      // 1: rebuild discretization maps/graph (full size). This mirrors the
+      // updateMesh() that finalizePostCommit runs at construction.
+      stk_disc.rebuildAfterTopologyChange();
+
+      // 1b: re-apply DBC DOF elimination, mirroring the eliminateConstrainedDOFs
+      // that finalizePostCommit runs right after updateMesh. rebuildAfterTopologyChange
+      // leaves the owned vector space FULL; without re-reducing it the mechanical
+      // system loses its Dirichlet constraints (the owned map jumps from the
+      // reduced size back to full), becomes singular, and the next solve blows up.
+      app.eliminateConstrainedDOFs();
+
+      // 2: rebuild the solution manager's comms from the (now reduced) maps.
+      app.getAdaptSolMgr()->resizeMeshDataArraysAfterTopologyChange();
+
+      // Migrate the warm-start state onto the rebuilt owned map via STK.
+      // Capture BEFORE the solver rebuild so the model-evaluator construction
+      // cannot perturb the STK solution field underneath the read.
+      auto      x_mv  = stk_disc.getSolutionMV();
+      int const ncols = x_mv->domain()->dim();
+
+      this_x_[subdomain] = Thyra::createMember(x_mv->col(0)->space());
+      Thyra::copy(*x_mv->col(0), this_x_[subdomain].ptr());
+      if (ncols > 1) {
+        this_xdot_[subdomain] = Thyra::createMember(x_mv->col(1)->space());
+        Thyra::copy(*x_mv->col(1), this_xdot_[subdomain].ptr());
+      }
+      if (ncols > 2) {
+        this_xdotdot_[subdomain] = Thyra::createMember(x_mv->col(2)->space());
+        Thyra::copy(*x_mv->col(2), this_xdotdot_[subdomain].ptr());
+      }
+
+      // 3: rebuild the Piro solver + model evaluator around the existing app
+      // (createAlbanyApp = false), so their operators match the new map.
+      solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(init_pls_[subdomain], comm_));
+      Teuchos::RCP<Albany::Application> app_ref = apps_[subdomain];
+      solvers_[subdomain]          = solver_factories_[subdomain]->createAndGetAlbanyApp(
+          app_ref, comm_, comm_, Teuchos::null, /*createAlbanyApp=*/false);
+      model_evaluators_[subdomain] = solver_factories_[subdomain]->returnModel();
+
+      auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
+
+      // Refresh the handoff the next solve warm-starts from (nominal values
+      // for the trapezoid path; setX/Xdot/Xdotdot on the app), now on the
+      // rebuilt map.
+      auto nv = me.getNominalValues();
+      nv.set_x(this_x_[subdomain]);
+      if (ncols > 1) nv.set_x_dot(this_xdot_[subdomain]);
+      me.setNominalValues(nv);
+      app.setX(this_x_[subdomain]);
+      if (ncols > 1) app.setXdot(this_xdot_[subdomain]);
+      if (ncols > 2) app.setXdotdot(this_xdotdot_[subdomain]);
+
+      app.clearTopologyChanged();
+    }
+}
+
 bool
 ACEThermoMechanical::continueSolve() const
 {
@@ -733,6 +796,64 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
   }
   int stop{0};
   ST  current_time{initial_time_};
+
+  // Restarted run: replay the restored death set structurally before anything
+  // else. The Exodus file carries cell_death but not the death SURGERY: parts
+  // (activePart/deadCellsPart), the erodible node and side sets that track the
+  // erosion front (and carry the ocean DBCs and wave-pressure NBCs), and the
+  // reduced maps are all in-memory state, so after a restart every historical
+  // dead cell is structurally alive and the boundary conditions act on the
+  // ORIGINAL surface. Run the surgery for the whole restored set now and
+  // rebuild through the same path used between steps, so the first solve sees
+  // the discretization the run being continued actually had. Without this, a
+  // restart from any frame after the first death follows a different
+  // trajectory (issue #119: stale erodible sets, step-cut cascades, and a
+  // different erosion outcome).
+  if (restarted_ == true) {
+    int mech_sub0 = -1;
+    for (auto s = 0; s < num_subdomains_; ++s)
+      if (prob_types_[s] == MECHANICAL) mech_sub0 = s;
+    auto ioss_mesh = Teuchos::rcp_dynamic_cast<Albany::IossSTKMeshStruct>(stk_mesh_structs_[0]);
+    if (mech_sub0 >= 0 && Teuchos::nonnull(ioss_mesh)) {
+      // The erodible side and node sets are painted INCREMENTALLY, at each
+      // death event's dying-live interface, so they are a function of the
+      // death SEQUENCE, not of the final death set: killing the whole
+      // restored set at once paints only the final dead-live surface and
+      // misses the faces painted at earlier events. The sequence is in the
+      // restart file: cell_death at each frame. Replay it frame by frame --
+      // each frame's increment is exactly the set the run being continued
+      // committed at that stop (already throttled there, ranked by the
+      // restored failure_state measures, and applyDeathToActivePart skips
+      // cells that already left activePart, so the replay is idempotent and
+      // throttle-safe). Then re-read the restart frame, since the walk
+      // clobbered every field with intermediate states.
+      int const restart_index = init_pls_[0]->sublist("Discretization").get<int>("Restart Index", -1);
+      if (restart_index > 1) {
+        *fos_ << "ACE: restart death-history replay over frames 1-" << restart_index << ".\n";
+        for (int frame = 1; frame <= restart_index; ++frame) {
+          ioss_mesh->readInputFieldsAtIndex(frame);
+          populateDeathStatus(mech_sub0);
+          apps_[mech_sub0]->applyDeathToActivePart();
+        }
+        ioss_mesh->readInputFieldsAtIndex(restart_index);
+      } else {
+        // No index to walk (e.g. Restart Time): fall back to committing the
+        // restored death set in one batch. Correct dead-live interface, but
+        // an erodible-set painting history spanning several death events is
+        // not reproduced.
+        populateDeathStatus(mech_sub0);
+        apps_[mech_sub0]->applyDeathToActivePart();
+      }
+      populateDeathStatus(mech_sub0);
+      bool topo_changed = false;
+      for (auto s = 0; s < num_subdomains_; ++s)
+        if (apps_[s]->topologyChanged()) topo_changed = true;
+      if (topo_changed == true) {
+        *fos_ << "ACE: restart carries dead cells; replaying death surgery before the first step.\n";
+        rebuildAfterTopologyChangeAll();
+      }
+    }
+  }
 
   // Emit the initial state as the first output frame, stamped t = initial_time_.
   // The time loop otherwise writes each frame at the END of its step
@@ -1087,64 +1208,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       }
     }
     if (topo_changed == true) {
-      for (auto subdomain = 0; subdomain < num_subdomains_; ++subdomain) {
-        auto& app      = *apps_[subdomain];
-        auto& stk_disc = static_cast<Albany::STKDiscretization&>(*discs_[subdomain]);
-
-        // 1: rebuild discretization maps/graph (full size). This mirrors the
-        // updateMesh() that finalizePostCommit runs at construction.
-        stk_disc.rebuildAfterTopologyChange();
-
-        // 1b: re-apply DBC DOF elimination, mirroring the eliminateConstrainedDOFs
-        // that finalizePostCommit runs right after updateMesh. rebuildAfterTopologyChange
-        // leaves the owned vector space FULL; without re-reducing it the mechanical
-        // system loses its Dirichlet constraints (the owned map jumps from the
-        // reduced size back to full), becomes singular, and the next solve blows up.
-        app.eliminateConstrainedDOFs();
-
-        // 2: rebuild the solution manager's comms from the (now reduced) maps.
-        app.getAdaptSolMgr()->resizeMeshDataArraysAfterTopologyChange();
-
-        // Migrate the warm-start state onto the rebuilt owned map via STK.
-        // Capture BEFORE the solver rebuild so the model-evaluator construction
-        // cannot perturb the STK solution field underneath the read.
-        auto      x_mv  = stk_disc.getSolutionMV();
-        int const ncols = x_mv->domain()->dim();
-
-        this_x_[subdomain] = Thyra::createMember(x_mv->col(0)->space());
-        Thyra::copy(*x_mv->col(0), this_x_[subdomain].ptr());
-        if (ncols > 1) {
-          this_xdot_[subdomain] = Thyra::createMember(x_mv->col(1)->space());
-          Thyra::copy(*x_mv->col(1), this_xdot_[subdomain].ptr());
-        }
-        if (ncols > 2) {
-          this_xdotdot_[subdomain] = Thyra::createMember(x_mv->col(2)->space());
-          Thyra::copy(*x_mv->col(2), this_xdotdot_[subdomain].ptr());
-        }
-
-        // 3: rebuild the Piro solver + model evaluator around the existing app
-        // (createAlbanyApp = false), so their operators match the new map.
-        solver_factories_[subdomain] = Teuchos::rcp(new Albany::SolverFactory(init_pls_[subdomain], comm_));
-        Teuchos::RCP<Albany::Application> app_ref = apps_[subdomain];
-        solvers_[subdomain]          = solver_factories_[subdomain]->createAndGetAlbanyApp(
-            app_ref, comm_, comm_, Teuchos::null, /*createAlbanyApp=*/false);
-        model_evaluators_[subdomain] = solver_factories_[subdomain]->returnModel();
-
-        auto& me = dynamic_cast<Albany::ModelEvaluator&>(*model_evaluators_[subdomain]);
-
-        // Refresh the handoff the next solve warm-starts from (nominal values
-        // for the trapezoid path; setX/Xdot/Xdotdot on the app), now on the
-        // rebuilt map.
-        auto nv = me.getNominalValues();
-        nv.set_x(this_x_[subdomain]);
-        if (ncols > 1) nv.set_x_dot(this_xdot_[subdomain]);
-        me.setNominalValues(nv);
-        app.setX(this_x_[subdomain]);
-        if (ncols > 1) app.setXdot(this_xdot_[subdomain]);
-        if (ncols > 2) app.setXdotdot(this_xdotdot_[subdomain]);
-
-        app.clearTopologyChanged();
-      }
+      rebuildAfterTopologyChangeAll();
     }
 
     // Update IC vecs

@@ -1,0 +1,23 @@
+# Restart test, part 3: continue the reference run from frame 15
+# (t = 6300 s), AFTER erosion has begun (24 cells dead across three
+# death events). On top of what part 2 checks, this exercises the
+# restart death-history replay: the death surgery, the erodible node
+# and side sets that carry the ocean DBCs, and the rebuilt maps must
+# all be reconstructed from the file's frame sequence (issue #119).
+LCM:
+  Alternating System:
+    Model Input Files: ['thermal_restart_pd.yaml', 'mechanical_restart_pd.yaml']
+    Initial Time: 6300.0 # [sec] post-death restart frame (Exodus index 15)
+    Final Time: 9000.0 #  [sec] (full run: 64800.0)
+    Initial Time Step: 450.0 # [sec]
+    Maximum Steps: 10000
+    Minimum Time Step: 1.0e-04 # [sec]
+    Maximum Time Step: 450.0 # [sec]
+    Reduction Factor: 0.5
+    Amplification Factor: 1.1
+    Exodus Write Interval: 1
+    Exodus ACE Output File Initial Index: 0
+  Problem:
+    Solution Method: ACE Sequential Thermo-Mechanical
+    Phalanx Graph Visualization Detail: 0
+...

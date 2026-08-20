@@ -44,6 +44,12 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_restart.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/thermal_restart.yaml COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_restart.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/mechanical_restart.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_restart_pd.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/coupled_restart_pd.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/thermal_restart_pd.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/thermal_restart_pd.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_restart_pd.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_restart_pd.yaml COPYONLY)
 
 # Name the test with the directory name
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -125,4 +131,21 @@ add_test(
 set_tests_properties(ACE_${testName}_Denudation_Restart_np4
                      PROPERTIES LABELS "LCM;Tpetra;Forward"
                                 PROCESSORS ${MPIMNP}
+                                RESOURCE_LOCK ACE_${testName}_workdir)
+
+# Restart test from a POST-death frame: same self-comparing structure, restart
+# point after the first three death events. Exercises the restart
+# death-history replay (frame-walked death surgery, erodible-set painting,
+# post-surgery rebuild); see issue #119. Restarting before any death (the
+# tests above) does not cover any of that machinery.
+add_test(
+  NAME ACE_${testName}_Denudation_Restart_PostDeath
+  COMMAND
+  ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=denudation
+    -DBASE_ARGS=coupled_restart_base.yaml -DRESTART_ARGS=coupled_restart_pd.yaml
+    -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DBASE_FILENAME=restart_base.e -DRESTART_FILENAME=restart_pd.e -P
+    ${runtest_restart.cmake})
+set_tests_properties(ACE_${testName}_Denudation_Restart_PostDeath
+                     PROPERTIES LABELS "LCM;Tpetra;Forward"
                                 RESOURCE_LOCK ACE_${testName}_workdir)

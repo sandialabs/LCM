@@ -41,8 +41,9 @@ with the materials file jinja-templated for calibration.
 ## Environment
 
 Setup is a one-time task done outside the repo (Miniforge + a `matcal` conda
-env with Python 3.12 + Dakota 6.24). The env's activate hook puts this
-directory on `PYTHONPATH`, so:
+env with Python 3.12 + Dakota 6.24). The full, reproducible bring-up for each
+platform is in **[`docs/SETUP.md`](docs/SETUP.md)**. Once done, the env's
+activate hook puts this directory on `PYTHONPATH`, so:
 
 ```bash
 source ~/miniforge3/etc/profile.d/conda.sh
@@ -86,34 +87,38 @@ elastic_modulus poissons_ratio`. Anything not calibrated keeps its
 
 Platform specifics (Albany path, environment) live in `site_matcal/platforms.py`.
 
-| Platform | Status | Albany | Environment |
-|----------|--------|--------|-------------|
-| `rigel`  | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | none (serial build resolves Trilinos via RUNPATH) |
-| `cee`    | **stub** | TODO | TODO |
+| Platform | Status | Albany | Dakota | Environment |
+|----------|--------|--------|--------|-------------|
+| `rigel`  | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `~/dakota/6.24.0` (downloaded) | none (serial build resolves Trilinos via RUNPATH) |
+| `cee` (hpws\*) | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `/projects/dakota/install/rhel8/6.24.0` (on disk) | none (serial build resolves Trilinos via RUNPATH) |
+
+Full environment bring-up (Miniforge, conda env, MatCal, Dakota, activate hook)
+for both platforms is documented in [`docs/SETUP.md`](docs/SETUP.md). MatCal is
+installed via conda+pip on both — the CEE `matcal` module is not used (it is
+pinned to the older rhel8 analyst stack; see `docs/SETUP.md`).
 
 Selection: `$LCM_MATCAL_PLATFORM` → hostname match → local default (rigel).
 Override just the executable with `$LCM_ALBANY`.
 
-### Adding the CEE platform (next)
+### Adding another platform
 
-In `site_matcal/platforms.py`, fill in the `CEE` entry:
+Both rigel and CEE are set up (see `docs/SETUP.md`). To add a new platform, add
+a `Platform` entry in `site_matcal/platforms.py`:
 
-1. **Albany** — set `albany` to the CEE build/install path, or leave it as
-   `"Albany"` and arrange for a module to put it on `PATH` (then `$LCM_ALBANY`
-   still overrides).
-2. **Environment** — if CEE needs extra library paths, add them to `env`
-   (applied to the Albany subprocess via `Platform.apply_env`). If CEE needs
-   `module load` commands, prefer a small wrapper script as the executable
-   (`albany="/path/to/run_albany_cee.sh"` that does the module loads then
-   `exec Albany "$@"`), so the loads happen in the subprocess.
-3. **Hostnames** — the `hostnames` tuple already lists common CEE hosts for
-   auto-detection; adjust as needed.
-4. **HPC queue** — to submit models through the scheduler rather than running
-   on the login/compute node, call `model.run_in_queue(...)` (MatCal) and
-   register the computing-platform factories; out of scope for this scaffold.
+1. **Albany** — set `albany` to the build/install path (or leave a name and rely
+   on `$LCM_ALBANY` / PATH).
+2. **Environment** — if the platform needs extra library paths at run time, add
+   them to `env` (applied to the Albany subprocess via `Platform.apply_env`). If
+   it needs `module load` commands, prefer a small wrapper script as the
+   executable (`albany="/path/to/run_albany.sh"` that does the loads then
+   `exec Albany "$@"`).
+3. **Hostnames** — add substrings to the `hostnames` tuple for auto-detection
+   (or force with `$LCM_MATCAL_PLATFORM`).
+4. **HPC queue** — to submit models through a scheduler, call
+   `model.run_in_queue(...)` and register the computing-platform factories; out
+   of scope here.
 
-Nothing else should need to change — the model, harness, and readers are
-platform-agnostic.
+Nothing else changes — the model, harness, and readers are platform-agnostic.
 
 ## Notes / gotchas
 

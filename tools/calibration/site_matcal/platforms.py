@@ -69,18 +69,21 @@ RIGEL = Platform(
     hostnames=("rigel",),
 )
 
-# --- cee (SRN CEE LAN) -- STUB, fill in when we move there ------------------
-# TODO(cee): set `albany` to the CEE Albany build/install path (or leave as
-# "Albany" and rely on $LCM_ALBANY / a module that puts it on PATH), and add
-# any required environment setup to `env` (e.g. extra LD_LIBRARY_PATH entries).
-# If CEE needs `module load` commands rather than plain env vars, prefer a
-# small wrapper script as the executable, or register a MatCal executable
-# environment setup -- see README "Adding a platform (CEE)".
+# --- cee (SRN CEE LAN workstations, e.g. hpws*) -----------------------------
+# The LCM Albany serial build lives at the same ~/LCM/... path as on rigel.
+# Dakota is provided by the on-disk CEE install /projects/dakota/install/rhel8/
+# 6.24.0 (cpython-312 bindings) and is wired via the conda env's activate hook
+# (DAKOTA_ROOT), not here. env is empty because the serial Albany build
+# resolves its Trilinos libraries via RUNPATH; if a freshly built CEE Albany
+# turns out to need runtime module libraries, add them to `env` (or use a
+# module-load wrapper script as the executable) -- see README
+# "Adding a platform (CEE)". matcal itself is installed via conda+pip (the CEE
+# matcal module is pinned to the older rhel8 analyst stack); see docs/SETUP.md.
 CEE = Platform(
     name="cee",
-    albany=os.environ.get("LCM_ALBANY", "Albany"),
-    env={},                    # TODO(cee): CEE-specific environment
-    hostnames=("cee", "skybridge", "ghost", "eclipse", "attaway", "solo"),
+    albany="~/LCM/lcm-build-serial-gcc-release/src/Albany",
+    env={},                    # serial build; Trilinos libs via RUNPATH
+    hostnames=("hpws", "hpv", "cee", "skybridge", "ghost", "eclipse", "attaway", "solo"),
 )
 
 _PLATFORMS = {p.name: p for p in (RIGEL, CEE)}

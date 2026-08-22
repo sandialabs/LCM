@@ -1,0 +1,34 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: CapModel
+  Materials:
+    # Cap plasticity material for calibration. Every calibratable value is a
+    # jinja placeholder ({{ name }}); MatCal renders this file in each
+    # evaluation working directory, substituting study parameters (highest
+    # precedence) and model constants (the defaults in site_matcal.lcm_model,
+    # e.g. the Salem-limestone set of Sun, Chen & Ostien 2014). Units: MPa.
+    CapModel:
+      Material Model:
+        Model Name: Cap
+      # Small-strain model: routes MechanicsProblem to compute the
+      # infinitesimal Strain field the kernel consumes.
+      Finite Deformation: false
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: {{ elastic_modulus }}}
+      Poissons Ratio: {Poissons Ratio Type: Constant, Value: {{ poissons_ratio }}}
+      A: {{ A }}
+      D: {{ D }}
+      C: {{ C }}
+      theta: {{ theta }}
+      R: {{ R }}
+      kappa0: {{ kappa0 }}
+      W: {{ W }}
+      D1: {{ D1 }}
+      D2: {{ D2 }}
+      calpha: {{ calpha }}
+      psi: {{ psi }}
+      N: {{ N }}
+      L: {{ L }}
+      phi: {{ phi }}
+      Q: {{ Q }}
+

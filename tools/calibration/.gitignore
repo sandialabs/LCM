@@ -1,0 +1,22 @@
+# MatCal / Dakota study run artifacts
+matcal_workdir.*/
+matcal_template/
+matcal_batch_restart.csv
+reference_run*/
+calibration_run/
+dakota.in
+dakota.out
+dakota.err
+dakota.rst
+dakota_tabular.dat
+*.joblib
+Best_Material_*.inc
+# generated reference "experiments"
+*_reference.csv
+# LCM/Albany outputs
+*.exo
+*.e
+*.g
+# Python
+__pycache__/
+*.pyc

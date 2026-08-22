@@ -1,0 +1,33 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: CapModelTriaxial
+  Materials:
+    # Triaxial calibration material. Same jinja placeholders as materials.yaml
+    # (one physical parameter set drives every load path), but the block maps
+    # to CapModelTriaxial to match input_triaxial.yaml. With psi<1, theta!=0
+    # and L/phi/Q distinct from D/theta/R the Lode-angle and non-associative
+    # terms are active, so the triaxial response constrains A, C, theta, psi,
+    # L, phi, Q. Units: MPa.
+    CapModelTriaxial:
+      Material Model:
+        Model Name: Cap
+      Finite Deformation: false
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: {{ elastic_modulus }}}
+      Poissons Ratio: {Poissons Ratio Type: Constant, Value: {{ poissons_ratio }}}
+      A: {{ A }}
+      D: {{ D }}
+      C: {{ C }}
+      theta: {{ theta }}
+      R: {{ R }}
+      kappa0: {{ kappa0 }}
+      W: {{ W }}
+      D1: {{ D1 }}
+      D2: {{ D2 }}
+      calpha: {{ calpha }}
+      psi: {{ psi }}
+      N: {{ N }}
+      L: {{ L }}
+      phi: {{ phi }}
+      Q: {{ Q }}
+

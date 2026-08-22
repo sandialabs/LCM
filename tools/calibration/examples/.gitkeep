@@ -1,0 +1,3 @@
+Reference CSVs and MatCal/Dakota run artifacts are written here by
+`harness/calibrate.py make-reference` and `... calibrate`. They are
+git-ignored (regenerable); see ../README.md.

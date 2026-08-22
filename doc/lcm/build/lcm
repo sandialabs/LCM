@@ -96,6 +96,11 @@ case "$HN" in
         export MPI_BIN="$(dirname "$(which mpicc)")"
         export MPI_INC="${MPI_BIN}/../include"
         export MPI_LIB="${MPI_BIN}/../lib"
+        # The AUE cmake/ctest are found via PATH, but the 'module purge' in
+        # load_module removes every copy of this dir from PATH; remember it so
+        # load_module can re-prepend it (otherwise ctest falls back to the
+        # system /usr/bin/cmake, which is too old for Trilinos).
+        export AUE_CMAKE_BIN="$(dirname "$(which cmake)")"
         # Concrete TPL paths (survive the later 'module purge').
         export BOOST_INC="$BOOST_ROOT/include"
         export BOOST_LIB="$BOOST_ROOT/lib"
@@ -222,6 +227,12 @@ validate_package() {
 load_module() {
     module purge 2>/dev/null || true
     module load "$MODULE_NAME"
+    # 'module purge' above strips the AUE cmake/ctest dir from PATH; put it
+    # back so ctest configures with the AUE cmake (>=3.27) rather than the
+    # system one (see the CEE toolchain block above).
+    if [ -n "${AUE_CMAKE_BIN:-}" ]; then
+        export PATH="$AUE_CMAKE_BIN:$PATH"
+    fi
     echo "Module:      $MODULE_NAME"
     echo "LCM_DIR:     $LCM_DIR"
     echo "ARCH:        ${ARCH:-unset}"

@@ -182,14 +182,18 @@ Nothing else changes — the model, harness, and readers are platform-agnostic.
 
 ## Verification status
 
-rigel:
+All three platforms, rerun 2026-08-25 after the switch to base SI. The full
+list below is the sirius run. rigel and cee (hpws00344) were rerun on the
+forward runs and the two single-parameter studies, and return **identical**
+values: the same `max|stress_zz|` on every load path to all printed digits, the
+same converged parameters, and the same Dakota convergence messages. Timings
+are the only thing that differs between machines.
 
-- MatCal → Albany → Exodus forward runs on all three load paths.
-- End-to-end Dakota `GradientCalibrationStudy` converges through the harness.
+sirius (Fedora 44, MatCal 1.4.28, Dakota 6.24.0):
 
-sirius (Fedora 44, MatCal 1.4.28, Dakota 6.24.0), rerun 2026-08-25 in base SI:
-
-- Forward runs on all three load paths (about 2.5 s each).
+- Forward runs on all three load paths (about 2.5 s each; `1.585615e+08`,
+  `3.094229e+08` and `2.265800e+08` Pa peak `stress_zz` for confined,
+  hydrostatic and triaxial).
 - **Unit invariance.** Each load path rerun with the original MPa parameter set
   reproduces the Pa run to a maximum relative difference of 3e-15 in
   `stress_zz` (confined 2.4e-15, hydrostatic 2.9e-15, triaxial 2.4e-15), which

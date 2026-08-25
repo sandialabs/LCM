@@ -126,10 +126,12 @@ export REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 # ahead of its own RUNPATH and segfaults at MPI finalize.
 export DAKOTA_ROOT=/projects/dakota/install/rhel8/6.24.0   # CEE
 export PATH="$DAKOTA_ROOT/bin:$PATH"
-export PYTHONPATH="$DAKOTA_ROOT/share/dakota/Python:$PYTHONPATH"
+# Default PYTHONPATH to empty: it is usually unset, and an unguarded $PYTHONPATH
+# aborts the hook (and so the whole `conda activate`) under `set -u`.
+export PYTHONPATH="$DAKOTA_ROOT/share/dakota/Python:${PYTHONPATH:-}"
 
 # --- site_matcal harness + platform selection ---
-export PYTHONPATH="${LCM_DIR:-$HOME/LCM}/LCM/tools/calibration:$PYTHONPATH"
+export PYTHONPATH="${LCM_DIR:-$HOME/LCM}/LCM/tools/calibration:${PYTHONPATH:-}"
 export LCM_MATCAL_PLATFORM=cee
 ```
 

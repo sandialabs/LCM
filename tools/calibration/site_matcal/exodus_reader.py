@@ -7,6 +7,9 @@ cap hardening parameter kappa, and the volumetric plastic strain) and returns
 them as a MatCal ``Data`` object keyed by field name, with ``time`` as the
 independent variable.
 
+Units are whatever the deck was run in, which for this harness is base SI:
+stresses come back in Pa (see ``site_matcal.lcm_model.SALEM_LIMESTONE``).
+
 MatCal calls a results-reader object as ``reader(file_path, file_type=None)``
 (see ``matcal.core.models._ResultsInformation.read``), which is exactly the
 signature of ``read_lcm_cap_exodus`` below. Register it on a model with

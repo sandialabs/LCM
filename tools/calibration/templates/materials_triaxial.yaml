@@ -8,7 +8,10 @@ LCM:
     # to CapModelTriaxial to match input_triaxial.yaml. With psi<1, theta!=0
     # and L/phi/Q distinct from D/theta/R the Lode-angle and non-associative
     # terms are active, so the triaxial response constrains A, C, theta, psi,
-    # L, phi, Q. Units: MPa.
+    # L, phi, Q.
+    #
+    # Units: base SI (stress in Pa, D/L/D1 in 1/Pa, D2 in 1/Pa^2), written in
+    # scientific notation rather than with prefixed units. See lcm_model.py.
     CapModelTriaxial:
       Material Model:
         Model Name: Cap

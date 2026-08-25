@@ -173,7 +173,18 @@ python calibrate.py calibrate --load-path confined --load-path hydrostatic \
 ```
 
 which returns `R: 28.0`, `W: 0.080000000001` (X-CONVERGENCE, 18 evaluations,
-about 28 s).
+about 28 s). Both of those parameters are dimensionless; add one stress-like
+parameter to check that base-SI bounds are being entered correctly (the harness
+is in Pa, see the README's "Units" section):
+
+```bash
+python calibrate.py calibrate --load-path hydrostatic \
+    --param kappa0:-2.0e7:-2.0e6:-1.2e7
+```
+
+which returns `kappa0: -8050000.0` (X-CONVERGENCE, ten evaluations, about 13
+s). A result stuck at a bound, or off by a clean factor of 1e6, means the
+bounds or the experimental data were given in MPa.
 
 ---
 
@@ -197,6 +208,11 @@ libraries, add them to the `cee` entry's `env` in `site_matcal/platforms.py`.
 
 ## Gotchas (all platforms)
 
+- **Base SI everywhere** - the harness is in Pa, with magnitudes in scientific
+  notation and no prefixed units (`2.2547e10`, not `22547` MPa). `--param`
+  bounds, `--set` overrides and the stress column of a `--data` file must match.
+  A curve supplied in MPa is not detected; it is simply fit by stress-like
+  parameters 1e6 too small. See the README's "Units" section.
 - **One Dakota study per Python process** — Dakota-as-a-library cannot run
   multiple studies in one interpreter (segfaults on the second). Separate
   calibrations = separate `python` invocations.

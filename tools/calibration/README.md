@@ -12,6 +12,37 @@ can be constrained against several load paths at once (hydrostatic, confined,
 triaxial), which is how the shear- and cap-surface parameters become
 identifiable.
 
+## Units
+
+Everything in this harness is in **base SI**, with magnitudes written in
+scientific notation rather than as prefixed units: stress in Pa (`2.2547e10`,
+not `22547` MPa), never kPa/MPa/GPa. That covers the `SALEM_LIMESTONE`
+defaults, the templated materials files, `--param` bounds and initial values,
+`--set` overrides, the stress column of any `--data` file, and the stresses the
+Exodus reader returns.
+
+| Dimension | Parameters |
+|-----------|------------|
+| stress, Pa | `A` `C` `N` `kappa0` `calpha` `elastic_modulus` |
+| 1/stress, 1/Pa | `D` `L` `D1` |
+| 1/stress^2, 1/Pa^2 | `D2` |
+| dimensionless | `poissons_ratio` `theta` `R` `W` `psi` `phi` `Q` |
+
+The cap model itself is unit-agnostic and only requires one consistent system,
+so this is a convention, not a constraint. It is chosen to match the ACE
+permafrost production decks, which are already in Pa and scientific notation
+(`tests/LCM/ACE/MiniErosionPermafrost/materials_mechanical_permafrost.yaml`:
+`A: 2.0e+06`, `kappa0: -1.0e+07`, `D1: 1.0e-08`): a parameter set calibrated
+here drops into one without rescaling. It does mean the values here differ from
+the MPa table of Sun, Chen & Ostien (2014) by the appropriate power of 1e6, and
+from the MPa verification decks in `tests/LCM/CapModelPlasticity3D` that these
+templates were copied from. The two agree to roundoff; see "Verification
+status".
+
+A curve supplied in MPa would be fit by stress-like parameters 1e6 too small,
+and would not be detected: the objective compares raw values. Convert the data,
+not the harness.
+
 ## Layout
 
 ```
@@ -67,21 +98,28 @@ python calibrate.py calibrate \
     --load-path confined --load-path hydrostatic \
     --param R:20:35 --param W:0.02:0.15 \
     --study gradient --core-limit 4
+
+# Stress-like parameters take base-SI bounds (Pa), e.g. the cap branch point:
+python calibrate.py calibrate --load-path hydrostatic \
+    --param kappa0:-2.0e7:-2.0e6:-1.2e7
 ```
 
 - `--param NAME:LO:HI[:INIT]` — repeatable; `NAME` must match a jinja
-  placeholder. `INIT` defaults to the Salem-limestone value.
+  placeholder. `INIT` defaults to the Salem-limestone value. Bounds are in base
+  SI (see "Units"): `A:5e8:8e8`, not `A:500:800`.
 - `--load-path` — repeatable; each becomes a MatCal evaluation set.
-- `--data LOADPATH:CSV` — real experimental data (columns `time,stress_zz`;
-  `time`∈[0,1] maps to applied strain for these decks). Defaults to
-  `examples/<load_path>_reference.csv`.
-- `--set NAME=VALUE` — override a fixed (non-calibrated) parameter default.
+- `--data LOADPATH:CSV` — real experimental data (columns `time,stress_zz`
+  with stress in Pa; `time`∈[0,1] maps to applied strain for these decks).
+  Defaults to `examples/<load_path>_reference.csv`.
+- `--set NAME=VALUE` — override a fixed (non-calibrated) parameter default,
+  in base SI.
 - `--platform rigel|sirius|cee` — force a platform (default: auto by hostname).
 - `--study gradient|scipy` — Dakota gradient (default) or SciPy.
 
 Calibratable placeholders: `A C R W D1 D2 kappa0 calpha N theta psi L phi Q D
-elastic_modulus poissons_ratio`. Anything not calibrated keeps its
-`SALEM_LIMESTONE` default (MatCal precedence: study params > model constants).
+elastic_modulus poissons_ratio` (dimensions in the table above). Anything not
+calibrated keeps its `SALEM_LIMESTONE` default (MatCal precedence: study params
+> model constants).
 
 ## Platforms
 
@@ -149,13 +187,33 @@ rigel:
 - MatCal → Albany → Exodus forward runs on all three load paths.
 - End-to-end Dakota `GradientCalibrationStudy` converges through the harness.
 
-sirius (Fedora 44, MatCal 1.4.28, Dakota 6.24.0, 2026-08-25):
+sirius (Fedora 44, MatCal 1.4.28, Dakota 6.24.0), rerun 2026-08-25 in base SI:
 
-- Forward runs on all three load paths (about 3 s each).
-- `GradientCalibrationStudy`, one parameter, one path: `R` recovered as
-  `28.000000001` from an initial 22 (ABSOLUTE FUNCTION CONVERGENCE, ten Albany
-  evaluations, 12 s).
+- Forward runs on all three load paths (about 2.5 s each).
+- **Unit invariance.** Each load path rerun with the original MPa parameter set
+  reproduces the Pa run to a maximum relative difference of 3e-15 in
+  `stress_zz` (confined 2.4e-15, hydrostatic 2.9e-15, triaxial 2.4e-15), which
+  is the roundoff floor. The model is unit-agnostic as documented: the drift
+  tolerance is scaled by `E^2` in `CapModel_Def.hpp` and the Newton test acts on
+  prescribed displacements, so nothing in the solve carries an absolute stress
+  scale.
+- `GradientCalibrationStudy`, one dimensionless parameter, one path: `R`
+  recovered as `28.000000001` from an initial 22 (ABSOLUTE FUNCTION
+  CONVERGENCE, ten Albany evaluations, 12 s).
+- `GradientCalibrationStudy`, one stress-like parameter, one path:
+  `kappa0 = -8050000.0` recovered exactly from an initial `-1.2e7` with bounds
+  `[-2.0e7, -2.0e6]` (X-CONVERGENCE, ten evaluations, 13 s). This is the case
+  the unit convention actually touches: Dakota normalizes each parameter onto
+  [0, 1] over its bounds, so a stress-like parameter is searched no differently
+  from a dimensionless one.
 - `GradientCalibrationStudy`, two parameters, two paths: `R = 28.0`,
   `W = 0.080000000001` from (22, 0.05) (X-CONVERGENCE, 18 evaluations, 28 s on
   four cores).
-- `ScipyMinimizeStudy` (`--study scipy`), one parameter: `R = 27.9934`.
+- `ScipyMinimizeStudy` (`--study scipy`), one parameter: `R = 27.995`.
+
+The gradient-study results are unchanged by the switch to Pa, as expected:
+`CurveBasedInterpolatedObjective` conditions each field onto a fixed range
+before differencing (MatCal's `RangeDataConditioner`), so the objective is
+dimensionless and Dakota's convergence path does not carry the stress scale
+either. The `--study scipy` value moves in the fourth digit only because that
+study stops at a much looser tolerance.

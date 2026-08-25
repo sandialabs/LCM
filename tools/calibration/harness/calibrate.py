@@ -21,6 +21,12 @@ Data files default to ``<out-dir>/<load_path>_reference.csv`` (columns
 time,<dependent field>). Point ``--data confined:/path/to/expt.csv`` at real
 measurements to calibrate against lab data.
 
+UNITS: base SI throughout -- stress in Pa, magnitudes in scientific notation,
+never prefixed units. That applies to --param bounds and initial values for
+stress-like parameters (A, C, N, kappa0, calpha, elastic_modulus in Pa; D, L,
+D1 in 1/Pa; D2 in 1/Pa^2), to --set overrides, and to the stress column of any
+--data file. R, W, psi, theta, phi, Q and poissons_ratio are dimensionless.
+
 Platform: auto-detected (rigel, sirius, cee); force with --platform or
 $LCM_MATCAL_PLATFORM. See the project README.
 
@@ -44,7 +50,11 @@ DEFAULT_OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(_
 
 
 def _parse_param(spec):
-    """NAME:LO:HI[:INIT] -> matcal.Parameter (INIT defaults to SALEM value)."""
+    """NAME:LO:HI[:INIT] -> matcal.Parameter (INIT defaults to SALEM value).
+
+    Bounds and INIT are in the harness's base-SI units (stress in Pa), matching
+    ``SALEM_LIMESTONE``; e.g. ``A:5e8:8e8`` rather than ``A:500:800``.
+    """
     parts = spec.split(":")
     if len(parts) not in (3, 4):
         raise argparse.ArgumentTypeError(
@@ -131,11 +141,14 @@ def main(argv=None):
     ap.add_argument("--load-path", action="append", dest="load_paths",
                     metavar="NAME", help="hydrostatic|confined|triaxial (repeatable)")
     ap.add_argument("--param", action="append", type=_parse_param, dest="params",
-                    default=[], metavar="NAME:LO:HI[:INIT]", help="calibrated parameter (repeatable)")
+                    default=[], metavar="NAME:LO:HI[:INIT]",
+                    help="calibrated parameter, base SI (repeatable)")
     ap.add_argument("--data", action="append", dest="data", default=[],
-                    metavar="LOADPATH:CSV", help="experimental data for a load path (repeatable)")
+                    metavar="LOADPATH:CSV",
+                    help="experimental data for a load path, stress in Pa (repeatable)")
     ap.add_argument("--set", action="append", type=_parse_kv, dest="defaults",
-                    default=[], metavar="NAME=VALUE", help="override a constant default (repeatable)")
+                    default=[], metavar="NAME=VALUE",
+                    help="override a constant default, base SI (repeatable)")
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
     ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)

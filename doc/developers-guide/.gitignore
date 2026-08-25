@@ -6,6 +6,8 @@
 *.lot
 *.lof
 *.dvi
+*.bbl
+*.blg
 missfont.log
 
 # getting-started is not distributed as a PDF

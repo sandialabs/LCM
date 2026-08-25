@@ -7,7 +7,11 @@ LCM:
     # jinja placeholder ({{ name }}); MatCal renders this file in each
     # evaluation working directory, substituting study parameters (highest
     # precedence) and model constants (the defaults in site_matcal.lcm_model,
-    # e.g. the Salem-limestone set of Sun, Chen & Ostien 2014). Units: MPa.
+    # e.g. the Salem-limestone set of Sun, Chen & Ostien 2014).
+    #
+    # Units: base SI. Stress-like values (A, C, N, kappa0, calpha, Elastic
+    # Modulus) are in Pa, D/L/D1 in 1/Pa, D2 in 1/Pa^2; magnitudes are written
+    # in scientific notation, never with prefixed units. See lcm_model.py.
     CapModel:
       Material Model:
         Model Name: Cap

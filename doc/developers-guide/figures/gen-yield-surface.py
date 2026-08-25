@@ -64,22 +64,23 @@ def surface(p, kappa=KAPPA0, n_i1=160, n_theta=120):
 
 
 def meridian(p, kappa=KAPPA0, n=400):
-    """Mean stress p=I1/3 and von Mises q=sqrt(3 J2) along the meridian (MPa)."""
+    """Mean stress p=I1/3 and von Mises q=sqrt(3 J2) along the meridian (Pa)."""
     I1 = np.linspace(X_of_kappa(kappa, p), apex_I1(p), n)
     ff = Ff(I1, p)
     X = X_of_kappa(kappa, p)
     fc = np.where(I1 < kappa, 1.0 - (I1 - kappa) ** 2 / (X - kappa) ** 2, 1.0)
     fc = np.clip(fc, 0.0, 1.0)
     sqrtJ2 = np.sqrt(fc) * np.clip(ff - p["N"], 0.0, None)
-    return I1 / 3.0 / 1e6, np.sqrt(3.0) * sqrtJ2 / 1e6
+    return I1 / 3.0, np.sqrt(3.0) * sqrtJ2
 
 
-MPA = 1e6
+# Base SI throughout: axes are in Pa, with magnitudes carried by matplotlib's
+# scientific-notation offset rather than by a prefixed unit (no MPa/GPa).
 fig = plt.figure(figsize=(11.0, 4.6))
 
 # --- (a) 3D frozen yield surface ------------------------------------------
 ax = fig.add_subplot(1, 2, 1, projection="3d")
-X1, X2, X3 = (a / MPA for a in surface(FROZEN))
+X1, X2, X3 = surface(FROZEN)
 ax.plot_surface(
     X1, X2, X3, rstride=2, cstride=2, color="#4c72b0", alpha=0.55,
     linewidth=0.0, antialiased=True, shade=True,
@@ -87,9 +88,13 @@ ax.plot_surface(
 # hydrostatic axis for reference
 lim = np.array([X1.min(), X1.max()])
 ax.plot(lim, lim, lim, color="0.35", lw=1.0, ls="--")
-ax.set_xlabel(r"$\sigma_1$ [MPa]", labelpad=2)
-ax.set_ylabel(r"$\sigma_2$ [MPa]", labelpad=2)
-ax.set_zlabel(r"$\sigma_3$ [MPa]", labelpad=2)
+ax.set_xlabel(r"$\sigma_1$ [Pa]", labelpad=2)
+ax.set_ylabel(r"$\sigma_2$ [Pa]", labelpad=2)
+ax.set_zlabel(r"$\sigma_3$ [Pa]", labelpad=2)
+for axis in (ax.xaxis, ax.yaxis, ax.zaxis):
+    fmt = axis.get_major_formatter()
+    fmt.set_powerlimits((0, 0))
+    fmt.set_useMathText(True)
 ax.set_title("(a) frozen end member ($f=1$)", fontsize=10)
 ax.view_init(elev=22, azim=-58)
 ax.tick_params(labelsize=7)
@@ -103,14 +108,15 @@ for p, col, lab in ((FROZEN, "#4c72b0", "frozen ($f=1$)"),
     ax2.plot(pm, -qm, color=col, lw=1.8)
 ax2.axhline(0, color="0.6", lw=0.6)
 ax2.axvline(0, color="0.6", lw=0.6)
-ax2.set_xlabel(r"mean stress $p = I_1/3$ [MPa]")
-ax2.set_ylabel(r"von Mises stress $q = \sqrt{3 J_2}$ [MPa]")
+ax2.set_xlabel(r"mean stress $p = I_1/3$ [Pa]")
+ax2.set_ylabel(r"von Mises stress $q = \sqrt{3 J_2}$ [Pa]")
+ax2.ticklabel_format(style="sci", scilimits=(0, 0), useMathText=True)
 ax2.set_title("(b) meridian profile (true relative scale)", fontsize=10)
 ax2.legend(fontsize=8, loc="upper left")
-ax2.annotate("tensile\napex", xy=(1.65, 0), xytext=(0.2, 2.3),
+ax2.annotate("tensile\napex", xy=(1.65e6, 0), xytext=(0.2e6, 2.3e6),
              fontsize=7, ha="center",
              arrowprops=dict(arrowstyle="->", lw=0.7, color="0.4"))
-ax2.annotate("cap\nclosure", xy=(-2.74, 0), xytext=(-2.4, 2.3),
+ax2.annotate("cap\nclosure", xy=(-2.74e6, 0), xytext=(-2.4e6, 2.3e6),
              fontsize=7, ha="center",
              arrowprops=dict(arrowstyle="->", lw=0.7, color="0.4"))
 

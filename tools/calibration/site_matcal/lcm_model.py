@@ -17,6 +17,11 @@ The Albany path comes from :mod:`site_matcal.platforms` (rigel, sirius, cee).
 Calibrate a subset of parameters by defining ``matcal.Parameter`` objects whose
 names match the jinja placeholders; study parameters override the defaults
 (MatCal precedence: study params > model constants > state vars).
+
+Everything here is in **base SI**: stress in Pa, no magnitude prefixes,
+magnitudes written in scientific notation. That covers the defaults below, the
+bounds and initial values passed as ``matcal.Parameter``, the experimental
+curves, and the stresses the Exodus reader returns. See ``SALEM_LIMESTONE``.
 """
 
 import os
@@ -34,26 +39,45 @@ TEMPLATES_DIR = os.environ.get(
 )
 
 # Salem limestone, associative parameter set: Table 1 of Sun, Chen & Ostien,
-# Acta Geotechnica 9 (2014) 903-934. Units: MPa. Keys are the jinja
+# Acta Geotechnica 9 (2014) 903-934, converted to base SI. Keys are the jinja
 # placeholder names used in the templated materials files.
+#
+# UNITS. The cap model is unit-agnostic: it only requires one consistent unit
+# system. This harness uses base SI throughout -- stress in Pa, no magnitude
+# prefixes -- which is what the ACE/permafrost production decks use, so a set
+# calibrated here can be pasted into one without rescaling. Magnitudes are
+# written in scientific notation rather than as prefixed units (2.2547e10 Pa,
+# not 22547 MPa). Sun, Chen & Ostien tabulate in MPa; each stress-like value
+# below is therefore their value times 1e6, each 1/stress value theirs times
+# 1e-6, and D2 (1/stress^2) theirs times 1e-12.
+#
+# Dimensions (sigma = Pa):
+#   sigma        A, C, N, kappa0, calpha, elastic_modulus
+#   1/sigma      D, L, D1
+#   1/sigma^2    D2
+#   dimensionless  poissons_ratio, theta, R, W, psi, phi, Q
+#
+# Experimental data fed to the harness must be in Pa as well: the objective
+# compares raw stress values, so a curve in MPa would be fit by parameters
+# 1e6 too small.
 SALEM_LIMESTONE = dict(
-    elastic_modulus=22547.0,
-    poissons_ratio=0.2524,
-    A=689.2,
-    D=0.000394,
-    C=675.2,
-    theta=0.0,
-    R=28.0,
-    kappa0=-8.05,
-    W=0.08,
-    D1=0.00147,
-    D2=0.0,
-    calpha=100000.0,
-    psi=1.0,
-    N=6.0,
-    L=0.000394,
-    phi=0.0,
-    Q=28.0,
+    elastic_modulus=2.2547e10,   # Pa      (22547 MPa)
+    poissons_ratio=0.2524,       # -
+    A=6.892e8,                   # Pa      (689.2 MPa)
+    D=3.94e-10,                  # 1/Pa    (3.94e-4 1/MPa)
+    C=6.752e8,                   # Pa      (675.2 MPa)
+    theta=0.0,                   # -
+    R=28.0,                      # -
+    kappa0=-8.05e6,              # Pa      (-8.05 MPa)
+    W=0.08,                      # -
+    D1=1.47e-9,                  # 1/Pa    (1.47e-3 1/MPa)
+    D2=0.0,                      # 1/Pa^2
+    calpha=1.0e11,               # Pa      (1.0e5 MPa)
+    psi=1.0,                     # -
+    N=6.0e6,                     # Pa      (6.0 MPa)
+    L=3.94e-10,                  # 1/Pa    (3.94e-4 1/MPa)
+    phi=0.0,                     # -
+    Q=28.0,                      # -
 )
 
 

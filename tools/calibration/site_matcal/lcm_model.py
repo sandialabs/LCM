@@ -9,11 +9,11 @@ The model, for a given load path:
   * runs ``Albany <deck>`` there (an internally generated single-element STK
     mesh -- no mesh file needed; the serial Albany binary resolves its
     Trilinos libraries via a baked-in RUNPATH, so no module load is required
-    on rigel),
+    on the supported workstations),
   * reads the resulting Exodus stress/strain series back through
     ``read_lcm_cap_exodus``.
 
-The Albany path comes from :mod:`site_matcal.platforms` (rigel now, cee next).
+The Albany path comes from :mod:`site_matcal.platforms` (rigel, sirius, cee).
 Calibrate a subset of parameters by defining ``matcal.Parameter`` objects whose
 names match the jinja placeholders; study parameters override the defaults
 (MatCal precedence: study params > model constants > state vars).
@@ -80,7 +80,7 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
     """
     lp = get_load_path(load_path)
     plat = get_platform(platform)
-    plat.apply_env()                       # no-op on rigel; CEE env when added
+    plat.apply_env()                       # no-op where the platform needs no env
     albany = albany or get_albany(platform)
     constants = {**SALEM_LIMESTONE, **(defaults or {})}
     name = name or f"lcm_cap_{lp.name}"

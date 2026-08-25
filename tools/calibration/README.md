@@ -19,7 +19,7 @@ tools/calibration/
   site_matcal/               top-level package MatCal auto-imports (from site_matcal import *)
     __init__.py              exposes helpers (also on the matcal namespace)
     register_factories.py    clean-shell env + jinja templating (side-effect on import)
-    platforms.py             platform registry: rigel (local) + cee (stub)
+    platforms.py             platform registry: rigel, sirius (local) + cee
     load_paths.py            hydrostatic / confined / triaxial deck registry
     lcm_model.py             make_lcm_cap_model(load_path=...); SALEM_LIMESTONE defaults
     exodus_reader.py         read_lcm_cap_exodus() -> MatCal Data (time, stress_*, kappa, evp)
@@ -76,7 +76,7 @@ python calibrate.py calibrate \
   `time`∈[0,1] maps to applied strain for these decks). Defaults to
   `examples/<load_path>_reference.csv`.
 - `--set NAME=VALUE` — override a fixed (non-calibrated) parameter default.
-- `--platform rigel|cee` — force a platform (default: auto by hostname).
+- `--platform rigel|sirius|cee` — force a platform (default: auto by hostname).
 - `--study gradient|scipy` — Dakota gradient (default) or SciPy.
 
 Calibratable placeholders: `A C R W D1 D2 kappa0 calpha N theta psi L phi Q D
@@ -90,11 +90,15 @@ Platform specifics (Albany path, environment) live in `site_matcal/platforms.py`
 | Platform | Status | Albany | Dakota | Environment |
 |----------|--------|--------|--------|-------------|
 | `rigel`  | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `~/dakota/6.24.0` (downloaded) | none (serial build resolves Trilinos via RUNPATH) |
+| `sirius` | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `~/dakota/6.24.0` (downloaded) | none (serial build resolves Trilinos via RUNPATH) |
 | `cee` (hpws\*) | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `/projects/dakota/install/rhel8/6.24.0` (on disk) | none (serial build resolves Trilinos via RUNPATH) |
 
+`sirius` is off-SRN (direct internet, Fedora): its bring-up is the same as
+rigel's minus every proxy/CA step. See `docs/SETUP.md`.
+
 Full environment bring-up (Miniforge, conda env, MatCal, Dakota, activate hook)
-for both platforms is documented in [`docs/SETUP.md`](docs/SETUP.md). MatCal is
-installed via conda+pip on both — the CEE `matcal` module is not used (it is
+for every platform is documented in [`docs/SETUP.md`](docs/SETUP.md). MatCal is
+installed via conda+pip everywhere; the CEE `matcal` module is not used (it is
 pinned to the older rhel8 analyst stack; see `docs/SETUP.md`).
 
 Selection: `$LCM_MATCAL_PLATFORM` → hostname match → local default (rigel).
@@ -102,8 +106,8 @@ Override just the executable with `$LCM_ALBANY`.
 
 ### Adding another platform
 
-Both rigel and CEE are set up (see `docs/SETUP.md`). To add a new platform, add
-a `Platform` entry in `site_matcal/platforms.py`:
+rigel, sirius and CEE are set up (see `docs/SETUP.md`). To add a new platform,
+add a `Platform` entry in `site_matcal/platforms.py`:
 
 1. **Albany** — set `albany` to the build/install path (or leave a name and rely
    on `$LCM_ALBANY` / PATH).
@@ -138,7 +142,20 @@ Nothing else changes — the model, harness, and readers are platform-agnostic.
   parameters (`R`, `W`, `D1`, `kappa0`) on confined/hydrostatic, and add the
   triaxial path to constrain the shear and non-associative terms.
 
-## Verification status (rigel)
+## Verification status
+
+rigel:
 
 - MatCal → Albany → Exodus forward runs on all three load paths.
 - End-to-end Dakota `GradientCalibrationStudy` converges through the harness.
+
+sirius (Fedora 44, MatCal 1.4.28, Dakota 6.24.0, 2026-08-25):
+
+- Forward runs on all three load paths (about 3 s each).
+- `GradientCalibrationStudy`, one parameter, one path: `R` recovered as
+  `28.000000001` from an initial 22 (ABSOLUTE FUNCTION CONVERGENCE, ten Albany
+  evaluations, 12 s).
+- `GradientCalibrationStudy`, two parameters, two paths: `R = 28.0`,
+  `W = 0.080000000001` from (22, 0.05) (X-CONVERGENCE, 18 evaluations, 28 s on
+  four cores).
+- `ScipyMinimizeStudy` (`--study scipy`), one parameter: `R = 27.9934`.

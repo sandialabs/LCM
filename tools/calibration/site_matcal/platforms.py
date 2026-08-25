@@ -5,16 +5,17 @@ different environment setup (module loads, extra library paths, job dispatch).
 This module keeps those differences in one place so the model/harness code is
 platform-agnostic.
 
-Two platforms are anticipated:
+Three platforms are supported:
 
-  * ``rigel`` -- the local workstation (current). The serial Albany binary
-    resolves its Trilinos libraries via a baked-in RUNPATH, so no environment
-    setup is required.
-  * ``cee``   -- the SRN CEE LAN (next). STUBBED: fill in the Albany path and
-    any module/environment setup when we move there.
+  * ``rigel``  -- a local workstation. The serial Albany binary resolves its
+    Trilinos libraries via a baked-in RUNPATH, so no environment setup is
+    required.
+  * ``sirius`` -- a second local workstation, same shape as rigel (separate
+    entry so the two can diverge, e.g. a different build directory).
+  * ``cee``    -- the SRN CEE LAN workstations (hpws*).
 
 Selection order:
-  1. ``$LCM_MATCAL_PLATFORM`` (explicit: "rigel" or "cee"), else
+  1. ``$LCM_MATCAL_PLATFORM`` (explicit: "rigel", "sirius" or "cee"), else
   2. hostname match, else
   3. the local default (rigel).
 
@@ -69,6 +70,17 @@ RIGEL = Platform(
     hostnames=("rigel",),
 )
 
+# --- sirius (local workstation) -------------------------------------------
+# Same shape as rigel: serial Albany at the standard LCM build path, no runtime
+# environment needed. Dakota comes from the conda env's activate hook
+# ($HOME/dakota/6.24.0, downloaded); see docs/SETUP.md.
+SIRIUS = Platform(
+    name="sirius",
+    albany="~/LCM/lcm-build-serial-gcc-release/src/Albany",
+    env={},                    # serial build; Trilinos libs via RUNPATH
+    hostnames=("sirius",),
+)
+
 # --- cee (SRN CEE LAN workstations, e.g. hpws*) -----------------------------
 # The LCM Albany serial build lives at the same ~/LCM/... path as on rigel.
 # Dakota is provided by the on-disk CEE install /projects/dakota/install/rhel8/
@@ -86,7 +98,7 @@ CEE = Platform(
     hostnames=("hpws", "hpv", "cee", "skybridge", "ghost", "eclipse", "attaway", "solo"),
 )
 
-_PLATFORMS = {p.name: p for p in (RIGEL, CEE)}
+_PLATFORMS = {p.name: p for p in (RIGEL, SIRIUS, CEE)}
 
 
 def get_platform(name=None):

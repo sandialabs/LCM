@@ -21,7 +21,7 @@ Data files default to ``<out-dir>/<load_path>_reference.csv`` (columns
 time,<dependent field>). Point ``--data confined:/path/to/expt.csv`` at real
 measurements to calibrate against lab data.
 
-Platform: auto-detected (rigel now, cee next); force with --platform or
+Platform: auto-detected (rigel, sirius, cee); force with --platform or
 $LCM_MATCAL_PLATFORM. See the project README.
 
 NOTE: launch only ONE calibration (one Dakota study) per Python process -- a
@@ -137,7 +137,7 @@ def main(argv=None):
     ap.add_argument("--set", action="append", type=_parse_kv, dest="defaults",
                     default=[], metavar="NAME=VALUE", help="override a constant default (repeatable)")
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
-    ap.add_argument("--platform", default=None, help="rigel|cee (default: auto)")
+    ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)
     ap.add_argument("--out-dir", default=DEFAULT_OUT_DIR)
     args = ap.parse_args(argv)

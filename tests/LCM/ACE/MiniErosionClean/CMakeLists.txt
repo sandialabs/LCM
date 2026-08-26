@@ -67,6 +67,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_np4_consistency.cmake
 # Name the tests with the directory name.
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
+# Both tests run in this directory and both write denudation.e, so they
+# must not be scheduled concurrently. RESOURCE_LOCK below serializes
+# them, matching what MiniErosion already does.
 set(OUTFILE "denudation.e")
 set(REF_FILE "denudation_gold.e")
 
@@ -80,7 +83,8 @@ add_test(
     -DREF_FILENAME=${REF_FILE} -DOUTPUT_FILENAME=${OUTFILE} -P
     ${runtest_serial.cmake})
 set_tests_properties(ACE_${testName}_Denudation_Serial
-                     PROPERTIES LABELS "LCM;Tpetra;Forward")
+                     PROPERTIES LABELS "LCM;Tpetra;Forward"
+                                RESOURCE_LOCK ACE_${testName}_workdir)
 
 # --- Test 2: parallel consistency (position-based dead-set match) ---------
 set(runtest_np4_consistency.cmake
@@ -97,4 +101,5 @@ add_test(
     ${runtest_np4_consistency.cmake})
 set_tests_properties(ACE_${testName}_Denudation_np4_Consistency
                      PROPERTIES LABELS "LCM;Tpetra;Forward"
-                                PROCESSORS ${MPIMNP})
+                                PROCESSORS ${MPIMNP}
+                                RESOURCE_LOCK ACE_${testName}_workdir)

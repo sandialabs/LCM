@@ -265,6 +265,11 @@ run_ctest() {
     echo "  BUILD_THREADS=$THREADS"
 
     local BUILD_ID_STRING="${ARCH}-${TOOL_CHAIN}-${BUILD_TYPE}"
+    # LCM_BUILD_SUFFIX gives a variant configuration its own build and
+    # install directories; must match lcm-build.cmake.
+    if [ -n "${LCM_BUILD_SUFFIX:-}" ]; then
+        BUILD_ID_STRING="${BUILD_ID_STRING}-${LCM_BUILD_SUFFIX}"
+    fi
     local PREFIX="${PACKAGE}-${BUILD_ID_STRING}"
     local LOG_FILE="$LCM_DIR/${PREFIX}.log"
 

@@ -28,6 +28,11 @@ message("DO_BUILD ${DO_BUILD}")
 message("DO_TEST ${DO_TEST}")
 
 set(BUILD_ID_STRING "$ENV{ARCH}-$ENV{TOOL_CHAIN}-$ENV{BUILD_TYPE}")
+# LCM_BUILD_SUFFIX gives a variant configuration its own build and install
+# directories, so it sits beside the working build instead of replacing it.
+if (DEFINED ENV{LCM_BUILD_SUFFIX} AND NOT "$ENV{LCM_BUILD_SUFFIX}" STREQUAL "")
+  set(BUILD_ID_STRING "${BUILD_ID_STRING}-$ENV{LCM_BUILD_SUFFIX}")
+endif()
 message("BUILD_ID_STRING ${BUILD_ID_STRING}")
 
 # Build pass-through arguments from explicit boolean flags

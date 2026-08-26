@@ -12,10 +12,7 @@ parameter subset back to them (multi-load-path capable):
     python calibrate.py make-reference --load-path confined --load-path hydrostatic
 
     # calibrate R and W against both paths at once
-    python calibrate.py calibrate \
-        --load-path confined --load-path hydrostatic \
-        --param R:20:35 --param W:0.02:0.15 \
-        --study gradient
+    python calibrate.py calibrate --load-path confined --load-path hydrostatic --param R:20:35 --param W:0.02:0.15 --study gradient
 
 Data files default to ``<out-dir>/<load_path>_reference.csv`` (columns
 time,<dependent field>). Point ``--data confined:/path/to/expt.csv`` at real

@@ -94,14 +94,10 @@ cd tools/calibration/harness
 python calibrate.py make-reference --load-path confined --load-path hydrostatic
 
 # 2. Calibrate cap-active parameters against those paths (one Dakota study):
-python calibrate.py calibrate \
-    --load-path confined --load-path hydrostatic \
-    --param R:20:35 --param W:0.02:0.15 \
-    --study gradient --core-limit 4
+python calibrate.py calibrate --load-path confined --load-path hydrostatic --param R:20:35 --param W:0.02:0.15 --study gradient --core-limit 4
 
 # Stress-like parameters take base-SI bounds (Pa), e.g. the cap branch point:
-python calibrate.py calibrate --load-path hydrostatic \
-    --param kappa0:-2.0e7:-2.0e6:-1.2e7
+python calibrate.py calibrate --load-path hydrostatic --param kappa0:-2.0e7:-2.0e6:-1.2e7
 ```
 
 - `--param NAME:LO:HI[:INIT]` — repeatable; `NAME` must match a jinja

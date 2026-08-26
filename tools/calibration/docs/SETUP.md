@@ -52,8 +52,7 @@ the same MatCal version and identical harness code.
 export SSL_CERT_FILE=/etc/pki/tls/certs/ca-bundle.crt
 export REQUESTS_CA_BUNDLE=/etc/pki/tls/certs/ca-bundle.crt
 cd /tmp
-curl -fsSL -o miniforge.sh \
-  https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+curl -fsSL -o miniforge.sh https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
 bash miniforge.sh -b -p "$HOME/miniforge3"
 # (SRN only)
 "$HOME/miniforge3/bin/conda" config --set ssl_verify /etc/pki/tls/certs/ca-bundle.crt
@@ -170,8 +169,7 @@ the next check:
 
 ```bash
 python calibrate.py make-reference --load-path confined --load-path hydrostatic
-python calibrate.py calibrate --load-path confined --load-path hydrostatic \
-    --param R:20:35:22 --param W:0.02:0.15:0.05 --core-limit 4
+python calibrate.py calibrate --load-path confined --load-path hydrostatic --param R:20:35:22 --param W:0.02:0.15:0.05 --core-limit 4
 ```
 
 which returns `R: 28.0`, `W: 0.080000000001` (X-CONVERGENCE, 18 evaluations,
@@ -180,8 +178,7 @@ parameter to check that base-SI bounds are being entered correctly (the harness
 is in Pa, see the README's "Units" section):
 
 ```bash
-python calibrate.py calibrate --load-path hydrostatic \
-    --param kappa0:-2.0e7:-2.0e6:-1.2e7
+python calibrate.py calibrate --load-path hydrostatic --param kappa0:-2.0e7:-2.0e6:-1.2e7
 ```
 
 which returns `kappa0: -8050000.0` (X-CONVERGENCE, ten evaluations, about 13

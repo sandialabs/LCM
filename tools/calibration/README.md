@@ -93,16 +93,25 @@ cd tools/calibration/harness
 # 1. Synthetic "experiments" at the default parameters (one Albany run each):
 python calibrate.py make-reference --load-path confined --load-path hydrostatic
 
-# 2. Calibrate cap-active parameters against those paths (one Dakota study):
-python calibrate.py calibrate --load-path confined --load-path hydrostatic --param R:20:35 --param W:0.02:0.15 --study gradient --core-limit 4
+# 2. Calibrate cap-active parameters against those paths (one Dakota study).
+#    The :22 and :0.05 start the search away from the values the references
+#    were generated at, so the run has something to recover:
+python calibrate.py calibrate --load-path confined --load-path hydrostatic --param R:20:35:22 --param W:0.02:0.15:0.05 --study gradient --core-limit 4
 
 # Stress-like parameters take base-SI bounds (Pa), e.g. the cap branch point:
 python calibrate.py calibrate --load-path hydrostatic --param kappa0:-2.0e7:-2.0e6:-1.2e7
 ```
 
+Step 2 must come back with `R: 28.0`, `W: 0.080000000001`: the defaults the
+references were made at. Leaving `INIT` off (`--param R:20:35`) starts the
+search at those defaults instead, which converges immediately and therefore
+demonstrates nothing.
+
 - `--param NAME:LO:HI[:INIT]` — repeatable; `NAME` must match a jinja
-  placeholder. `INIT` defaults to the Salem-limestone value. Bounds are in base
-  SI (see "Units"): `A:5e8:8e8`, not `A:500:800`.
+  placeholder. `INIT` is where the search starts and defaults to the
+  Salem-limestone value, so give it explicitly whenever the reference data was
+  generated at those defaults. Bounds are in base SI (see "Units"):
+  `A:5e8:8e8`, not `A:500:800`.
 - `--load-path` — repeatable; each becomes a MatCal evaluation set.
 - `--data LOADPATH:CSV` — real experimental data (columns `time,stress_zz`
   with stress in Pa; `time`∈[0,1] maps to applied strain for these decks).

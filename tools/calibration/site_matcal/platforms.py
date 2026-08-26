@@ -73,7 +73,7 @@ RIGEL = Platform(
 # --- sirius (local workstation) -------------------------------------------
 # Same shape as rigel: serial Albany at the standard LCM build path, no runtime
 # environment needed. Dakota comes from the conda env's activate hook
-# ($HOME/dakota/6.24.0, downloaded); see docs/SETUP.md.
+# ($HOME/dakota/6.24.0, downloaded); see SETUP.md.
 SIRIUS = Platform(
     name="sirius",
     albany="~/LCM/lcm-build-serial-gcc-release/src/Albany",
@@ -88,9 +88,9 @@ SIRIUS = Platform(
 # (DAKOTA_ROOT), not here. env is empty because the serial Albany build
 # resolves its Trilinos libraries via RUNPATH; if a freshly built CEE Albany
 # turns out to need runtime module libraries, add them to `env` (or use a
-# module-load wrapper script as the executable) -- see README
-# "Adding a platform (CEE)". matcal itself is installed via conda+pip (the CEE
-# matcal module is pinned to the older rhel8 analyst stack); see docs/SETUP.md.
+# module-load wrapper script as the executable) -- see the README's
+# "Platforms" section. matcal itself is installed by cloning it (the CEE matcal
+# module does not load on a rhel9 workstation at all); see SETUP.md.
 CEE = Platform(
     name="cee",
     albany="~/LCM/lcm-build-serial-gcc-release/src/Albany",

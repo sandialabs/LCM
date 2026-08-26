@@ -1,228 +1,391 @@
 # LCM cap-plasticity calibration (MatCal + Dakota)
 
-Calibrate the LCM (Albany) `CapModel` against material-point (single-element)
-experiments using [MatCal](https://github.com/sandialabs/matcal) and
+Fit the LCM (Albany) `CapModel` to a measured **stress-strain** or
+**load-displacement** curve, using
+[MatCal](https://github.com/sandialabs/matcal) and
 [Dakota](https://github.com/snl-dakota/dakota).
 
-MatCal drives a `UserExecutableModel`: it renders a jinja-templated
-`materials.yaml`, runs `Albany <deck>` on an internally generated single
-element (all DOFs prescribed → a true material point), and reads the resulting
-Exodus stress/strain series back for the objective. The same cap parameter set
-can be constrained against several load paths at once (hydrostatic, confined,
-triaxial), which is how the shear- and cap-surface parameters become
-identifiable.
+MatCal renders a templated `materials.yaml`, runs `Albany` on an internally
+generated single element with every degree of freedom prescribed (so the finite
+element problem *is* a material point), reads the resulting curve back, and
+compares it to yours. Dakota adjusts the cap parameters and repeats until the
+two curves agree. One parameter set can be constrained against several load
+paths at once, which is how the shear-surface and cap-surface parameters become
+separately identifiable.
+
+**New here? Read [`SETUP.md`](SETUP.md) first** and work through it to the end.
+It installs everything and finishes with a calibration that recovers a known
+answer. This document assumes that is done.
+
+---
+
+## Contents
+
+- [Every session starts like this](#every-session-starts-like-this)
+- [Quick start](#quick-start)
+- [Calibrating against your own data](#calibrating-against-your-own-data)
+- [Units](#units)
+- [Reference](#reference)
+- [Layout](#layout)
+- [Platforms](#platforms)
+- [Notes and gotchas](#notes-and-gotchas)
+- [Verification status](#verification-status)
+
+---
+
+## Every session starts like this
+
+```bash
+source "$HOME/miniforge3/etc/profile.d/conda.sh"
+conda activate matcal
+cd ~/LCM/LCM/tools/calibration/harness
+```
+
+If anything misbehaves later, come back and run this first. It reports on
+everything the harness needs and runs no simulations:
+
+```bash
+python calibrate.py check
+```
+
+---
+
+## Quick start
+
+Three commands, about a minute. This manufactures a curve from known
+parameters and then recovers one of them, which confirms the whole chain works:
+
+```bash
+python calibrate.py check
+python calibrate.py make-reference --load-path confined
+python calibrate.py calibrate --load-path confined --param R:20:35:22
+```
+
+The last command must end with:
+
+```
+BEST: R: 28.0
+
+***** X-CONVERGENCE *****
+```
+
+`R = 28` is what the reference was generated at. The `:22` on the end of
+`R:20:35:22` starts the search away from it, so the run has something to
+recover. Leaving it off starts the search already at the answer, which
+converges instantly and demonstrates nothing.
+
+---
+
+## Calibrating against your own data
+
+This is what the harness is for. Five decisions, then one command.
+
+### 1. Put your curve in a CSV
+
+One header row naming the columns, then two columns of numbers:
+
+```
+Axial Strain,Axial Stress
+0.0,0.0
+-0.002,-15600000.0
+-0.004,-31200000.0
+```
+
+Blank lines and lines starting with `#` are ignored. The column names can be
+anything; you tell the harness which to use in step 5.
+
+Two things about the numbers matter, and both are common mistakes:
+
+- **Base SI.** Strain dimensionless (not percent), stress in Pa, displacement
+  in m, force in N. See [Units](#units).
+- **Compression is negative.** These are compression load paths, and the
+  simulation reports compressive stress and strain as negative. A
+  compression-positive curve will not be matched.
+
+The harness warns on standard input if your data looks like it has either
+problem, but it cannot be certain, so it warns rather than stopping.
+
+### 2. Choose the curve type
+
+| `--curve` | Compares | Units of the two columns |
+|-----------|----------|--------------------------|
+| `stress-strain` (default) | axial strain vs axial Cauchy stress | dimensionless, Pa |
+| `load-displacement` | loaded-face displacement vs reaction force | m, N |
+
+Pick whichever your instrument actually recorded. For the single-element decks
+here the mesh is a unit cube, so the two curves happen to carry identical
+numbers; that is a property of this mesh, not a general identity, and the two
+are computed independently.
+
+### 3. Choose the load path
+
+| `--load-path` | Loading | Constrains |
+|---------------|---------|------------|
+| `hydrostatic` | equal compression on all three axes | the cap: `R`, `W`, `D1`, `kappa0`, `calpha` |
+| `confined` | 1D (oedometric) compression, lateral strains held at zero | shear and cap together |
+| `triaxial` | three unequal compressive strains | shear and non-associative terms: `A`, `C`, `theta`, `psi`, `L`, `phi`, `Q` |
+
+`--load-path` is repeatable. Each one you give becomes a separate comparison
+that the *same* parameter set has to satisfy, which is the whole point: cap
+parameters are material constants, so one set must fit every path at once.
+
+### 4. Choose which parameters to fit
+
+`--param NAME:LO:HI[:INIT]`, repeatable. `LO` and `HI` bound the search, `INIT`
+is where it starts (defaulting to the Salem limestone value in the table
+[below](#cap-parameters)). Bounds are in base SI: `A:5e8:8e8`, not `A:500:800`.
+
+Fit few parameters at a time. Every parameter you add costs Albany runs and
+makes it easier for the optimizer to find a curve that matches for the wrong
+reasons. Anything you do not name keeps its default; override a default without
+fitting it using `--set NAME=VALUE`.
+
+### 5. Run it
+
+```bash
+python calibrate.py calibrate --load-path confined --curve stress-strain --data "confined:/path/to/oedometer.csv:Axial Strain:Axial Stress" --param A:3e8:9e8
+```
+
+The `--data` argument is `LOADPATH:CSV:XCOL:YCOL`. The last two name the
+columns of *your* file holding the independent and dependent quantities. Drop
+them if your file already uses the harness's own names (`strain_xx`,
+`stress_xx`, `displacement_x`, `force_x`). Give one `--data` per load path.
+Wrap the whole argument in double quotes, as above, whenever a column name
+contains a space.
+
+The run prints which file it read and what it compared, then Dakota's progress,
+then:
+
+```
+BEST: A: 681935050.91
+
+***** RELATIVE FUNCTION CONVERGENCE *****
+```
+
+### Reading the result
+
+- **A convergence message** ending in `CONVERGENCE` means Dakota stopped on
+  purpose. `X-CONVERGENCE` and `ABSOLUTE FUNCTION CONVERGENCE` are the clean
+  ones.
+- **`SINGULAR CONVERGENCE`, or a result sitting exactly at its starting value,**
+  means the objective did not respond to the parameter. Either the data is in
+  the wrong units or sign (check the warnings), or that parameter is not
+  identifiable from that load path (see the table in step 3).
+- **A result pinned to `LO` or `HI`** means the true value is probably outside
+  your bounds, or the data is off by a factor of `1e6` because it is in MPa.
+
+Everything MatCal and Dakota wrote is left in `examples/calibration_run/`,
+including one working directory per evaluation, so you can look at any
+individual Albany run.
+
+---
 
 ## Units
 
-Everything in this harness is in **base SI**, with magnitudes written in
-scientific notation rather than as prefixed units: stress in Pa (`2.2547e10`,
-not `22547` MPa), never kPa/MPa/GPa. That covers the `SALEM_LIMESTONE`
-defaults, the templated materials files, `--param` bounds and initial values,
-`--set` overrides, the stress column of any `--data` file, and the stresses the
-Exodus reader returns.
+Everything here is **base SI**, with magnitudes written in scientific notation
+rather than as prefixed units: `2.2547e10` Pa, never `22547` MPa. That covers
+the defaults, the templated materials files, `--param` bounds and initial
+values, `--set` overrides, and both columns of any `--data` file.
 
-| Dimension | Parameters |
-|-----------|------------|
-| stress, Pa | `A` `C` `N` `kappa0` `calpha` `elastic_modulus` |
-| 1/stress, 1/Pa | `D` `L` `D1` |
-| 1/stress^2, 1/Pa^2 | `D2` |
-| dimensionless | `poissons_ratio` `theta` `R` `W` `psi` `phi` `Q` |
+| Quantity | Unit | Where |
+|----------|------|-------|
+| stress | Pa | `A` `C` `N` `kappa0` `calpha` `elastic_modulus`, `stress_*` columns |
+| 1/stress | 1/Pa | `D` `L` `D1` |
+| 1/stress^2 | 1/Pa^2 | `D2` |
+| dimensionless | - | `poissons_ratio` `theta` `R` `W` `psi` `phi` `Q`, `strain_*` columns |
+| force | N | `force_*` columns |
+| length | m | `displacement_*` columns |
 
-The cap model itself is unit-agnostic and only requires one consistent system,
-so this is a convention, not a constraint. It is chosen to match the ACE
-permafrost production decks, which are already in Pa and scientific notation
+The cap model is unit-agnostic and needs only one consistent system, so this is
+a convention rather than a constraint. It matches the ACE permafrost production
+decks, which are already in Pa and scientific notation
 (`tests/LCM/ACE/MiniErosionPermafrost/materials_mechanical_permafrost.yaml`:
-`A: 2.0e+06`, `kappa0: -1.0e+07`, `D1: 1.0e-08`): a parameter set calibrated
+`A: 2.0e+06`, `kappa0: -1.0e+07`, `D1: 1.0e-08`), so a parameter set calibrated
 here drops into one without rescaling. The verification decks in
-`tests/LCM/CapModelPlasticity3D` that these templates were copied from are in
-base SI too, so the two carry identical numbers. It does mean the values here
-differ from the MPa table of Sun, Chen & Ostien (2014) by the appropriate power
-of 1e6; the two parameter sets agree to roundoff, see "Verification status".
+`tests/LCM/CapModelPlasticity3D` that these templates came from are in base SI
+too. It does mean the values differ from the MPa table of Sun, Chen and Ostien
+(2014) by the appropriate power of `1e6`.
 
-A curve supplied in MPa would be fit by stress-like parameters 1e6 too small,
-and would not be detected: the objective compares raw values. Convert the data,
-not the harness.
+A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
+**Convert the data, not the harness.**
+
+---
+
+## Reference
+
+### Actions
+
+| Command | What it does |
+|---------|--------------|
+| `python calibrate.py check` | Reports on the environment. Runs no simulations. Exits nonzero if anything fails. |
+| `python calibrate.py make-reference` | Runs Albany once per load path at the default parameters and writes the resulting curve to `examples/<load_path>_reference.csv`. Use it to generate practice data. |
+| `python calibrate.py calibrate` | Runs the Dakota study. |
+
+### Options
+
+| Option | Meaning |
+|--------|---------|
+| `--load-path NAME` | `hydrostatic`, `confined` or `triaxial`. Repeatable. Default `confined`. |
+| `--curve NAME` | `stress-strain` (default), `load-displacement` or `time-stress`. |
+| `--param NAME:LO:HI[:INIT]` | Parameter to fit, base SI. Repeatable. |
+| `--data LOADPATH:CSV[:XCOL:YCOL]` | Experimental data for one load path, base SI. Repeatable. Defaults to `examples/<load_path>_reference.csv`. |
+| `--set NAME=VALUE` | Override a default without fitting it, base SI. Repeatable. |
+| `--study gradient\|scipy` | Dakota gradient study (default) or SciPy. |
+| `--platform rigel\|sirius\|cee` | Force a platform. Default: detected from the hostname. |
+| `--core-limit N` | Concurrent Albany evaluations. Default 4. |
+| `--out-dir DIR` | Where references and run directories go. Default `../examples`. |
+
+Bad input is rejected before any simulation runs: unknown parameter or load
+path names, bounds that are not increasing, an `INIT` outside its bounds, a
+data file whose columns do not match the chosen curve.
+
+`--curve time-stress` compares the LOCA continuation parameter (which runs over
+`[0, 1]` and is affine in applied strain) against axial stress. It is kept for
+regression checks and is equivalent to `stress-strain` up to a rescaling of the
+abscissa.
+
+### Cap parameters
+
+Every name below is a placeholder in the templated materials file and can be
+given to `--param` or `--set`. Defaults are Salem limestone, Table 1 of Sun,
+Chen and Ostien, *Acta Geotechnica* **9** (2014) 903-934, converted to base SI.
+
+| Name | Default | Unit | Name | Default | Unit |
+|------|---------|------|------|---------|------|
+| `elastic_modulus` | `2.2547e10` | Pa | `W` | `0.08` | - |
+| `poissons_ratio` | `0.2524` | - | `D1` | `1.47e-9` | 1/Pa |
+| `A` | `6.892e8` | Pa | `D2` | `0.0` | 1/Pa^2 |
+| `C` | `6.752e8` | Pa | `calpha` | `1.0e11` | Pa |
+| `D` | `3.94e-10` | 1/Pa | `psi` | `1.0` | - |
+| `theta` | `0.0` | - | `N` | `6.0e6` | Pa |
+| `R` | `28.0` | - | `L` | `3.94e-10` | 1/Pa |
+| `kappa0` | `-8.05e6` | Pa | `phi` | `0.0` | - |
+| | | | `Q` | `28.0` | - |
+
+### Fields the simulation reports
+
+Available as `--curve` components and as CSV column names:
+`time`, `stress_xx/yy/zz/xy`, `strain_xx/yy/zz/xy`, `displacement_x/y/z`,
+`force_x/y/z`, `kappa` (cap hardening parameter), `evp` (volumetric plastic
+strain).
+
+---
 
 ## Layout
 
 ```
 tools/calibration/
-  site_matcal/               top-level package MatCal auto-imports (from site_matcal import *)
+  README.md                  this file: how to calibrate
+  SETUP.md                   how to install everything, from scratch
+  site_matcal/               top-level package MatCal auto-imports
     __init__.py              exposes helpers (also on the matcal namespace)
-    register_factories.py    clean-shell env + jinja templating (side-effect on import)
-    platforms.py             platform registry: rigel, sirius (local) + cee
-    load_paths.py            hydrostatic / confined / triaxial deck registry
-    lcm_model.py             make_lcm_cap_model(load_path=...); SALEM_LIMESTONE defaults
-    exodus_reader.py         read_lcm_cap_exodus() -> MatCal Data (time, stress_*, kappa, evp)
+    register_factories.py    clean-shell env + jinja templating (on import)
+    platforms.py             platform registry: rigel, sirius, cee
+    load_paths.py            load-path and curve registries
+    lcm_model.py             make_lcm_cap_model(...); SALEM_LIMESTONE defaults
+    exodus_reader.py         read_lcm_cap_exodus() -> MatCal Data
   templates/
-    materials.yaml           jinja cap params (CapModel)        -- hydrostatic, confined
-    materials_triaxial.yaml  jinja cap params (CapModelTriaxial) -- triaxial (same placeholders)
+    materials.yaml           jinja cap params (CapModel)         hydrostatic, confined
+    materials_triaxial.yaml  jinja cap params (CapModelTriaxial)  triaxial
     input_{hydrostatic,confined,triaxial}.yaml   Albany decks (single element)
   harness/
-    calibrate.py             CLI: make-reference / calibrate; multi-load-path, platform-aware
-  examples/
-    *_reference.csv          demo "experiments" generated at the defaults
-  README.md
+    calibrate.py             the CLI: check / make-reference / calibrate
+  examples/                  generated references and run output (git-ignored)
 ```
 
 The decks are copies of the verification decks in
-`tests/LCM/CapModelPlasticity3D` (same single-element material-point setup),
-with the materials file jinja-templated for calibration.
+`tests/LCM/CapModelPlasticity3D`, with the materials file jinja-templated.
 
-## Environment
-
-Setup is a one-time task done outside the repo (Miniforge + a `matcal` conda
-env with Python 3.12 + Dakota 6.24). The full, reproducible bring-up for each
-platform is in **[`docs/SETUP.md`](docs/SETUP.md)**. Once done, the env's
-activate hook puts this directory on `PYTHONPATH`, so:
-
-```bash
-source ~/miniforge3/etc/profile.d/conda.sh
-conda activate matcal
-```
-
-makes `import site_matcal` work (the "no site matcal" warning disappears) and
-puts the Dakota CLI + bindings on the path.
-
-## Usage
-
-```bash
-conda activate matcal
-cd tools/calibration/harness
-
-# 1. Synthetic "experiments" at the default parameters (one Albany run each):
-python calibrate.py make-reference --load-path confined --load-path hydrostatic
-
-# 2. Calibrate cap-active parameters against those paths (one Dakota study).
-#    The :22 and :0.05 start the search away from the values the references
-#    were generated at, so the run has something to recover:
-python calibrate.py calibrate --load-path confined --load-path hydrostatic --param R:20:35:22 --param W:0.02:0.15:0.05 --study gradient --core-limit 4
-
-# Stress-like parameters take base-SI bounds (Pa), e.g. the cap branch point:
-python calibrate.py calibrate --load-path hydrostatic --param kappa0:-2.0e7:-2.0e6:-1.2e7
-```
-
-Step 2 must come back with `R: 28.0`, `W: 0.080000000001`: the defaults the
-references were made at. Leaving `INIT` off (`--param R:20:35`) starts the
-search at those defaults instead, which converges immediately and therefore
-demonstrates nothing.
-
-- `--param NAME:LO:HI[:INIT]` — repeatable; `NAME` must match a jinja
-  placeholder. `INIT` is where the search starts and defaults to the
-  Salem-limestone value, so give it explicitly whenever the reference data was
-  generated at those defaults. Bounds are in base SI (see "Units"):
-  `A:5e8:8e8`, not `A:500:800`.
-- `--load-path` — repeatable; each becomes a MatCal evaluation set.
-- `--data LOADPATH:CSV` — real experimental data (columns `time,stress_zz`
-  with stress in Pa; `time`∈[0,1] maps to applied strain for these decks).
-  Defaults to `examples/<load_path>_reference.csv`.
-- `--set NAME=VALUE` — override a fixed (non-calibrated) parameter default,
-  in base SI.
-- `--platform rigel|sirius|cee` — force a platform (default: auto by hostname).
-- `--study gradient|scipy` — Dakota gradient (default) or SciPy.
-
-Calibratable placeholders: `A C R W D1 D2 kappa0 calpha N theta psi L phi Q D
-elastic_modulus poissons_ratio` (dimensions in the table above). Anything not
-calibrated keeps its `SALEM_LIMESTONE` default (MatCal precedence: study params
-> model constants).
+---
 
 ## Platforms
 
-Platform specifics (Albany path, environment) live in `site_matcal/platforms.py`.
+Platform specifics live in `site_matcal/platforms.py`. All three are working.
 
-| Platform | Status | Albany | Dakota | Environment |
-|----------|--------|--------|--------|-------------|
-| `rigel`  | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `~/dakota/6.24.0` (downloaded) | none (serial build resolves Trilinos via RUNPATH) |
-| `sirius` | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `~/dakota/6.24.0` (downloaded) | none (serial build resolves Trilinos via RUNPATH) |
-| `cee` (hpws\*) | working | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `/projects/dakota/install/rhel8/6.24.0` (on disk) | none (serial build resolves Trilinos via RUNPATH) |
+| Platform | Albany | Dakota |
+|----------|--------|--------|
+| `cee` (`hpws*`) | `~/LCM/lcm-build-serial-gcc-release/src/Albany` | `/projects/dakota/install/rhel8/6.24.0` (on disk) |
+| `rigel` | same | `~/dakota/6.24.0` (downloaded) |
+| `sirius` | same | `~/dakota/6.24.0` (downloaded) |
 
-`sirius` is off-SRN (direct internet, Fedora): its bring-up is the same as
-rigel's minus every proxy/CA step. See `docs/SETUP.md`.
+None of them needs a runtime environment: the serial Albany build resolves its
+Trilinos libraries through a baked-in RUNPATH. Selection is
+`$LCM_MATCAL_PLATFORM`, then hostname, then rigel as the fallback. Override
+just the executable with `$LCM_ALBANY`.
 
-Full environment bring-up (Miniforge, conda env, MatCal, Dakota, activate hook)
-for every platform is documented in [`docs/SETUP.md`](docs/SETUP.md). MatCal is
-installed via conda+pip everywhere; the CEE `matcal` module is not used (it is
-pinned to the older rhel8 analyst stack; see `docs/SETUP.md`).
+To add a platform, add a `Platform` entry in `site_matcal/platforms.py`: the
+Albany path, any environment variables the build needs at run time (or a small
+wrapper script that does the `module load`s and then `exec Albany "$@"`), and
+hostname substrings for auto-detection. Nothing else changes; the model,
+harness and readers are platform-agnostic.
 
-Selection: `$LCM_MATCAL_PLATFORM` → hostname match → local default (rigel).
-Override just the executable with `$LCM_ALBANY`.
+---
 
-### Adding another platform
+## Notes and gotchas
 
-rigel, sirius and CEE are set up (see `docs/SETUP.md`). To add a new platform,
-add a `Platform` entry in `site_matcal/platforms.py`:
-
-1. **Albany** — set `albany` to the build/install path (or leave a name and rely
-   on `$LCM_ALBANY` / PATH).
-2. **Environment** — if the platform needs extra library paths at run time, add
-   them to `env` (applied to the Albany subprocess via `Platform.apply_env`). If
-   it needs `module load` commands, prefer a small wrapper script as the
-   executable (`albany="/path/to/run_albany.sh"` that does the loads then
-   `exec Albany "$@"`).
-3. **Hostnames** — add substrings to the `hostnames` tuple for auto-detection
-   (or force with `$LCM_MATCAL_PLATFORM`).
-4. **HPC queue** — to submit models through a scheduler, call
-   `model.run_in_queue(...)` and register the computing-platform factories; out
-   of scope here.
-
-Nothing else changes — the model, harness, and readers are platform-agnostic.
-
-## Notes / gotchas
-
-- **One Dakota study per Python process.** Dakota-as-a-library cannot run
-  multiple studies in one interpreter (documented MatCal limitation; it
-  segfaults on the second). Separate calibrations = separate `python` runs.
-- **Do not put Dakota's `bin`/`lib` on `LD_LIBRARY_PATH`.** The Dakota CLI and
-  bindings self-resolve via RPATH/RUNPATH; if Dakota's `bin` is on
-  `LD_LIBRARY_PATH`, the Albany subprocess loads Dakota's bundled
-  `libmpi.so.40` ahead of its own RUNPATH and segfaults at MPI finalize. The
-  activate hook is set up accordingly.
-- **Templates end with a blank line on purpose.** jinja2 strips one trailing
-  newline; Albany's YAML parser fails at EOF without a final newline.
+- **One calibration per `python` command.** Dakota-as-a-library cannot run two
+  studies in one interpreter; it segfaults on the second. This is a documented
+  MatCal limitation. Separate calibrations means separate `python` commands.
+- **Keep Dakota off `LD_LIBRARY_PATH`.** Dakota's programs and bindings resolve
+  their own libraries. If Dakota's `bin` is on `LD_LIBRARY_PATH`, the Albany
+  subprocess loads Dakota's bundled `libmpi.so.40` ahead of its own and
+  segfaults at MPI finalize. `check` tests for this.
 - **Identifiability depends on the load path.** The confined path is
-  cap-dominated, so shear-surface parameters `A`/`C` are weakly constrained
-  there (a fit can match the curve at the wrong `A`/`C`). Calibrate cap-active
-  parameters (`R`, `W`, `D1`, `kappa0`) on confined/hydrostatic, and add the
-  triaxial path to constrain the shear and non-associative terms.
+  cap-dominated, so `A` and `C` are weakly constrained there: a fit can match
+  the curve at the wrong `A` and `C`. Calibrate cap-active parameters (`R`,
+  `W`, `D1`, `kappa0`) on confined and hydrostatic, and add the triaxial path
+  to pin the shear and non-associative terms.
+- **Templates end with a blank line on purpose.** jinja2 strips one trailing
+  newline, and Albany's YAML parser fails at end-of-file without one.
+- **The reference CSV is overwritten by `make-reference`,** including when you
+  change `--curve`. If a later `calibrate` complains that a column is missing,
+  regenerate the reference with the curve you actually want.
+
+---
 
 ## Verification status
 
-All three platforms, rerun 2026-08-25 after the switch to base SI. The full
-list below is the sirius run. rigel and cee (hpws00344) were rerun on the
-forward runs and the two single-parameter studies, and return **identical**
-values: the same `max|stress_zz|` on every load path to all printed digits, the
-same converged parameters, and the same Dakota convergence messages. Timings
-are the only thing that differs between machines.
+Rerun on 2026-08-26 on sirius (Fedora 44, MatCal 1.4.28, Dakota 6.24.0) and on
+CEE (`hpws00344`, RHEL 9.7, MatCal 1.4.27, the on-disk Dakota 6.24.0), after
+the harness gained the strain and load-displacement fields. The two platforms
+return identical values to every printed digit; only timings differ.
 
-sirius (Fedora 44, MatCal 1.4.28, Dakota 6.24.0):
+Forward runs, peak axial stress at the default parameters (about 2.5 s each):
 
-- Forward runs on all three load paths (about 2.5 s each; `1.585615e+08`,
-  `3.094229e+08` and `2.265800e+08` Pa peak `stress_zz` for confined,
-  hydrostatic and triaxial).
-- **Unit invariance.** Each load path rerun with the original MPa parameter set
-  reproduces the Pa run to a maximum relative difference of 3e-15 in
-  `stress_zz` (confined 2.4e-15, hydrostatic 2.9e-15, triaxial 2.4e-15), which
-  is the roundoff floor. The model is unit-agnostic as documented: the drift
-  tolerance is scaled by `E^2` in `CapModel_Def.hpp` and the Newton test acts on
-  prescribed displacements, so nothing in the solve carries an absolute stress
-  scale.
-- `GradientCalibrationStudy`, one dimensionless parameter, one path: `R`
-  recovered as `28.000000001` from an initial 22 (ABSOLUTE FUNCTION
-  CONVERGENCE, ten Albany evaluations, 12 s).
-- `GradientCalibrationStudy`, one stress-like parameter, one path:
-  `kappa0 = -8050000.0` recovered exactly from an initial `-1.2e7` with bounds
-  `[-2.0e7, -2.0e6]` (X-CONVERGENCE, ten evaluations, 13 s). This is the case
-  the unit convention actually touches: Dakota normalizes each parameter onto
-  [0, 1] over its bounds, so a stress-like parameter is searched no differently
-  from a dimensionless one.
-- `GradientCalibrationStudy`, two parameters, two paths: `R = 28.0`,
-  `W = 0.080000000001` from (22, 0.05) (X-CONVERGENCE, 18 evaluations, 28 s on
-  four cores).
-- `ScipyMinimizeStudy` (`--study scipy`), one parameter: `R = 27.995`.
+| Load path | peak `\|stress_xx\|` |
+|-----------|--------------------|
+| confined | `3.106368e+08` Pa |
+| hydrostatic | `3.094229e+08` Pa |
+| triaxial | `3.085363e+08` Pa |
 
-The gradient-study results are unchanged by the switch to Pa, as expected:
+Round trips, each recovering a parameter the reference was generated at:
+
+| Study | Result | Convergence | Cost |
+|-------|--------|-------------|------|
+| `R` from 22, confined, stress-strain | `R: 28.0` | X-CONVERGENCE | 10 evaluations, 15 s |
+| `R` from 22, confined, load-displacement | `R: 28.0` | X-CONVERGENCE | 10 evaluations, 15 s |
+| `kappa0` from `-1.2e7`, hydrostatic | `kappa0: -8050000.0` | X-CONVERGENCE | 10 evaluations, 12 s |
+| `R`, `W` from (22, 0.05), confined + hydrostatic | `R: 28.0`, `W: 0.08` | X-CONVERGENCE | 18 evaluations, 28 s on 4 cores |
+| `R` from 22, confined, `--study scipy` | `R: 27.983` | (looser tolerance by design) | 16 s |
+
+`kappa0` is the case the unit convention actually touches: Dakota normalizes
+each parameter onto `[0, 1]` over its bounds, so a stress-like parameter is
+searched no differently from a dimensionless one.
+
+The `stress-strain` and `load-displacement` studies agree exactly, as the
+unit-cube mesh implies. Both improve slightly on what this harness compared
+before it had strain fields, which was `time` against the *lateral* stress
+`stress_zz`: that recovered `W: 0.080000000001` where these recover `W: 0.08`,
+the axial stress being the stronger signal. The peak values moved accordingly,
+confined from `1.585615e+08` Pa (lateral) to `3.106368e+08` Pa (axial).
+
+**Unit invariance**, checked when the harness moved to base SI: each load path
+rerun with the original MPa parameter set reproduces the Pa run to a maximum
+relative difference of `3e-15` in stress (confined `2.4e-15`, hydrostatic
+`2.9e-15`, triaxial `2.4e-15`), which is the roundoff floor. The drift
+tolerance is scaled by `E^2` in `CapModel_Def.hpp` and the Newton test acts on
+prescribed displacements, so nothing in the solve carries an absolute stress
+scale. Converged calibration results are likewise unaffected, because
 `CurveBasedInterpolatedObjective` conditions each field onto a fixed range
-before differencing (MatCal's `RangeDataConditioner`), so the objective is
-dimensionless and Dakota's convergence path does not carry the stress scale
-either. The `--study scipy` value moves in the fourth digit only because that
-study stops at a much looser tolerance.
+before differencing (MatCal's `RangeDataConditioner`), leaving the objective
+dimensionless.

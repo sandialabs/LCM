@@ -9,7 +9,7 @@
 #include <limits>
 #include <unordered_set>
 
-#include "Albany_BucketArray.hpp"
+#include "Albany_EntityDimension.hpp"
 #include "Albany_CombineAndScatterManager.hpp"
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_Macros.hpp"
@@ -32,6 +32,8 @@
 #include <fstream>
 #include <iostream>
 #include <stk_mesh/base/Entity.hpp>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include <stk_mesh/base/FEMHelpers.hpp>
 #include <stk_mesh/base/GetEntities.hpp>
 #include <stk_mesh/base/Selector.hpp>
@@ -1918,12 +1920,13 @@ STKDiscretization::computeWorksetInfo()
             const ScalarFieldType& field = *metaData.get_field<double>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1]);
             array.assign<ElemTag, NodeTag>(stateVec.data(), dim0, dim[1]);
+            auto fieldData = field.data();
             for (int i = 0; i < dim0; i++) {
               stk::mesh::Entity        element = buck[i];
               stk::mesh::Entity const* rel     = bulkData.begin_nodes(element);
               for (int j = 0; j < static_cast<int>(dim[1]); j++) {
                 stk::mesh::Entity rowNode = rel[j];
-                array(i, j)               = *stk::mesh::field_data(field, rowNode);
+                array(i, j)               = fieldData.entity_values(rowNode)();
               }
             }
             break;
@@ -1933,14 +1936,15 @@ STKDiscretization::computeWorksetInfo()
             const VectorFieldType& field = *metaData.get_field<double>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1] * dim[2]);
             array.assign<ElemTag, NodeTag, CompTag>(stateVec.data(), dim0, dim[1], dim[2]);
+            auto fieldData = field.data();
             for (int i = 0; i < dim0; i++) {
               stk::mesh::Entity        element = buck[i];
               stk::mesh::Entity const* rel     = bulkData.begin_nodes(element);
               for (int j = 0; j < static_cast<int>(dim[1]); j++) {
                 stk::mesh::Entity rowNode = rel[j];
-                double*           entry   = stk::mesh::field_data(field, rowNode);
+                auto              entry   = fieldData.entity_values(rowNode);
                 for (int k = 0; k < static_cast<int>(dim[2]); k++) {
-                  array(i, j, k) = entry[k];
+                  array(i, j, k) = entry(stk::mesh::ComponentIdx(k));
                 }
               }
             }
@@ -1951,17 +1955,25 @@ STKDiscretization::computeWorksetInfo()
             const TensorFieldType& field = *metaData.get_field<double>(stk::topology::NODE_RANK, name);
             stateVec.resize(dim0 * dim[1] * dim[2] * dim[3]);
             array.assign<ElemTag, NodeTag, CompTag, CompTag>(stateVec.data(), dim0, dim[1], dim[2], dim[3]);
+            // The legacy form was entry[k * dim[3] + l], a hand-computed
+            // flattened index that is only correct for Layout::Right. The
+            // ScalarIdx accessor takes that same flattened index and applies
+            // whatever stride the active layout uses, so this is the identical
+            // element on every build. It is deliberately not rewritten as
+            // (CopyIdx, ComponentIdx): for a square tensor dim[2] == dim[3],
+            // so getting those two the wrong way round would silently
+            // transpose the state and no bounds check would catch it.
+            auto fieldData = field.data();
             for (int i = 0; i < dim0; i++) {
               stk::mesh::Entity        element = buck[i];
               stk::mesh::Entity const* rel     = bulkData.begin_nodes(element);
               for (int j = 0; j < static_cast<int>(dim[1]); j++) {
                 stk::mesh::Entity rowNode = rel[j];
-                double*           entry   = stk::mesh::field_data(field, rowNode);
+                auto              entry   = fieldData.entity_values(rowNode);
                 for (int k = 0; k < static_cast<int>(dim[2]); k++) {
                   for (int l = 0; l < static_cast<int>(dim[3]); l++) {
-                    array(i, j, k, l) = entry[k * dim[3] + l];  // check this,
-                                                                // is stride
-                                                                // Correct?
+                    array(i, j, k, l) =
+                        entry(stk::mesh::ScalarIdx(k * dim[3] + l));
                   }
                 }
               }

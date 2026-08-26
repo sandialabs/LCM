@@ -9,8 +9,10 @@
 #include <stk_mesh/base/MetaData.hpp>
 
 #include "Albany_AbstractNodeFieldContainer.hpp"
-#include "Albany_BucketArray.hpp"  // for EntityDimension tag
+#include "Albany_EntityDimension.hpp"
 #include <stk_mesh/base/FieldBase.hpp>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include "Albany_GlobalLocalIndexer.hpp"
 #include "Albany_StateInfoStruct.hpp"  // For MDArray
 #include "Albany_ThyraUtils.hpp"
@@ -196,6 +198,12 @@ struct NodeData_Traits<T, 3>
       int const num_i_components = stk::mesh::field_extent0_per_entity(*fld, bucket);
       int const num_j_components = (num_i_components > 0) ? scalars_per / num_i_components : 1;
 
+      // The legacy form was data[k + j * num_i_components], a hand-computed
+      // flattened index valid only for Layout::Right. ScalarIdx takes the same
+      // flattened index and applies the active layout's stride, so this reaches
+      // the identical element on every build.
+      auto fieldData = fld->template data<stk::mesh::ReadWrite>();
+
       for (int j = 0; j < num_j_components; ++j) {
         for (int k = 0; k < num_i_components; ++k) {
           Teuchos::ArrayRCP<const ST> const_overlap_node_view = getLocalData(overlap_node_vec->col(offset + j * num_i_components + k));
@@ -203,8 +211,8 @@ struct NodeData_Traits<T, 3>
           for (int i = 0; i < num_nodes_in_bucket; ++i) {
             const GO global_id = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
             const LO local_id  = indexer->getLocalElement(global_id);
-            T* data = stk::mesh::field_data(*fld, bucket[i]);
-            data[k + j * num_i_components] = const_overlap_node_view[local_id];
+            auto     values    = fieldData.entity_values(bucket[i]);
+            values(stk::mesh::ScalarIdx(k + j * num_i_components)) = const_overlap_node_view[local_id];
           }
         }
       }

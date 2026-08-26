@@ -16,7 +16,8 @@ __all__ = []
 from . import register_factories  # noqa: F401
 
 from .exodus_reader import read_lcm_cap_exodus
-from .lcm_model import make_lcm_cap_model, SALEM_LIMESTONE, TEMPLATES_DIR
+from .lcm_model import (make_lcm_cap_model, SALEM_LIMESTONE, TEMPLATES_DIR,
+                        DEFAULT_FINITE_DEFORMATION)
 from .platforms import get_platform, get_albany, Platform
 from .load_paths import (LOAD_PATHS, get_load_path, LoadPath,
                          CURVES, get_curve, Curve, DEFAULT_CURVE)
@@ -26,6 +27,7 @@ __all__ += [
     "make_lcm_cap_model",
     "SALEM_LIMESTONE",
     "TEMPLATES_DIR",
+    "DEFAULT_FINITE_DEFORMATION",
     "get_platform",
     "get_albany",
     "Platform",

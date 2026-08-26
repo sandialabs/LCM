@@ -121,6 +121,12 @@ genuinely different curves, differing by up to 7 per cent at the strain levels
 these decks reach. `load-displacement` is the safest when you are unsure,
 because displacement and force mean the same thing under both formulations.
 
+`true-stress-strain` is the default because it is the pair the
+finite-deformation kernel actually works in. If your laboratory reports
+engineering stress and strain, as most do, either pass
+`--curve eng-stress-strain` every run or change the default once: see
+[Changing the defaults](#changing-the-defaults).
+
 ### 3. Choose the load path
 
 | `--load-path` | Loading | Constrains |
@@ -187,7 +193,9 @@ individual Albany run.
 ## Kinematics
 
 **The harness runs the finite-deformation cap model by default.** The materials
-file's `Finite Deformation` flag is templated, and `--small-strain` flips it.
+file's `Finite Deformation` flag is templated, `--small-strain` flips it for one
+run, and `DEFAULT_FINITE_DEFORMATION` in `site_matcal/lcm_model.py` flips it
+permanently (see [Changing the defaults](#changing-the-defaults)).
 
 The two kernels are not two discretizations of the same thing:
 
@@ -310,6 +318,36 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 Bad input is rejected before any simulation runs: unknown parameter or load
 path names, bounds that are not increasing, an `INIT` outside its bounds, a
 data file whose columns do not match the chosen curve.
+
+### Changing the defaults
+
+Two choices are made for you, and both are stated on every run: the header line
+of `calibrate` reads `curve=... kinematics=...`, and `make-reference` records
+both in the line it prints and nothing else changes silently.
+
+| Default | Value | Override for one run | Change permanently |
+|---------|-------|----------------------|--------------------|
+| Curve | `true-stress-strain` | `--curve eng-stress-strain` (or any other) | `DEFAULT_CURVE` in `site_matcal/load_paths.py` |
+| Kinematics | finite deformation | `--small-strain` | `DEFAULT_FINITE_DEFORMATION` in `site_matcal/lcm_model.py` |
+| Load path | `confined` | `--load-path NAME`, repeatable | - |
+| Cores | 4 | `--core-limit N` | - |
+
+Each permanent default is a single named constant, read by both the library and
+the command line, so editing it is the whole change. For example, to make
+engineering stress-strain the site default:
+
+```python
+DEFAULT_CURVE = "eng-stress-strain"    # site_matcal/load_paths.py
+```
+
+`--help` picks the change up automatically: whichever kinematics constant is
+set gets the `(default)` label, and the `--curve` help text names the current
+default. Nothing else needs editing, and no deck or template is touched.
+
+Changing a default does **not** rewrite existing reference CSVs. Those carry
+the column names of the curve they were generated with, so a stale one is
+caught by the column check rather than silently misread; regenerate with
+`make-reference`.
 
 `--curve time-stress` compares the LOCA continuation parameter (which runs over
 `[0, 1]` and is affine in applied displacement) against axial Cauchy stress. It

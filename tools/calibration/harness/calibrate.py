@@ -63,7 +63,7 @@ import matcal as mc
 
 from site_matcal import (make_lcm_cap_model, SALEM_LIMESTONE, get_platform,
                          get_albany, get_load_path, CURVES, DEFAULT_CURVE,
-                         LOAD_PATHS, TEMPLATES_DIR)
+                         LOAD_PATHS, TEMPLATES_DIR, DEFAULT_FINITE_DEFORMATION)
 
 DEFAULT_OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                "examples")
@@ -355,11 +355,13 @@ def main(argv=None):
                     help="override a constant default, base SI (repeatable)")
     kin = ap.add_mutually_exclusive_group()
     kin.add_argument("--finite-deformation", dest="finite_deformation",
-                     action="store_true", default=True,
-                     help="exponential/logarithmic-map kinematics (default)")
+                     action="store_true", default=DEFAULT_FINITE_DEFORMATION,
+                     help="exponential/logarithmic-map kinematics"
+                          + (" (default)" if DEFAULT_FINITE_DEFORMATION else ""))
     kin.add_argument("--small-strain", dest="finite_deformation",
                      action="store_false",
-                     help="infinitesimal-strain kinematics")
+                     help="infinitesimal-strain kinematics"
+                          + ("" if DEFAULT_FINITE_DEFORMATION else " (default)"))
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
     ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)

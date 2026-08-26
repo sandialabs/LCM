@@ -92,8 +92,15 @@ SALEM_LIMESTONE = dict(
 )
 
 
+# Kinematics used unless a caller says otherwise. This is the single place to
+# change it: both the library default below and the --finite-deformation /
+# --small-strain flag in harness/calibrate.py read it.
+DEFAULT_FINITE_DEFORMATION = True
+
+
 def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
-                       platform=None, name=None, finite_deformation=True):
+                       platform=None, name=None,
+                       finite_deformation=DEFAULT_FINITE_DEFORMATION):
     """Return a configured ``UserExecutableModel`` for an LCM cap load path.
 
     Parameters
@@ -114,7 +121,8 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
         (default ``lcm_cap_<load_path>``).
     finite_deformation : bool, optional
         Kinematics for the ``Finite Deformation`` flag in the materials file.
-        Default True. See the KINEMATICS note in the module docstring.
+        Default :data:`DEFAULT_FINITE_DEFORMATION`. See the KINEMATICS note in
+        the module docstring.
     """
     lp = get_load_path(load_path)
     plat = get_platform(platform)

@@ -337,10 +337,15 @@ python calibrate.py make-reference --load-path confined
 [confined] wrote reference .../examples/confined_reference.csv (201 points, true-stress-strain, finite deformation, peak |stress_xx| = 3.270823e+08)
 ```
 
-`finite deformation` is the harness default and is what these calibrations use.
-Adding `--small-strain` selects the infinitesimal-strain kernel instead and
-gives `3.106368e+08`; the README's "Kinematics" section explains when that
-matters.
+Two defaults are being applied here, and both are named in that line:
+`true-stress-strain` is the curve being compared, and `finite deformation` is
+the kinematics. Every run states them, so you never have to guess which was
+used. Adding `--small-strain` selects the infinitesimal-strain kernel instead
+and gives `3.106368e+08`.
+
+The README explains both: "Kinematics" for why finite deformation is the
+default and when it matters, and "Changing the defaults" for how to override
+either one for a single run or change it permanently (one constant each).
 
 Now recover `R`, one of the cap-shape parameters. The curve was made at
 `R = 28`; `20:35:22` tells the optimizer to search between 20 and 35 **and to

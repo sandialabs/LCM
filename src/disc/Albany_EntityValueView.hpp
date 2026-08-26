@@ -6,6 +6,7 @@
 #define ALBANY_ENTITYVALUEVIEW_HPP
 
 #include <cstddef>
+#include <type_traits>
 
 namespace Albany {
 
@@ -56,6 +57,23 @@ class EntityValueViewT
 // Read-only by default: every cached use in the discretization reads.
 using EntityValueView    = EntityValueViewT<double const>;
 using MutEntityValueView = EntityValueViewT<double>;
+
+// Build a view of one entity's values from an STK Field data handle. The
+// handle must outlive the view: Field::data() returns by value and releases
+// its access when it dies, so acquire it in an enclosing scope rather than
+// inline in this call.
+//
+//   auto coordsData = coordinates_field->data<stk::mesh::ReadWrite>();
+//   auto coord      = entity_view(coordsData, node);
+//   coord[0] = x;   // correct under any layout
+template <typename FieldDataT, typename EntityT>
+auto
+entity_view(FieldDataT& data, EntityT entity)
+{
+  auto values = data.entity_values(entity);
+  using ValueType = std::remove_pointer_t<decltype(values.pointer())>;
+  return EntityValueViewT<ValueType>(values.pointer(), values.component_stride());
+}
 
 }  // namespace Albany
 

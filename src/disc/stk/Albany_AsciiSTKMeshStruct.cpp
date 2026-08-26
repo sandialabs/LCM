@@ -3,6 +3,9 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include "Albany_AsciiSTKMeshStruct.hpp"
+#include "Albany_EntityValueView.hpp"
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 
 #include <Albany_STKNodeSharing.hpp>
 #include <Shards_BasicTopologies.hpp>
@@ -413,6 +416,7 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
   typedef AbstractSTKFieldContainer::ScalarFieldType ScalarFieldType;
 
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field    = fieldContainer->getCoordinatesField();
+
   ScalarFieldType*                            surfaceHeight_field  = metaData->get_field<double>(stk::topology::NODE_RANK, "surface_height");
   ScalarFieldType*                            flowFactor_field     = metaData->get_field<double>(stk::topology::ELEMENT_RANK, "flow_factor");
   ScalarFieldType*                            temperature_field    = metaData->get_field<double>(stk::topology::ELEMENT_RANK, "temperature");
@@ -422,6 +426,19 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
   if (!flowFactor_field) have_flwa = false;
   if (!temperature_field) have_temp = false;
   if (!basal_friction_field) have_beta = false;
+
+  // One Field data handle per field, held for the whole build below. These
+  // must outlive the views taken from them, and Field::data() returns by
+  // value, so they cannot be acquired inline at each use.
+  auto coordsData        = coordinates_field->data<stk::mesh::ReadWrite>();
+  auto surfaceHeightData = have_sh ? surfaceHeight_field->data<stk::mesh::ReadWrite>()
+                                   : decltype(surfaceHeight_field->data<stk::mesh::ReadWrite>()){};
+  auto flowFactorData    = have_flwa ? flowFactor_field->data<stk::mesh::ReadWrite>()
+                                     : decltype(flowFactor_field->data<stk::mesh::ReadWrite>()){};
+  auto temperatureData   = have_temp ? temperature_field->data<stk::mesh::ReadWrite>()
+                                     : decltype(temperature_field->data<stk::mesh::ReadWrite>()){};
+  auto basalFrictionData = have_beta ? basal_friction_field->data<stk::mesh::ReadWrite>()
+                                     : decltype(basal_friction_field->data<stk::mesh::ReadWrite>()){};
 
   for (int i = 0; i < elem_mapT->getLocalNumElements(); i++) {
     const unsigned int elem_GID = elem_mapT->getGlobalElement(i);
@@ -448,39 +465,39 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
     bulkData->declare_relation(elem, urnodeb, 6);
     bulkData->declare_relation(elem, ulnodeb, 7);
 
-    double*      coord;
+    MutEntityValueView coord;
     int          node_GID;
     unsigned int node_LID;
 
     node_GID = eles[i][0] - 1;
     node_LID = node_mapT->getLocalElement(node_GID);
-    coord    = stk::mesh::field_data(*coordinates_field, llnode);
+    coord = entity_view(coordsData, llnode);
     coord[0] = xyz[node_LID][0];
     coord[1] = xyz[node_LID][1];
     coord[2] = xyz[node_LID][2];
 
     node_GID = eles[i][1] - 1;
     node_LID = node_mapT->getLocalElement(node_GID);
-    coord    = stk::mesh::field_data(*coordinates_field, lrnode);
+    coord = entity_view(coordsData, lrnode);
     coord[0] = xyz[node_LID][0];
     coord[1] = xyz[node_LID][1];
     coord[2] = xyz[node_LID][2];
 
     node_GID = eles[i][2] - 1;
     node_LID = node_mapT->getLocalElement(node_GID);
-    coord    = stk::mesh::field_data(*coordinates_field, urnode);
+    coord = entity_view(coordsData, urnode);
     coord[0] = xyz[node_LID][0];
     coord[1] = xyz[node_LID][1];
     coord[2] = xyz[node_LID][2];
 
     node_GID = eles[i][3] - 1;
     node_LID = node_mapT->getLocalElement(node_GID);
-    coord    = stk::mesh::field_data(*coordinates_field, ulnode);
+    coord = entity_view(coordsData, ulnode);
     coord[0] = xyz[node_LID][0];
     coord[1] = xyz[node_LID][1];
     coord[2] = xyz[node_LID][2];
 
-    coord    = stk::mesh::field_data(*coordinates_field, llnodeb);
+    coord = entity_view(coordsData, llnodeb);
     node_GID = eles[i][4] - 1;
     node_LID = node_mapT->getLocalElement(node_GID);
     coord[0] = xyz[node_LID][0];
@@ -489,19 +506,19 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
 
     node_GID = eles[i][5] - 1;
     node_LID = node_mapT->getLocalElement(node_GID);
-    coord    = stk::mesh::field_data(*coordinates_field, lrnodeb);
+    coord = entity_view(coordsData, lrnodeb);
     coord[0] = xyz[node_LID][0];
     coord[1] = xyz[node_LID][1];
     coord[2] = xyz[node_LID][2];
 
-    coord    = stk::mesh::field_data(*coordinates_field, urnodeb);
+    coord = entity_view(coordsData, urnodeb);
     node_GID = eles[i][6] - 1;
     node_LID = node_mapT->getLocalElement(node_GID);
     coord[0] = xyz[node_LID][0];
     coord[1] = xyz[node_LID][1];
     coord[2] = xyz[node_LID][2];
 
-    coord    = stk::mesh::field_data(*coordinates_field, ulnodeb);
+    coord = entity_view(coordsData, ulnodeb);
     node_GID = eles[i][7] - 1;
     node_LID = node_mapT->getLocalElement(node_GID);
     coord[0] = xyz[node_LID][0];
@@ -509,97 +526,97 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
     coord[2] = xyz[node_LID][2];
 
     if (have_sh) {
-      double* sHeight;
-      sHeight    = stk::mesh::field_data(*surfaceHeight_field, llnode);
+      MutEntityValueView sHeight;
+      sHeight = entity_view(surfaceHeightData, llnode);
       node_GID   = eles[i][0] - 1;
       node_LID   = node_mapT->getLocalElement(node_GID);
       sHeight[0] = sh[node_LID];
 
-      sHeight    = stk::mesh::field_data(*surfaceHeight_field, lrnode);
+      sHeight = entity_view(surfaceHeightData, lrnode);
       node_GID   = eles[i][1] - 1;
       node_LID   = node_mapT->getLocalElement(node_GID);
       sHeight[0] = sh[node_LID];
 
-      sHeight    = stk::mesh::field_data(*surfaceHeight_field, urnode);
+      sHeight = entity_view(surfaceHeightData, urnode);
       node_GID   = eles[i][2] - 1;
       node_LID   = node_mapT->getLocalElement(node_GID);
       sHeight[0] = sh[node_LID];
 
-      sHeight    = stk::mesh::field_data(*surfaceHeight_field, ulnode);
+      sHeight = entity_view(surfaceHeightData, ulnode);
       node_GID   = eles[i][3] - 1;
       node_LID   = node_mapT->getLocalElement(node_GID);
       sHeight[0] = sh[node_LID];
 
-      sHeight    = stk::mesh::field_data(*surfaceHeight_field, llnodeb);
+      sHeight = entity_view(surfaceHeightData, llnodeb);
       node_GID   = eles[i][4] - 1;
       node_LID   = node_mapT->getLocalElement(node_GID);
       sHeight[0] = sh[node_LID];
 
-      sHeight    = stk::mesh::field_data(*surfaceHeight_field, lrnodeb);
+      sHeight = entity_view(surfaceHeightData, lrnodeb);
       node_GID   = eles[i][5] - 1;
       node_LID   = node_mapT->getLocalElement(node_GID);
       sHeight[0] = sh[node_LID];
 
-      sHeight    = stk::mesh::field_data(*surfaceHeight_field, urnodeb);
+      sHeight = entity_view(surfaceHeightData, urnodeb);
       node_GID   = eles[i][6] - 1;
       node_LID   = node_mapT->getLocalElement(node_GID);
       sHeight[0] = sh[node_LID];
 
-      sHeight    = stk::mesh::field_data(*surfaceHeight_field, ulnodeb);
+      sHeight = entity_view(surfaceHeightData, ulnodeb);
       node_GID   = eles[i][7] - 1;
       node_LID   = node_mapT->getLocalElement(node_GID);
       sHeight[0] = sh[node_LID];
     }
     if (have_flwa) {
-      double* flowFactor = stk::mesh::field_data(*flowFactor_field, elem);
+      auto flowFactor = entity_view(flowFactorData, elem);
       // i is elem_LID (element local ID);
       //*out << "i: " << i <<", flwa: " << flwa[i] << std::endl;
       flowFactor[0] = flwa[i];
     }
     if (have_temp) {
-      double* temperature = stk::mesh::field_data(*temperature_field, elem);
+      auto temperature = entity_view(temperatureData, elem);
       // i is elem_LID (element local ID);
       //*out << "i: " << i <<", temp: " << temperature[i] << std::endl;
       temperature[0] = temper[i];
     }
     if (have_beta) {
-      double* bFriction;
-      bFriction    = stk::mesh::field_data(*basal_friction_field, llnode);
+      MutEntityValueView bFriction;
+      bFriction = entity_view(basalFrictionData, llnode);
       node_GID     = eles[i][0] - 1;
       node_LID     = node_mapT->getLocalElement(node_GID);
       bFriction[0] = beta[node_LID];
 
-      bFriction    = stk::mesh::field_data(*basal_friction_field, lrnode);
+      bFriction = entity_view(basalFrictionData, lrnode);
       node_GID     = eles[i][1] - 1;
       node_LID     = node_mapT->getLocalElement(node_GID);
       bFriction[0] = beta[node_LID];
 
-      bFriction    = stk::mesh::field_data(*basal_friction_field, urnode);
+      bFriction = entity_view(basalFrictionData, urnode);
       node_GID     = eles[i][2] - 1;
       node_LID     = node_mapT->getLocalElement(node_GID);
       bFriction[0] = beta[node_LID];
 
-      bFriction    = stk::mesh::field_data(*basal_friction_field, ulnode);
+      bFriction = entity_view(basalFrictionData, ulnode);
       node_GID     = eles[i][3] - 1;
       node_LID     = node_mapT->getLocalElement(node_GID);
       bFriction[0] = beta[node_LID];
 
-      bFriction    = stk::mesh::field_data(*basal_friction_field, llnodeb);
+      bFriction = entity_view(basalFrictionData, llnodeb);
       node_GID     = eles[i][4] - 1;
       node_LID     = node_mapT->getLocalElement(node_GID);
       bFriction[0] = beta[node_LID];
 
-      bFriction    = stk::mesh::field_data(*basal_friction_field, lrnodeb);
+      bFriction = entity_view(basalFrictionData, lrnodeb);
       node_GID     = eles[i][5] - 1;
       node_LID     = node_mapT->getLocalElement(node_GID);
       bFriction[0] = beta[node_LID];
 
-      bFriction    = stk::mesh::field_data(*basal_friction_field, urnodeb);
+      bFriction = entity_view(basalFrictionData, urnodeb);
       node_GID     = eles[i][6] - 1;
       node_LID     = node_mapT->getLocalElement(node_GID);
       bFriction[0] = beta[node_LID];
 
-      bFriction    = stk::mesh::field_data(*basal_friction_field, ulnodeb);
+      bFriction = entity_view(basalFrictionData, ulnodeb);
       node_GID     = eles[i][7] - 1;
       node_LID     = node_mapT->getLocalElement(node_GID);
       bFriction[0] = beta[node_LID];

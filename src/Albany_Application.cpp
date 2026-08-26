@@ -512,51 +512,6 @@ Application::DBCDescriptor::eval(double time) const
 
     case Kind::Schwarz: return schwarz_cached_value;
 
-    case Kind::Kfield: {
-      // Linearly interpolate KI(t) and KII(t) from the time series and
-      // multiply by the YAML "Kfield KI" / "Kfield KII" scalars (which the
-      // legacy evaluator registered as Sacado parameters so LOCA could
-      // continuation-sweep them; elimination treats them as fixed scalars).
-      auto const n = kfield_time_values.size();
-      double     ki_t, kii_t;
-      if (n == 0) {
-        ki_t = 0.0; kii_t = 0.0;
-      } else if (time <= kfield_time_values[0]) {
-        ki_t = kfield_ki_values[0]; kii_t = kfield_kii_values[0];
-      } else if (time >= kfield_time_values[n - 1]) {
-        ki_t = kfield_ki_values[n - 1]; kii_t = kfield_kii_values[n - 1];
-      } else {
-        std::size_t i = 1;
-        while (i < n && kfield_time_values[i] < time) ++i;
-        double const dt    = kfield_time_values[i] - kfield_time_values[i - 1];
-        double const alpha = (time - kfield_time_values[i - 1]) / dt;
-        ki_t  = kfield_ki_values[i - 1]  + alpha * (kfield_ki_values[i]  - kfield_ki_values[i - 1]);
-        kii_t = kfield_kii_values[i - 1] + alpha * (kfield_kii_values[i] - kfield_kii_values[i - 1]);
-      }
-      double const ki  = kfield_ki_scale  * ki_t;
-      double const kii = kfield_kii_scale * kii_t;
-      // Williams' plane-strain crack-tip displacement field, in the
-      // arrangement the legacy LCM evaluator used:
-      //   coeff_1 = KI / mu * sqrt(R / 2π)
-      //   coeff_2 = KII / mu * sqrt(R / 2π)
-      //   ux = coeff_1 (1 - 2 nu + sin^2(θ/2)) cos(θ/2)
-      //      + coeff_2 (2 - 2 nu + cos^2(θ/2)) sin(θ/2)
-      //   uy = coeff_1 (2 - 2 nu - cos^2(θ/2)) sin(θ/2)
-      //      + coeff_2 (-1 + 2 nu + sin^2(θ/2)) cos(θ/2)
-      double const tau     = 2.0 * M_PI;
-      double const half_th = kfield_theta * 0.5;
-      double const c_half  = std::cos(half_th);
-      double const s_half  = std::sin(half_th);
-      double const coeff_1 = (ki  / kfield_mu) * std::sqrt(kfield_r / tau);
-      double const coeff_2 = (kii / kfield_mu) * std::sqrt(kfield_r / tau);
-      double const ki_x  = coeff_1 * (1.0 - 2.0 * kfield_nu + s_half * s_half) * c_half;
-      double const ki_y  = coeff_1 * (2.0 - 2.0 * kfield_nu - c_half * c_half) * s_half;
-      double const kii_x = coeff_2 * (2.0 - 2.0 * kfield_nu + c_half * c_half) * s_half;
-      double const kii_y = coeff_2 * (-1.0 + 2.0 * kfield_nu + s_half * s_half) * c_half;
-      if (kfield_component == 0) return ki_x + kii_x;
-      return ki_y + kii_y;
-    }
-
     case Kind::EquilibriumConcentration:
       // Coupled-injection BC: the value depends on the overlap pressure DOF
       // at the same node. The injection loop reads the pressure each fill
@@ -608,14 +563,6 @@ Application::DBCDescriptor::derivs_at(double time) const
 
     case Kind::Schwarz: return {schwarz_cached_velocity, schwarz_cached_acceleration};
 
-    case Kind::Kfield: {
-      double const h_max = 1.0e-6;
-      double const h     = (time > h_max) ? h_max : (time > 0.0 ? time : h_max);
-      double const f0    = eval(time);
-      double const fp    = eval(time + h);
-      double const fm    = eval(time - h);
-      return {(fp - fm) / (2.0 * h), (fp - 2.0 * f0 + fm) / (h * h)};
-    }
 
     case Kind::EquilibriumConcentration:
       // Quasistatic concentration BC — no inherent time derivative.
@@ -684,7 +631,6 @@ Application::eliminateConstrainedDOFs()
   //                                   "BC Values" inline, or "Time File"/"BC File")
   //     "Schwarz"                   → value from the coupled subdomain; only on
   //                                   the pseudo-DOF "all" (covers every equation)
-  //     "Kfield"                    → Williams crack-tip solution; only on the
   //                                   pseudo-DOF "K" (writes X and Y)
   //     "Equilibrium Concentration" → concentration from the local pressure DOF
   //
@@ -697,7 +643,6 @@ Application::eliminateConstrainedDOFs()
     std::set<std::string> valid_keys;
     for (auto const& ns : node_set_ids) {
       for (auto const& dof : bc_names) valid_keys.insert("DBC on NS " + ns + " for DOF " + dof);
-      valid_keys.insert("DBC on NS " + ns + " for DOF K");
       valid_keys.insert("DBC on NS " + ns + " for DOF all");
     }
     std::string bad;
@@ -710,9 +655,9 @@ Application::eliminateConstrainedDOFs()
         "Unrecognized Dirichlet BC key(s):" + bad +
             "\nThe only accepted form is \"DBC on NS <nodeset> for DOF <dof>\", where "
             "<nodeset> is a mesh node set and <dof> is one of the problem's DBC names "
-            "(or the pseudo-DOFs \"K\" for Kfield and \"all\" for Schwarz), with a "
+            "(or the pseudo-DOF \"all\" for Schwarz), with a "
             "double (constant), string (expression in x, y, z, t), or sublist "
-            "(BC Function: Array | Schwarz | Kfield | Equilibrium Concentration) value.");
+            "(BC Function: Array | Schwarz | Equilibrium Concentration) value.");
   }
   std::map<GO, DBCDescriptor> local_gid_desc_map;
 
@@ -749,7 +694,7 @@ Application::eliminateConstrainedDOFs()
         ALBANY_ASSERT(
             sub.isType<std::string>("BC Function"),
             "Dirichlet BC \"" + dbc_key + "\": a sublist value requires a \"BC Function\" string entry "
-            "(Array | Schwarz | Kfield | Equilibrium Concentration).");
+            "(Array | Schwarz | Equilibrium Concentration).");
         std::string const bc_fn = sub.get<std::string>("BC Function");
         if (bc_fn == "Array") {
           proto.kind = DBCDescriptor::Kind::TimeArray;
@@ -796,7 +741,7 @@ Application::eliminateConstrainedDOFs()
           ALBANY_ABORT(
               "Dirichlet BC \"" + dbc_key + "\": unrecognized BC Function \"" + bc_fn +
               "\". Valid on a real DOF: Array | Equilibrium Concentration. "
-              "Schwarz goes on the pseudo-DOF \"all\"; Kfield on the pseudo-DOF \"K\".");
+              "Schwarz goes on the pseudo-DOF \"all\".");
         }
       } else if (bc_params.isParameter(dbc_key)) {
         ALBANY_ABORT(
@@ -821,54 +766,6 @@ Application::eliminateConstrainedDOFs()
     }
 
     std::string const& ns_id = node_set_ids[i];
-
-    // Kfield BC on the pseudo-DOF "K": plane-strain crack-tip Williams'
-    // solution on a single nodeset; writes both x and y displacement DOFs.
-    // YAML key form:
-    //   "DBC on NS <ns> for DOF K":
-    //     BC Function: Kfield
-    //     Time Values: [...]
-    //     KI Values:   [...]
-    //     KII Values:  [...]
-    //     Kfield KI:      <double>
-    //     Kfield KII:     <double>
-    //     Shear Modulus:  <double>
-    //     Poissons Ratio: <double>
-    std::string const kfield_key = "DBC on NS " + ns_id + " for DOF K";
-    if (bc_params.isSublist(kfield_key) && ns_coords != nullptr) {
-      auto const& k_sub = bc_params.sublist(kfield_key);
-      ALBANY_ASSERT(
-          k_sub.isType<std::string>("BC Function") && k_sub.get<std::string>("BC Function") == "Kfield",
-          "Dirichlet BC \"" + kfield_key + "\": the pseudo-DOF \"K\" requires \"BC Function: Kfield\".");
-      auto const& ttv   = k_sub.get<Teuchos::Array<double>>("Time Values");
-      auto const& kiv   = k_sub.get<Teuchos::Array<double>>("KI Values");
-      auto const& kiiv  = k_sub.get<Teuchos::Array<double>>("KII Values");
-      double const mu        = k_sub.get<double>("Shear Modulus");
-      double const nu        = k_sub.get<double>("Poissons Ratio");
-      double const ki_scale  = k_sub.get<double>("Kfield KI");
-      double const kii_scale = k_sub.get<double>("Kfield KII");
-      for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
-        auto const   c = (*ns_coords)[ni];
-        double const r     = std::sqrt(c[0] * c[0] + c[1] * c[1]);
-        double const th    = std::atan2(c[1], c[0]);
-        for (int comp = 0; comp < 2; ++comp) {
-          GO const      dof_gid = stk_disc->getGlobalDOF(node_gids[ni], comp);
-          DBCDescriptor desc;
-          desc.kind               = DBCDescriptor::Kind::Kfield;
-          desc.kfield_time_values = ttv.toVector();
-          desc.kfield_ki_values   = kiv.toVector();
-          desc.kfield_kii_values  = kiiv.toVector();
-          desc.kfield_mu          = mu;
-          desc.kfield_nu          = nu;
-          desc.kfield_ki_scale    = ki_scale;
-          desc.kfield_kii_scale   = kii_scale;
-          desc.kfield_r           = r;
-          desc.kfield_theta       = th;
-          desc.kfield_component   = comp;
-          local_gid_desc_map[dof_gid] = desc;
-        }
-      }
-    }
 
     // Schwarz BC on the pseudo-DOF "all": one sublist entry covers every
     // equation on the nodeset; values come from the coupled subdomain's

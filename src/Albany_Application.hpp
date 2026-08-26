@@ -728,7 +728,7 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
   //! prescribed value given the current time (and, for expressions, node coords).
   struct DBCDescriptor
   {
-    enum class Kind { Constant, TimeArray, Expression, Schwarz, Kfield, EquilibriumConcentration };
+    enum class Kind { Constant, TimeArray, Expression, Schwarz, EquilibriumConcentration };
     Kind              kind           = Kind::Constant;
     LO                overlap_lid    = -1;
     LO                full_owned_lid = -1;  // LID in full (pre-elimination) owned VS; -1 if this rank does not own this DOF
@@ -755,21 +755,6 @@ class Application : public Sacado::ParameterAccessor<PHAL::AlbanyTraits::Residua
     mutable double schwarz_cached_value        = 0.0;
     mutable double schwarz_cached_velocity     = 0.0;
     mutable double schwarz_cached_acceleration = 0.0;
-    // Kfield: plane-strain crack-tip Williams' solution with time-varying
-    // KI(t) and KII(t) interpolated from piecewise-linear time series. The
-    // descriptor stores (r, theta) for the node, the elastic constants
-    // (shear modulus, Poisson's ratio), the two time series, and which
-    // displacement component (0 = ux, 1 = uy) it represents.
-    std::vector<double> kfield_time_values;
-    std::vector<double> kfield_ki_values;
-    std::vector<double> kfield_kii_values;
-    double              kfield_mu        = 0.0;
-    double              kfield_nu        = 0.0;
-    double              kfield_r         = 0.0;
-    double              kfield_theta     = 0.0;
-    double              kfield_ki_scale  = 1.0;  // YAML "Kfield KI" scalar (LOCA parameter handle in legacy path)
-    double              kfield_kii_scale = 1.0;  // YAML "Kfield KII" scalar
-    int                 kfield_component = 0;  // 0 → ux, 1 → uy
     // EquilibriumConcentration: c_bc = applied * exp(pressure_factor * P_node),
     // where P_node is the pressure DOF value at the same node read from
     // the overlap solution. The descriptor stores the constants and the

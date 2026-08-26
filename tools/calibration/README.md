@@ -345,10 +345,20 @@ harness and readers are platform-agnostic.
 
 ## Verification status
 
-Rerun on 2026-08-26 on sirius (Fedora 44, MatCal 1.4.28, Dakota 6.24.0) and on
-CEE (`hpws00344`, RHEL 9.7, MatCal 1.4.27, the on-disk Dakota 6.24.0), after
-the harness gained the strain and load-displacement fields. The two platforms
-return identical values to every printed digit; only timings differ.
+Rerun on 2026-08-26 on all three platforms, after the harness gained the strain
+and load-displacement fields:
+
+| Platform | OS | MatCal | Dakota |
+|----------|----|--------|--------|
+| sirius | Fedora 44 | 1.4.28 | 6.24.0, `~/dakota` |
+| rigel | RHEL 9.8 | 1.4.27 | 6.24.0, `~/dakota` |
+| cee (`hpws00344`) | RHEL 9.7 | 1.4.27 | 6.24.0, `/projects` |
+
+All three return identical values to every printed digit. Only timings differ:
+rigel takes about twice as long per study as sirius (31 s against 15 s for the
+single-parameter confined round trip). That is per-core speed on what is a
+serial workload, not a configuration problem; pinning `OMP_NUM_THREADS=1` on
+rigel's 336-core node changes nothing (30.3 s against 31.6 s).
 
 Forward runs, peak axial stress at the default parameters (about 2.5 s each):
 
@@ -367,6 +377,12 @@ Round trips, each recovering a parameter the reference was generated at:
 | `kappa0` from `-1.2e7`, hydrostatic | `kappa0: -8050000.0` | X-CONVERGENCE | 10 evaluations, 12 s |
 | `R`, `W` from (22, 0.05), confined + hydrostatic | `R: 28.0`, `W: 0.08` | X-CONVERGENCE | 18 evaluations, 28 s on 4 cores |
 | `R` from 22, confined, `--study scipy` | `R: 27.983` | (looser tolerance by design) | 16 s |
+
+Timings are sirius. Coverage of the reruns, all matching exactly where run:
+sirius ran everything; rigel ran all three forward runs and the first four
+round trips; CEE ran the confined and hydrostatic forward runs and the
+stress-strain, load-displacement and `kappa0` round trips. `--study scipy` was
+run on sirius only.
 
 `kappa0` is the case the unit convention actually touches: Dakota normalizes
 each parameter onto `[0, 1]` over its bounds, so a stress-like parameter is

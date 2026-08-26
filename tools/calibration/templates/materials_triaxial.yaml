@@ -15,7 +15,9 @@ LCM:
     CapModelTriaxial:
       Material Model:
         Model Name: Cap
-      Finite Deformation: false
+      # Kinematics; see the note in materials.yaml. Set with
+      # --finite-deformation / --small-strain.
+      Finite Deformation: {{ finite_deformation }}
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: {{ elastic_modulus }}}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: {{ poissons_ratio }}}
       A: {{ A }}

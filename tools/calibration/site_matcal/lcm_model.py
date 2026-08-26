@@ -22,6 +22,17 @@ Everything here is in **base SI**: stress in Pa, no magnitude prefixes,
 magnitudes written in scientific notation. That covers the defaults below, the
 bounds and initial values passed as ``matcal.Parameter``, the experimental
 curves, and the stresses the Exodus reader returns. See ``SALEM_LIMESTONE``.
+
+KINEMATICS. ``finite_deformation`` renders the materials file's ``Finite
+Deformation`` flag and defaults to True. The finite-deformation kernel wraps
+exponential/logarithmic-map kinematics around the same verified integrator,
+working in logarithmic elastic strain and Kirchhoff stress and converting to
+Cauchy on output; it consumes F, J and Fp and writes no Strain field at all,
+which is why the harness reconstructs strain from nodal displacement (see
+``site_matcal.exodus_reader``). The Salem limestone constants below were
+identified under a small-strain formulation, so they remain a sound starting
+point under finite deformation but are not the finite-deformation answer to
+the same data.
 """
 
 import os
@@ -82,7 +93,7 @@ SALEM_LIMESTONE = dict(
 
 
 def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
-                       platform=None, name=None):
+                       platform=None, name=None, finite_deformation=True):
     """Return a configured ``UserExecutableModel`` for an LCM cap load path.
 
     Parameters
@@ -101,12 +112,20 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
     name : str, optional
         Model name and per-evaluation working-directory name
         (default ``lcm_cap_<load_path>``).
+    finite_deformation : bool, optional
+        Kinematics for the ``Finite Deformation`` flag in the materials file.
+        Default True. See the KINEMATICS note in the module docstring.
     """
     lp = get_load_path(load_path)
     plat = get_platform(platform)
     plat.apply_env()                       # no-op where the platform needs no env
     albany = albany or get_albany(platform)
-    constants = {**SALEM_LIMESTONE, **(defaults or {})}
+    # The flag is a jinja substitution like any other, but it is a YAML
+    # boolean rather than a number, so it is kept out of SALEM_LIMESTONE
+    # (which doubles as the whitelist of calibratable placeholders) and
+    # rendered as a lowercase literal Albany's YAML parser accepts.
+    constants = {**SALEM_LIMESTONE, **(defaults or {}),
+                 "finite_deformation": "true" if finite_deformation else "false"}
     name = name or f"lcm_cap_{lp.name}"
 
     deck_path = os.path.join(TEMPLATES_DIR, lp.deck)

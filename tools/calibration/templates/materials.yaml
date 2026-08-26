@@ -15,9 +15,13 @@ LCM:
     CapModel:
       Material Model:
         Model Name: Cap
-      # Small-strain model: routes MechanicsProblem to compute the
-      # infinitesimal Strain field the kernel consumes.
-      Finite Deformation: false
+      # Kinematics. true (the harness default) selects the
+      # exponential/logarithmic-map kernel, which integrates in logarithmic
+      # elastic strain / Kirchhoff stress and consumes F, J and Fp; it writes
+      # NO Strain field. false selects the small-strain kernel, which consumes
+      # the infinitesimal Strain field instead. Set with --finite-deformation
+      # / --small-strain; see site_matcal.lcm_model.
+      Finite Deformation: {{ finite_deformation }}
       Elastic Modulus: {Elastic Modulus Type: Constant, Value: {{ elastic_modulus }}}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: {{ poissons_ratio }}}
       A: {{ A }}

@@ -19,17 +19,33 @@ the axial direction an experiment would report. It is ``x`` for all three
 decks (hydrostatic loads all three axes equally, so any axis would do).
 
 A **curve** says which pair of fields to compare, and is what makes the
-harness usable with whatever the laboratory measured:
+harness usable with whatever the laboratory measured. Under finite deformation
+the strain and stress measures stop being interchangeable, so the curve names
+say which measure they mean:
 
-  * ``stress-strain``    - axial strain vs axial Cauchy stress (Pa). The
-                           default, and the usual output of a material test.
-  * ``load-displacement`` - face displacement (m) vs face reaction force (N).
-  * ``time-stress``      - LOCA continuation parameter vs axial stress. `time`
-                           runs over [0,1] and is affine in applied strain, so
-                           this is equivalent to ``stress-strain`` up to a
-                           rescaling of the abscissa. Kept for regression
-                           checks that want the abscissa the deck stepped on
-                           rather than a measured one.
+  * ``true-stress-strain`` - logarithmic (true) strain vs Cauchy (true) stress
+                           (Pa). The default: this is the pair the
+                           finite-deformation kernel actually works in, since
+                           it integrates in logarithmic elastic strain and
+                           reports Cauchy stress.
+  * ``eng-stress-strain``  - engineering strain ``u/L0`` vs engineering stress
+                           ``force/A0``, both referred to the undeformed
+                           geometry. This is what most laboratory reports
+                           contain.
+  * ``load-displacement``  - face displacement (m) vs face reaction force (N).
+                           The raw measured quantities, identical in meaning
+                           under both kinematics, so the safest choice when
+                           the reduction to stress and strain is in doubt.
+  * ``time-stress``        - LOCA continuation parameter vs axial Cauchy
+                           stress. `time` runs over [0,1] and is affine in
+                           applied displacement. Kept for regression checks
+                           that want the abscissa the deck stepped on rather
+                           than a measured one.
+
+Under ``Finite Deformation: false`` the two stress-strain curves differ only by
+the difference between ``u/L0`` and ``ln(1 + u/L0)``, because the face area
+does not change. Under finite deformation they differ in the stress as well,
+on any path whose loaded face changes area.
 
 Both fields of a curve are produced by ``site_matcal.exodus_reader`` and must
 appear, under these names, as columns of any experimental CSV.
@@ -52,10 +68,14 @@ class Curve:
 
 
 CURVES = {
-    "stress-strain": Curve(
-        "stress-strain", "strain_{a}{a}", "stress_{a}{a}",
+    "true-stress-strain": Curve(
+        "true-stress-strain", "strain_log_{a}", "stress_{a}{a}",
         units=("dimensionless", "Pa"),
-        description="axial strain vs axial Cauchy stress"),
+        description="logarithmic (true) strain vs Cauchy (true) stress"),
+    "eng-stress-strain": Curve(
+        "eng-stress-strain", "strain_eng_{a}", "stress_eng_{a}",
+        units=("dimensionless", "Pa"),
+        description="engineering strain u/L0 vs engineering stress force/A0"),
     "load-displacement": Curve(
         "load-displacement", "displacement_{a}", "force_{a}",
         units=("m", "N"),
@@ -63,10 +83,10 @@ CURVES = {
     "time-stress": Curve(
         "time-stress", "time", "stress_{a}{a}",
         units=("dimensionless", "Pa"),
-        description="LOCA continuation parameter vs axial stress"),
+        description="LOCA continuation parameter vs axial Cauchy stress"),
 }
 
-DEFAULT_CURVE = "stress-strain"
+DEFAULT_CURVE = "true-stress-strain"
 
 
 class LoadPath:

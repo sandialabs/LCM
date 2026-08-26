@@ -334,8 +334,13 @@ python calibrate.py make-reference --load-path confined
 **Check it worked.** The last line must read (the numbers matter):
 
 ```
-[confined] wrote reference .../examples/confined_reference.csv (201 points, stress-strain, peak |stress_xx| = 3.106368e+08)
+[confined] wrote reference .../examples/confined_reference.csv (201 points, true-stress-strain, finite deformation, peak |stress_xx| = 3.270823e+08)
 ```
+
+`finite deformation` is the harness default and is what these calibrations use.
+Adding `--small-strain` selects the infinitesimal-strain kernel instead and
+gives `3.106368e+08`; the README's "Kinematics" section explains when that
+matters.
 
 Now recover `R`, one of the cap-shape parameters. The curve was made at
 `R = 28`; `20:35:22` tells the optimizer to search between 20 and 35 **and to
@@ -357,7 +362,9 @@ That is a complete, verified installation: `28.0` is the value the reference
 was generated at, recovered from a starting guess of 22.
 
 You are done. Read [`README.md`](README.md) next to calibrate against your own
-stress-strain or load-displacement data.
+data. Start with its "Kinematics" section, which explains the finite-deformation
+default and, in particular, why the Salem limestone numbers this test recovers
+are a starting point rather than an answer.
 
 ---
 
@@ -374,6 +381,7 @@ stress-strain or load-displacement data.
 | `ERROR: Unrecognized cluster linux_rh9` | You are trying to `module load` the SEMS/Dakota module tree on a RHEL 9 workstation. Do not; this setup does not use modules at all. |
 | `conda activate` itself fails with `PYTHONPATH: unbound variable` | An older hook that used `$PYTHONPATH` unguarded. Use `${PYTHONPATH:-}` as shown in Step 6. |
 | Everything passes, but a calibration ends at its starting value | Usually the experimental data is not in base SI, or is compression-positive. The harness warns about both; see the README's "Units" section. |
+| A column such as `strain_xx` is reported missing | The finite-deformation kernel writes no strain field. Use `--curve true-stress-strain` or `eng-stress-strain`, whose strain is reconstructed from displacement, or run `--small-strain`. |
 | The second calibration in one script crashes | Only one calibration may run per `python` process. This is a Dakota-as-a-library limitation. Use a separate `python` command for each. |
 
 ---

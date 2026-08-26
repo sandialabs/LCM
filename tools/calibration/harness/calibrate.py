@@ -17,13 +17,23 @@ Three actions:
     #    (INIT defaults to the value the references were generated at)
     python calibrate.py calibrate --load-path confined --load-path hydrostatic --param R:20:35:22 --param W:0.02:0.15:0.05 --study gradient
 
-CURVES: --curve selects what is compared. ``stress-strain`` (default) uses the
-axial strain and axial Cauchy stress; ``load-displacement`` uses the loaded
-face's displacement and reaction force; ``time-stress`` uses the LOCA
+KINEMATICS: the finite-deformation kernel is the default; --small-strain
+selects the infinitesimal-strain one. They differ by 5 to 7 per cent in peak
+stress on these decks, and the finite-deformation kernel writes no strain
+field, so the harness reconstructs strain from nodal displacement. The
+SALEM_LIMESTONE defaults are small-strain values from Sun, Chen & Ostien
+(2014): a sound starting point under finite deformation, not the answer.
+
+CURVES: --curve selects what is compared. ``true-stress-strain`` (default) uses
+logarithmic strain against Cauchy stress, the pair the finite-deformation
+kernel works in; ``eng-stress-strain`` uses engineering strain u/L0 against
+engineering stress force/A0, which is what most laboratory reports contain;
+``load-displacement`` uses the loaded face's displacement and reaction force,
+which mean the same thing under both kinematics; ``time-stress`` uses the LOCA
 continuation parameter. Experimental CSVs must carry the matching column
 names, or be told which of their columns to use:
 
-    python calibrate.py calibrate --load-path confined --curve stress-strain --data confined:oedometer.csv:Strain:Stress_Pa --param R:20:35:22
+    python calibrate.py calibrate --load-path confined --curve eng-stress-strain --data confined:oedometer.csv:Strain:Stress_Pa --param R:20:35:22
 
 Data files default to ``<out-dir>/<load_path>_reference.csv``.
 
@@ -62,6 +72,10 @@ DEFAULT_OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(_
 # materials this harness targets, and almost always means the column was
 # supplied in MPa (or kN) rather than base SI.
 _SMALL_STRESS = 1.0e4
+
+
+def _kinematics(finite_deformation):
+    return "finite deformation" if finite_deformation else "small strain"
 
 
 def _parse_param(spec):
@@ -256,13 +270,14 @@ def check(platform=None):
     return 0 if ok else 1
 
 
-def make_reference(load_paths, defaults, out_dir, platform, curve):
+def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deformation):
     os.makedirs(out_dir, exist_ok=True)
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
         indep, dep = lp.fields(curve)
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
-                                   platform=platform, name=f"ref_{lp_name}")
+                                   platform=platform, name=f"ref_{lp_name}",
+                                   finite_deformation=finite_deformation)
         run_dir = os.path.join(out_dir, f"reference_run_{lp_name}")
         os.makedirs(run_dir, exist_ok=True)
         results = model.run(mc.State(lp_name), mc.ParameterCollection("truth"),
@@ -274,11 +289,12 @@ def make_reference(load_paths, defaults, out_dir, platform, curve):
         np.savetxt(out, np.column_stack([x, y]), delimiter=",",
                    header=f"{indep},{dep}", comments="")
         print(f"[{lp_name}] wrote reference {out} ({len(x)} points, "
-              f"{curve}, peak |{dep}| = {np.abs(y).max():.6e})")
+              f"{curve}, {_kinematics(finite_deformation)}, "
+              f"peak |{dep}| = {np.abs(y).max():.6e})")
 
 
 def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
-              study_type, core_limit, curve):
+              study_type, core_limit, curve, finite_deformation):
     if not params:
         raise SystemExit("no --param given; nothing to calibrate")
 
@@ -296,14 +312,16 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
                              f"make-reference or pass --data {lp_name}:<csv>")
         experiment = _load_experiment(lp_name, data_path, indep, dep, xcol, ycol)
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
-                                   platform=platform)
+                                   platform=platform,
+                                   finite_deformation=finite_deformation)
         objective = mc.CurveBasedInterpolatedObjective(indep, dep)
         study.add_evaluation_set(model, objective, experiment)
         print(f"[{lp_name}] evaluation set: {data_path} ({indep} vs {dep})")
 
     study.set_core_limit(core_limit)
     print(f"platform={get_platform(platform).name} study={study_type} "
-          f"curve={curve} params={[p.get_name() for p in params]}")
+          f"curve={curve} kinematics={_kinematics(finite_deformation)} "
+          f"params={[p.get_name() for p in params]}")
     # MatCal writes its working dirs / Dakota files into the CWD; run inside a
     # dedicated (git-ignored) directory so the source tree stays clean.
     run_dir = os.path.join(out_dir, "calibration_run")
@@ -335,6 +353,13 @@ def main(argv=None):
     ap.add_argument("--set", action="append", type=_parse_kv, dest="defaults",
                     default=[], metavar="NAME=VALUE",
                     help="override a constant default, base SI (repeatable)")
+    kin = ap.add_mutually_exclusive_group()
+    kin.add_argument("--finite-deformation", dest="finite_deformation",
+                     action="store_true", default=True,
+                     help="exponential/logarithmic-map kinematics (default)")
+    kin.add_argument("--small-strain", dest="finite_deformation",
+                     action="store_false",
+                     help="infinitesimal-strain kinematics")
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
     ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)
@@ -351,10 +376,12 @@ def main(argv=None):
     data_map = {lp: (path, xcol, ycol) for lp, path, xcol, ycol in args.data}
 
     if args.action == "make-reference":
-        make_reference(load_paths, defaults, args.out_dir, args.platform, args.curve)
+        make_reference(load_paths, defaults, args.out_dir, args.platform,
+                       args.curve, args.finite_deformation)
     else:
         calibrate(load_paths, args.params, data_map, defaults, args.out_dir,
-                  args.platform, args.study, args.core_limit, args.curve)
+                  args.platform, args.study, args.core_limit, args.curve,
+                  args.finite_deformation)
     return 0
 
 

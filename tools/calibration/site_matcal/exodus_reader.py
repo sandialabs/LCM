@@ -5,29 +5,47 @@ the FE problem *is* the material point: every element variable is a scalar
 time series. This reader extracts those series and returns them as a MatCal
 ``Data`` object keyed by field name.
 
-Three families of field come back, which is what lets the harness calibrate
+Several families of field come back, which is what lets the harness calibrate
 against whichever curve the experiment actually produced:
 
-  * ``stress_xx/yy/zz/xy`` and ``strain_xx/yy/zz/xy`` -- the material-point
-    Cauchy stress and strain, for a **stress-strain** curve;
   * ``displacement_x/y/z`` and ``force_x/y/z`` -- the displacement of, and the
-    reaction force on, the loaded face, for a **load-displacement** curve;
+    reaction force on, the loaded face. These are the raw measured
+    quantities and mean the same thing under both kinematics.
+  * ``strain_eng_x/y/z`` and ``stress_eng_x/y/z`` -- engineering (nominal)
+    strain ``u/L0`` and stress ``force/A0``, both referred to the
+    **undeformed** geometry.
+  * ``strain_log_x/y/z`` -- logarithmic (true) strain ``ln(1 + u/L0)``, the
+    measure work-conjugate to the Cauchy stress the model reports.
+  * ``stress_xx/yy/zz/xy`` -- the material-point **Cauchy** (true) stress.
+  * ``strain_xx/yy/zz/xy`` -- the model's own small-strain tensor. Present
+    ONLY under ``Finite Deformation: false``; the finite-deformation kernel
+    consumes ``F`` and ``Fp`` and never forms this field.
   * ``time``, ``kappa`` and ``evp`` -- the LOCA continuation parameter, the cap
     hardening parameter, and the volumetric plastic strain.
 
 Displacement and force are read from the nodal fields ``solution_<axis>`` and
 ``residual_<axis>`` on the face at the maximum coordinate along that axis:
 the displacement is the mean over the face nodes and the force is their sum.
-Because every DOF is prescribed, that sum is the reaction force, and for the
-uniform single element it equals (Cauchy stress) x (face area) to roundoff.
-The unit-cube mesh these decks generate has unit face area and unit edge
-length, so the load-displacement curve is numerically equal to the
-stress-strain curve; that is a property of this particular mesh, not an
-identity, and the two are computed independently here.
+Because every DOF is prescribed, that sum is the reaction force on the
+**deformed** face.
 
-Signs follow the simulation: compression is negative in both stress and
-strain, and force and displacement share the sign of the stress and strain
-they come from. Experimental data must use the same convention.
+The strain measures are reconstructed from that displacement rather than read
+from the model. For these decks the deformation is exactly homogeneous (a
+single element with every DOF prescribed), so ``u/L0`` is the engineering
+strain to roundoff, and the reconstruction is therefore available under both
+kinematics. That matters because the finite-deformation kernel writes no
+strain field at all.
+
+The distinction between the two stress measures only appears under finite
+deformation, and only when the loaded face changes area. Confined compression
+holds both lateral strains at zero, so its face area is preserved and
+``force/A0`` equals the Cauchy stress exactly; hydrostatic compression shrinks
+the face, and the two differ by the area ratio (measured 0.9604 = 0.98^2 at
+2 per cent nominal strain). Under small strain they coincide on every path.
+
+Signs follow the simulation: compression is negative in stress and strain
+alike, and force and displacement share the sign of the stress and strain they
+come from. Experimental data must use the same convention.
 
 Units are whatever the deck was run in, which for this harness is base SI:
 stresses in Pa, forces in N, displacements in m, strains dimensionless (see
@@ -110,15 +128,20 @@ _AXES = ("x", "y", "z")
 
 
 def _load_displacement(ds):
-    """Return ``{displacement_<axis>: ..., force_<axis>: ...}`` for each axis
-    whose nodal fields and coordinates are present.
+    """Return the nodal-derived fields for each axis whose nodal output and
+    coordinates are present: ``displacement_<axis>``, ``force_<axis>``,
+    ``strain_eng_<axis>``, ``strain_log_<axis>`` and ``stress_eng_<axis>``.
 
     The loaded face is the one at the maximum coordinate along the axis. Its
     displacement is the mean of ``solution_<axis>`` over the face nodes (they
     are equal for these homogeneous decks; the mean is simply robust) and its
     force is the sum of ``residual_<axis>``, which is the reaction because
-    every DOF is prescribed. Returns ``{}`` when the deck writes no nodal
-    output.
+    every DOF is prescribed.
+
+    ``L0`` is the undeformed extent along the axis and ``A0`` the undeformed
+    area of the face normal to it, both taken from the mesh coordinates, so
+    these hold for any box mesh rather than only the unit cube. Returns ``{}``
+    when the deck writes no nodal output.
     """
     idx = _names(ds, "name_nod_var")
     if not idx:
@@ -127,30 +150,49 @@ def _load_displacement(ds):
     def nodal(name):
         return np.array(ds.variables[f"vals_nod_var{idx[name] + 1}"][:])
 
+    extent = {}
+    for axis in _AXES:
+        key = f"coord{axis}"
+        if key in ds.variables:
+            coord = np.array(ds.variables[key][:])
+            extent[axis] = (coord, coord.max() - coord.min())
+
     out = {}
     for axis in _AXES:
-        coord_key = f"coord{axis}"
         disp_key, force_key = f"solution_{axis}", f"residual_{axis}"
-        if coord_key not in ds.variables:
+        if axis not in extent or disp_key not in idx or force_key not in idx:
             continue
-        if disp_key not in idx or force_key not in idx:
+        coord, length = extent[axis]
+        # A degenerate (flat) direction would select every node, so skip it
+        # rather than report nonsense.
+        if length <= 0.0:
             continue
-        coord = np.array(ds.variables[coord_key][:])
-        span = coord.max() - coord.min()
-        # Tolerance relative to the mesh extent; a degenerate (flat) direction
-        # would select every node, so skip it rather than report nonsense.
-        if span <= 0.0:
-            continue
-        face = np.flatnonzero(coord >= coord.max() - 1.0e-8 * span)
-        out[f"displacement_{axis}"] = nodal(disp_key)[:, face].mean(axis=1)
-        out[f"force_{axis}"] = nodal(force_key)[:, face].sum(axis=1)
+        face = np.flatnonzero(coord >= coord.max() - 1.0e-8 * length)
+        disp = nodal(disp_key)[:, face].mean(axis=1)
+        force = nodal(force_key)[:, face].sum(axis=1)
+        out[f"displacement_{axis}"] = disp
+        out[f"force_{axis}"] = force
+
+        stretch = 1.0 + disp / length
+        out[f"strain_eng_{axis}"] = disp / length
+        # Guard the log: a stretch at or below zero is a collapsed element,
+        # which is a failed run rather than a curve worth reporting.
+        with np.errstate(invalid="ignore", divide="ignore"):
+            out[f"strain_log_{axis}"] = np.where(stretch > 0.0,
+                                                 np.log(np.abs(stretch)), np.nan)
+
+        area = 1.0
+        for other in _AXES:
+            if other != axis and other in extent and extent[other][1] > 0.0:
+                area *= extent[other][1]
+        out[f"stress_eng_{axis}"] = force / area
     return out
 
 
 def read_lcm_cap_exodus(file_path, file_type=None):
     """Read ``file_path`` (an LCM cap-model Exodus output) and return a MatCal
     ``Data`` with ``time`` plus whichever of ``stress_*``, ``strain_*``,
-    ``displacement_*``, ``force_*``, ``kappa`` and ``evp`` the run wrote.
+    ``displacement_*``, ``force_*``, ``kappa`` and ``evp`` the run supports.
     ``file_type`` is accepted for MatCal's reader protocol and ignored (the
     format is always Exodus)."""
     ds = _open_exo(file_path)

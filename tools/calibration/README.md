@@ -24,6 +24,7 @@ answer. This document assumes that is done.
 - [Every session starts like this](#every-session-starts-like-this)
 - [Quick start](#quick-start)
 - [Calibrating against your own data](#calibrating-against-your-own-data)
+- [Kinematics](#kinematics)
 - [Units](#units)
 - [Reference](#reference)
 - [Layout](#layout)
@@ -107,15 +108,18 @@ problem, but it cannot be certain, so it warns rather than stopping.
 
 ### 2. Choose the curve type
 
-| `--curve` | Compares | Units of the two columns |
-|-----------|----------|--------------------------|
-| `stress-strain` (default) | axial strain vs axial Cauchy stress | dimensionless, Pa |
-| `load-displacement` | loaded-face displacement vs reaction force | m, N |
+| `--curve` | Independent | Dependent | Units |
+|-----------|-------------|-----------|-------|
+| `true-stress-strain` (default) | logarithmic strain `ln(1 + u/L0)` | Cauchy (true) stress | -, Pa |
+| `eng-stress-strain` | engineering strain `u/L0` | engineering stress `force/A0` | -, Pa |
+| `load-displacement` | face displacement | face reaction force | m, N |
+| `time-stress` | LOCA continuation parameter | Cauchy stress | -, Pa |
 
-Pick whichever your instrument actually recorded. For the single-element decks
-here the mesh is a unit cube, so the two curves happen to carry identical
-numbers; that is a property of this mesh, not a general identity, and the two
-are computed independently.
+Pick whichever your instrument actually recorded, and read
+[Kinematics](#kinematics) before choosing: under finite deformation these are
+genuinely different curves, differing by up to 7 per cent at the strain levels
+these decks reach. `load-displacement` is the safest when you are unsure,
+because displacement and force mean the same thing under both formulations.
 
 ### 3. Choose the load path
 
@@ -143,7 +147,7 @@ fitting it using `--set NAME=VALUE`.
 ### 5. Run it
 
 ```bash
-python calibrate.py calibrate --load-path confined --curve stress-strain --data "confined:/path/to/oedometer.csv:Axial Strain:Axial Stress" --param A:3e8:9e8
+python calibrate.py calibrate --load-path confined --curve eng-stress-strain --data "confined:/path/to/oedometer.csv:Axial Strain:Axial Stress" --param A:3e8:9e8
 ```
 
 The `--data` argument is `LOADPATH:CSV:XCOL:YCOL`. The last two name the
@@ -157,7 +161,7 @@ The run prints which file it read and what it compared, then Dakota's progress,
 then:
 
 ```
-BEST: A: 681935050.91
+BEST: A: 681275829.17
 
 ***** RELATIVE FUNCTION CONVERGENCE *****
 ```
@@ -179,6 +183,73 @@ including one working directory per evaluation, so you can look at any
 individual Albany run.
 
 ---
+
+## Kinematics
+
+**The harness runs the finite-deformation cap model by default.** The materials
+file's `Finite Deformation` flag is templated, and `--small-strain` flips it.
+
+The two kernels are not two discretizations of the same thing:
+
+| | `--finite-deformation` (default) | `--small-strain` |
+|---|---|---|
+| Kinematics | multiplicative, `be = F Cp^-1 F^T` | additive |
+| Integrated in | logarithmic elastic strain, Kirchhoff stress | infinitesimal strain |
+| Consumes | `F`, `J`, `Fp` | `Strain` |
+| Writes a strain field | **no** | yes (`Strain_i_j`) |
+| Reports | Cauchy stress (converted by `1/J`) | Cauchy stress |
+
+The same verified integrator runs in both; only the kinematics wrap around it.
+
+Two consequences matter in practice.
+
+**The model writes no strain field under finite deformation.** The harness
+therefore reconstructs strain from the nodal displacement of the loaded face,
+`u/L0` and `ln(1 + u/L0)`. That is exact here, because a single element with
+every degree of freedom prescribed deforms homogeneously, and it means every
+curve is available under both formulations.
+
+**The strain and stress measures separate.** At the strains these decks reach,
+logarithmic strain differs from engineering strain by 1.0 per cent at 2 per
+cent nominal and 2.0 per cent at 4 per cent. Engineering stress `force/A0`
+differs from Cauchy stress by the area change of the loaded face: nothing at
+all on the confined path, whose lateral strains are held at zero so its area is
+preserved, but a factor of `0.98^2 = 0.9604` on the hydrostatic path. Under
+`--small-strain` all of this collapses and the measures coincide.
+
+The response itself moves by more than any of that:
+
+| Load path | peak Cauchy stress, small strain | finite deformation | difference |
+|-----------|----------------------------------|--------------------|------------|
+| confined | `3.106368e+08` Pa | `3.270823e+08` Pa | +5.3% |
+| hydrostatic | `3.094229e+08` Pa | `3.313530e+08` Pa | +7.1% |
+| triaxial | `3.085363e+08` Pa | `3.250095e+08` Pa | +5.3% |
+
+### The Salem limestone defaults are small-strain values
+
+The `SALEM_LIMESTONE` constants come from Sun, Chen and Ostien (2014), who
+identified them under a small-strain formulation. They remain a sound **starting
+point** under finite deformation, and that is how the harness uses them: as
+`--param` defaults for `INIT`. They are not the finite-deformation answer to the
+same data.
+
+How much that matters is measurable. Generating the reference under
+`--small-strain` and then fitting it with the finite-deformation model, starting
+from the Salem values themselves, moves them:
+
+| Parameter | Salem (small strain) | refit under finite deformation | shift |
+|-----------|----------------------|-------------------------------|-------|
+| `R` | `28.0` | `27.731329063` | -1.0% |
+| `W` | `0.08` | `0.090377625831` | +13.0% |
+
+So `R` is nearly formulation-independent and `W` is not. Do not quote a
+published small-strain parameter set as a finite-deformation result, and do not
+treat agreement with one as a validation.
+
+Note that a **round trip is self-consistent either way**: `make-reference`
+generates its reference with the same flag the subsequent `calibrate` uses, so
+the recovery tests below return the exact input parameters under both
+formulations. That checks the machinery, not the physics.
 
 ## Units
 
@@ -226,7 +297,8 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 | Option | Meaning |
 |--------|---------|
 | `--load-path NAME` | `hydrostatic`, `confined` or `triaxial`. Repeatable. Default `confined`. |
-| `--curve NAME` | `stress-strain` (default), `load-displacement` or `time-stress`. |
+| `--curve NAME` | `true-stress-strain` (default), `eng-stress-strain`, `load-displacement` or `time-stress`. |
+| `--finite-deformation` / `--small-strain` | Kinematics. Finite deformation is the default; see [Kinematics](#kinematics). |
 | `--param NAME:LO:HI[:INIT]` | Parameter to fit, base SI. Repeatable. |
 | `--data LOADPATH:CSV[:XCOL:YCOL]` | Experimental data for one load path, base SI. Repeatable. Defaults to `examples/<load_path>_reference.csv`. |
 | `--set NAME=VALUE` | Override a default without fitting it, base SI. Repeatable. |
@@ -240,9 +312,9 @@ path names, bounds that are not increasing, an `INIT` outside its bounds, a
 data file whose columns do not match the chosen curve.
 
 `--curve time-stress` compares the LOCA continuation parameter (which runs over
-`[0, 1]` and is affine in applied strain) against axial stress. It is kept for
-regression checks and is equivalent to `stress-strain` up to a rescaling of the
-abscissa.
+`[0, 1]` and is affine in applied displacement) against axial Cauchy stress. It
+is kept for regression checks that want the abscissa the deck stepped on rather
+than a measured one.
 
 ### Cap parameters
 
@@ -265,9 +337,18 @@ Chen and Ostien, *Acta Geotechnica* **9** (2014) 903-934, converted to base SI.
 ### Fields the simulation reports
 
 Available as `--curve` components and as CSV column names:
-`time`, `stress_xx/yy/zz/xy`, `strain_xx/yy/zz/xy`, `displacement_x/y/z`,
-`force_x/y/z`, `kappa` (cap hardening parameter), `evp` (volumetric plastic
-strain).
+
+| Field | Meaning |
+|-------|---------|
+| `time` | LOCA continuation parameter, `[0, 1]` |
+| `stress_xx/yy/zz/xy` | Cauchy (true) stress |
+| `stress_eng_x/y/z` | engineering stress, `force/A0` |
+| `strain_eng_x/y/z` | engineering strain, `u/L0` |
+| `strain_log_x/y/z` | logarithmic (true) strain, `ln(1 + u/L0)` |
+| `displacement_x/y/z` | loaded-face displacement |
+| `force_x/y/z` | loaded-face reaction force |
+| `kappa`, `evp` | cap hardening parameter, volumetric plastic strain |
+| `strain_xx/yy/zz/xy` | the model's own small-strain tensor. **`--small-strain` only**; the finite-deformation kernel never forms it. |
 
 ---
 
@@ -345,8 +426,39 @@ harness and readers are platform-agnostic.
 
 ## Verification status
 
-Rerun on 2026-08-26 on all three platforms, after the harness gained the strain
-and load-displacement fields:
+### Finite deformation (the default), sirius, 2026-08-26
+
+Forward runs, peak Cauchy stress at the default parameters:
+
+| Load path | peak `stress_xx` |
+|-----------|------------------|
+| confined | `3.270823e+08` Pa |
+| hydrostatic | `3.313530e+08` Pa |
+| triaxial | `3.250095e+08` Pa |
+
+Round trips, each recovering the parameter its reference was generated at:
+
+| Study | Result | Convergence | Cost |
+|-------|--------|-------------|------|
+| `R` from 22, confined, `true-stress-strain` | `R: 28.0` | X-CONVERGENCE | 15 s |
+| `R` from 22, confined, `eng-stress-strain` | `R: 28.0` | X-CONVERGENCE | 15 s |
+| `R` from 22, confined, `load-displacement` | `R: 28.0` | X-CONVERGENCE | 15 s |
+| `R` from 22, confined, `time-stress` | `R: 28.0` | X-CONVERGENCE | 15 s |
+| `kappa0` from `-1.2e7`, hydrostatic | `kappa0: -8050000.0` | X-CONVERGENCE | 12 s |
+| `R`, `W` from (22, 0.05), confined + hydrostatic | `R: 28.0`, `W: 0.08` | X-CONVERGENCE | 28 s on 4 cores |
+| `R` from 22, confined, `--study scipy` | `R: 27.983` | (looser tolerance by design) | 17 s |
+
+All four curves recover the same answer exactly, which is the point: they are
+four reductions of one simulation, and the objective is conditioned onto the
+data range either way.
+
+Cross-formulation, the check behind the
+[Salem caveat](#the-salem-limestone-defaults-are-small-strain-values):
+a reference generated under `--small-strain` and then fitted with the
+finite-deformation model, starting from the Salem values, returns
+`R: 27.731329063`, `W: 0.090377625831` (RELATIVE FUNCTION CONVERGENCE).
+
+### Small strain (`--small-strain`), all three platforms, 2026-08-26
 
 | Platform | OS | MatCal | Dakota |
 |----------|----|--------|--------|
@@ -354,46 +466,28 @@ and load-displacement fields:
 | rigel | RHEL 9.8 | 1.4.27 | 6.24.0, `~/dakota` |
 | cee (`hpws00344`) | RHEL 9.7 | 1.4.27 | 6.24.0, `/projects` |
 
-All three return identical values to every printed digit. Only timings differ:
-rigel takes about twice as long per study as sirius (31 s against 15 s for the
-single-parameter confined round trip). That is per-core speed on what is a
-serial workload, not a configuration problem; pinning `OMP_NUM_THREADS=1` on
-rigel's 336-core node changes nothing (30.3 s against 31.6 s).
+All three return identical values to every printed digit. Forward-run peaks are
+`3.106368e+08`, `3.094229e+08` and `3.085363e+08` Pa for confined, hydrostatic
+and triaxial. The round trips recover `R: 28.0` (from 22, both under
+stress-strain and load-displacement), `kappa0: -8050000.0` (from `-1.2e7`) and
+`R: 28.0`, `W: 0.08` across two paths, all X-CONVERGENCE.
 
-Forward runs, peak axial stress at the default parameters (about 2.5 s each):
+Coverage of that multi-platform run, all matching exactly where run: sirius ran
+everything; rigel ran all three forward runs and the first four round trips;
+CEE ran the confined and hydrostatic forward runs and three round trips.
+`--study scipy` was run on sirius only.
 
-| Load path | peak `\|stress_xx\|` |
-|-----------|--------------------|
-| confined | `3.106368e+08` Pa |
-| hydrostatic | `3.094229e+08` Pa |
-| triaxial | `3.085363e+08` Pa |
+Only timings differ between platforms: rigel takes about twice as long per
+study as sirius (31 s against 15 s for the single-parameter confined round
+trip). That is per-core speed on what is a serial workload, not a configuration
+problem; pinning `OMP_NUM_THREADS=1` on rigel's 336-core node changes nothing
+(30.3 s against 31.6 s).
 
-Round trips, each recovering a parameter the reference was generated at:
-
-| Study | Result | Convergence | Cost |
-|-------|--------|-------------|------|
-| `R` from 22, confined, stress-strain | `R: 28.0` | X-CONVERGENCE | 10 evaluations, 15 s |
-| `R` from 22, confined, load-displacement | `R: 28.0` | X-CONVERGENCE | 10 evaluations, 15 s |
-| `kappa0` from `-1.2e7`, hydrostatic | `kappa0: -8050000.0` | X-CONVERGENCE | 10 evaluations, 12 s |
-| `R`, `W` from (22, 0.05), confined + hydrostatic | `R: 28.0`, `W: 0.08` | X-CONVERGENCE | 18 evaluations, 28 s on 4 cores |
-| `R` from 22, confined, `--study scipy` | `R: 27.983` | (looser tolerance by design) | 16 s |
-
-Timings are sirius. Coverage of the reruns, all matching exactly where run:
-sirius ran everything; rigel ran all three forward runs and the first four
-round trips; CEE ran the confined and hydrostatic forward runs and the
-stress-strain, load-displacement and `kappa0` round trips. `--study scipy` was
-run on sirius only.
+### Notes on both
 
 `kappa0` is the case the unit convention actually touches: Dakota normalizes
 each parameter onto `[0, 1]` over its bounds, so a stress-like parameter is
 searched no differently from a dimensionless one.
-
-The `stress-strain` and `load-displacement` studies agree exactly, as the
-unit-cube mesh implies. Both improve slightly on what this harness compared
-before it had strain fields, which was `time` against the *lateral* stress
-`stress_zz`: that recovered `W: 0.080000000001` where these recover `W: 0.08`,
-the axial stress being the stronger signal. The peak values moved accordingly,
-confined from `1.585615e+08` Pa (lateral) to `3.106368e+08` Pa (axial).
 
 **Unit invariance**, checked when the harness moved to base SI: each load path
 rerun with the original MPa parameter set reproduces the Pa run to a maximum

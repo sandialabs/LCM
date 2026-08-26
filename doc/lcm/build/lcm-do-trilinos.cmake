@@ -140,6 +140,14 @@ function(lcm_do_trilinos)
   if (DEFINED ENV{LCM_SLFAD_SIZE})
     set(CONFIG_OPTS ${CONFIG_OPTS} $ENV{LCM_SLFAD_SIZE})
   endif()
+  # Extra Trilinos options for one-off configurations, semicolon-separated.
+  # Used for the STK unified-memory gate build, which flips the host Field
+  # layout to Layout::Left so that any code still doing legacy pointer
+  # striding reads transposed memory and fails visibly:
+  #   LCM_TRILINOS_EXTRA_OPTIONS="-DSTK_UNIFIED_MEMORY:BOOL=ON;-DSTK_FIELD_BOUNDS_CHECK:BOOL=ON"
+  if (DEFINED ENV{LCM_TRILINOS_EXTRA_OPTIONS})
+    set(CONFIG_OPTS ${CONFIG_OPTS} $ENV{LCM_TRILINOS_EXTRA_OPTIONS})
+  endif()
   if (DEFINED ENV{LCM_LINK_FLAGS})
     set(CONFIG_OPTS ${CONFIG_OPTS}
         "-DCMAKE_EXE_LINKER_FLAGS:STRING=$ENV{LCM_LINK_FLAGS}"

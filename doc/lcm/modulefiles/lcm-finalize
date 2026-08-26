@@ -25,7 +25,17 @@ if { [info exists ::env(LCM_DIR)] } {
   set lcm_dir $::env(HOME)/LCM
 }
 
-set build       $arch-$tool_chain-$build_type
+# LCM_BUILD_SUFFIX gives a variant build its own Trilinos install and LCM
+# build directories, so an experimental configuration (for example the STK
+# unified-memory gate build) can sit beside the working one instead of
+# replacing it.
+if { [info exists ::env(LCM_BUILD_SUFFIX)] } {
+  set build_suffix "-$::env(LCM_BUILD_SUFFIX)"
+} else {
+  set build_suffix ""
+}
+
+set build       $arch-$tool_chain-$build_type$build_suffix
 set install_dir $lcm_dir/trilinos-install-$build
 set alb_exe_dir $lcm_dir/lcm-build-$build/src
 

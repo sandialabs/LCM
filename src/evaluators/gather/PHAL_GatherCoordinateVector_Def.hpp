@@ -67,7 +67,7 @@ void
 GatherCoordinateVector<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
 {
   unsigned int                                  numCells = workset.numCells;
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>> wsCoords = workset.wsCoords;
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<Albany::EntityValueView>> wsCoords = workset.wsCoords;
 
   typedef Kokkos::View<MeshScalarT***, PHX::Device> view_type;
   typedef typename view_type::host_mirror_type      host_view_type;

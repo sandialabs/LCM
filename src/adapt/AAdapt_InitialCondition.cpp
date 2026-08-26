@@ -46,7 +46,7 @@ InitialConditions(
     Teuchos::RCP<Thyra_Vector> const&                                      soln,
     const Albany::Conn&                                                    wsElNodeEqID,
     const Teuchos::ArrayRCP<std::string>&                                  wsEBNames,
-    const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>> coords,
+    const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<Albany::EntityValueView>>> coords,
     int const                                                              neq,
     int const                                                              numDim,
     Teuchos::ParameterList&                                                icParams,
@@ -191,7 +191,7 @@ InitialConditions(
     for (int ws = 0; ws < wsElNodeEqID.size(); ws++) {
       for (unsigned el = 0; el < wsElNodeEqID[ws].extent(0); el++) {
         for (unsigned ln = 0; ln < wsElNodeEqID[ws].extent(1); ln++) {
-          double const* X = coords[ws][el][ln];
+          auto const    X = coords[ws][el][ln];
           for (int j = 0; j < numDOFsPerDim; j++)
             for (int i = 0; i < numDim; i++) soln_data[wsElNodeEqID[ws](el, ln, j * numDim + i)] = X[i];
         }
@@ -213,11 +213,15 @@ InitialConditions(
     for (int ws = 0; ws < wsElNodeEqID.size(); ws++) {
       for (unsigned el = 0; el < wsElNodeEqID[ws].extent(0); el++) {
         for (unsigned ln = 0; ln < wsElNodeEqID[ws].extent(1); ln++) {
-          double const* X = coords[ws][el][ln];
+          auto const    X = coords[ws][el][ln];
           for (int i = 0; i < neq; i++) {
             x[i] = soln_data[wsElNodeEqID[ws](el, ln, i)];
           }
-          initFunc->compute(&x[0], X);
+          // compute() takes a contiguous const double*, which a strided view
+          // cannot provide, so copy the node's coordinates out first.
+          double Xloc[3] = {0.0, 0.0, 0.0};
+          for (int d = 0; d < numDim; ++d) Xloc[d] = X[d];
+          initFunc->compute(&x[0], Xloc);
           for (int i = 0; i < neq; i++) {
             soln_data[wsElNodeEqID[ws](el, ln, i)] = x[i];
           }
@@ -238,11 +242,15 @@ InitialConditions(
     for (int ws = 0; ws < wsElNodeEqID.size(); ws++) {
       for (unsigned el = 0; el < wsElNodeEqID[ws].extent(0); el++) {
         for (unsigned ln = 0; ln < wsElNodeEqID[ws].extent(1); ln++) {
-          double const* X = coords[ws][el][ln];
+          auto const    X = coords[ws][el][ln];
           for (int i = 0; i < neq; i++) {
             x[i] = soln_data[wsElNodeEqID[ws](el, ln, i)];
           }
-          initFunc->compute(&x[0], X);
+          // compute() takes a contiguous const double*, which a strided view
+          // cannot provide, so copy the node's coordinates out first.
+          double Xloc[3] = {0.0, 0.0, 0.0};
+          for (int d = 0; d < numDim; ++d) Xloc[d] = X[d];
+          initFunc->compute(&x[0], Xloc);
           for (int i = 0; i < neq; i++) {
             soln_data[wsElNodeEqID[ws](el, ln, i)] = x[i];
           }

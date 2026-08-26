@@ -18,7 +18,7 @@ InitialConditions(
     Teuchos::RCP<Thyra_Vector> const&                                      solnT,
     const Albany::Conn&                                                    wsElNodeEqID,
     const Teuchos::ArrayRCP<std::string>&                                  wsEBNames,
-    const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>> coords,
+    const Teuchos::ArrayRCP<Teuchos::ArrayRCP<Teuchos::ArrayRCP<Albany::EntityValueView>>> coords,
     int const                                                              neq,
     int const                                                              numDim,
     Teuchos::ParameterList&                                                icParams,

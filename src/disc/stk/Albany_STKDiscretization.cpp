@@ -1833,10 +1833,19 @@ STKDiscretization::computeWorksetInfo()
     sphereVolume_field = stkMeshStruct->getFieldContainer()->getSphereVolumeField();
   }
 
-  stk::mesh::Field<double>* latticeOrientation_field;
+  stk::mesh::Field<double>* latticeOrientation_field = nullptr;
   if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
     latticeOrientation_field = stkMeshStruct->getFieldContainer()->getLatticeOrientationField();
   }
+
+  // Field data handles for the views cached below. Acquired once here rather
+  // than per entity: they are lookups, and the views built from them only need
+  // the pointer and the component stride of the layout in force.
+  auto coordsData = coordinates_field->data();
+  auto latticeOrientationData =
+      (latticeOrientation_field != nullptr) ?
+          latticeOrientation_field->data() :
+          decltype(latticeOrientation_field->data()){};
 
   wsEBNames.resize(num_buckets);
   for (int i = 0; i < num_buckets; i++) {
@@ -2041,7 +2050,8 @@ STKDiscretization::computeWorksetInfo()
         }
       }
       if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
-        latticeOrientation[b][i] = static_cast<double*>(stk::mesh::field_data(*latticeOrientation_field, element));
+        auto latValues           = latticeOrientationData.entity_values(element);
+        latticeOrientation[b][i] = EntityValueView(latValues.pointer(), latValues.component_stride());
       }
 
       // loop over local nodes
@@ -2054,7 +2064,8 @@ STKDiscretization::computeWorksetInfo()
         const LO                node_lid = ov_node_indexer->getLocalElement(node_gid);
 
         ALBANY_PANIC(node_lid < 0, "STK1D_Disc: node_lid out of range " << node_lid << std::endl);
-        coords[b][i][j] = stk::mesh::field_data(*coordinates_field, rowNode);
+        auto coordValues = coordsData.entity_values(rowNode);
+        coords[b][i][j]  = EntityValueView(coordValues.pointer(), coordValues.component_stride());
 
         wsElNodeID[b][i][j] = node_array((int)i, j);
 
@@ -2095,7 +2106,8 @@ STKDiscretization::computeWorksetInfo()
                     StateArray::iterator sHeight = stateArrays.elemStateArrays[b].find("surface_height");
                     if (sHeight != stateArrays.elemStateArrays[b].end()) sHeight->second(int(i), j) -= stkMeshStruct->PBCStruct.scale[d] * tan(alpha);
                   }
-                  coords[b][i][j] = xleak;  // replace ptr to coords
+                  // xleak is an Albany-owned contiguous copy, so stride 1.
+                  coords[b][i][j] = EntityValueView(xleak, 1);
                   toDelete.push_back(xleak);
                 }
               }
@@ -2560,6 +2572,7 @@ STKDiscretization::computeNodeSets()
     }
 
     nodeSets[ns->first].resize(nodes.size());
+    auto nsCoordsData = coordinates_field->data();
     nodeSetGIDs[ns->first].resize(nodes.size());
     nodeSetCoords[ns->first].resize(nodes.size());
     //    nodeSetIDs.push_back(ns->first); // Grab string ID
@@ -2572,7 +2585,8 @@ STKDiscretization::computeNodeSets()
       for (std::size_t eq = 0; eq < neq; ++eq) {
         nodeSets[ns->first][i][eq] = getOwnedDOF(node_lid, eq);
       }
-      nodeSetCoords[ns->first][i] = stk::mesh::field_data(*coordinates_field, nodes[i]);
+      auto nsValues               = nsCoordsData.entity_values(nodes[i]);
+      nodeSetCoords[ns->first][i] = EntityValueView(nsValues.pointer(), nsValues.component_stride());
     }
 
     // Overlap-scope nodeset (includes ghosted nodes): used by DBC DOF
@@ -2596,11 +2610,13 @@ STKDiscretization::computeNodeSets()
       }
       overlap_nodes.swap(clipped);
     }
+    auto nsOverlapCoordsData = coordinates_field->data();
     nodeSetOverlapGIDs[ns->first].resize(overlap_nodes.size());
     nodeSetOverlapCoords[ns->first].resize(overlap_nodes.size());
     for (std::size_t i = 0; i < overlap_nodes.size(); ++i) {
       nodeSetOverlapGIDs[ns->first][i]   = gid(overlap_nodes[i]);
-      nodeSetOverlapCoords[ns->first][i] = stk::mesh::field_data(*coordinates_field, overlap_nodes[i]);
+      auto nsOvValues                    = nsOverlapCoordsData.entity_values(overlap_nodes[i]);
+      nodeSetOverlapCoords[ns->first][i] = EntityValueView(nsOvValues.pointer(), nsOvValues.component_stride());
     }
     ns++;
   }

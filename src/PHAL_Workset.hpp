@@ -103,9 +103,9 @@ struct Workset
 
   Albany::WorksetConn                           wsElNodeEqID;
   Teuchos::ArrayRCP<Teuchos::ArrayRCP<GO>>      wsElNodeID;
-  Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>> wsCoords;
+  Teuchos::ArrayRCP<Teuchos::ArrayRCP<Albany::EntityValueView>> wsCoords;
   Teuchos::ArrayRCP<double>                     wsSphereVolume;
-  Teuchos::ArrayRCP<double*>                    wsLatticeOrientation;
+  Teuchos::ArrayRCP<Albany::EntityValueView>    wsLatticeOrientation;
   std::string                                   EBName{""};
 
   // Needed for Schwarz coupling and for dirichlet conditions based on dist

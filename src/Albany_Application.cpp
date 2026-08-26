@@ -722,7 +722,7 @@ Application::eliminateConstrainedDOFs()
     auto const& node_gids = gid_it->second;
 
     // Node-set coordinates parallel to node_gids (may be absent for this ns).
-    std::vector<double*> const* ns_coords = nullptr;
+    std::vector<Albany::EntityValueView> const* ns_coords = nullptr;
     auto coord_it = ns_coords_map.find(node_set_ids[i]);
     if (coord_it != ns_coords_map.end()) ns_coords = &coord_it->second;
 
@@ -811,7 +811,7 @@ Application::eliminateConstrainedDOFs()
         GO const dof_gid = stk_disc->getGlobalDOF(node_gids[ni], eq);
         DBCDescriptor desc = proto;
         if (proto.kind == DBCDescriptor::Kind::Expression && ns_coords != nullptr) {
-          double* c = (*ns_coords)[ni];
+          auto const c = (*ns_coords)[ni];
           desc.x = c[0];
           desc.y = c[1];
           desc.z = (spatial_dimension > 2) ? c[2] : 0.0;
@@ -848,7 +848,7 @@ Application::eliminateConstrainedDOFs()
       double const ki_scale  = k_sub.get<double>("Kfield KI");
       double const kii_scale = k_sub.get<double>("Kfield KII");
       for (std::size_t ni = 0; ni < node_gids.size(); ++ni) {
-        double* c = (*ns_coords)[ni];
+        auto const   c = (*ns_coords)[ni];
         double const r     = std::sqrt(c[0] * c[0] + c[1] * c[1]);
         double const th    = std::atan2(c[1], c[0]);
         for (int comp = 0; comp < 2; ++comp) {

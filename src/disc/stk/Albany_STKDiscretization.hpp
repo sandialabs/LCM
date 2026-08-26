@@ -288,7 +288,7 @@ class STKDiscretization : public AbstractDiscretization
   }
 #endif
 
-  const WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type&
+  const WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<EntityValueView>>>::type&
   getCoords() const
   {
     return coords;
@@ -298,7 +298,7 @@ class STKDiscretization : public AbstractDiscretization
   {
     return sphereVolume;
   }
-  const WorksetArray<Teuchos::ArrayRCP<double*>>::type&
+  const WorksetArray<Teuchos::ArrayRCP<EntityValueView>>::type&
   getLatticeOrientation() const
   {
     return latticeOrientation;
@@ -746,9 +746,9 @@ class STKDiscretization : public AbstractDiscretization
   Teuchos::RCP<Thyra_MultiVector>                                   coordMV;
   WorksetArray<std::string>::type                                   wsEBNames;
   WorksetArray<int>::type                                           wsPhysIndex;
-  WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type coords;
+  WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<EntityValueView>>>::type coords;
   WorksetArray<Teuchos::ArrayRCP<double>>::type                     sphereVolume;
-  WorksetArray<Teuchos::ArrayRCP<double*>>::type                    latticeOrientation;
+  WorksetArray<Teuchos::ArrayRCP<EntityValueView>>::type             latticeOrientation;
   WorksetArray<Teuchos::ArrayRCP<std::uint8_t>>::type               cell_is_erodible;
 
 #if defined(ALBANY_CONTACT)

@@ -6,6 +6,7 @@
 #define ALBANY_ABSTRACT_DISCRETIZATION_HPP
 
 #include <map>
+#include "Albany_EntityValueView.hpp"
 #include <set>
 
 #include "Albany_AbstractMeshStruct.hpp"
@@ -143,8 +144,10 @@ class AbstractDiscretization
   virtual const NodalDOFManager&
   getOverlapDOFManager(std::string const& field_name) const = 0;
 
-  //! Retrieve coodinate ptr_field (ws, el, node)
-  virtual const WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<double*>>>::type&
+  //! Retrieve coordinate views (ws, el, node). EntityValueView carries the
+  //! component stride of the active STK Field layout, so [i] is component i
+  //! under both Layout::Right and Layout::Left.
+  virtual const WorksetArray<Teuchos::ArrayRCP<Teuchos::ArrayRCP<EntityValueView>>>::type&
   getCoords() const = 0;
 
   //! Get coordinates (overlap map).
@@ -169,7 +172,7 @@ class AbstractDiscretization
   virtual const WorksetArray<Teuchos::ArrayRCP<double>>::type&
   getSphereVolume() const = 0;
 
-  virtual const WorksetArray<Teuchos::ArrayRCP<double*>>::type&
+  virtual const WorksetArray<Teuchos::ArrayRCP<EntityValueView>>::type&
   getLatticeOrientation() const = 0;
 
   //! Per-cell flag: 1 if the cell touches any side-set whose name

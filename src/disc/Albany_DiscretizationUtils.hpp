@@ -6,6 +6,7 @@
 #define ALBANY_DISCRETIZATION_UTILS_HPP
 
 #include <map>
+#include "Albany_EntityValueView.hpp"
 #include <string>
 #include <vector>
 
@@ -23,7 +24,7 @@ namespace Albany {
 
 using NodeSetList      = std::map<std::string, std::vector<std::vector<int>>>;
 using NodeSetGIDsList  = std::map<std::string, std::vector<GO>>;
-using NodeSetCoordList = std::map<std::string, std::vector<double*>>;
+using NodeSetCoordList = std::map<std::string, std::vector<EntityValueView>>;
 using NodeGID2LIDMap   = std::map<GO, LO>;
 
 class SideStruct

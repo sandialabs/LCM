@@ -9,12 +9,16 @@
 #include "Albany_ThyraUtils.hpp"
 
 #include <stk_mesh/base/Field.hpp>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 
 namespace Albany {
 
 // Fill the result vector
 // Create a view of the solution field data for this bucket of nodes.
-// Uses stk::mesh::field_data to access field values directly.
+// Uses the STK Field data API, which applies whatever component stride the
+// active memory layout uses, so these loops are correct under both
+// Layout::Right and the Layout::Left of a unified-memory build.
 
 void
 STKFieldContainerHelper::fillVector(
@@ -32,13 +36,16 @@ STKFieldContainerHelper::fillVector(
   const stk::mesh::BulkData& mesh = field_stk.get_mesh();
   auto                       data = getNonconstLocalData(field_thyra);
 
+  auto field_data = field_stk.data();
+
   for (int i = 0; i < num_nodes_in_bucket; ++i) {
     const GO node_gid = mesh.identifier(bucket[i]) - 1;
     const LO node_lid = indexer->getLocalElement(node_gid);
-    const double* field_data = stk::mesh::field_data(field_stk, bucket[i]);
+    auto     values   = field_data.entity_values(bucket[i]);
 
     for (int j = 0; j < num_vec_components; ++j) {
-      data[nodalDofManager.getLocalDOF(node_lid, offset + j)] = field_data[j];
+      data[nodalDofManager.getLocalDOF(node_lid, offset + j)] =
+          values(stk::mesh::ComponentIdx(j));
     }
   }
 }
@@ -59,13 +66,16 @@ STKFieldContainerHelper::saveVector(
   const stk::mesh::BulkData& mesh = field_stk.get_mesh();
   auto                       data = getLocalData(field_thyra);
 
+  auto field_data = field_stk.data<stk::mesh::ReadWrite>();
+
   for (int i = 0; i < num_nodes_in_bucket; ++i) {
     const GO node_gid = mesh.identifier(bucket[i]) - 1;
     const LO node_lid = indexer->getLocalElement(node_gid);
-    double* field_data = stk::mesh::field_data(field_stk, bucket[i]);
+    auto     values   = field_data.entity_values(bucket[i]);
 
     for (int j = 0; j < num_vec_components; ++j) {
-      field_data[j] = data[nodalDofManager.getLocalDOF(node_lid, offset + j)];
+      values(stk::mesh::ComponentIdx(j)) =
+          data[nodalDofManager.getLocalDOF(node_lid, offset + j)];
     }
   }
 }
@@ -75,6 +85,13 @@ STKFieldContainerHelper::copySTKField(const FieldType& source, FieldType& target
 {
   const stk::mesh::BulkData&     mesh = source.get_mesh();
   const stk::mesh::BucketVector& bv   = mesh.buckets(stk::topology::NODE_RANK);
+
+  // Acquired once, outside the bucket loop: these are temporary handles and
+  // re-acquiring them per bucket costs a lookup for nothing. Source and target
+  // are always distinct fields here, so the ReadOnly and ReadWrite lifetimes
+  // may overlap.
+  auto src_data = source.data();
+  auto tgt_data = target.data<stk::mesh::ReadWrite>();
 
   for (auto it = bv.begin(); it != bv.end(); ++it) {
     const stk::mesh::Bucket& bucket = **it;
@@ -92,11 +109,12 @@ STKFieldContainerHelper::copySTKField(const FieldType& source, FieldType& target
             << std::endl);
 
     for (int i = 0; i < num_nodes_in_bucket; ++i) {
-      const double* src_data = stk::mesh::field_data(source, bucket[i]);
-      double*       tgt_data = stk::mesh::field_data(target, bucket[i]);
+      auto src_values = src_data.entity_values(bucket[i]);
+      auto tgt_values = tgt_data.entity_values(bucket[i]);
 
       for (int j = 0; j < num_target_components; ++j) {
-        tgt_data[j] = src_data[j];
+        tgt_values(stk::mesh::ComponentIdx(j)) =
+            src_values(stk::mesh::ComponentIdx(j));
       }
     }
   }

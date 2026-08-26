@@ -426,7 +426,13 @@ harness and readers are platform-agnostic.
 
 ## Verification status
 
-### Finite deformation (the default), sirius, 2026-08-26
+### Finite deformation (the default), all three platforms, 2026-08-26
+
+sirius, rigel and CEE (`hpws00344`) each pulled the commit and returned
+identical values to every printed digit. sirius ran the full table below;
+rigel and CEE ran the three forward runs, the `true-stress-strain` and
+`load-displacement` round trips, the `kappa0` round trip, and the
+`--small-strain` peak.
 
 Forward runs, peak Cauchy stress at the default parameters:
 
@@ -465,6 +471,11 @@ finite-deformation model, starting from the Salem values, returns
 | sirius | Fedora 44 | 1.4.28 | 6.24.0, `~/dakota` |
 | rigel | RHEL 9.8 | 1.4.27 | 6.24.0, `~/dakota` |
 | cee (`hpws00344`) | RHEL 9.7 | 1.4.27 | 6.24.0, `/projects` |
+
+All three confirmed the confined small-strain peak of `3.106368e+08` Pa under
+the current code, which is what pins the two kinematics apart. The fuller
+small-strain sweep below predates the finite-deformation default and was run
+when small strain was the only option.
 
 All three return identical values to every printed digit. Forward-run peaks are
 `3.106368e+08`, `3.094229e+08` and `3.085363e+08` Pa for confined, hydrostatic

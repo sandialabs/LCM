@@ -70,7 +70,7 @@ def exo_series(fname):
 # materials_permafrost_death_*.yaml decks (both end members = Salem,
 # constant ice saturation 1.0: the trajectories are the already-verified
 # CapModel paths, so the death tests isolate the failure bookkeeping).
-SALEM_SHARED = dict(D=3.94e-4, theta=0.0, L=3.94e-4, phi=0.0,
+SALEM_SHARED = dict(D=3.94e-10, theta=0.0, L=3.94e-10, phi=0.0,
                     R=28.0, Q=28.0, psi=1.0, D2=0.0)
 
 # Per-mode death tests: load path, indicator field, deck threshold, and
@@ -349,13 +349,13 @@ def main():
         eps = lambda t: np.diag([-0.04 * t, 0.0, 0.0])
     elif path == 'triaxial':
         eps = lambda t: np.diag([-0.025 * t, -0.008 * t, -0.012 * t])
-        p = ref.CapParams(psi=0.8, L=3.5e-4, phi=0.085, theta=0.1, Q=20.0)
+        p = ref.CapParams(psi=0.8, L=3.5e-10, phi=0.085, theta=0.1, Q=20.0)
     elif path == 'confined_fd':
         # u = h(t) x  =>  F = I + diag(h)
         F_of_t = lambda t: np.diag([1.0 - 0.04 * t, 1.0, 1.0])
     elif path == 'triaxial_fd':
         F_of_t = lambda t: np.diag([1.0 - 0.025 * t, 1.0 - 0.008 * t, 1.0 - 0.012 * t])
-        p = ref.CapParams(psi=0.8, L=3.5e-4, phi=0.085, theta=0.1, Q=20.0)
+        p = ref.CapParams(psi=0.8, L=3.5e-10, phi=0.085, theta=0.1, Q=20.0)
     elif path == 'permafrost_thaw':
         eps = lambda t: np.diag([-0.04 * t, 0.0, 0.0])
         # Two-point table [0,1] -> [1.0, 0.3]: same end-clamped linear

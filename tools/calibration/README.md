@@ -33,11 +33,11 @@ so this is a convention, not a constraint. It is chosen to match the ACE
 permafrost production decks, which are already in Pa and scientific notation
 (`tests/LCM/ACE/MiniErosionPermafrost/materials_mechanical_permafrost.yaml`:
 `A: 2.0e+06`, `kappa0: -1.0e+07`, `D1: 1.0e-08`): a parameter set calibrated
-here drops into one without rescaling. It does mean the values here differ from
-the MPa table of Sun, Chen & Ostien (2014) by the appropriate power of 1e6, and
-from the MPa verification decks in `tests/LCM/CapModelPlasticity3D` that these
-templates were copied from. The two agree to roundoff; see "Verification
-status".
+here drops into one without rescaling. The verification decks in
+`tests/LCM/CapModelPlasticity3D` that these templates were copied from are in
+base SI too, so the two carry identical numbers. It does mean the values here
+differ from the MPa table of Sun, Chen & Ostien (2014) by the appropriate power
+of 1e6; the two parameter sets agree to roundoff, see "Verification status".
 
 A curve supplied in MPa would be fit by stress-like parameters 1e6 too small,
 and would not be detected: the objective compares raw values. Convert the data,

@@ -35,26 +35,30 @@ I3 = np.eye(3)
 
 
 class CapParams:
-    """Salem limestone, associative set: Table 1 of [3]. Units: MPa."""
+    """Salem limestone, associative set: Table 1 of [3], converted to base
+    SI. Units: stress in Pa (E, A, C, kappa0, calpha, N), 1/Pa (D, L, D1),
+    1/Pa^2 (D2); theta, phi, R, Q, W, psi, nu dimensionless. The model is
+    unit-agnostic; base SI is the convention shared with the materials decks
+    beside this file, the ACE production decks and tools/calibration."""
 
     def __init__(self, **kw):
-        self.E      = 22547.0
+        self.E      = 2.2547e10
         self.nu     = 0.2524
-        self.A      = 689.2
-        self.C      = 675.2
-        self.D      = 3.94e-4
+        self.A      = 6.892e8
+        self.C      = 6.752e8
+        self.D      = 3.94e-10
         self.theta  = 0.0
-        self.L      = 3.94e-4
+        self.L      = 3.94e-10
         self.phi    = 0.0
         self.R      = 28.0
         self.Q      = 28.0
-        self.kappa0 = -8.05
+        self.kappa0 = -8.05e6
         self.W      = 0.08
-        self.D1     = 1.47e-3
+        self.D1     = 1.47e-9
         self.D2     = 0.0
-        self.calpha = 1.0e5
+        self.calpha = 1.0e11
         self.psi    = 1.0
-        self.N      = 6.0
+        self.N      = 6.0e6
         for k, v in kw.items():
             assert hasattr(self, k), k
             setattr(self, k, v)
@@ -363,14 +367,15 @@ def drive_fd(F_of_t, nsteps, p):
     return out
 
 
-SALEM_END = dict(K=15177.03284868067, G=9001.517087192591,
-                 A=689.2, C=675.2, N=6.0, kappa0=-8.05, W=0.08,
-                 D1=1.47e-3, calpha=1.0e5)
+# Base SI, matching materials_permafrost*.yaml exactly (see CapParams).
+SALEM_END = dict(K=1.517703284868067e10, G=9.001517087192591e9,
+                 A=6.892e8, C=6.752e8, N=6.0e6, kappa0=-8.05e6, W=0.08,
+                 D1=1.47e-9, calpha=1.0e11)
 
-THAWED_TEST_END = dict(K=5000.0, G=20.0, A=10.0, C=9.0, N=0.5,
-                       kappa0=-0.5, W=0.4, D1=0.01, calpha=500.0)
+THAWED_TEST_END = dict(K=5.0e9, G=2.0e7, A=1.0e7, C=9.0e6, N=5.0e5,
+                       kappa0=-5.0e5, W=0.4, D1=1.0e-8, calpha=5.0e8)
 
-THAWED_TEST_SHARED = dict(D=1.0e-3, theta=0.05, L=8.0e-4, phi=0.04,
+THAWED_TEST_SHARED = dict(D=1.0e-9, theta=0.05, L=8.0e-10, phi=0.04,
                           R=8.0, Q=6.0, psi=1.0, D2=0.0)
 
 
@@ -500,11 +505,11 @@ def selfcheck():
     #    closed-form invariant identities at a general (non-principal) state.
     rng = np.random.default_rng(42)
     M = rng.normal(size=(3, 3))
-    sigma = -50.0 * I3 + 5.0 * (M + M.T)   # compressive + random shear
+    sigma = -5.0e7 * I3 + 5.0e6 * (M + M.T)   # compressive + random shear
     alpha = np.zeros((3, 3))
     a = rng.normal(size=(3, 3)); a = a + a.T
-    alpha = 0.5 * (a - np.trace(a) / 3 * I3)   # deviatoric backstress
-    kappa = -20.0
+    alpha = 0.5e6 * (a - np.trace(a) / 3 * I3)   # deviatoric backstress
+    kappa = -2.0e7
 
     # dJ3/dsigma identity: numerical gradient of J3 must equal
     # s.s - (2/3) J2 I (the matrix-product form -- the bug we fixed).
@@ -514,11 +519,15 @@ def selfcheck():
     I1, J2, J3, s = invariants(sigma, alpha)
     closed = s @ s - 2.0 / 3.0 * J2 * I3
     elementwise = s * s - 2.0 / 3.0 * J2 * I3
-    err_closed = np.abs(nJ3 - closed).max()
-    err_elem = np.abs(nJ3 - elementwise).max()
-    print(f"dJ3/dsigma: |FD - matrix-product| = {err_closed:.3e}  "
+    # dJ3/dsigma carries units of stress^2, so both errors are measured
+    # relative to the closed form's own scale: an absolute threshold would
+    # only be meaningful in one unit system.
+    scale = np.abs(closed).max()
+    err_closed = np.abs(nJ3 - closed).max() / scale
+    err_elem = np.abs(nJ3 - elementwise).max() / scale
+    print(f"dJ3/dsigma: |FD - matrix-product|/scale = {err_closed:.3e}  "
           f"(elementwise-square error would be {err_elem:.3e})")
-    ok &= err_closed < 1.0e-5 and err_elem > 1.0e-1
+    ok &= err_closed < 1.0e-10 and err_elem > 1.0e-1
 
     # 2. Hydrostatic crush-curve identity: on the hydrostat the converged
     #    stress sits at I1 = X(kappa) and evp must equal the crush curve.

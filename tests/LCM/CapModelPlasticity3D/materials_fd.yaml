@@ -4,27 +4,31 @@ LCM:
       material: CapModel
   Materials:
     # Salem limestone, associative parameter set: Table 1 of Sun, Chen &
-    # Ostien, Acta Geotechnica 9 (2014) 903-934. Units: MPa.
+    # Ostien, Acta Geotechnica 9 (2014) 903-934, converted to base SI:
+    # stress in Pa, D/L/D1 in 1/Pa, D2 in 1/Pa^2, magnitudes in scientific
+    # notation with no prefixed units. The model is unit-agnostic, so this
+    # is only a convention; it matches the ACE production decks and
+    # tools/calibration.
     CapModel:
       Material Model:
         Model Name: Cap
       # Exponential/logarithmic-map finite-deformation kinematics around
       # the small-strain integrator.
       Finite Deformation: true
-      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 2.2547e10}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
-      A: 689.2
-      D: 0.000394
-      C: 675.2
+      A: 6.892e8
+      D: 3.94e-10
+      C: 6.752e8
       theta: 0.0
       R: 28.0
-      kappa0: -8.05
+      kappa0: -8.05e6
       W: 0.08
-      D1: 0.00147
+      D1: 1.47e-9
       D2: 0.0
-      calpha: 100000.0
+      calpha: 1.0e11
       psi: 1.0
-      N: 6.0
-      L: 0.000394
+      N: 6.0e6
+      L: 3.94e-10
       phi: 0.0
       Q: 28.0

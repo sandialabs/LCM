@@ -8,27 +8,28 @@ LCM:
     # activates Gamma(beta) and its J2/J3 derivatives; L != D, phi !=
     # theta and Q != R activate the non-associative plastic potential,
     # the X^g(kappa) = kappa - Q*F_f(kappa) convention, and the
-    # yield-X crush curve. Units: MPa.
+    # yield-X crush curve. Units: base SI (stress in Pa, D/L/D1 in 1/Pa),
+    # as in materials.yaml.
     CapModelTriaxial:
       Material Model:
         Model Name: Cap
       # Exponential/logarithmic-map finite-deformation kinematics around
       # the small-strain integrator.
       Finite Deformation: true
-      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 22547.0}
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 2.2547e10}
       Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
-      A: 689.2
-      D: 0.000394
-      C: 675.2
+      A: 6.892e8
+      D: 3.94e-10
+      C: 6.752e8
       theta: 0.1
       R: 28.0
-      kappa0: -8.05
+      kappa0: -8.05e6
       W: 0.08
-      D1: 0.00147
+      D1: 1.47e-9
       D2: 0.0
-      calpha: 100000.0
+      calpha: 1.0e11
       psi: 0.8
-      N: 6.0
-      L: 0.00035
+      N: 6.0e6
+      L: 3.5e-10
       phi: 0.085
       Q: 20.0

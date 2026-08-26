@@ -23,28 +23,28 @@ LCM:
       Output Eqps Indicator: true
       Output Displacement Indicator: true
       Frozen Parameters:
-        K: 15177.03284868067
-        G: 9001.517087192591
-        A: 689.2
-        C: 675.2
-        N: 6.0
-        kappa0: -8.05
+        K: 1.517703284868067e10
+        G: 9.001517087192591e9
+        A: 6.892e8
+        C: 6.752e8
+        N: 6.0e6
+        kappa0: -8.05e6
         W: 0.08
-        D1: 0.00147
-        calpha: 100000.0
+        D1: 1.47e-9
+        calpha: 1.0e11
       Thawed Parameters:
-        K: 15177.03284868067
-        G: 9001.517087192591
-        A: 689.2
-        C: 675.2
-        N: 6.0
-        kappa0: -8.05
+        K: 1.517703284868067e10
+        G: 9.001517087192591e9
+        A: 6.892e8
+        C: 6.752e8
+        N: 6.0e6
+        kappa0: -8.05e6
         W: 0.08
-        D1: 0.00147
-        calpha: 100000.0
-        D: 0.000394
+        D1: 1.47e-9
+        calpha: 1.0e11
+        D: 3.94e-10
         theta: 0.0
-        L: 0.000394
+        L: 3.94e-10
         phi: 0.0
         R: 28.0
         Q: 28.0

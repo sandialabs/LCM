@@ -717,8 +717,10 @@ evaluates all stress gradients by complex-step differentiation
 derivatives and the reference share no code and no derivation. Its
 self-check verifies, among other identities, the $J_3$ derivative
 \eqref{eq:dJ3} against complex step at a generic (non-principal-axes)
-state, where the elementwise-square error would be $O(10^2)$ in
-stress-squared units.
+state. Both errors are measured relative to the closed form's own
+scale, so the check means the same thing in any unit system: the
+matrix-product form agrees to $O(10^{-15})$, while the
+elementwise-square form is wrong by $O(1)$.
 
 \paragraph{Material-point exactness of the test problems.}
 Each verification problem is a single hexahedral element whose 24
@@ -775,9 +777,10 @@ consistent unit system, with the stress unit denoted $\sigma$ in the
 table. The convention throughout LCM is base SI, with magnitudes
 written in scientific notation rather than as prefixed units: stresses
 in Pa, so $2.2547 \times 10^{10}$~Pa and not $22547$~MPa. The ACE
-permafrost decks and the MatCal/Dakota calibration harness in
-\texttt{tools/calibration} both follow it, so a calibrated set
-transfers between them without rescaling. The Salem limestone values
+permafrost decks, the verification decks of
+Section~\ref{sec:verification} and the MatCal/Dakota calibration
+harness in \texttt{tools/calibration} all follow it, so a parameter
+set transfers between them without rescaling. The Salem limestone values
 below are the associative set of
 \citet[Table~1]{Sun.Chen.Ostien:2014}, converted from the MPa of that
 table (stress-like values $\times 10^{6}$, $1/\sigma$ values

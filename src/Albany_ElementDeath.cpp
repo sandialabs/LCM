@@ -43,10 +43,11 @@ fieldFillZero(stk::mesh::BulkData& bulk, DoubleField& field)
 {
   const auto& meta = bulk.mesh_meta_data();
   const auto& buckets = bulk.get_buckets(field.entity_rank(), meta.universal_part());
+  auto fieldData = field.data<stk::mesh::ReadWrite>();
   for (const auto* bucket : buckets) {
-    double* data = stk::mesh::field_data(field, *bucket);
-    if (data != nullptr) {
-      std::fill(data, data + bucket->size(), 0.0);
+    auto values = fieldData.bucket_values(*bucket);
+    for (stk::mesh::EntityIdx entity : bucket->entities()) {
+      values(entity) = 0.0;
     }
   }
 }
@@ -96,13 +97,11 @@ applyElementDeath(
   for (const auto* bucket : liveBuckets) {
     for (size_t i = 0; i < bucket->size(); ++i) {
       stk::mesh::Entity elem = (*bucket)[i];
+      auto attachCountData = faceElemAttachCount->data<stk::mesh::ReadWrite>();
       const stk::mesh::Entity* faces = bulkData.begin(elem, side_rank);
       const unsigned nf = bulkData.num_connectivity(elem, side_rank);
       for (unsigned j = 0; j < nf; ++j) {
-        double* count = stk::mesh::field_data(*faceElemAttachCount, faces[j]);
-        if (count != nullptr) {
-          *count += 1.0;
-        }
+        attachCountData.entity_values(faces[j])() += 1.0;
       }
     }
   }
@@ -139,23 +138,17 @@ applyElementDeath(
     for (unsigned j = 0; j < nf; ++j) {
       const stk::mesh::Entity face = elem_faces[j];
       const unsigned side_ord = static_cast<unsigned>(elem_face_ords[j]);
-      const double* count =
-          stk::mesh::field_data(*faceElemAttachCount, face);
-      const bool isShared = count != nullptr && (*count) > 1.01;
+      // Read before the modification below; the handle is re-acquired after.
+      const bool isShared =
+          faceElemAttachCount->data().entity_values(face)() > 1.01;
 
       if (isShared) {
         bulkData.destroy_relation(elem, face, side_ord);
         bulkData.declare_element_side(elem, side_ord, sideSetParts);
-        double* exposure =
-            stk::mesh::field_data(*faceExposureCount, face);
-        if (exposure != nullptr) {
-          *exposure += 1.0;
-        }
-        double* boundaryMark =
-            stk::mesh::field_data(*boundaryFaceMarker, face);
-        if (boundaryMark != nullptr) {
-          *boundaryMark = 1.0;
-        }
+        // Re-acquired here: declare_element_side above modifies the mesh, so
+        // a handle taken before it could hold dangling pointers.
+        faceExposureCount->data<stk::mesh::ReadWrite>().entity_values(face)() += 1.0;
+        boundaryFaceMarker->data<stk::mesh::ReadWrite>().entity_values(face)() = 1.0;
       }
       // Unshared (boundary) faces of the dying cell are left attached
       // and unmodified. LCM keeps dying cells in the mesh
@@ -206,16 +199,12 @@ applyElementDeath(
         bulkData.get_buckets(side_rank, meta.universal_part());
     for (const auto* bucket : faceBuckets) {
       if (!bucket->owned()) continue;
+      auto exposureData = faceExposureCount->data();
+      auto boundaryData = boundaryFaceMarker->data();
       for (size_t i = 0; i < bucket->size(); ++i) {
         stk::mesh::Entity face = (*bucket)[i];
-        const double* exposure =
-            stk::mesh::field_data(*faceExposureCount, face);
-        const double* boundaryMark =
-            stk::mesh::field_data(*boundaryFaceMarker, face);
-        const bool isExposed =
-            exposure != nullptr && (*exposure) > 1.01;
-        const bool isBoundary =
-            boundaryMark != nullptr && (*boundaryMark) > 0.5;
+        const bool isExposed  = exposureData.entity_values(face)() > 1.01;
+        const bool isBoundary = boundaryData.entity_values(face)() > 0.5;
         if (isExposed) {
           toDelete.push_back(face);
         } else if (isBoundary) {

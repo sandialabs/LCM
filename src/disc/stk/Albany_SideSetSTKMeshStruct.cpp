@@ -3,6 +3,9 @@
 // detailed in the file license.txt in the top-level Albany directory.
 
 #include "Albany_SideSetSTKMeshStruct.hpp"
+#include "Albany_EntityValueView.hpp"
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 
 #include <Shards_BasicTopologies.hpp>
 #include <iostream>
@@ -153,16 +156,22 @@ SideSetSTKMeshStruct::setFieldAndBulkData(
     nodeId = inputBulkData.identifier(nodes[inode]);
     node   = bulkData->declare_entity(stk::topology::NODE_RANK, nodeId, singlePartVec);
 
+    // Handles acquired inside the loop: declare_entity above modifies the mesh.
+    auto coordsData         = coordinates_field.data<stk::mesh::ReadWrite>();
+    auto parentCoordsData   = parent_coordinates_field.data();
+    auto coords3dData       = coordinates_field3d.data<stk::mesh::ReadWrite>();
+    auto parentCoords3dData = parent_coordinates_field3d.data();
+
     // Setting the coordinates_field
-    double*       coord   = stk::mesh::field_data(coordinates_field, node);
-    double const* p_coord = stk::mesh::field_data(parent_coordinates_field, nodes[inode]);
+    auto coord   = entity_view(coordsData, node);
+    auto p_coord = entity_view(parentCoordsData, nodes[inode]);
     for (size_t idim = 0; idim < metaData->spatial_dimension(); ++idim) coord[idim] = p_coord[idim];
 
     // Setting the coordinates_field3d (since this is a side mesh, for sure
     // numDim<3)
-    coord   = stk::mesh::field_data(coordinates_field3d, node);
-    p_coord = stk::mesh::field_data(parent_coordinates_field3d, nodes[inode]);
-    for (int idim = 0; idim < 3; ++idim) coord[idim] = p_coord[idim];
+    auto coord3d   = entity_view(coords3dData, node);
+    auto p_coord3d = entity_view(parentCoords3dData, nodes[inode]);
+    for (int idim = 0; idim < 3; ++idim) coord3d[idim] = p_coord3d[idim];
 
     // Checking for shared node
     std::vector<int> sharing_procs;

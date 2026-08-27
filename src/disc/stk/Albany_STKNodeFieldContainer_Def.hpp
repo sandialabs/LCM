@@ -3,6 +3,8 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include <stk_io/IossBridge.hpp>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Types.hpp>
@@ -75,7 +77,10 @@ MDArray
 STKNodeField<DataType, ArrayDim, traits>::getMDA(const stk::mesh::Bucket& buck)
 {
   MDArray ar;
-  double* data = stk::mesh::field_data(*node_field, buck);
+  // Feeds a shards::Array view, so it needs the raw pointer; taken through
+  // the new API's expert accessor rather than the legacy call.
+  auto    nodeFieldData = node_field->template data<stk::mesh::ReadWrite>();
+  double* data          = nodeFieldData.bucket_values(buck).pointer();
   if (data != nullptr) {
     const MDArray::size_type num_nodes = buck.size();
     const MDArray::size_type scalars_per = stk::mesh::field_scalars_per_entity(*node_field, buck);

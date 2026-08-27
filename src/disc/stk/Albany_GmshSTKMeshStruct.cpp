@@ -3,6 +3,9 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include "Albany_GmshSTKMeshStruct.hpp"
+#include "Albany_EntityValueView.hpp"
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 
 #include <Albany_STKNodeSharing.hpp>
 #include <Shards_BasicTopologies.hpp>
@@ -286,8 +289,9 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
     for (int i = 0; i < NumNodes; i++) {
       stk::mesh::Entity node = bulkData->declare_entity(stk::topology::NODE_RANK, i + 1, singlePartVec);
 
-      double* coord;
-      coord    = stk::mesh::field_data(*coordinates_field, node);
+      MutEntityValueView coord;
+      auto coordDataLocal = coordinates_field->data<stk::mesh::ReadWrite>();
+      coord = entity_view(coordDataLocal, node);
       coord[0] = pts[i][0];
       coord[1] = pts[i][1];
       if (numDim == 3) coord[2] = pts[i][2];
@@ -302,8 +306,7 @@ Albany::GmshSTKMeshStruct::setFieldAndBulkData(
         bulkData->declare_relation(elem, node, j);
       }
 
-      int* p_rank = stk::mesh::field_data(*proc_rank_field, elem);
-      p_rank[0]   = commT->getRank();
+      proc_rank_field->data<stk::mesh::ReadWrite>().entity_values(elem)() = commT->getRank();
     }
 
     std::string           partName;

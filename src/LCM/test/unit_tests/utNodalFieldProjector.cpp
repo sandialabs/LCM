@@ -16,6 +16,8 @@
 //
 
 #include <fstream>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 
 #include "Teuchos_RCP.hpp"
 #include "Teuchos_UnitTestHarness.hpp"
@@ -191,11 +193,13 @@ forEachOwnedNode(Albany::AbstractSTKMeshStruct& ms, stk::mesh::Field<double>* fl
 {
   stk::mesh::Selector              sel     = ms.metaData->locally_owned_part();
   const stk::mesh::BucketVector&   buckets = ms.bulkData->get_buckets(stk::topology::NODE_RANK, sel);
+  auto                             fldData = fld->data<stk::mesh::ReadWrite>();
   for (auto const* bptr : buckets) {
     stk::mesh::Bucket const& bucket = *bptr;
     int const                ncomp  = stk::mesh::field_scalars_per_entity(*fld, bucket);
     for (std::size_t i = 0; i < bucket.size(); ++i) {
-      double* data = stk::mesh::field_data(*fld, bucket[i]);
+      // f() takes a raw pointer, so use the expert accessor.
+      double* data = fldData.entity_values(bucket[i]).pointer();
       f(data, ncomp);
     }
   }

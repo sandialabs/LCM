@@ -106,6 +106,7 @@ struct NodeData_Traits<T, 1>
     Teuchos::ArrayRCP<const ST> const_overlap_node_view = getLocalData(overlap_node_vec->col(offset));
 
     auto indexer = createGlobalLocalIndexer(overlap_node_vec->range());
+    auto fieldData = fld->template data<stk::mesh::ReadWrite>();
     for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
       const stk::mesh::Bucket&   bucket   = **it;
       const stk::mesh::BulkData& bulkData = bucket.mesh();
@@ -115,8 +116,7 @@ struct NodeData_Traits<T, 1>
       for (std::size_t i = 0; i < num_nodes_in_bucket; i++) {
         const GO global_id = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
         const LO local_id  = indexer->getLocalElement(global_id);
-        T* data = stk::mesh::field_data(*fld, bucket[i]);
-        data[0] = const_overlap_node_view[local_id];
+        fieldData.entity_values(bucket[i])() = const_overlap_node_view[local_id];
       }
     }
   }
@@ -145,6 +145,7 @@ struct NodeData_Traits<T, 2>
   saveFieldData(const Teuchos::RCP<const Thyra_MultiVector>& overlap_node_vec, const stk::mesh::BucketVector& all_elements, field_type* fld, int offset)
   {
     auto indexer = createGlobalLocalIndexer(overlap_node_vec->range());
+    auto fieldData = fld->template data<stk::mesh::ReadWrite>();
     for (auto it = all_elements.begin(); it != all_elements.end(); ++it) {
       const stk::mesh::Bucket& bucket = **it;
       stk::mesh::BulkData const& bulkData = bucket.mesh();
@@ -158,8 +159,7 @@ struct NodeData_Traits<T, 2>
         for (int i = 0; i < num_nodes_in_bucket; ++i) {
           const GO global_id = bulkData.identifier(bucket[i]) - 1;  // global node in mesh
           const LO local_id  = indexer->getLocalElement(global_id);
-          T* data = stk::mesh::field_data(*fld, bucket[i]);
-          data[j] = const_overlap_node_view[local_id];
+          fieldData.entity_values(bucket[i])(stk::mesh::ComponentIdx(j)) = const_overlap_node_view[local_id];
         }
       }
     }

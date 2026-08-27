@@ -9,6 +9,8 @@
 // and apply the appropriate Neumann conditions to them.
 
 #include "ACE_ThermoMechanical.hpp"
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -1315,7 +1317,10 @@ ACEThermoMechanical::snapshotStatesInto(SharedStateStore& out) const
     for (auto* bucket : bulk.get_buckets(stk::topology::ELEMENT_RANK, owned & stk::mesh::selectField(*field))) {
       unsigned const ncomp = stk::mesh::field_scalars_per_entity(*field, *bucket);
       if (ncomp == 0) continue;
-      double const* data = stk::mesh::field_data(*field, *bucket);
+      // v.assign takes iterators over the bucket, so this needs the raw
+      // pointer; taken through the new API's expert accessor.
+      auto          fieldData = field->data();
+      double const* data      = fieldData.bucket_values(*bucket).pointer();
       for (size_t i = 0; i < bucket->size(); ++i) {
         auto& v = store[bulk.identifier((*bucket)[i])];
         v.assign(data + i * ncomp, data + (i + 1) * ncomp);
@@ -1351,7 +1356,9 @@ ACEThermoMechanical::restoreStatesFrom(SharedStateStore const& in, bool keep_dea
     for (auto* bucket : bulk.get_buckets(stk::topology::ELEMENT_RANK, owned & stk::mesh::selectField(*field))) {
       unsigned const ncomp = stk::mesh::field_scalars_per_entity(*field, *bucket);
       if (ncomp == 0) continue;
-      double* data = stk::mesh::field_data(*field, *bucket);
+      // std::copy writes through a pointer, same reasoning as above.
+      auto    fieldData = field->data<stk::mesh::ReadWrite>();
+      double* data      = fieldData.bucket_values(*bucket).pointer();
       for (size_t i = 0; i < bucket->size(); ++i) {
         auto const vit = store.find(bulk.identifier((*bucket)[i]));
         if (vit == store.end()) continue;

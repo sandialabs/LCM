@@ -508,6 +508,7 @@ STKDiscretization::getCoordinates() const
   // since the mesh can move in shape opt problems
 
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
+  auto coordsData = coordinates_field->data<stk::mesh::ReadWrite>();
 
   int const meshDim         = stkMeshStruct->numDim;
   auto      ov_node_indexer = createGlobalLocalIndexer(m_overlap_node_vs);
@@ -515,7 +516,7 @@ STKDiscretization::getCoordinates() const
     GO  node_gid = gid(overlapnodes[i]);
     int node_lid = ov_node_indexer->getLocalElement(node_gid);
 
-    double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+    auto x = entity_view(coordsData, overlapnodes[i]);
     for (int dim = 0; dim < meshDim; ++dim) {
       coordinates[meshDim * node_lid + dim] = x[dim];
     }
@@ -547,6 +548,7 @@ STKDiscretization::transformMesh()
   using std::cout;
   using std::endl;
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
+  auto coordsData = coordinates_field->data<stk::mesh::ReadWrite>();
   std::string                                 transformType     = stkMeshStruct->transformType;
 
   if (transformType == "None") {
@@ -555,7 +557,7 @@ STKDiscretization::transformMesh()
     // of a circle/sphere
     int const numDim = stkMeshStruct->numDim;
     for (int i = 0; i < numOverlapNodes; i++) {
-      double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+      auto x = entity_view(coordsData, overlapnodes[i]);
       double  r = 0.0;
       for (int n = 0; n < numDim; n++) {
         r += x[n] * x[n];
@@ -577,19 +579,19 @@ STKDiscretization::transformMesh()
     //*out << "numDim = " << numDim << '\n';
     if (numDim >= 0) {
       for (int i = 0; i < numOverlapNodes; i++) {
-        double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+        auto x = entity_view(coordsData, overlapnodes[i]);
         x[0]      = xshift + x[0];
       }
     }
     if (numDim >= 1) {
       for (int i = 0; i < numOverlapNodes; i++) {
-        double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+        auto x = entity_view(coordsData, overlapnodes[i]);
         x[1]      = yshift + x[1];
       }
     }
     if (numDim >= 1) {
       for (int i = 0; i < numOverlapNodes; i++) {
-        double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+        auto x = entity_view(coordsData, overlapnodes[i]);
         x[2]      = zshift + x[2];
       }
     }
@@ -626,7 +628,7 @@ STKDiscretization::transformMesh()
       scale = scales[0];
       if (std::abs(beta) > 1.0e-12) {
         for (int i = 0; i < numOverlapNodes; i++) {
-          double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+          auto x = entity_view(coordsData, overlapnodes[i]);
           x[0]      = scale * (1.0 - tanh(beta * (scale - x[0])) / tanh(scale * beta));
         }
       }
@@ -636,7 +638,7 @@ STKDiscretization::transformMesh()
       scale = scales[1];
       if (std::abs(beta) > 1.0e-12) {
         for (int i = 0; i < numOverlapNodes; i++) {
-          double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+          auto x = entity_view(coordsData, overlapnodes[i]);
           x[1]      = scale * (1.0 - tanh(beta * (scale - x[1])) / tanh(scale * beta));
         }
       }
@@ -646,7 +648,7 @@ STKDiscretization::transformMesh()
       scale = scales[2];
       if (std::abs(beta) > 1.0e-12) {
         for (int i = 0; i < numOverlapNodes; i++) {
-          double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+          auto x = entity_view(coordsData, overlapnodes[i]);
           x[2]      = scale * (1.0 - tanh(beta * (scale - x[2])) / tanh(scale * beta));
         }
       }
@@ -659,14 +661,15 @@ STKDiscretization::transformMesh()
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
+    auto surfaceHeightData = surfaceHeight_field->data<stk::mesh::ReadWrite>();
     for (int i = 0; i < numOverlapNodes; i++) {
-      double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+      auto x = entity_view(coordsData, overlapnodes[i]);
       x[0]                                                          = L * x[0];
       x[1]                                                          = L * x[1];
       double s                                                      = -x[0] * tan(alpha);
       double b                                                      = s - 1.0 + 0.5 * sin(2 * pi / L * x[0]) * sin(2 * pi / L * x[1]);
       x[2]                                                          = s * x[2] + b * (1 - x[2]);
-      *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
+      surfaceHeightData.entity_values(overlapnodes[i])() = s;
     }
   } else if (transformType == "ISMIP-HOM Test B") {
     double L     = stkMeshStruct->felixL;
@@ -675,14 +678,15 @@ STKDiscretization::transformMesh()
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
+    auto surfaceHeightData = surfaceHeight_field->data<stk::mesh::ReadWrite>();
     for (int i = 0; i < numOverlapNodes; i++) {
-      double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+      auto x = entity_view(coordsData, overlapnodes[i]);
       x[0]                                                          = L * x[0];
       x[1]                                                          = L * x[1];
       double s                                                      = -x[0] * tan(alpha);
       double b                                                      = s - 1.0 + 0.5 * sin(2 * pi / L * x[0]);
       x[2]                                                          = s * x[2] + b * (1 - x[2]);
-      *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
+      surfaceHeightData.entity_values(overlapnodes[i])() = s;
     }
   } else if ((transformType == "ISMIP-HOM Test C") || (transformType == "ISMIP-HOM Test D")) {
     double L     = stkMeshStruct->felixL;
@@ -691,27 +695,29 @@ STKDiscretization::transformMesh()
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
+    auto surfaceHeightData = surfaceHeight_field->data<stk::mesh::ReadWrite>();
     for (int i = 0; i < numOverlapNodes; i++) {
-      double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+      auto x = entity_view(coordsData, overlapnodes[i]);
       x[0]                                                          = L * x[0];
       x[1]                                                          = L * x[1];
       double s                                                      = -x[0] * tan(alpha);
       double b                                                      = s - 1.0;
       x[2]                                                          = s * x[2] + b * (1 - x[2]);
-      *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
+      surfaceHeightData.entity_values(overlapnodes[i])() = s;
     }
   } else if (transformType == "Dome") {
     double L = 0.7071 * 30;
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
+    auto surfaceHeightData = surfaceHeight_field->data<stk::mesh::ReadWrite>();
     for (int i = 0; i < numOverlapNodes; i++) {
-      double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+      auto x = entity_view(coordsData, overlapnodes[i]);
       x[0]                                                          = L * x[0];
       x[1]                                                          = L * x[1];
       double s                                                      = 0.7071 * sqrt(450.0 - x[0] * x[0] - x[1] * x[1]) / sqrt(450.0);
       x[2]                                                          = s * x[2];
-      *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
+      surfaceHeightData.entity_values(overlapnodes[i])() = s;
     }
   } else if (transformType == "Confined Shelf") {
     double L = stkMeshStruct->felixL;
@@ -719,14 +725,15 @@ STKDiscretization::transformMesh()
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
+    auto surfaceHeightData = surfaceHeight_field->data<stk::mesh::ReadWrite>();
     for (int i = 0; i < numOverlapNodes; i++) {
-      double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+      auto x = entity_view(coordsData, overlapnodes[i]);
       x[0]                                                          = L * x[0];
       x[1]                                                          = L * x[1];
       double s                                                      = 0.06;    // top surface is at z=0.06km=60m
       double b                                                      = -0.440;  // basal surface is at z=-0.440km=-440m
       x[2]                                                          = s * x[2] + b * (1.0 - x[2]);
-      *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
+      surfaceHeightData.entity_values(overlapnodes[i])() = s;
     }
   } else if (transformType == "Circular Shelf") {
     double L        = stkMeshStruct->felixL;
@@ -735,14 +742,15 @@ STKDiscretization::transformMesh()
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stkMeshStruct->PBCStruct.scale[1] *= L;
     stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
+    auto surfaceHeightData = surfaceHeight_field->data<stk::mesh::ReadWrite>();
     for (int i = 0; i < numOverlapNodes; i++) {
-      double* x                                                     = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+      auto x = entity_view(coordsData, overlapnodes[i]);
       x[0]                                                          = L * x[0];
       x[1]                                                          = L * x[1];
       double s                                                      = 1.0 - rhoIce / rhoOcean;  // top surface is at z=(1-rhoIce/rhoOcean) km
       double b                                                      = s - 1.0;                  // basal surface is at z=s-1 km
       x[2]                                                          = s * x[2] + b * (1.0 - x[2]);
-      *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
+      surfaceHeightData.entity_values(overlapnodes[i])() = s;
     }
   } else if (transformType == "FO XZ MMS") {
     // This test case assumes the domain read in from the input file is 0 < x <
@@ -755,15 +763,16 @@ STKDiscretization::transformMesh()
     double H      = 1.0;
     stkMeshStruct->PBCStruct.scale[0] *= L;
     stk::mesh::Field<double>* surfaceHeight_field = metaData.get_field<double>(stk::topology::NODE_RANK, "surface_height");
+    auto surfaceHeightData = surfaceHeight_field->data<stk::mesh::ReadWrite>();
     for (int i = 0; i < numOverlapNodes; i++) {
-      double* x = stk::mesh::field_data(*coordinates_field, overlapnodes[i]);
+      auto x = entity_view(coordsData, overlapnodes[i]);
       x[0]      = L * (x[0] - 1.0);  // test case assumes domain is from [-L, L],
                                      // where unscaled domain is from [0, 2];
       double s = s0 - alpha0 * x[0] * x[0];
       double b = s - H;
       // this transformation of y = [0,1] should give b(x) < y < s(x)
       x[1]                                                          = b * (1 - x[1]) + s * x[1];
-      *stk::mesh::field_data(*surfaceHeight_field, overlapnodes[i]) = s;
+      surfaceHeightData.entity_values(overlapnodes[i])() = s;
     }
   } else {
     ALBANY_ABORT("STKDiscretization::transformMesh() Unknown transform type :" << transformType << std::endl);
@@ -775,6 +784,7 @@ STKDiscretization::setupMLCoords()
 {
   int const                                   numDim            = stkMeshStruct->numDim;
   AbstractSTKFieldContainer::VectorFieldType* coordinates_field = stkMeshStruct->getCoordinatesField();
+  auto coordsData = coordinates_field->data<stk::mesh::ReadWrite>();
   coordMV                                                       = Thyra::createMembers(m_node_vs, numDim);
   auto coordMV_data                                             = getNonconstLocalData(coordMV);
 
@@ -782,7 +792,7 @@ STKDiscretization::setupMLCoords()
   for (int i = 0; i < numOwnedNodes; i++) {
     GO      node_gid = gid(ownednodes[i]);
     int     node_lid = node_indexer->getLocalElement(node_gid);
-    double* X        = stk::mesh::field_data(*coordinates_field, ownednodes[i]);
+    auto X = entity_view(coordsData, ownednodes[i]);
     for (int j = 0; j < numDim; j++) {
       coordMV_data[j][node_lid] = X[j];
     }
@@ -2044,10 +2054,8 @@ STKDiscretization::computeWorksetInfo()
       }
 
       if (stkMeshStruct->getFieldContainer()->hasSphereVolumeField() && nodes_per_element == 1) {
-        double* volumeTemp = stk::mesh::field_data(*sphereVolume_field, element);
-        if (volumeTemp) {
-          sphereVolume[b][i] = volumeTemp[0];
-        }
+        auto sphereVolumeData = sphereVolume_field->data();
+        sphereVolume[b][i] = sphereVolumeData.entity_values(element)();
       }
       if (stkMeshStruct->getFieldContainer()->hasLatticeOrientationField()) {
         auto latValues           = latticeOrientationData.entity_values(element);
@@ -2162,7 +2170,17 @@ STKDiscretization::computeWorksetInfo()
       const StateStruct::FieldDims& dim = st.dim;
       auto* field = metaData.get_field<double>(stk::topology::ELEMENT_RANK, st.name);
       if (field == nullptr) continue;
-      double* data = stk::mesh::field_data(*field, buck);
+      // The workset state arrays are shards::Array views laid over the
+      // bucket's field memory, so this needs the raw pointer. Take it through
+      // the new API's expert accessor rather than the legacy field_data:
+      // stk::mesh::BucketValues::pointer() is provided for exactly this,
+      // handing a pointer to code that cannot take a strided view. The
+      // pointer's validity is the same contract the legacy one had, namely
+      // until the next mesh modification, and the shape below assumes
+      // Layout::Right, which is what a host-only LCM always gets. See the
+      // note on ElemStateLayout in Albany_AbstractSTKFieldContainer.hpp.
+      auto    fieldData = field->data<stk::mesh::ReadWrite>();
+      double* data      = fieldData.bucket_values(buck).pointer();
       if (data == nullptr) continue;
 
       switch (dim.size()) {
@@ -3111,6 +3129,9 @@ STKDiscretization::findDetachedCells(
   // assembly skips it and the active-element count drops) and return it for
   // the caller to feed into the element-death surgery.
   auto* cell_death_field = metaData.get_field<double>(stk::topology::ELEMENT_RANK, "cell_death");
+  auto cellDeathData = (cell_death_field != nullptr)
+                           ? cell_death_field->data<stk::mesh::ReadWrite>()
+                           : decltype(cell_death_field->data<stk::mesh::ReadWrite>()){};
   for (auto const& c : live) {
     stk::mesh::Entity const* nodes     = bulkData.begin_nodes(c);
     int const                nn        = bulkData.num_nodes(c);
@@ -3124,8 +3145,7 @@ STKDiscretization::findDetachedCells(
     if (connected) continue;
     detached.push_back(c);
     if (cell_death_field != nullptr) {
-      double* cd = stk::mesh::field_data(*cell_death_field, c);
-      if (cd != nullptr) *cd = 1.0;
+      cellDeathData.entity_values(c)() = 1.0;
     }
   }
 
@@ -3146,6 +3166,9 @@ STKDiscretization::getDeadNodeDOFGids()
   // a freshly calved block for a step -- exactly when its velocity is largest.
   // No cell_death field -> erosion not enabled -> nothing to do.
   auto* cell_death_field = metaData.get_field<double>(stk::topology::ELEMENT_RANK, "cell_death");
+  auto cellDeathData = (cell_death_field != nullptr)
+                           ? cell_death_field->data<stk::mesh::ReadWrite>()
+                           : decltype(cell_death_field->data<stk::mesh::ReadWrite>()){};
   if (cell_death_field == nullptr) return dead_dof_gids;
 
   // 1. Mark every node touched by a LIVE (cell_death < 0.5) owned active cell.
@@ -3155,8 +3178,11 @@ STKDiscretization::getDeadNodeDOFGids()
   std::vector<stk::mesh::Entity> active_cells;
   stk::mesh::get_selected_entities(active_sel, bulkData.buckets(stk::topology::ELEMENT_RANK), active_cells);
   for (auto const& c : active_cells) {
-    double const* cd = stk::mesh::field_data(*cell_death_field, c);
-    if (cd != nullptr && *cd >= 0.5) continue;  // dead cell: do not mark its nodes live
+    // A null cell_death field means nothing has died, so every cell is live.
+    if (cell_death_field != nullptr &&
+        cellDeathData.entity_values(c)() >= 0.5) {
+      continue;  // dead cell: do not mark its nodes live
+    }
     stk::mesh::Entity const* nodes = bulkData.begin_nodes(c);
     int const                nn    = bulkData.num_nodes(c);
     for (int i = 0; i < nn; ++i) live_nodes.insert(gid(nodes[i]));

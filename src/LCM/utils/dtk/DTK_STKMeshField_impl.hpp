@@ -42,6 +42,8 @@
 #define DTK_STKMESHFIELD_IMPL_HPP
 
 #include <vector>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 
 #include "DTK_DBC.hpp"
 
@@ -130,8 +132,9 @@ STKMeshField<Scalar, FieldType>::readFieldData( const SupportId support_id,
 {
     DTK_REQUIRE( d_id_map.count( support_id ) );
     int local_id = d_id_map.find( support_id )->second;
-    return stk::mesh::field_data( *d_field,
-                                  d_field_entities[local_id] )[dimension];
+    auto field_data = d_field->data();
+    return field_data.entity_values( d_field_entities[local_id] )(
+        stk::mesh::ComponentIdx( dimension ) );
 }
 
 //---------------------------------------------------------------------------//
@@ -143,8 +146,9 @@ void STKMeshField<Scalar, FieldType>::writeFieldData(
 {
     DTK_REQUIRE( d_id_map.count( support_id ) );
     int local_id = d_id_map.find( support_id )->second;
-    stk::mesh::field_data( *d_field, d_field_entities[local_id] )[dimension] =
-        data;
+    auto field_data = d_field->template data<stk::mesh::ReadWrite>();
+    field_data.entity_values( d_field_entities[local_id] )(
+        stk::mesh::ComponentIdx( dimension ) ) = data;
 }
 
 //---------------------------------------------------------------------------//

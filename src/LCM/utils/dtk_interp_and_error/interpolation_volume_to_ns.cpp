@@ -14,6 +14,8 @@
 //---------------------------------------------------------------------------//
 
 #include <Ionit_Initializer.h>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include <Ioss_SubSystem.h>
 
 #include <Kokkos_DynRankView.hpp>
@@ -246,8 +248,8 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
 
   for (int component = 0; component < neq; component++) {
     for (int n = 0; n < num_tgt_part_nodes; ++n) {
-      gold_value                = stk::mesh::field_data(target_interp_field, tgt_part_nodes[n]);
-      tgt_field_data            = stk::mesh::field_data(*target_field, tgt_part_nodes[n]);
+      gold_value                = target_interp_field.template data<stk::mesh::ReadWrite>().entity_values(tgt_part_nodes[n]).pointer();
+      tgt_field_data            = target_field->template data<stk::mesh::ReadWrite>().entity_values(tgt_part_nodes[n]).pointer();
       tgt_field_data[component] = gold_value[component];
     }
   }
@@ -261,8 +263,8 @@ interpolate(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<Teuchos::P
     int num_tgt_all_nodes = tgt_all_nodes.size();  // number nodes (owned + overlap)
     for (int component = 0; component < neq; component++) {
       for (int n = 0; n < num_tgt_all_nodes; ++n) {
-        tgt_field_data            = stk::mesh::field_data(*target_field, tgt_all_nodes[n]);
-        dirichlet_data            = stk::mesh::field_data(dirichlet_field, tgt_all_nodes[n]);
+        tgt_field_data            = target_field->template data<stk::mesh::ReadWrite>().entity_values(tgt_all_nodes[n]).pointer();
+        dirichlet_data            = dirichlet_field.template data<stk::mesh::ReadWrite>().entity_values(tgt_all_nodes[n]).pointer();
         dirichlet_data[component] = tgt_field_data[component];
       }
     }

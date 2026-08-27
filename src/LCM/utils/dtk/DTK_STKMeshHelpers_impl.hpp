@@ -42,6 +42,8 @@
 #define DTK_STKMESHHELPERS_IMPL_HPP
 
 #include <limits>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include <unordered_set>
 
 #include "DTK_DBC.hpp"
@@ -66,6 +68,7 @@ Kokkos::DynRankView<double, Kokkos::HostSpace> STKMeshHelpers::extractEntityNode
     const stk::mesh::Field<double> *coord_field =
         dynamic_cast<const stk::mesh::Field<double> *>(
             coord_field_base );
+    auto coordFieldData = coord_field->data();
 
     // Allocate the coordinate array.
     int num_cells = stk_entities.size();
@@ -90,13 +93,13 @@ Kokkos::DynRankView<double, Kokkos::HostSpace> STKMeshHelpers::extractEntityNode
     Kokkos::DynRankView<double, Kokkos::HostSpace> coords( "coords", num_cells, num_nodes, space_dim );
 
     // Extract the coordinates.
-    double *node_coords = 0;
+    double const* node_coords = 0;
     for ( int c = 0; c < num_cells; ++c )
     {
         if ( stk::topology::NODE_RANK == stk_rank )
         {
             node_coords =
-                stk::mesh::field_data( *coord_field, stk_entities[c] );
+                coordFieldData.entity_values( stk_entities[c] ).pointer();
             if(!node_coords){
                std::cerr << "Node coords is null!" << std::endl;
                exit(0);
@@ -115,7 +118,7 @@ Kokkos::DynRankView<double, Kokkos::HostSpace> STKMeshHelpers::extractEntityNode
             DTK_CHECK( std::distance( begin, end ) == num_nodes );
             for ( int n = 0; n < num_nodes; ++n )
             {
-                node_coords = stk::mesh::field_data( *coord_field, begin[n] );
+                node_coords = coordFieldData.entity_values( begin[n] ).pointer();
                 for ( int d = 0; d < space_dim; ++d )
                 {
                     coords( c, n, d ) = node_coords[d];

@@ -13,6 +13,8 @@
 //---------------------------------------------------------------------------//
 
 #include <Ionit_Initializer.h>
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include <Ioss_SubSystem.h>
 
 #include <Kokkos_DynRankView.hpp>
@@ -373,13 +375,13 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
       for (int n = 0; n < num_tgt_part_nodes; ++n) {
         // reference solution (i.e., target_interp_field)
-        double* gold_value = stk::mesh::field_data(target_interp_field, tgt_part_nodes[n]);
+        double* gold_value = target_interp_field.template data<stk::mesh::ReadWrite>().entity_values(tgt_part_nodes[n]).pointer();
 
-        tgt_field_data = stk::mesh::field_data(*target_field, tgt_part_nodes[n]);
+        tgt_field_data = target_field->template data<stk::mesh::ReadWrite>().entity_values(tgt_part_nodes[n]).pointer();
 
-        rel_err_field_data = stk::mesh::field_data(target_rel_error_field, tgt_part_nodes[n]);
+        rel_err_field_data = target_rel_error_field.template data<stk::mesh::ReadWrite>().entity_values(tgt_part_nodes[n]).pointer();
 
-        abs_err_field_data = stk::mesh::field_data(target_abs_error_field, tgt_part_nodes[n]);
+        abs_err_field_data = target_abs_error_field.template data<stk::mesh::ReadWrite>().entity_values(tgt_part_nodes[n]).pointer();
 
         rel_err_field_data[component] = std::abs(tgt_field_data[component] - gold_value[component]);
 
@@ -421,7 +423,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
 
       if (scale_by_norm_soln_vec == false) {
         for (int n = 0; n < num_tgt_part_nodes; ++n) {
-          rel_err_field_data = stk::mesh::field_data(target_rel_error_field, tgt_part_nodes[n]);
+          rel_err_field_data = target_rel_error_field.template data<stk::mesh::ReadWrite>().entity_values(tgt_part_nodes[n]).pointer();
           if (field_l2_norm_global > 1.0e-14) {
             rel_err_field_data[component] /= field_l2_norm_global;
           }
@@ -456,7 +458,7 @@ interp_and_calc_error(Teuchos::RCP<Teuchos::Comm<int> const> comm, Teuchos::RCP<
     if (scale_by_norm_soln_vec == true) {
       for (int component = 0; component < neq; component++) {
         for (int n = 0; n < num_tgt_part_nodes; ++n) {
-          rel_err_field_data = stk::mesh::field_data(target_rel_error_field, tgt_part_nodes[n]);
+          rel_err_field_data = target_rel_error_field.template data<stk::mesh::ReadWrite>().entity_values(tgt_part_nodes[n]).pointer();
           if (field_l2_norm_global_vec > 1.0e-14) {
             rel_err_field_data[component] /= field_l2_norm_global_vec;
           }

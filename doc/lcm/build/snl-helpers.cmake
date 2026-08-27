@@ -66,6 +66,10 @@ endfunction(snl_config)
 
 function(snl_build BUILD_DIR NUM_THREADS TARGET ERR)
   set(CTEST_USE_LAUNCHERS 1)
+  # Load CTestCustom.cmake before building, not only before testing: it is
+  # what teaches ctest_build to count linker failures, and without it a failed
+  # link is reported as zero errors and this function returns success.
+  ctest_read_custom_files("${BUILD_DIR}")
   ctest_build(
     BUILD "${BUILD_DIR}"
     APPEND

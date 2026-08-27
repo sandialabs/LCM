@@ -282,7 +282,30 @@ run_ctest() {
         -DDO_TEST:BOOL="$DO_TEST" \
         -DCTEST_DO_SUBMIT:BOOL="$CDASH" \
         -DTEST_FILTER:STRING="$TEST_FILTER" \
-        | tee "$LOG_FILE"
+        2>&1 | tee "$LOG_FILE"
+
+    # Report failure to the caller. Piping to tee made this function always
+    # return 0, so a failed configure or build still looked like success.
+    #
+    # ctest's own exit code cannot be used directly: in -S script mode it
+    # exits 255 on a perfectly good build simply because the script ran no
+    # tests. The authoritative result is the one lcm-build.cmake prints,
+    # "lcm_do_package returned \"N\"", so key on that and fall back to
+    # ctest's status only when the script never got far enough to print it.
+    local ctest_rc=${PIPESTATUS[0]}
+    local pkg_rc
+    pkg_rc=$(sed -n 's/.*lcm_do_package returned "\([-0-9]*\)".*/\1/p' "$LOG_FILE" | tail -1)
+
+    if [ -z "$pkg_rc" ]; then
+        echo "ERROR: ctest -S $BUILD_SCRIPT produced no package result for '$PACKAGE'" \
+             "(ctest exit $ctest_rc); see $LOG_FILE" >&2
+        return "${ctest_rc:-1}"
+    fi
+    if [ "$pkg_rc" -ne 0 ]; then
+        echo "ERROR: $PACKAGE failed (lcm_do_package returned $pkg_rc); see $LOG_FILE" >&2
+        return 1
+    fi
+    return 0
 }
 
 #---------------------------------------------------------------------------

@@ -649,20 +649,28 @@ AAdapt::AcousticWave::compute(double* x, double const* X)
 AAdapt::ExpressionParser::ExpressionParser(int neq_, int dim_, Teuchos::Array<std::string>& expr_) : dim(dim_), neq(neq_), expr(expr_)
 {
   ALBANY_ASSERT(expr.size() == neq, "Must have the same number of equations (" << neq << ") and expressions (" << expr.size() << ").");
+
+  // Parse once here rather than per node in compute(), and bind the coordinate
+  // variables by reference to coord_, which compute() then just updates.
+  static char const* const coord_str[3] = {"x", "y", "z"};
+  evals_.reserve(neq);
+  for (int eq = 0; eq < neq; ++eq) {
+    auto eval = std::make_shared<stk::expreval::Eval>(expr[eq]);
+    eval->parse();
+    for (int i = 0; i < dim; ++i) {
+      eval->bindVariable(coord_str[i], coord_[i]);
+    }
+    evals_.push_back(eval);
+  }
 }
 
 void
 AAdapt::ExpressionParser::compute(double* unknowns, double const* coords)
 {
-  std::vector<std::string> coord_str{"x", "y", "z"};
-  double*                  X = const_cast<double*>(coords);
-  for (auto eq = 0; eq < neq; ++eq) {
-    auto const&         expr_str = expr[eq];
-    stk::expreval::Eval expr_eval(expr_str);
-    expr_eval.parse();
-    for (auto i = 0; i < dim; ++i) {
-      expr_eval.bindVariable(coord_str[i], X[i]);
-    }
-    unknowns[eq] = expr_eval.evaluate();
+  for (int i = 0; i < dim; ++i) {
+    coord_[i] = coords[i];
+  }
+  for (int eq = 0; eq < neq; ++eq) {
+    unknowns[eq] = evals_[eq]->evaluate();
   }
 }

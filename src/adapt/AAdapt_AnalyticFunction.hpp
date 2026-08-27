@@ -15,6 +15,11 @@
 #include "RTC_FunctionRTC.hh"
 #endif
 
+#include <stk_expreval/Eval.hpp>
+
+#include <memory>
+#include <vector>
+
 namespace AAdapt {
 
 // generate seed convenience function
@@ -344,6 +349,12 @@ class AcousticWave : public AnalyticFunction
   Teuchos::Array<double> data;
 };
 
+// Initial condition given as one expression in x, y, z per equation.
+//
+// The expressions are parsed once, in the constructor, and the coordinate
+// variables are bound by reference to member storage that compute() updates.
+// compute() is called once per node, so parsing there instead would cost one
+// parse per node per equation.
 class ExpressionParser : public AnalyticFunction
 {
  public:
@@ -355,6 +366,9 @@ class ExpressionParser : public AnalyticFunction
   int                         dim;  // size of coordinate vector X
   int                         neq;  // size of solution vector x
   Teuchos::Array<std::string> expr;
+  // One parsed evaluator per equation, each with x/y/z bound to coord_.
+  std::vector<std::shared_ptr<stk::expreval::Eval>> evals_;
+  double                                            coord_[3] = {0.0, 0.0, 0.0};
 };
 
 }  // namespace AAdapt

@@ -54,70 +54,10 @@ class ConstantFunction : public AnalyticFunction
   Teuchos::Array<double> data;
 };
 
-class StepX : public AnalyticFunction
-{
- public:
-  StepX(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
 
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
 
-class TemperatureStep : public AnalyticFunction
-{
- public:
-  TemperatureStep(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
 
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
 
-class DispConstTemperatureStep : public AnalyticFunction
-{
- public:
-  DispConstTemperatureStep(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
-
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
-
-class TemperatureLinear : public AnalyticFunction
-{
- public:
-  TemperatureLinear(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
-
- private:
-  int                    numDim;  // size of coordinate vector Y
-  int                    neq;     // size of solution vector
-  Teuchos::Array<double> data;
-};
-
-class DispConstTemperatureLinear : public AnalyticFunction
-{
- public:
-  DispConstTemperatureLinear(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
-
- private:
-  int                    numDim;  // size of coordinate vector Y
-  int                    neq;     // size of solution vector
-  Teuchos::Array<double> data;
-};
 
 class ConstantFunctionPerturbed : public AnalyticFunction
 {
@@ -154,31 +94,7 @@ class ConstantFunctionGaussianPerturbed : public AnalyticFunction
   Teuchos::Array<Teuchos::RCP<std::normal_distribution<double>>>     nd;
 };
 
-class GaussSin : public AnalyticFunction
-{
- public:
-  GaussSin(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
 
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
-
-class GaussCos : public AnalyticFunction
-{
- public:
-  GaussCos(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
-
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
 
 class LinearY : public AnalyticFunction
 {
@@ -206,18 +122,6 @@ class Linear : public AnalyticFunction
   Teuchos::Array<double> data;
 };
 
-class ConstantBox : public AnalyticFunction
-{
- public:
-  ConstantBox(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
-
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
 
 class AboutZ : public AnalyticFunction
 {
@@ -232,18 +136,6 @@ class AboutZ : public AnalyticFunction
   Teuchos::Array<double> data;
 };
 
-class RadialZ : public AnalyticFunction
-{
- public:
-  RadialZ(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
-
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
 
 class AboutLinearZ : public AnalyticFunction
 {
@@ -284,31 +176,7 @@ class Circle : public AnalyticFunction
   Teuchos::Array<double> data;
 };
 
-class GaussianPress : public AnalyticFunction
-{
- public:
-  GaussianPress(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
 
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
-
-class SinCos : public AnalyticFunction
-{
- public:
-  SinCos(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
-
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
 
 class SinScalar : public AnalyticFunction
 {
@@ -323,31 +191,7 @@ class SinScalar : public AnalyticFunction
   Teuchos::Array<double> data;
 };
 
-class TaylorGreenVortex : public AnalyticFunction
-{
- public:
-  TaylorGreenVortex(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
 
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
-
-class AcousticWave : public AnalyticFunction
-{
- public:
-  AcousticWave(int neq_, int numDim_, Teuchos::Array<double> data_);
-  void
-  compute(double* x, const double* X);
-
- private:
-  int                    numDim;  // size of coordinate vector X
-  int                    neq;     // size of solution vector x
-  Teuchos::Array<double> data;
-};
 
 // Initial condition given as one expression in x, y, z per equation.
 //

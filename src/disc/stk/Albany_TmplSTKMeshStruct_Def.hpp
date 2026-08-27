@@ -3,6 +3,9 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include <Albany_STKNodeSharing.hpp>
+#include "Albany_EntityValueView.hpp"
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include <Shards_BasicTopologies.hpp>
 #include <cinttypes>
 #include <iostream>
@@ -654,14 +657,17 @@ Albany::TmplSTKMeshStruct<1>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
     bulkData->declare_relation(edge, rnode, 1);
 
     // set the coordinate values for these nodes
-    double* lnode_coord = stk::mesh::field_data(*coordinates_field, lnode);
+    auto lnode_coordData = coordinates_field->data<stk::mesh::ReadWrite>();
+    auto lnode_coord = entity_view(lnode_coordData, lnode);
     lnode_coord[0]      = x[0][left_node];
-    double* rnode_coord = stk::mesh::field_data(*coordinates_field, rnode);
+    auto rnode_coordData = coordinates_field->data<stk::mesh::ReadWrite>();
+    auto rnode_coord = entity_view(rnode_coordData, rnode);
     rnode_coord[0]      = x[0][right_node];
 
     /*
         if(proc_rank_field){
-          int* p_rank = stk::mesh::field_data(*proc_rank_field, edge);
+          auto p_rankData = proc_rank_field->data<stk::mesh::ReadWrite>();
+    auto p_rank = entity_view(p_rankData, edge);
           p_rank[0] = comm->MyPID();
         }
     */
@@ -881,16 +887,20 @@ Albany::TmplSTKMeshStruct<2>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
       }
     }  // end 4 node quad
 
-    double* llnode_coord = stk::mesh::field_data(*coordinates_field, llnode);
+    auto llnode_coordData = coordinates_field->data<stk::mesh::ReadWrite>();
+    auto llnode_coord = entity_view(llnode_coordData, llnode);
     llnode_coord[0]      = x[0][x_GID];
     llnode_coord[1]      = x[1][y_GID];
-    double* lrnode_coord = stk::mesh::field_data(*coordinates_field, lrnode);
+    auto lrnode_coordData = coordinates_field->data<stk::mesh::ReadWrite>();
+    auto lrnode_coord = entity_view(lrnode_coordData, lrnode);
     lrnode_coord[0]      = x[0][x_GIDplus1];
     lrnode_coord[1]      = x[1][y_GID];
-    double* urnode_coord = stk::mesh::field_data(*coordinates_field, urnode);
+    auto urnode_coordData = coordinates_field->data<stk::mesh::ReadWrite>();
+    auto urnode_coord = entity_view(urnode_coordData, urnode);
     urnode_coord[0]      = x[0][x_GIDplus1];
     urnode_coord[1]      = x[1][y_GIDplus1];
-    double* ulnode_coord = stk::mesh::field_data(*coordinates_field, ulnode);
+    auto ulnode_coordData = coordinates_field->data<stk::mesh::ReadWrite>();
+    auto ulnode_coord = entity_view(ulnode_coordData, ulnode);
     ulnode_coord[0]      = x[0][x_GID];
     ulnode_coord[1]      = x[1][y_GIDplus1];
 
@@ -1048,42 +1058,44 @@ Albany::TmplSTKMeshStruct<3>::buildMesh(const Teuchos::RCP<Teuchos_Comm const>& 
 
     /*
         if(proc_rank_field){
-          int* p_rank = stk::mesh::field_data(*proc_rank_field, elem);
+          auto p_rankData = proc_rank_field->data<stk::mesh::ReadWrite>();
+    auto p_rank = entity_view(p_rankData, elem);
           p_rank[0] = comm->MyPID();
         }
     */
 
-    double* coord;
-    coord    = stk::mesh::field_data(*coordinates_field, llnode);
+    MutEntityValueView coord;
+    auto coordDataLocal = coordinates_field->data<stk::mesh::ReadWrite>();
+    coord    = entity_view(coordDataLocal, llnode);
     coord[0] = x[0][x_GID];
     coord[1] = x[1][y_GID];
     coord[2] = x[2][z_GID];
-    coord    = stk::mesh::field_data(*coordinates_field, lrnode);
+    coord    = entity_view(coordDataLocal, lrnode);
     coord[0] = x[0][x_GIDplus1];
     coord[1] = x[1][y_GID];
     coord[2] = x[2][z_GID];
-    coord    = stk::mesh::field_data(*coordinates_field, urnode);
+    coord    = entity_view(coordDataLocal, urnode);
     coord[0] = x[0][x_GIDplus1];
     coord[1] = x[1][y_GIDplus1];
     coord[2] = x[2][z_GID];
-    coord    = stk::mesh::field_data(*coordinates_field, ulnode);
+    coord    = entity_view(coordDataLocal, ulnode);
     coord[0] = x[0][x_GID];
     coord[1] = x[1][y_GIDplus1];
     coord[2] = x[2][z_GID];
 
-    coord    = stk::mesh::field_data(*coordinates_field, llnodeb);
+    coord    = entity_view(coordDataLocal, llnodeb);
     coord[0] = x[0][x_GID];
     coord[1] = x[1][y_GID];
     coord[2] = x[2][z_GIDplus1];
-    coord    = stk::mesh::field_data(*coordinates_field, lrnodeb);
+    coord    = entity_view(coordDataLocal, lrnodeb);
     coord[0] = x[0][x_GIDplus1];
     coord[1] = x[1][y_GID];
     coord[2] = x[2][z_GIDplus1];
-    coord    = stk::mesh::field_data(*coordinates_field, urnodeb);
+    coord    = entity_view(coordDataLocal, urnodeb);
     coord[0] = x[0][x_GIDplus1];
     coord[1] = x[1][y_GIDplus1];
     coord[2] = x[2][z_GIDplus1];
-    coord    = stk::mesh::field_data(*coordinates_field, ulnodeb);
+    coord    = entity_view(coordDataLocal, ulnodeb);
     coord[0] = x[0][x_GID];
     coord[1] = x[1][y_GIDplus1];
     coord[2] = x[2][z_GIDplus1];

@@ -40,12 +40,37 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   // int vector per Node/Cell  - (Node,Dim/VecDim) or (Cell,Dim/VecDim)
   typedef stk::mesh::Field<int> IntVectorFieldType;
 
+  // Element state fields are pinned to stk::mesh::Layout::Right, which places
+  // an entity's components adjacent in memory. That is what the workset state
+  // arrays assume: Albany_STKDiscretization builds each entry of
+  // stateArrays.elemStateArrays as a shards::Array laid directly over the raw
+  // bucket pointer with shape (entities, QP, Dim, Dim), and that shape is only
+  // correct for Layout::Right. A unified-memory STK build switches the default
+  // host layout to Layout::Left, which would transpose every one of those
+  // views silently.
+  //
+  // The trade-off: a Right-layout field cannot share one allocation with the
+  // device (has_unified_device_storage() requires the host and device layouts
+  // to match), so these fields keep separate host and device copies on a
+  // unified-memory machine. LCM is host-only and has no device code at all, so
+  // that costs nothing here. Revisit this the day LCM targets a GPU: the fix
+  // is then to make elemStateArrays layout-independent rather than to pin.
+  //
+  // Deliberately NOT applied to the nodal Scalar/Vector/TensorFieldType above:
+  // leaving those at the default layout is what lets a unified-memory build
+  // still act as a detector for code that strides raw field pointers by hand.
+  static constexpr stk::mesh::Layout ElemStateLayout = stk::mesh::Layout::Right;
+
   // Tensor per QP   - (Cell, QP, Dim, Dim)
-  typedef stk::mesh::Field<double> QPTensorFieldType;
+  typedef stk::mesh::Field<double, ElemStateLayout> QPTensorFieldType;
   // Vector per QP   - (Cell, QP, Dim)
-  typedef stk::mesh::Field<double> QPVectorFieldType;
+  typedef stk::mesh::Field<double, ElemStateLayout> QPVectorFieldType;
   // One scalar per QP   - (Cell, QP)
-  typedef stk::mesh::Field<double> QPScalarFieldType;
+  typedef stk::mesh::Field<double, ElemStateLayout> QPScalarFieldType;
+  // Per-element (cell) states, same reasoning as the QP states above.
+  typedef stk::mesh::Field<double, ElemStateLayout> CellTensorFieldType;
+  typedef stk::mesh::Field<double, ElemStateLayout> CellVectorFieldType;
+  typedef stk::mesh::Field<double, ElemStateLayout> CellScalarFieldType;
   typedef stk::mesh::Field<double> SphereVolumeFieldType;
 
   typedef std::vector<std::string const*> ScalarValueState;
@@ -53,9 +78,9 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   typedef std::vector<QPVectorFieldType*> QPVectorState;
   typedef std::vector<QPTensorFieldType*> QPTensorState;
 
-  typedef std::vector<ScalarFieldType*> ScalarState;
-  typedef std::vector<VectorFieldType*> VectorState;
-  typedef std::vector<TensorFieldType*> TensorState;
+  typedef std::vector<CellScalarFieldType*> ScalarState;
+  typedef std::vector<CellVectorFieldType*> VectorState;
+  typedef std::vector<CellTensorFieldType*> TensorState;
 
   typedef std::map<std::string, double>              MeshScalarState;
   typedef std::map<std::string, std::vector<double>> MeshVectorState;

@@ -2160,7 +2160,10 @@ STKDiscretization::computeWorksetInfo()
     for (std::size_t is = 0; is < elem_sis.size(); ++is) {
       const StateStruct& st = *elem_sis[is];
       const StateStruct::FieldDims& dim = st.dim;
-      auto* field = metaData.get_field<double>(stk::topology::ELEMENT_RANK, st.name);
+      // Element state fields are declared with ElemStateLayout; the layout is
+      // part of the Field type, so the retrieval has to name it too.
+      auto* field = metaData.get_field<double, Albany::AbstractSTKFieldContainer::ElemStateLayout>(
+          stk::topology::ELEMENT_RANK, st.name);
       if (field == nullptr) continue;
       double* data = stk::mesh::field_data(*field, buck);
       if (data == nullptr) continue;
@@ -3110,7 +3113,8 @@ STKDiscretization::findDetachedCells(
   // Any live cell with no reachable node has calved off. Mark it dead (so
   // assembly skips it and the active-element count drops) and return it for
   // the caller to feed into the element-death surgery.
-  auto* cell_death_field = metaData.get_field<double>(stk::topology::ELEMENT_RANK, "cell_death");
+  auto* cell_death_field = metaData.get_field<double, Albany::AbstractSTKFieldContainer::ElemStateLayout>(
+      stk::topology::ELEMENT_RANK, "cell_death");
   for (auto const& c : live) {
     stk::mesh::Entity const* nodes     = bulkData.begin_nodes(c);
     int const                nn        = bulkData.num_nodes(c);
@@ -3145,7 +3149,8 @@ STKDiscretization::getDeadNodeDOFGids()
   // death vector snapshotted before the solve). Keying off the part would miss
   // a freshly calved block for a step -- exactly when its velocity is largest.
   // No cell_death field -> erosion not enabled -> nothing to do.
-  auto* cell_death_field = metaData.get_field<double>(stk::topology::ELEMENT_RANK, "cell_death");
+  auto* cell_death_field = metaData.get_field<double, Albany::AbstractSTKFieldContainer::ElemStateLayout>(
+      stk::topology::ELEMENT_RANK, "cell_death");
   if (cell_death_field == nullptr) return dead_dof_gids;
 
   // 1. Mark every node touched by a LIVE (cell_death < 0.5) owned active cell.

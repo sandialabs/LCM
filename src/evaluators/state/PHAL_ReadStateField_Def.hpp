@@ -110,8 +110,7 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(typename Tra
   switch (dims.size()) {
     case 2: {
       using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
-      auto scalar_field = metaData.get_field<double, Albany::AbstractSTKFieldContainer::ElemStateLayout>(
-          stk::topology::ELEM_RANK, state_name);
+      auto scalar_field = metaData.get_field<double>(stk::topology::ELEM_RANK, state_name);
       ALBANY_ASSERT(scalar_field != nullptr);
       auto fieldData = scalar_field->data();
       for (int cell = 0; cell < workset.numCells; ++cell) {

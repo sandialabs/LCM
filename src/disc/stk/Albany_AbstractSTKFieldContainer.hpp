@@ -40,37 +40,37 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   // int vector per Node/Cell  - (Node,Dim/VecDim) or (Cell,Dim/VecDim)
   typedef stk::mesh::Field<int> IntVectorFieldType;
 
-  // Element state fields are pinned to stk::mesh::Layout::Right, which places
-  // an entity's components adjacent in memory. That is what the workset state
-  // arrays assume: Albany_STKDiscretization builds each entry of
-  // stateArrays.elemStateArrays as a shards::Array laid directly over the raw
-  // bucket pointer with shape (entities, QP, Dim, Dim), and that shape is only
-  // correct for Layout::Right. A unified-memory STK build switches the default
-  // host layout to Layout::Left, which would transpose every one of those
-  // views silently.
+  // NOTE on memory layout, and why these are NOT pinned to Layout::Right.
   //
-  // The trade-off: a Right-layout field cannot share one allocation with the
-  // device (has_unified_device_storage() requires the host and device layouts
-  // to match), so these fields keep separate host and device copies on a
-  // unified-memory machine. LCM is host-only and has no device code at all, so
-  // that costs nothing here. Revisit this the day LCM targets a GPU: the fix
-  // is then to make elemStateArrays layout-independent rather than to pin.
+  // Albany_STKDiscretization builds each entry of stateArrays.elemStateArrays
+  // as a shards::Array laid directly over the raw bucket pointer, with shape
+  // (entities, QP, Dim, Dim). That shape is only correct for
+  // stk::mesh::Layout::Right. A unified-memory STK build switches the default
+  // host layout to Layout::Left and transposes every one of those views, which
+  // is what makes the ACE erosion tests fail there on Cauchy_Stress,
+  // Yield_Surface and eqps.
   //
-  // Deliberately NOT applied to the nodal Scalar/Vector/TensorFieldType above:
-  // leaving those at the default layout is what lets a unified-memory build
-  // still act as a detector for code that strides raw field pointers by hand.
-  static constexpr stk::mesh::Layout ElemStateLayout = stk::mesh::Layout::Right;
+  // Declaring these fields as Layout::Right looks like the cheap fix and was
+  // tried; it does not work. Restart reads an Exodus file through
+  // stk::io::StkMeshIoBroker::add_all_mesh_fields_as_input_fields(), which
+  // re-registers every field in the file and takes no layout argument, so it
+  // registers at the default layout. STK then rejects the second registration:
+  //   Re-registration of Field 'failure_state' with a different datatype or
+  //   host layout is not allowed.
+  // LCM cannot control that call's layout from this side, so pinning and
+  // Exodus restart are mutually exclusive on a unified-memory build.
+  //
+  // The real fix is to stop laying a shards::Array over raw bucket memory, ie
+  // to make elemStateArrays own its data or carry strides. Until then LCM is
+  // host-only, never defines STK_UNIFIED_MEMORY, and always gets
+  // Layout::Right, so nothing here is broken in any build LCM performs.
 
   // Tensor per QP   - (Cell, QP, Dim, Dim)
-  typedef stk::mesh::Field<double, ElemStateLayout> QPTensorFieldType;
+  typedef stk::mesh::Field<double> QPTensorFieldType;
   // Vector per QP   - (Cell, QP, Dim)
-  typedef stk::mesh::Field<double, ElemStateLayout> QPVectorFieldType;
+  typedef stk::mesh::Field<double> QPVectorFieldType;
   // One scalar per QP   - (Cell, QP)
-  typedef stk::mesh::Field<double, ElemStateLayout> QPScalarFieldType;
-  // Per-element (cell) states, same reasoning as the QP states above.
-  typedef stk::mesh::Field<double, ElemStateLayout> CellTensorFieldType;
-  typedef stk::mesh::Field<double, ElemStateLayout> CellVectorFieldType;
-  typedef stk::mesh::Field<double, ElemStateLayout> CellScalarFieldType;
+  typedef stk::mesh::Field<double> QPScalarFieldType;
   typedef stk::mesh::Field<double> SphereVolumeFieldType;
 
   typedef std::vector<std::string const*> ScalarValueState;
@@ -78,9 +78,9 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   typedef std::vector<QPVectorFieldType*> QPVectorState;
   typedef std::vector<QPTensorFieldType*> QPTensorState;
 
-  typedef std::vector<CellScalarFieldType*> ScalarState;
-  typedef std::vector<CellVectorFieldType*> VectorState;
-  typedef std::vector<CellTensorFieldType*> TensorState;
+  typedef std::vector<ScalarFieldType*> ScalarState;
+  typedef std::vector<VectorFieldType*> VectorState;
+  typedef std::vector<TensorFieldType*> TensorState;
 
   typedef std::map<std::string, double>              MeshScalarState;
   typedef std::map<std::string, std::vector<double>> MeshVectorState;
@@ -271,10 +271,7 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   VectorFieldType*          coordinates_field;
   IntScalarFieldType*       proc_rank_field;
   IntScalarFieldType*       refine_field;
-  // Also registered as a cell state through StateInfoStruct, so it must carry
-  // the same layout as the other element states or STK rejects the second
-  // registration. It is a scalar, where the two layouts are identical.
-  CellScalarFieldType*      failure_state[stk::topology::ELEMENT_RANK + 1];
+  ScalarFieldType*          failure_state[stk::topology::ELEMENT_RANK + 1];
 
   // Required for Peridynamics in LCM
   SphereVolumeFieldType* sphereVolume_field;

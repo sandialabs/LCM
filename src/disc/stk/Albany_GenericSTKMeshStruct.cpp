@@ -3,6 +3,9 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include "Albany_GenericSTKMeshStruct.hpp"
+#include "Albany_EntityValueView.hpp"
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 
 #include <Albany_CombineAndScatterManager.hpp>
 #include <Albany_GlobalLocalIndexer.hpp>
@@ -536,11 +539,11 @@ GenericSTKMeshStruct::setDefaultCoordinates3d()
 
   std::vector<stk::mesh::Entity> nodes;
   stk::mesh::get_entities(*bulkData, stk::topology::NODE_RANK, nodes);
-  double* values;
-  double* values3d;
+  auto coords3dData = this->getCoordinatesField3d()->data<stk::mesh::ReadWrite>();
+  auto coordsData   = this->getCoordinatesField()->data();
   for (auto node : nodes) {
-    values3d = stk::mesh::field_data(*this->getCoordinatesField3d(), node);
-    values   = stk::mesh::field_data(*this->getCoordinatesField(), node);
+    auto values3d = entity_view(coords3dData, node);
+    auto values   = entity_view(coordsData, node);
 
     for (int iDim = 0; iDim < numDim; ++iDim) {
       values3d[iDim] = values[iDim];
@@ -919,7 +922,10 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetN
 
   const stk::topology::rank_t                           SIDE_RANK = metaData->side_rank();
   int const                                             num_nodes = side_mesh->bulkData->num_nodes(cells2D[0]);
-  int*                                                  cell3D_id;
+  Albany::EntityValueViewT<int>                         cell3D_id;
+  // std::is_permutation and std::find below need a real iterator, so this one
+  // stays a raw pointer, taken through EntityValues::pointer() rather than the
+  // legacy field_data.
   int*                                                  side_nodes_ids;
   GO                                                    cell2D_GID, side3D_GID;
   int                                                   side_lid;
@@ -928,6 +934,8 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetN
   typedef AbstractSTKFieldContainer::IntVectorFieldType IVFT;
   ISFT* side_to_cell_map   = this->sideSetMeshStructs[sideSetName]->metaData->get_field<int>(stk::topology::ELEM_RANK, "side_to_cell_map");
   IVFT* side_nodes_ids_map = this->sideSetMeshStructs[sideSetName]->metaData->get_field<int>(stk::topology::ELEM_RANK, "side_nodes_ids");
+  auto sideToCellData = side_to_cell_map->data<stk::mesh::ReadWrite>();
+  auto sideNodesData  = side_nodes_ids_map->data<stk::mesh::ReadWrite>();
   std::vector<stk::mesh::EntityId> cell2D_nodes_ids(num_nodes), side3D_nodes_ids(num_nodes);
   const stk::mesh::Entity*         side3D_nodes;
   const stk::mesh::Entity*         cell2D_nodes;
@@ -943,9 +951,9 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetN
     //          Maps' to true in the input file
     for (const auto& cell2D : cells2D) {
       // Get the stk field data
-      cell3D_id                = stk::mesh::field_data(*side_to_cell_map, cell2D);
-      side_nodes_ids           = stk::mesh::field_data(*side_nodes_ids_map, cell2D);
-      stk::mesh::Entity cell3D = bulkData->get_entity(stk::topology::ELEM_RANK, *cell3D_id);
+      cell3D_id                = entity_view(sideToCellData, cell2D);
+      side_nodes_ids           = sideNodesData.entity_values(cell2D).pointer();
+      stk::mesh::Entity cell3D = bulkData->get_entity(stk::topology::ELEM_RANK, cell3D_id[0]);
 
       num_sides                           = bulkData->num_sides(cell3D);
       const stk::mesh::Entity* cell_sides = bulkData->begin(cell3D, SIDE_RANK);
@@ -978,8 +986,8 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetN
   const stk::mesh::Entity* side_cells;
   for (const auto& cell2D : cells2D) {
     // Get the stk field data
-    cell3D_id      = stk::mesh::field_data(*side_to_cell_map, cell2D);
-    side_nodes_ids = stk::mesh::field_data(*side_nodes_ids_map, cell2D);
+    cell3D_id      = entity_view(sideToCellData, cell2D);
+    side_nodes_ids = sideNodesData.entity_values(cell2D).pointer();
 
     // The side-id is assumed equal to the cell-id in the side mesh...
     side3D_GID = cell2D_GID  = side_mesh->bulkData->identifier(cell2D) - 1;
@@ -991,7 +999,7 @@ GenericSTKMeshStruct::buildCellSideNodeNumerationMap(std::string const& sideSetN
     side_cells               = bulkData->begin_elements(side3D);
     stk::mesh::Entity cell3D = side_cells[0];
 
-    *cell3D_id = bulkData->identifier(cell3D);
+    cell3D_id[0] = bulkData->identifier(cell3D);
 
     sideMap[side3D_GID] = cell2D_GID;
     sideNodeMap[side3D_GID].resize(num_nodes);
@@ -1295,15 +1303,21 @@ GenericSTKMeshStruct::loadRequiredInputFields(const AbstractFieldContainer::Fiel
 
     stk::mesh::EntityId gid;
     LO                  lid;
-    double*             values;
+    auto scalarData = (scalar_field != 0) ? scalar_field->data<stk::mesh::ReadWrite>()
+                                          : decltype(scalar_field->data<stk::mesh::ReadWrite>()){};
+    auto vectorData = (vector_field != 0) ? vector_field->data<stk::mesh::ReadWrite>()
+                                          : decltype(vector_field->data<stk::mesh::ReadWrite>()){};
+    auto tensorData = (tensor_field != 0) ? tensor_field->data<stk::mesh::ReadWrite>()
+                                          : decltype(tensor_field->data<stk::mesh::ReadWrite>()){};
+    MutEntityValueView  values;
     auto                indexer = createGlobalLocalIndexer(vs);
     for (unsigned int i(0); i < entities->size(); ++i) {
       if (scalar_field != 0) {
-        values = stk::mesh::field_data(*scalar_field, (*entities)[i]);
+        values = entity_view(scalarData, (*entities)[i]);
       } else if (vector_field != 0) {
-        values = stk::mesh::field_data(*vector_field, (*entities)[i]);
+        values = entity_view(vectorData, (*entities)[i]);
       } else {
-        values = stk::mesh::field_data(*tensor_field, (*entities)[i]);
+        values = entity_view(tensorData, (*entities)[i]);
       }
 
       gid = bulkData->identifier((*entities)[i]) - 1;

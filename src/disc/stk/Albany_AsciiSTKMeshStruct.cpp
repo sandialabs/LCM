@@ -427,18 +427,6 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
   if (!temperature_field) have_temp = false;
   if (!basal_friction_field) have_beta = false;
 
-  // One Field data handle per field, held for the whole build below. These
-  // must outlive the views taken from them, and Field::data() returns by
-  // value, so they cannot be acquired inline at each use.
-  auto coordsData        = coordinates_field->data<stk::mesh::ReadWrite>();
-  auto surfaceHeightData = have_sh ? surfaceHeight_field->data<stk::mesh::ReadWrite>()
-                                   : decltype(surfaceHeight_field->data<stk::mesh::ReadWrite>()){};
-  auto flowFactorData    = have_flwa ? flowFactor_field->data<stk::mesh::ReadWrite>()
-                                     : decltype(flowFactor_field->data<stk::mesh::ReadWrite>()){};
-  auto temperatureData   = have_temp ? temperature_field->data<stk::mesh::ReadWrite>()
-                                     : decltype(temperature_field->data<stk::mesh::ReadWrite>()){};
-  auto basalFrictionData = have_beta ? basal_friction_field->data<stk::mesh::ReadWrite>()
-                                     : decltype(basal_friction_field->data<stk::mesh::ReadWrite>()){};
 
   for (int i = 0; i < elem_mapT->getLocalNumElements(); i++) {
     const unsigned int elem_GID = elem_mapT->getGlobalElement(i);
@@ -464,6 +452,20 @@ AsciiSTKMeshStruct::setFieldAndBulkData(
     bulkData->declare_relation(elem, lrnodeb, 5);
     bulkData->declare_relation(elem, urnodeb, 6);
     bulkData->declare_relation(elem, ulnodeb, 7);
+
+    // Field data handles are acquired here, after this iteration's
+    // declare_entity/declare_relation calls. Declaring entities is mesh
+    // modification, which can move Field data, so a handle taken before the
+    // loop would hold dangling pointers by the second iteration.
+    auto coordsData        = coordinates_field->data<stk::mesh::ReadWrite>();
+    auto surfaceHeightData = have_sh ? surfaceHeight_field->data<stk::mesh::ReadWrite>()
+                                     : decltype(surfaceHeight_field->data<stk::mesh::ReadWrite>()){};
+    auto flowFactorData    = have_flwa ? flowFactor_field->data<stk::mesh::ReadWrite>()
+                                       : decltype(flowFactor_field->data<stk::mesh::ReadWrite>()){};
+    auto temperatureData   = have_temp ? temperature_field->data<stk::mesh::ReadWrite>()
+                                       : decltype(temperature_field->data<stk::mesh::ReadWrite>()){};
+    auto basalFrictionData = have_beta ? basal_friction_field->data<stk::mesh::ReadWrite>()
+                                       : decltype(basal_friction_field->data<stk::mesh::ReadWrite>()){};
 
     MutEntityValueView coord;
     int          node_GID;

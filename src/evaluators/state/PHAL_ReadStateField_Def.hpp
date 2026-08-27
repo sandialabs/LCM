@@ -3,6 +3,8 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include "Albany_AbstractDiscretization.hpp"
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include "Albany_AbstractSTKFieldContainer.hpp"
 #include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_Macros.hpp"
@@ -110,22 +112,23 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readElemState(typename Tra
       using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
       auto scalar_field = metaData.get_field<double>(stk::topology::ELEM_RANK, state_name);
       ALBANY_ASSERT(scalar_field != nullptr);
+      auto fieldData = scalar_field->data();
       for (int cell = 0; cell < workset.numCells; ++cell) {
         auto gid    = elem_lid_2_gid[cell];
         auto e      = bulkData.get_entity(stk::topology::ELEM_RANK, gid + 1);
-        auto values = stk::mesh::field_data(*scalar_field, e);
-        field(cell) = values[0];
+        field(cell) = fieldData.entity_values(e)();
       }
     } break;
     case 3: {
       using VFT         = Albany::AbstractSTKFieldContainer::VectorFieldType;
       auto vector_field = metaData.get_field<double>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(vector_field != nullptr);
+      auto fieldData = vector_field->data();
       for (int cell = 0; cell < workset.numCells; ++cell) {
         auto gid    = elem_lid_2_gid[cell];
         auto e      = bulkData.get_entity(stk::topology::ELEM_RANK, gid + 1);
-        auto values = stk::mesh::field_data(*vector_field, e);
-        for (int i = 0; i < dims[2]; ++i) field(cell, 0, i) = values[i];
+        auto values = fieldData.entity_values(e);
+        for (int i = 0; i < dims[2]; ++i) field(cell, 0, i) = values(stk::mesh::ComponentIdx(i));
       }
     } break;
     default: ALBANY_ABORT("Unexpected dimension: only cell scalar/vector");
@@ -162,24 +165,25 @@ ReadStateField<PHAL::AlbanyTraits::Residual, Traits>::readNodalState(typename Tr
       using SFT         = Albany::AbstractSTKFieldContainer::ScalarFieldType;
       auto scalar_field = metaData.get_field<double>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(scalar_field != nullptr);
+      auto fieldData = scalar_field->data();
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
           auto gid          = wsElgid[workset.wsIndex][cell][node];
           auto e            = bulkData.get_entity(stk::topology::NODE_RANK, gid + 1);
-          auto values       = stk::mesh::field_data(*scalar_field, e);
-          field(cell, node) = values[0];
+          field(cell, node) = fieldData.entity_values(e)();
         }
     } break;
     case 3: {
       using VFT         = Albany::AbstractSTKFieldContainer::VectorFieldType;
       auto vector_field = metaData.get_field<double>(stk::topology::NODE_RANK, state_name);
       ALBANY_ASSERT(vector_field != nullptr);
+      auto fieldData = vector_field->data();
       for (int cell = 0; cell < workset.numCells; ++cell)
         for (int node = 0; node < dims[1]; ++node) {
           auto gid    = wsElgid[workset.wsIndex][cell][node];
           auto e      = bulkData.get_entity(stk::topology::NODE_RANK, gid + 1);
-          auto values = stk::mesh::field_data(*vector_field, e);
-          for (int i = 0; i < dims[2]; ++i) field(cell, node, i) = values[i];
+          auto values = fieldData.entity_values(e);
+          for (int i = 0; i < dims[2]; ++i) field(cell, node, i) = values(stk::mesh::ComponentIdx(i));
         }
     } break;
     default: ALBANY_ABORT("Unexpected dimension: only cell scalar/vector");

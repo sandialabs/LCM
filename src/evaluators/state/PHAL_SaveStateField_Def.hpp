@@ -3,6 +3,8 @@
 // in the file license.txt in the top-level Albany directory.
 
 #include "Albany_AbstractDiscretization.hpp"
+#include <stk_mesh/base/FieldData.hpp>
+#include <stk_mesh/base/EntityValues.hpp>
 #include "Albany_AbstractSTKFieldContainer.hpp"
 #include "Albany_AbstractSTKMeshStruct.hpp"
 #include "Albany_Macros.hpp"
@@ -202,30 +204,34 @@ SaveStateField<PHAL::AlbanyTraits::Residual, Traits>::saveNodeState(typename Tra
   field.dimensions(dims);
 
   GO                nodeId;
-  double*           values;
   stk::mesh::Entity e;
   switch (dims.size()) {
     case 2:  // node_scalar
       scalar_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
       ALBANY_PANIC(scalar_field == 0, "Error! Field not found.\n");
-      for (int cell = 0; cell < workset.numCells; ++cell)
-        for (int node = 0; node < dims[1]; ++node) {
-          nodeId    = wsElNodeID[workset.wsIndex][cell][node];
-          e         = bulkData.get_entity(stk::topology::NODE_RANK, nodeId + 1);
-          values    = stk::mesh::field_data(*scalar_field, e);
-          values[0] = field(cell, node);
-        }
+      {
+        auto fieldData = scalar_field->data<stk::mesh::ReadWrite>();
+        for (int cell = 0; cell < workset.numCells; ++cell)
+          for (int node = 0; node < dims[1]; ++node) {
+            nodeId = wsElNodeID[workset.wsIndex][cell][node];
+            e      = bulkData.get_entity(stk::topology::NODE_RANK, nodeId + 1);
+            fieldData.entity_values(e)() = field(cell, node);
+          }
+      }
       break;
     case 3:  // node_vector
       vector_field = metaData.get_field<double>(stk::topology::NODE_RANK, stateName);
       ALBANY_PANIC(vector_field == 0, "Error! Field not found.\n");
-      for (int cell = 0; cell < workset.numCells; ++cell)
-        for (int node = 0; node < dims[1]; ++node) {
-          nodeId = wsElNodeID[workset.wsIndex][cell][node];
-          e      = bulkData.get_entity(stk::topology::NODE_RANK, nodeId + 1);
-          values = stk::mesh::field_data(*vector_field, e);
-          for (int i = 0; i < dims[2]; ++i) values[i] = field(cell, node, i);
-        }
+      {
+        auto fieldData = vector_field->data<stk::mesh::ReadWrite>();
+        for (int cell = 0; cell < workset.numCells; ++cell)
+          for (int node = 0; node < dims[1]; ++node) {
+            nodeId      = wsElNodeID[workset.wsIndex][cell][node];
+            e           = bulkData.get_entity(stk::topology::NODE_RANK, nodeId + 1);
+            auto values = fieldData.entity_values(e);
+            for (int i = 0; i < dims[2]; ++i) values(stk::mesh::ComponentIdx(i)) = field(cell, node, i);
+          }
+      }
       break;
     default:  // error!
       ALBANY_ABORT(

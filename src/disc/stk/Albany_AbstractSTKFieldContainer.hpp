@@ -271,7 +271,10 @@ class AbstractSTKFieldContainer : public AbstractFieldContainer
   VectorFieldType*          coordinates_field;
   IntScalarFieldType*       proc_rank_field;
   IntScalarFieldType*       refine_field;
-  ScalarFieldType*          failure_state[stk::topology::ELEMENT_RANK + 1];
+  // Also registered as a cell state through StateInfoStruct, so it must carry
+  // the same layout as the other element states or STK rejects the second
+  // registration. It is a scalar, where the two layouts are identical.
+  CellScalarFieldType*      failure_state[stk::topology::ELEMENT_RANK + 1];
 
   // Required for Peridynamics in LCM
   SphereVolumeFieldType* sphereVolume_field;

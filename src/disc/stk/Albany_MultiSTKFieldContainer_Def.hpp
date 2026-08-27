@@ -285,7 +285,8 @@ MultiSTKFieldContainer<Interleaved>::initializeSTKAdaptation()
 
   // Failure state used for mesh adaptation
   for (stk::mesh::EntityRank rank = stk::topology::NODE_RANK; rank <= stk::topology::ELEMENT_RANK; ++rank) {
-    this->failure_state[rank] = &this->metaData->template declare_field<double>(rank, "failure_state");
+    this->failure_state[rank] = &this->metaData->template declare_field<double,
+        AbstractSTKFieldContainer::ElemStateLayout>(rank, "failure_state");
     stk::mesh::put_field_on_mesh(*this->failure_state[rank], this->metaData->universal_part(), nullptr);
   }
 

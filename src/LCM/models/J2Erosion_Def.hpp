@@ -25,6 +25,20 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   critical_angle_           = p->get<RealType>("ACE Critical Angle", 0.0);
   tensile_strength_         = p->get<RealType>("ACE Tensile Strength", 0.0);
   ice_saturation_material_fit_truncation_ = p->get<RealType>("ACE Material Fit Truncation Ice Saturation", 0.0);
+  // Opt-in melt criterion: an absent key (or an explicit 0.0) leaves it inert,
+  // so every existing deck is unaffected. Deliberately NOT mandatory, unlike
+  // "ACE Strain Limit" and "ACE Maximum Displacement" below.
+  //
+  // isParameter MUST be asked before get(): Teuchos::ParameterList::get with a
+  // default INSERTS the default into the list, so afterwards isParameter is
+  // true whether or not the deck named the key. The value test is what makes
+  // the gate robust either way.
+  melt_enabled_             = p->isParameter("ACE Ice Melt Threshold");
+  ice_melt_threshold_       = p->get<RealType>("ACE Ice Melt Threshold", 0.0);
+  melt_enabled_             = melt_enabled_ && ice_melt_threshold_ > 0.0;
+  ALBANY_ASSERT(
+      melt_enabled_ == false || ice_melt_threshold_ < 1.0,
+      "J2Erosion: ACE Ice Melt Threshold must lie in (0, 1). Omit the key (or set it to 0.0) to disable the melt criterion.");
   disable_erosion_          = p->get<bool>("Disable Erosion", false);
   num_failed_pts_for_death_ = p->get<int>("ACE Failed Integration Points For Death", 0);
 
@@ -109,6 +123,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   std::string const strain_indicator_str       = stateName("Strain_Indicator");
   std::string const angle_indicator_str        = stateName("Angle_Indicator");
   std::string const displacement_indicator_str = stateName("Displacement_Indicator");
+  std::string const melt_indicator_str         = stateName("Melt_Indicator");
 
   // Elastic modulus used (for output)
   std::string const elastic_modulus_str = stateName("Elastic_Modulus_Used");
@@ -143,6 +158,7 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   setEvaluatedField(strain_indicator_str, dl->qp_scalar);
   setEvaluatedField(angle_indicator_str, dl->qp_scalar);
   setEvaluatedField(displacement_indicator_str, dl->qp_scalar);
+  if (melt_enabled_) setEvaluatedField(melt_indicator_str, dl->qp_scalar);
   setEvaluatedField(elastic_modulus_str, dl->qp_scalar);
   
   if (have_temperature_ == true) {
@@ -163,6 +179,8 @@ J2ErosionKernel<EvalT, Traits>::J2ErosionKernel(ConstitutiveModel<EvalT, Traits>
   addStateVariable(strain_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
   addStateVariable(angle_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Angle Indicator", false));
   addStateVariable(displacement_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
+  if (melt_enabled_)
+    addStateVariable(melt_indicator_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Melt Indicator", false));
   addStateVariable(elastic_modulus_str, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Elastic Modulus", false));
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
   addStateVariable("cell_death", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Cell Death", false));
@@ -197,6 +215,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   std::string const strain_indicator_str       = stateName("Strain_Indicator");
   std::string const angle_indicator_str        = stateName("Angle_Indicator");
   std::string const displacement_indicator_str = stateName("Displacement_Indicator");
+  std::string const melt_indicator_str         = stateName("Melt_Indicator");
   std::string const elastic_modulus_str        = stateName("Elastic_Modulus_Used");
 
   // extract dependent MDFields
@@ -222,6 +241,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
   strain_indicator_       = *eval_fields[strain_indicator_str];
   angle_indicator_        = *eval_fields[angle_indicator_str];
   displacement_indicator_ = *eval_fields[displacement_indicator_str];
+  if (melt_enabled_) melt_indicator_ = *eval_fields[melt_indicator_str];
   elastic_modulus_used_   = *eval_fields[elastic_modulus_str];
   failed_                 = *eval_fields["failure_state"];
   dead_                   = *eval_fields["cell_death"];
@@ -293,6 +313,7 @@ J2ErosionKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT const>& 
       if (m & 0x04) seed += 100.0;
       if (m & 0x08) seed += 1000.0;
       if (m & 0x10) seed += 10000.0;
+      if (m & 0x20) seed += 100000.0;
       if (m != 0u) ++num_failed_pts;
     }
     failed_(cell, 0) = seed;
@@ -516,6 +537,7 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
     strain_indicator_(cell, pt)       = 0.0;
     angle_indicator_(cell, pt)        = 0.0;
     displacement_indicator_(cell, pt) = 0.0;
+    if (melt_enabled_) melt_indicator_(cell, pt) = 0.0;
     elastic_modulus_used_(cell, pt)        = 0.0;
     // Carry the failure-mode bitmask forward unchanged: a dead cell never
     // trips new bits, but the state must still be written every fill.
@@ -798,6 +820,17 @@ J2ErosionKernel<EvalT, Traits>::operator()(int cell, int pt) const
   bool const disp_failure =
       (maximum_displacement_ > 0.0) && (displacement_norm > maximum_displacement_);
   trip(disp_failure, 0x10, 10000.0);
+
+  // Determine if the point has thawed. The driving quantity comes from the
+  // thermal solve rather than the mechanical one, so unlike the five criteria
+  // above this trip does not respond to mechanical solver drift. The indicator
+  // follows the same convention as the others (>= 1 means failed): it is 0 in
+  // fully frozen material and reaches 1 at the threshold.
+  if (melt_enabled_) {
+    auto const sat            = Sacado::Value<ScalarT>::eval(ice_saturation);
+    melt_indicator_(cell, pt) = safe_quotient(1.0 - sat, 1.0 - ice_melt_threshold_);
+    trip(sat < ice_melt_threshold_, 0x20, 100000.0);
+  }
 
   // Persist this fill's updated bitmask (old | newly tripped bits) to the
   // STK-backed state, so it follows the cell across workset rebuilds.

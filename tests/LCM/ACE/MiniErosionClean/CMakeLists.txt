@@ -64,6 +64,20 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_serial.cmake
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/runtest_np4_consistency.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/runtest_np4_consistency.cmake COPYONLY)
 
+# Melt-only case: same mesh and thermal subdomain, every mechanical criterion
+# switched off, so the ice-melt criterion (bit 0x20) is the only thing that can
+# kill a cell.
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_melt.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/coupled_melt.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mechanical_melt.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/mechanical_melt.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/materials_mechanical_melt.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/materials_mechanical_melt.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/melt.exodiff
+               ${CMAKE_CURRENT_BINARY_DIR}/melt.exodiff COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/melt_gold.e
+               ${CMAKE_CURRENT_BINARY_DIR}/melt_gold.e COPYONLY)
+
 # Name the tests with the directory name.
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
@@ -102,4 +116,21 @@ add_test(
 set_tests_properties(ACE_${testName}_Denudation_np4_Consistency
                      PROPERTIES LABELS "LCM;Tpetra;Forward"
                                 PROCESSORS ${MPIMNP}
+                                RESOURCE_LOCK ACE_${testName}_workdir)
+
+# --- Test 3: melt-only regression (exodiff vs serial gold) ----------------
+#
+# Guards the ice-melt failure criterion in isolation: a cell dies if and only
+# if all of its integration points have thawed past "ACE Ice Melt Threshold".
+# Shares the working directory (and therefore the RESOURCE_LOCK) with the two
+# tests above, but writes melt.e rather than denudation.e.
+add_test(
+  NAME ACE_${testName}_Melt_Serial
+  COMMAND
+  ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}" -DTEST_NAME=melt
+    -DTEST_ARGS=coupled_melt.yaml -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF}
+    -DREF_FILENAME=melt_gold.e -DOUTPUT_FILENAME=melt.e -P
+    ${runtest_serial.cmake})
+set_tests_properties(ACE_${testName}_Melt_Serial
+                     PROPERTIES LABELS "LCM;Tpetra;Forward"
                                 RESOURCE_LOCK ACE_${testName}_workdir)

@@ -1,0 +1,76 @@
+# Melt-only companion to materials_mechanical_denudation.yaml.
+#
+# Same mesh, same thermal subdomain, same thaw front. Every MECHANICAL failure
+# criterion is switched off, so the ice-melt criterion is the only thing that
+# can kill a cell and the eroded set is unambiguous:
+#
+#   ACE Tensile Strength     omitted   -> tension  (0x01) inert
+#   ACE Strain Limit         0.0       -> strain   (0x02) inert
+#   Yield Strength           1.0e+30   -> yield    (0x04) never trips. Yield is
+#   ACE Soil Yield Strength  1.0e+30      the one criterion with no off switch,
+#                                         so it is disabled by putting the
+#                                         yield surface out of reach instead.
+#   ACE Critical Angle       0.0       -> angle    (0x08) inert
+#   ACE Maximum Displacement 0.0       -> displ.   (0x10) inert
+#   ACE Ice Melt Threshold   1.0e-04   -> melt     (0x20) ACTIVE
+#
+# The expected result is exact: a cell dies if and only if all 8 of its
+# integration points have thawed past the threshold, failure_modes is 0 or 32
+# and nothing else, and failure_state is 0 or 8 x 100000.
+#
+# Instant death (no Death Steps) keeps the test on the criterion rather than on
+# the fade, which the denudation case in this directory already covers.
+#
+# Both blocks share one material on purpose. The natural form of this test --
+# an "ice wedge" block that erodes on thaw beside a "permafrost" block that
+# does not -- cannot be written yet: under the ACE coupled solver every element
+# block silently evaluates with the FIRST block's material, so the second
+# material is constructed and then never used. See the note in
+# Albany_IossSTKMeshStruct's borrowing constructor.
+LCM:
+
+  ElementBlocks:
+    top_block:
+      material: IceWedge
+    bottom_block:
+      material: IceWedge
+
+  Materials:
+    IceWedge:
+      Disable Erosion: false
+      Output Failure State: true
+      Output Cell Death: true
+      Output Failure Modes: true
+      Output Melt Indicator: true
+      Material Model:
+        Model Name: J2 Erosion
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 1.0e9
+      ACE Residual Elastic Modulus: 1.0e+04
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.2
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 1.0e+30
+      ACE Soil Yield Strength: 1.0e+30
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 0.0
+      ACE Maximum Displacement: 0.0
+      ACE Strain Limit: 0.0
+      ACE Critical Angle: 0.0
+      ACE Ice Melt Threshold: 1.0e-04
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
+      ACE Z Depth File: 'external_files/depth.txt'
+      Density: 1800.0
+      Body Force:
+        Body Force Type: Constant
+        Value: [0.0, 0.0, -18.00e+03]
+      Output Cauchy Stress: true
+      Output Yield Surface: true
+      Output eqps: true
+...

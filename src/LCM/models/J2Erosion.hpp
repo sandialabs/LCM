@@ -82,6 +82,7 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   ScalarField strain_indicator_;
   ScalarField angle_indicator_;
   ScalarField displacement_indicator_;
+  ScalarField melt_indicator_;
   ScalarField elastic_modulus_used_;
 
   // Workspace arrays
@@ -95,7 +96,8 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   // Per-(cell, pt) failure-mode bitmask, carried as an STK-backed element
   // state so it follows each cell correctly when the discretization
   // rebuilds its worksets (erosion re-buckets the mesh). Bits encode:
-  //   1 = tension, 2 = strain, 4 = yield, 8 = angle, 16 = displacement.
+  //   1 = tension, 2 = strain, 4 = yield, 8 = angle, 16 = displacement,
+  //   32 = melt.
   // Once a bit is set at (cell, pt) it stays set. failure_modes_old_ holds
   // the value converged at the previous step; failure_modes_ is this
   // fill's updated value (old | newly tripped bits), saved back to the
@@ -138,6 +140,14 @@ struct J2ErosionKernel : public ParallelKernel<EvalT, Traits>
   RealType tensile_strength_{0.0};
   RealType strain_limit_{0.0};
   RealType ice_saturation_material_fit_truncation_{0.0};
+
+  // Ice-melt failure criterion. Unlike the five mechanical criteria this one
+  // is opt-in: it is active only when "ACE Ice Melt Threshold" is present in
+  // the material YAML, so a material for which removal-on-thaw is not
+  // physical (permafrost) simply omits the key, while one for which it is
+  // (ice wedge) enables it by naming a threshold.
+  RealType ice_melt_threshold_{0.0};
+  bool     melt_enabled_{false};
 
   RealType maximum_displacement_{0.0};
   bool     disable_erosion_{false};

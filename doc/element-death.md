@@ -82,9 +82,9 @@ stay SPD (§3).
 
 ---
 
-## 2. The five failure criteria
+## 2. The six failure criteria
 
-Each integration point (IP) is checked against up to five independent
+Each integration point (IP) is checked against up to six independent
 failure criteria every time `J2Erosion` is evaluated. Each criterion is
 controlled by a material parameter in the mechanics material YAML;
 setting the parameter to `0.0` disables that criterion.
@@ -96,10 +96,26 @@ setting the parameter to `0.0` disables that criterion.
 | 0x04 | yield         | the J2 return map yielded this point                      | (always active; the J2 model)      |
 | 0x08 | angle         | abs polar-rotation tilt angle >= critical angle           | `ACE Critical Angle`               |
 | 0x10 | displacement  | displacement norm > maximum displacement                  | `ACE Maximum Displacement`         |
+| 0x20 | melt          | ice saturation < melt threshold                           | `ACE Ice Melt Threshold`           |
 
 `ACE Strain Limit` and `ACE Maximum Displacement` are mandatory
 parameters — the model aborts at construction if they are absent — so
 disable them explicitly with `0.0` rather than by omission.
+
+`ACE Ice Melt Threshold` is the opposite: it is **opt-in**, and
+omitting it (or setting it to `0.0`) leaves the melt criterion
+completely inert. That is deliberate. Removal on thaw is physical
+for a material like an ice wedge and is not for permafrost, so the
+criterion is activated per material by naming a threshold rather
+than deactivated by zeroing one. A threshold outside `(0, 1)`
+aborts at construction.
+
+Melt is also the only criterion whose driving quantity comes from
+the thermal solve rather than the mechanical one, so it is the
+least sensitive of the six to partition-dependent solver drift.
+That is why it carries the highest decimal magnitude: `failure_state`
+is the sort key of the death throttle (§3.2), and the magnitudes
+order the modes by priority, not by severity.
 
 One additional material-YAML key controls the cell-level death
 predicate (§1), separately from the per-IP criteria above:
@@ -117,9 +133,14 @@ failure mode.
 Independently of failure, each criterion also writes a continuous
 **indicator** field — the ratio of the actual quantity to its threshold
 (`tensile_indicator`, `strain_indicator`, `angle_indicator`,
-`displacement_indicator`, `yield_indicator`). Indicators are *always*
-computed, even when erosion is disabled, so they are useful for
-"how close to failure" visualization.
+`displacement_indicator`, `yield_indicator`, and `melt_indicator` when
+the melt criterion is active). Indicators are *always* computed, even
+when erosion is disabled, so they are useful for "how close to failure"
+visualization. `melt_indicator` is `(1 - ice_saturation) / (1 - melt
+threshold)`, which follows the same convention as the others: 0 in fully
+frozen material, reaching 1 at the threshold.
+
+All indicators, melt included, are zeroed on a cell once it is dead.
 
 ---
 
@@ -582,15 +603,16 @@ Enable the per-cell fields in the mechanics material YAML:
       Output Failure State: true   # decimal-encoded per-mode histogram
       Output Cell Death: true      # binary 0.0 / 1.0 death flag
       Output Failure Modes: true   # per-IP bitmask (optional, verbose)
+      Output Melt Indicator: true  # only when the melt criterion is active
 ```
 
 `failure_state` is a decimal-encoded histogram per cell: each set bit
-at each point contributes a decimal magnitude — `1` (tension), `10`
-(strain), `100` (yield), `1000` (angle), `10000` (displacement) —
-summed over the integration points of the cell. A value of `30201`
-decodes as 3 displacement trips, 0 angle, 2 yield, 0 strain, 1
-tension. It is **purely diagnostic** — it does not determine death;
-that is what `cell_death` is for.
+at each point contributes a decimal magnitude: `1` (tension), `10`
+(strain), `100` (yield), `1000` (angle), `10000` (displacement),
+`100000` (melt), summed over the integration points of the cell. A
+value of `30201` decodes as 0 melt trips, 3 displacement, 0 angle, 2
+yield, 0 strain, 1 tension. It is **purely diagnostic**: it does not
+determine death; that is what `cell_death` is for.
 
 To show **only alive cells** in ParaView:
 
@@ -1052,11 +1074,13 @@ Common modifications and where to make them:
 
 - **Change a criterion's threshold** — material YAML parameter (§2).
   No code change.
-- **Add a sixth failure mode** — add a bit (e.g. `0x20`) and a
+- **Add a seventh failure mode**: add a bit (`0x40`) and a
   `trip(...)` call in `J2ErosionKernel::operator()`; pick a decimal
-  magnitude (`100000`) and add it to the seeding loop in `init()`.
-  The death predicate needs no change — it only asks whether each
-  point's mask is non-zero.
+  magnitude (`1000000`) and add it to the seeding loop in `init()`.
+  The death predicate needs no change; it only asks whether each
+  point's mask is non-zero. Melt (`0x20`) was added exactly this way;
+  `ACE_MiniErosionClean_Melt_Serial` is a case that isolates one
+  criterion by switching all the others off.
 - **Change the death predicate** — implemented in exactly two
   places, and both must remain consistent:
   - `J2ErosionKernel::init()` — the per-cell seeding of `cell_death`.

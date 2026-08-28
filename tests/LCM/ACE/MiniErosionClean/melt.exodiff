@@ -1,0 +1,45 @@
+# Exodiff spec for the melt-only case (materials_mechanical_melt.yaml).
+#
+# Same tolerances as denudation.exodiff -- the two runs share a mesh, a thermal
+# subdomain and an output layout. The fields that matter here are the discrete
+# ones: failure_modes is 0 or 32 (bit 0x20, melt) and nothing else, failure_state
+# is 0 or 800000 (8 points x the melt magnitude 1e5), and cell_death matches the
+# fully-thawed set exactly. Those are integer-valued, so any change in the melt
+# criterion shows up as a relative difference of 1.0, far above the tolerance.
+#
+COORDINATES absolute 1.e-6
+
+TIME STEPS relative 1.e-6 floor 0.0
+
+# Tolerances are sized to absorb cross-build / parallel reduction-order
+# noise while still catching real regressions. The engineering quantities
+# are checked RELATIVE; the near-zero kinematic fields (velocity,
+# acceleration), which are physically ~0 in this slow-erosion problem, are
+# checked ABSOLUTE with a small floor. Displacements -- the meaningful
+# mechanical response -- stay at relative 2e-5. (Dead-node velocity and
+# acceleration are zeroed by the solver, so the gold and any build agree
+# exactly there.)
+NODAL VARIABLES relative 2.0e-5 floor 1.0e-5
+	temperature        relative 6.0e-6 floor 1.0e-12
+	temperature_dot    relative 6.0e-6 floor 1.0e-12
+	displacement_x
+	displacement_y
+	displacement_z
+	velocity_x               absolute 1.0e-4 floor 1.0e-6
+	velocity_y               absolute 1.0e-4 floor 1.0e-6
+	velocity_z               absolute 1.0e-4 floor 1.0e-6
+	acceleration_x           absolute 1.0e-5 floor 1.0e-6
+	acceleration_y           absolute 1.0e-5 floor 1.0e-6
+	acceleration_z           absolute 1.0e-5 floor 1.0e-6
+	displacement_residual_x  absolute 1.0e-5 floor 1.0e-6
+	displacement_residual_y  absolute 1.0e-5 floor 1.0e-6
+	displacement_residual_z  absolute 1.0e-5 floor 1.0e-6
+	proj_nodal_linear        absolute 1.0e-12 floor 1.0e-12
+
+# Element quantities (Cauchy_Stress ~ O(1e4), eqps, plastic strain, failure
+# state/modes) are checked relative. The large stresses agree to ~1e-8, but
+# small-magnitude stress components drift up to ~6e-5 across compilers, so the
+# relative tolerance is 2e-4. The floor drops near-zero shear-stress noise
+# (~1e-7) without masking a changed failure mode (a flipped 0->bit is rel
+# diff 1.0).
+ELEMENT VARIABLES relative 2.0e-4 floor 1.0e-3

@@ -1,8 +1,16 @@
 # Melt-only companion to materials_mechanical_denudation.yaml.
 #
-# Same mesh, same thermal subdomain, same thaw front. Every MECHANICAL failure
-# criterion is switched off, so the ice-melt criterion is the only thing that
-# can kill a cell and the eroded set is unambiguous:
+# The two element blocks share the thermal subdomain (and therefore the thaw
+# front) with the denudation case, and differ in exactly ONE key:
+#
+#   top_block    "IceWedge"    ACE Ice Melt Threshold: 1.0e-04   -> melt ACTIVE
+#   bottom_block "Permafrost"  key omitted                       -> melt INERT
+#
+# so one run shows both halves of the requirement in GitHub #120: a material
+# that erodes on thaw alone, and one that thaws just as completely and survives.
+#
+# Every MECHANICAL criterion is switched off in both materials, so melt is the
+# only thing that can kill a cell and the eroded set is unambiguous:
 #
 #   ACE Tensile Strength     omitted   -> tension  (0x01) inert
 #   ACE Strain Limit         0.0       -> strain   (0x02) inert
@@ -12,28 +20,25 @@
 #                                         yield surface out of reach instead.
 #   ACE Critical Angle       0.0       -> angle    (0x08) inert
 #   ACE Maximum Displacement 0.0       -> displ.   (0x10) inert
-#   ACE Ice Melt Threshold   1.0e-04   -> melt     (0x20) ACTIVE
 #
-# The expected result is exact: a cell dies if and only if all 8 of its
-# integration points have thawed past the threshold, failure_modes is 0 or 32
-# and nothing else, and failure_state is 0 or 8 x 100000.
+# The expected result is exact: in top_block a cell dies if and only if all 8 of
+# its integration points have thawed past the threshold, failure_modes is 0 or
+# 32 and nothing else, and failure_state is 0 or 8 x 100000. In bottom_block
+# nothing ever dies and failure_modes stays 0 no matter how far it thaws.
+#
+# Two materials on one mesh is also what exercises GitHub #121: before that fix
+# both blocks silently evaluated with bottom_block's material, so this deck ran
+# with melt disabled everywhere and eroded nothing.
 #
 # Instant death (no Death Steps) keeps the test on the criterion rather than on
 # the fade, which the denudation case in this directory already covers.
-#
-# Both blocks share one material on purpose. The natural form of this test --
-# an "ice wedge" block that erodes on thaw beside a "permafrost" block that
-# does not -- cannot be written yet: under the ACE coupled solver every element
-# block silently evaluates with the FIRST block's material, so the second
-# material is constructed and then never used. See the note in
-# Albany_IossSTKMeshStruct's borrowing constructor.
 LCM:
 
   ElementBlocks:
     top_block:
       material: IceWedge
     bottom_block:
-      material: IceWedge
+      material: Permafrost
 
   Materials:
     IceWedge:
@@ -62,6 +67,42 @@ LCM:
       ACE Strain Limit: 0.0
       ACE Critical Angle: 0.0
       ACE Ice Melt Threshold: 1.0e-04
+      Saturation Modulus: 0.0
+      Saturation Exponent: 0.0
+      ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.
+      ACE Z Depth File: 'external_files/depth.txt'
+      Density: 1800.0
+      Body Force:
+        Body Force Type: Constant
+        Value: [0.0, 0.0, -18.00e+03]
+      Output Cauchy Stress: true
+      Output Yield Surface: true
+      Output eqps: true
+
+    Permafrost:
+      Disable Erosion: false
+      Output Failure State: true
+      Output Cell Death: true
+      Output Failure Modes: true
+      Material Model:
+        Model Name: J2 Erosion
+      Elastic Modulus:
+        Elastic Modulus Type: Constant
+        Value: 1.0e9
+      ACE Residual Elastic Modulus: 1.0e+04
+      Poissons Ratio:
+        Poissons Ratio Type: Constant
+        Value: 0.2
+      Yield Strength:
+        Yield Strength Type: Constant
+        Value: 1.0e+30
+      ACE Soil Yield Strength: 1.0e+30
+      Hardening Modulus:
+        Hardening Modulus Type: Constant
+        Value: 0.0
+      ACE Maximum Displacement: 0.0
+      ACE Strain Limit: 0.0
+      ACE Critical Angle: 0.0
       Saturation Modulus: 0.0
       Saturation Exponent: 0.0
       ACE Bulk Porosity: 0.60  # Used if porosity.txt not given.

@@ -80,6 +80,14 @@ Albany::IossSTKMeshStruct::IossSTKMeshStruct(
   meshSpecs   = donor->meshSpecs;
   activePart  = donor->activePart;
   deadCellsPart = donor->deadCellsPart;
+  // Must travel with meshSpecs. The donor sets this false when it builds one
+  // MeshSpecsStruct per element block ("Separate Evaluators by Element Block");
+  // GenericSTKMeshStruct's ctor left ours at true. Without this the borrowed
+  // instance keeps the per-block meshSpecs but claims uniform physics, so
+  // STKDiscretization::computeWorksetInfo takes the wsPhysIndex[i] = 0 branch
+  // and every workset is evaluated by element block 0's field manager -- i.e.
+  // every block silently uses the FIRST block's material (GitHub #121).
+  allElementBlocksHaveSamePhysics = donor->allElementBlocksHaveSamePhysics;
 }
 
 Albany::IossSTKMeshStruct::IossSTKMeshStruct(

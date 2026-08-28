@@ -2,10 +2,13 @@
 #
 # Same tolerances as denudation.exodiff -- the two runs share a mesh, a thermal
 # subdomain and an output layout. The fields that matter here are the discrete
-# ones: failure_modes is 0 or 32 (bit 0x20, melt) and nothing else, failure_state
-# is 0 or 800000 (8 points x the melt magnitude 1e5), and cell_death matches the
-# fully-thawed set exactly. Those are integer-valued, so any change in the melt
-# criterion shows up as a relative difference of 1.0, far above the tolerance.
+# ones. In top_block (the "IceWedge" material, melt active) failure_modes is 0 or
+# 32 (bit 0x20, melt) and nothing else, failure_state is 0 or 800000 (8 points x
+# the melt magnitude 1e5), and cell_death matches the fully-thawed set exactly.
+# In bottom_block (the "Permafrost" material, which omits the melt key) both stay
+# 0 no matter how far it thaws. Those are integer-valued, so any change in the
+# melt criterion, or a regression of the per-block material dispatch of GitHub
+# #121, shows up as a relative difference of 1.0, far above the tolerance.
 #
 COORDINATES absolute 1.e-6
 

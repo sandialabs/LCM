@@ -1,33 +1,36 @@
 #
-# Thaw under load: confined compression while the ice saturation falls
-# from 1.0 to 0.3 via the time table in the material file. Verifies the
-# Permafrost parameter map (including the elasticity
-# (K, G) split and the nu cap) against the reference implementation,
-# and exercises the design constraint that melt softening enters
-# through f-dependent parameters while kappa keeps the plastic memory.
-# Confined (oedometric / 1D) compression of a homogeneous cube:
-# eps_xx(t) = -0.04 t, all other strain components zero. This is the
-# load path of Section 5.1 of Sun, Chen & Ostien (2014). Cross-checked
-# against cap_reference.py (200 steps, matching the LOCA step count so
-# the explicit integrator sees identical strain increments).
+# Permafrost ice-volume-fraction verification: the hydrostatic path
+# with the porosity(z) profile driving BOTH the crushable volume W and
+# the ice volume fraction phi = S n / n_ref, at constant saturation and
+# with distinct end members; the two Gauss-point z-groups are
+# independent material points verified against two reference runs
+# (cap_verify.py volfrac_profile).
 #
 LCM:
   Problem:
     Name: Mechanics 3D
     Solution Method: Continuation
     Phalanx Graph Visualization Detail: 0
-    MaterialDB Filename: materials_permafrost_thaw.yaml
+    MaterialDB Filename: materials_permafrost_volfrac.yaml
     Dirichlet BCs:
       DBC on NS NodeSet0 for DOF X: 0.00000000e+00
       DBC on NS NodeSet1 for DOF X:
         BC Function: Array
         Number of points: 2
         Time Values: [0.0, 1.0]
-        BC Values: [0.0, -4.00000000e-02]
+        BC Values: [0.0, -2.00000000e-02]
       DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
-      DBC on NS NodeSet3 for DOF Y: 0.00000000e+00
+      DBC on NS NodeSet3 for DOF Y:
+        BC Function: Array
+        Number of points: 2
+        Time Values: [0.0, 1.0]
+        BC Values: [0.0, -2.00000000e-02]
       DBC on NS NodeSet4 for DOF Z: 0.00000000e+00
-      DBC on NS NodeSet5 for DOF Z: 0.00000000e+00
+      DBC on NS NodeSet5 for DOF Z:
+        BC Function: Array
+        Number of points: 2
+        Time Values: [0.0, 1.0]
+        BC Values: [0.0, -2.00000000e-02]
     Parameters:
       Number: 1
       Parameter 0: Time
@@ -43,7 +46,7 @@ LCM:
     3D Elements: 1
     Method: STK3D
     Interleaved Ordering: true
-    Exodus Output File Name: permafrost_thaw.exo
+    Exodus Output File Name: permafrost_volfrac.exo
   Piro:
     LOCA:
       Bifurcation: { }

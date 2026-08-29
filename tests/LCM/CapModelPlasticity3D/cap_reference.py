@@ -410,12 +410,17 @@ def ce_apply(P, eps):
     return P.lame * np.trace(eps) * I3 + 2.0 * P.mu * eps
 
 
-def permafrost_map(f, frozen, thawed, shared, nu_max=0.45):
-    """Saturation-to-parameter map, mirroring the Permafrost kernel
-    exactly: cohesion/bonding and crush parameters linear between end
-    members; friction/shape from the (thawed) sediment skeleton; G and
-    K log-linear with the effective Poisson ratio capped at nu_max
-    preserving G; lame = K - 2G/3, mu = G."""
+def permafrost_map(f, frozen, thawed, shared, nu_max=0.45, fp=None):
+    """Parameter map, mirroring the Permafrost kernel exactly. Two
+    interpolation variables: f is the ice VOLUME fraction and drives
+    cohesion/bonding (A, C, N, calpha) and elasticity; fp is the ice
+    SATURATION and drives pore collapse (kappa0, W, D1). fp defaults to
+    f, which is the pure-saturation map. Friction/shape come from the
+    (thawed) sediment skeleton; G and K are log-linear in f with the
+    effective Poisson ratio capped at nu_max preserving G;
+    lame = K - 2G/3, mu = G."""
+    if fp is None:
+        fp = f
     K = np.exp((1.0 - f) * np.log(thawed['K']) + f * np.log(frozen['K']))
     G = np.exp((1.0 - f) * np.log(thawed['G']) + f * np.log(frozen['G']))
     nu = (3.0 * K - 2.0 * G) / (2.0 * (3.0 * K + G))
@@ -426,25 +431,52 @@ def permafrost_map(f, frozen, thawed, shared, nu_max=0.45):
     def lerp(key):
         return (1.0 - f) * thawed[key] + f * frozen[key]
 
+    def lerp_p(key):
+        return (1.0 - fp) * thawed[key] + fp * frozen[key]
+
     return BlendParams(lame=K - 2.0 * G / 3.0, mu=G,
                        A=lerp('A'), C=lerp('C'), N=lerp('N'),
-                       kappa0=lerp('kappa0'), W=lerp('W'), D1=lerp('D1'),
                        calpha=lerp('calpha'),
+                       kappa0=lerp_p('kappa0'), W=lerp_p('W'),
+                       D1=lerp_p('D1'),
                        D=shared['D'], theta=shared['theta'],
                        L=shared['L'], phi=shared['phi'],
                        R=shared['R'], Q=shared['Q'],
                        psi=shared['psi'], D2=shared['D2'])
 
 
+def ice_volume_fraction(S, kappa, frozen, thawed, shared, n_ref,
+                        n0=None, nu_max=0.45):
+    """phi = S n / n_ref with n = n0 + evp the current porosity, mirroring
+    the Permafrost kernel: evp (<= 0) is read off the crush curve at the
+    PREVIOUS converged kappa, so the parameters stay explicit in the
+    plastic state, and the crush curve is evaluated on the pure-S map,
+    which is what breaks the circularity of a W that is itself
+    interpolated. n0 defaults to n_ref (no porosity profile), which makes
+    phi = S up to accumulated compaction."""
+    if n0 is None:
+        n0 = n_ref
+    Ps = permafrost_map(S, frozen, thawed, shared, nu_max)
+    n = n0 + evp_of_kappa(kappa, Ps)
+    if n < 0.0:
+        n = 0.0
+    return min(1.0, max(0.0, S * n / n_ref))
+
+
 def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
-                     nu_max=0.45):
+                     nu_max=0.45, n_ref=None, n0=None):
     """Strain-driven history with per-step ice saturation, mirroring the
-    kernel exactly: parameters ramp from the previous step's saturation
-    to the current one inside the integrator; the stored stress is
-    re-expressed through the current stiffness before each step (the
-    elastic strain, not the stress, is the state); the cap parameter
-    starts at the FROZEN kappa0. History entries are
+    kernel exactly: parameters ramp from the previous step's state to the
+    current one inside the integrator; the stored stress is re-expressed
+    through the current stiffness before each step (the elastic strain,
+    not the stress, is the state); the cap parameter starts at the FROZEN
+    kappa0. Cohesion/bonding and elasticity follow the ice volume
+    fraction phi = S n / n_ref, evaluated at the kappa converged at the
+    start of the step; pore collapse follows S. n_ref defaults to the
+    frozen W, n0 to n_ref. History entries are
     (t, sigma, kappa, evp, alpha, eqps)."""
+    if n_ref is None:
+        n_ref = frozen['W']
     sigma = np.zeros((3, 3))
     alpha = np.zeros((3, 3))
     kappa = frozen['kappa0']
@@ -456,8 +488,14 @@ def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
     for n in range(1, nsteps + 1):
         t = n / nsteps
         f = f_of_t(t)
-        P0 = permafrost_map(f_prev, frozen, thawed, shared, nu_max)
-        P1 = permafrost_map(f, frozen, thawed, shared, nu_max)
+        # Both fractions use the kappa converged at the start of the
+        # step, exactly as the kernel reads capParameter_old.
+        phi_prev = ice_volume_fraction(f_prev, kappa, frozen, thawed,
+                                       shared, n_ref, n0, nu_max)
+        phi = ice_volume_fraction(f, kappa, frozen, thawed, shared,
+                                  n_ref, n0, nu_max)
+        P0 = permafrost_map(phi_prev, frozen, thawed, shared, nu_max, fp=f_prev)
+        P1 = permafrost_map(phi, frozen, thawed, shared, nu_max, fp=f)
         eps = eps_of_t(t)
         deps = eps - eps_prev
         # sigma_n <- C(f) : C(f_prev)^-1 : sigma_n

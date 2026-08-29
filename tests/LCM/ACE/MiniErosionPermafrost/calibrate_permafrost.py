@@ -34,7 +34,11 @@ Extension: Permafrost and Erosion"):
                f-independent (sediment skeleton).
   crush        W from porosity (the kernel overrides W per point via
                ACE Bulk Porosity / ACE Porosity File; the deck value
-               here is the same number). kappa0 COMMON to both end
+               here is the same number). The same porosity is emitted
+               as Reference Porosity: the end members are calibrated AT
+               it, so it is the n_ref that normalizes the ice volume
+               fraction phi = S n / n_ref (cap-plasticity.tex,
+               Eq. "icefraction"). kappa0 COMMON to both end
                members (see the calibration note in the doc: a frozen
                state read under a thawed kappa0 is reinterpreted as
                precompacted), placed outside the gravity stress range;
@@ -100,10 +104,10 @@ def calibrate(porosity=0.60, E0=1.0e9, Y0=3.0e6, Er=1.0e4, Yr=5.0e3,
     gamma = math.sqrt(3.0 * (strain_limit - 1.0) / 2.0)
     max_eqps = gamma / math.sqrt(3.0)
 
-    return frozen, thawed, shared, max_eqps, (E_f, Y_f, E_t, Y_t)
+    return frozen, thawed, shared, max_eqps, (E_f, Y_f, E_t, Y_t), porosity
 
 
-def emit(frozen, thawed, shared, max_eqps, raw):
+def emit(frozen, thawed, shared, max_eqps, raw, porosity):
     E_f, Y_f, E_t, Y_t = raw
     print(f"# Calibrated from the J2Erosion experimental fits:")
     print(f"#   frozen E = {E_f:.6e} Pa, Y = {Y_f:.6e} Pa")
@@ -116,6 +120,14 @@ def emit(frozen, thawed, shared, max_eqps, raw):
         print(f"        {k}: {thawed[k]:.16e}")
     for k in ("D", "theta", "L", "phi", "R", "Q", "psi", "D2"):
         print(f"        {k}: {shared[k]}")
+    # The end members above were evaluated at this porosity, so it is by
+    # construction the reference porosity that normalizes the ice volume
+    # fraction phi = S n / n_ref driving the cohesion/bonding and
+    # elasticity interpolation. Emitting it here keeps the deck and the
+    # calibration from drifting apart: recalibrating at a different
+    # porosity and leaving Reference Porosity behind would silently
+    # rescale the interpolation.
+    print(f"      Reference Porosity: {porosity:.16e}")
     print(f"# Maximum Equivalent Plastic Strain: {max_eqps:.4f}"
           f"  (image of the distortion strain limit)")
 

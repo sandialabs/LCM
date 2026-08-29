@@ -56,6 +56,13 @@ LCM:
       # the J2Erosion deck (no depth profile in this test).
       ACE Bulk Porosity: 0.60
 
+      # Porosity at which the end members above were calibrated. It
+      # normalizes the ice volume fraction phi = S n / n_ref that drives
+      # the cohesion/bonding and elasticity interpolation. Equal to the
+      # bulk porosity here, so phi differs from S only by the compaction
+      # already accumulated on the crush curve.
+      Reference Porosity: 0.60
+
       # Failure criteria. The constitutive criteria mirror the J2Erosion
       # deck's intent (the strain limit becomes an equivalent-plastic-
       # strain limit; backstress saturation replaces the yield-onset

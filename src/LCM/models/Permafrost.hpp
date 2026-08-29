@@ -78,6 +78,11 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   ScalarField displacement_indicator_;
   ScalarField strain_indicator_;
   ScalarField tilt_angle_;
+
+  // The ice volume fraction that drives the cohesion/bonding and
+  // elasticity interpolation. Output-only diagnostic; the value used is
+  // recomputed every fill from (S, kappa_old, porosity).
+  ScalarField ice_volume_fraction_;
   ScalarField failed_;
   ScalarField dead_;
 
@@ -138,7 +143,7 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   // End-member material parameters. The frozen set carries the
   // ice-bonding-dependent quantities; the thawed set additionally
   // carries the sediment-skeleton (friction/shape) quantities shared by
-  // both ends. See the saturation-to-parameter map in
+  // both ends. See the parameter map in
   // doc/developers-guide/cap-plasticity.tex, Section "The Permafrost
   // Model".
   struct EndMember
@@ -188,6 +193,16 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   std::vector<RealType> sea_level_;
   std::vector<RealType> time_;
   RealType              bulk_porosity_{0.0};  // constant fallback; 0 = no W override
+
+  // Porosity at which the Frozen/Thawed end members were calibrated. It
+  // normalizes the ice volume fraction phi = S n / n_ref that drives the
+  // cohesion/bonding and elasticity interpolation, so that phi = S
+  // recovers the pre-2026-08 saturation map exactly when the local
+  // porosity equals the calibration porosity and nothing has crushed.
+  // Required input ("Reference Porosity"): there is no defensible default,
+  // and a silent one would decouple the map from the calibration without
+  // any diagnostic.
+  RealType              reference_porosity_{0.0};
   RealType              cohesion_weakening_{1.0};
   RealType              stiffness_weakening_{1.0};
   RealType              eqps_limit_weakening_{1.0};

@@ -1,0 +1,53 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: Permafrost
+  Materials:
+    # Ice-volume-fraction verification: the SAME porosity(z) profile as
+    # materials_permafrost_porosity.yaml, but with DISTINCT end members,
+    # so the profile reaches the cohesion/bonding and elasticity
+    # parameters through phi = S n / n_ref and not only the crushable
+    # volume W. Ice saturation is held at 1.0, so every difference
+    # between the two Gauss-point z-groups is porosity, which is exactly
+    # what the saturation alone could not express. With n_ref = 0.10 the
+    # shallow group (porosity 0.10) sits at the frozen end member and the
+    # deep group (porosity 0.04) sits 60% of the way to the thawed one,
+    # with no clamping at either end.
+    Permafrost:
+      Material Model:
+        Model Name: Permafrost
+      Finite Deformation: false
+      ACE Z Depth File: 'depth_test.txt'
+      ACE Porosity File: 'porosity_test.txt'
+      Ice Saturation: 1.0
+      Output Ice Volume Fraction: true
+      Reference Porosity: 0.10
+
+      Frozen Parameters:
+        K: 1.517703284868067e10
+        G: 9.001517087192591e9
+        A: 6.892e8
+        C: 6.752e8
+        N: 6.0e6
+        kappa0: -8.05e6
+        W: 0.08
+        D1: 1.47e-9
+        calpha: 1.0e11
+      Thawed Parameters:
+        K: 5.0e9
+        G: 2.0e7
+        A: 1.0e7
+        C: 9.0e6
+        N: 5.0e5
+        kappa0: -5.0e5
+        W: 0.4
+        D1: 1.0e-8
+        calpha: 5.0e8
+        D: 1.0e-9
+        theta: 0.05
+        L: 8.0e-10
+        phi: 0.04
+        R: 8.0
+        Q: 6.0
+        psi: 1.0
+        D2: 0.0

@@ -6,7 +6,7 @@ LCM:
     # Thaw-under-load verification set: frozen end member at Salem-like
     # values, thawed end member soft (note thawed K, G imply nu ~ 0.499,
     # exercising the nu cap). The set exists to verify the
-    # saturation-to-parameter map against the reference implementation,
+    # parameter map against the reference implementation,
     # not to represent a calibrated material. Units: base SI (stress in Pa,
     # D/L/D1 in 1/Pa), as in materials.yaml.
     Permafrost:
@@ -14,6 +14,13 @@ LCM:
         Model Name: Permafrost
       Finite Deformation: false
       Ice Saturation: 0.5
+      # Porosity at which the end members below were calibrated: the
+      # normalizer of the ice volume fraction phi = S n / n_ref that
+      # drives the cohesion/bonding and elasticity interpolation. Set to
+      # the frozen crushable volume W, so that an uncrushed frozen point
+      # sits exactly at the frozen end member.
+      Reference Porosity: 0.08
+
       Frozen Parameters:
         K: 1.517703284868067e10
         G: 9.001517087192591e9

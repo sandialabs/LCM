@@ -1,7 +1,7 @@
 #
 # Thaw under load: confined compression while the ice saturation falls
 # from 1.0 to 0.3 via the time table in the material file. Verifies the
-# Permafrost saturation-to-parameter map (including the elasticity
+# Permafrost parameter map (including the elasticity
 # (K, G) split and the nu cap) against the reference implementation,
 # and exercises the design constraint that melt softening enters
 # through f-dependent parameters while kappa keeps the plastic memory.

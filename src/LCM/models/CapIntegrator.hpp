@@ -352,8 +352,11 @@ struct CapIntegrator
     return dedX * dXdkappa;
   }
 
-  ScalarT
-  compute_evp(Params const& P, ScalarT const& kappa) const
+  // Static: a pure function of (P, kappa) with no integrator state, so
+  // the Permafrost kernel can evaluate the crush curve to form its
+  // effective porosity before any integrator is built.
+  static ScalarT
+  compute_evp(Params const& P, ScalarT const& kappa)
   {
     // Plastic volumetric strain on the crush curve,
     //   eps_v^p = P.W (exp[P.D1 (X - X0) - P.D2 (X - X0)^2] - 1),

@@ -16,6 +16,13 @@ LCM:
       ACE Z Depth File: 'depth_test.txt'
       ACE Porosity File: 'porosity_test.txt'
       Output Crush Indicator: true
+      # Porosity at which the end members below were calibrated: the
+      # normalizer of the ice volume fraction phi = S n / n_ref that
+      # drives the cohesion/bonding and elasticity interpolation. Set to
+      # the frozen crushable volume W, so that an uncrushed frozen point
+      # sits exactly at the frozen end member.
+      Reference Porosity: 0.08
+
       Frozen Parameters:
         K: 1.517703284868067e10
         G: 9.001517087192591e9

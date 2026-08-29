@@ -5,13 +5,20 @@ LCM:
   Materials:
     # Phase-1 equivalence check: with both end members set to the Salem
     # limestone values and ice saturation at its default (1.0, frozen),
-    # the Permafrost saturation-to-parameter map must reproduce CapModel
+    # the Permafrost parameter map must reproduce CapModel
     # (and hence the reference implementation). The elastic constants are
     # the exact (K, G) images of Salem's E = 22547, nu = 0.2524.
     Permafrost:
       Material Model:
         Model Name: Permafrost
       Finite Deformation: false
+      # Porosity at which the end members below were calibrated: the
+      # normalizer of the ice volume fraction phi = S n / n_ref that
+      # drives the cohesion/bonding and elasticity interpolation. Set to
+      # the frozen crushable volume W, so that an uncrushed frozen point
+      # sits exactly at the frozen end member.
+      Reference Porosity: 0.08
+
       Frozen Parameters:
         K: 1.517703284868067e10
         G: 9.001517087192591e9

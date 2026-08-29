@@ -40,6 +40,7 @@ foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           materials_permafrost_death_displacement.yaml
           materials_permafrost_death_distortion.yaml
           input_porosity.yaml materials_permafrost_porosity.yaml
+          input_volfrac.yaml materials_permafrost_volfrac.yaml
           depth_test.txt porosity_test.txt
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
@@ -94,7 +95,7 @@ if (CAP_PY_OK)
   set_tests_properties(Permafrost_Equivalence_confined PROPERTIES LABELS "LCM;Tpetra;Forward")
 
   # Thaw under load: ice saturation falls 1.0 -> 0.3 during confined
-  # compression; verifies the saturation-to-parameter map (elasticity
+  # compression; verifies the parameter map (elasticity
   # split, nu cap, parameter blending) against the reference.
   add_test(NAME Permafrost_Verify_thaw
            COMMAND ${CMAKE_COMMAND}
@@ -107,7 +108,7 @@ if (CAP_PY_OK)
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   set_tests_properties(Permafrost_Verify_thaw PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-  # Constant ice saturation 0.5: the full saturation-to-parameter map
+  # Constant ice saturation 0.5: the full parameter map
   # (including the nu cap) without time variation.
   add_test(NAME Permafrost_Verify_f05
            COMMAND ${CMAKE_COMMAND}
@@ -133,6 +134,22 @@ if (CAP_PY_OK)
                    -P runverify.cmake
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   set_tests_properties(Permafrost_Verify_porosity PROPERTIES LABELS "LCM;Tpetra;Forward")
+
+  # Ice volume fraction: the same porosity profile, but with distinct end
+  # members and constant saturation, so porosity alone separates the two
+  # z-groups through phi = S n / n_ref. This is the case the saturation
+  # map could not express, and the only one that fails if the kernel
+  # feeds cohesion and elasticity the saturation instead of phi.
+  add_test(NAME Permafrost_Verify_volfrac
+           COMMAND ${CMAKE_COMMAND}
+                   "-DTEST_PROG=${SerialAlbany.exe}"
+                   "-DINPUT=input_volfrac.yaml"
+                   "-DEXO=permafrost_volfrac.exo"
+                   "-DPATHMODE=volfrac_profile"
+                   "-DPYTHON=${PYTHON3_FOR_CAP}"
+                   -P runverify.cmake
+           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  set_tests_properties(Permafrost_Verify_volfrac PROPERTIES LABELS "LCM;Tpetra;Forward")
 
   # Per-mode failure/death verification: each deck enables exactly one
   # failure criterion on an already-verified trajectory; the harness

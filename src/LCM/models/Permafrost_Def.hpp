@@ -12,13 +12,22 @@
 // doc/developers-guide/cap-plasticity.tex, Section "The Permafrost
 // Model".
 //
-// Saturation-to-parameter map:
-//   cohesion/bonding  A, C, N, calpha     linear between end members
-//   crush             kappa0, W, D1       linear between end members
-//   friction/shape    D, theta, L, phi,   thawed (sediment skeleton)
-//                     R, Q, psi, D2       values, f-independent
-//   elasticity        G(f) and K(f) log-linear; effective nu
+// Parameter map. Two interpolation variables, one per mechanism group:
+// the ice VOLUME fraction phi = S n / n_ref (n the current porosity,
+// n_ref the required Reference Porosity at which the end members were
+// calibrated) for what ice cementation controls, and the ice SATURATION
+// S for what pore collapse controls.
+//   cohesion/bonding  A, C, N, calpha     linear in phi
+//   elasticity        G(phi), K(phi) log-linear; effective nu
 //                     capped at nu_max (default 0.45) preserving G
+//   crush             kappa0, W, D1       linear in S
+//   friction/shape    D, theta, L, phi,   thawed (sediment skeleton)
+//                     R, Q, psi, D2       values, map-independent
+// The current porosity is n = n_0 + eps_v^p with n_0 the ACE profile
+// value and eps_v^p (<= 0) read off the crush curve at the previous
+// converged kappa, so the parameters are explicit in the plastic state.
+// With n = n_ref and no compaction, phi = S and the map reduces to the
+// pre-2026-08 saturation map exactly.
 //
 // Ice saturation comes from the ACE_Ice_Saturation field
 // (Have ACE Ice Saturation: true), from a time table (Ice Saturation
@@ -41,9 +50,10 @@
 // J2Erosion exactly, so the ACE solver and the scatter evaluators
 // consume Permafrost cells without modification.
 //
-// ACE environment: depth profiles of porosity (W override) and peat
-// (eqps-limit boost), sea level against time, and ocean-exposure
-// weakening of submerged erodible cells.
+// ACE environment: depth profiles of porosity (W override, and the n_0
+// of the ice volume fraction) and peat (eqps-limit boost), sea level
+// against time, and ocean-exposure weakening of submerged erodible
+// cells.
 
 #include <MiniTensor.h>
 
@@ -174,6 +184,20 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   // cohesion factor, the elastic moduli (uniformly, preserving nu) by
   // the stiffness factor, and the eqps limit by its factor.
   bulk_porosity_        = p->get<RealType>("ACE Bulk Porosity", 0.0);
+  // Porosity at which the end-member sets were calibrated, the normalizer
+  // of the ice volume fraction. Required, with no default: the only
+  // defensible value is a property of the calibration, and a silent
+  // default would decouple the interpolation from the end members with no
+  // diagnostic. isParameter is asked before get because Teuchos inserts a
+  // default when one is supplied, which would defeat the test.
+  ALBANY_ASSERT(
+      p->isParameter("Reference Porosity"),
+      "Permafrost: Reference Porosity is required. Set it to the porosity at which the Frozen Parameters and Thawed "
+      "Parameters were calibrated; setting it equal to ACE Bulk Porosity reproduces the pre-2026-08 saturation map.");
+  reference_porosity_ = p->get<RealType>("Reference Porosity");
+  ALBANY_ASSERT(
+      reference_porosity_ > 0.0 && reference_porosity_ <= 1.0,
+      "Permafrost: Reference Porosity must lie in (0, 1]");
   cohesion_weakening_   = p->get<RealType>("ACE Cohesion Weakening Factor", 1.0);
   stiffness_weakening_  = p->get<RealType>("ACE Stiffness Weakening Factor", 1.0);
   eqps_limit_weakening_ = p->get<RealType>("ACE Eqps Limit Weakening Factor", 1.0);
@@ -227,6 +251,7 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   std::string const displacement_indicator_string = stateName("Displacement_Indicator");
   std::string const strain_indicator_string       = stateName("Strain_Indicator");
   std::string const tilt_angle_string             = stateName("Tilt_Angle");
+  std::string const ice_volume_fraction_string   = stateName("Ice_Volume_Fraction");
 
   // define the dependent fields. Elasticity is computed internally from
   // the end-member (K, G) pairs, so there is no dependence on the
@@ -277,6 +302,7 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   setEvaluatedField(displacement_indicator_string, dl->qp_scalar);
   setEvaluatedField(strain_indicator_string, dl->qp_scalar);
   setEvaluatedField(tilt_angle_string, dl->qp_scalar);
+  setEvaluatedField(ice_volume_fraction_string, dl->qp_scalar);
   setEvaluatedField("failure_modes", dl->qp_scalar);
   setEvaluatedField("failure_state", dl->cell_scalar2);
   setEvaluatedField("cell_death", dl->cell_scalar2);
@@ -309,6 +335,8 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   addStateVariable(displacement_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Displacement Indicator", false));
   addStateVariable(strain_indicator_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Strain Indicator", false));
   addStateVariable(tilt_angle_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Tilt Angle", false));
+  addStateVariable(
+      ice_volume_fraction_string, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output Ice Volume Fraction", false));
   addStateVariable("failure_modes", dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Failure Modes", false));
   addStateVariable("failure_state", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Failure State", false));
   addStateVariable("cell_death", dl->cell_scalar2, "scalar", 0.0, false, p->get<bool>("Output Cell Death", false));
@@ -344,6 +372,7 @@ PermafrostKernel<EvalT, Traits>::init(
   std::string displacement_indicator_string = stateName("Displacement_Indicator");
   std::string strain_indicator_string       = stateName("Strain_Indicator");
   std::string tilt_angle_string             = stateName("Tilt_Angle");
+  std::string ice_volume_fraction_string    = stateName("Ice_Volume_Fraction");
 
   // extract dependent MDFields
   if (have_ice_field_) ice_saturation_ = *dep_fields["ACE_Ice_Saturation"];
@@ -373,6 +402,7 @@ PermafrostKernel<EvalT, Traits>::init(
   displacement_indicator_ = *eval_fields[displacement_indicator_string];
   strain_indicator_       = *eval_fields[strain_indicator_string];
   tilt_angle_             = *eval_fields[tilt_angle_string];
+  ice_volume_fraction_    = *eval_fields[ice_volume_fraction_string];
   failure_modes_          = *eval_fields["failure_modes"];
   failed_                 = *eval_fields["failure_state"];
   dead_                   = *eval_fields["cell_death"];
@@ -493,6 +523,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     displacement_indicator_(cell, pt) = 0.0;
     strain_indicator_(cell, pt)       = 0.0;
     tilt_angle_(cell, pt)             = 0.0;
+    ice_volume_fraction_(cell, pt)    = 0.0;
     // Carry the failure-mode bitmask forward unchanged: a dead cell never
     // trips new bits, but the state must still be written every fill.
     failure_modes_(cell, pt) = failure_modes_old_(cell, pt);
@@ -553,17 +584,39 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     if (submerged) max_distortion_eff = 1.0 + (max_distortion_eff - 1.0) / eqps_limit_weakening_;
   }
 
-  // Saturation-to-parameter map (see the file banner). Elasticity from
-  // the (K, G) split: both moduli interpolate geometrically
-  // (log-linearly) between the end members, the ice-bonding dependence
-  // the frozen-soil experimental literature shows for the shear AND the
-  // bulk modulus. The Wood-mixture bound remains calibration guidance
-  // for the thawed K. The effective Poisson ratio is capped at nu_max,
-  // preserving G (the trusted physics) and reducing K.
-  auto map_params = [&](ScalarT const& f) {
+  // Parameter map (see the file banner). Two interpolation variables,
+  // one per mechanism group:
+  //
+  //   phi = S n / n_ref   ice volume fraction, drives the cohesion and
+  //                       bonding group (A, C, N, c^alpha) and the
+  //                       elasticity, because what those represent is
+  //                       ice cementing grain contacts, and the amount
+  //                       of cement per unit volume is what S alone
+  //                       cannot express: two points at S = 1 and
+  //                       porosities 0.2 and 0.6 hold three times
+  //                       different ice and are not equally bonded.
+  //
+  //   S                   ice saturation, drives the pore-collapse group
+  //                       (kappa0, W, D1). The crush curve already
+  //                       carries the compaction history in kappa;
+  //                       feeding compaction back in through the
+  //                       parameters would double-count it, and would
+  //                       push the parameters toward the thawed member
+  //                       (loose saturated sediment) exactly when the
+  //                       material is densifying, which is the wrong
+  //                       direction.
+  //
+  // Elasticity from the (K, G) split: both moduli interpolate
+  // geometrically (log-linearly) between the end members, the
+  // ice-bonding dependence the frozen-soil experimental literature shows
+  // for the shear AND the bulk modulus. The Wood-mixture bound remains
+  // calibration guidance for the thawed K. The effective Poisson ratio
+  // is capped at nu_max, preserving G (the trusted physics) and
+  // reducing K.
+  auto map_params = [&](ScalarT const& f_vol, ScalarT const& f_sat) {
     CapParameters<ScalarT> P;
-    ScalarT Kmod = std::exp((1.0 - f) * std::log(ScalarT(thawed_.K)) + f * std::log(ScalarT(frozen_.K)));
-    ScalarT const Gmod = std::exp((1.0 - f) * std::log(ScalarT(thawed_.G)) + f * std::log(ScalarT(frozen_.G)));
+    ScalarT Kmod = std::exp((1.0 - f_vol) * std::log(ScalarT(thawed_.K)) + f_vol * std::log(ScalarT(frozen_.K)));
+    ScalarT const Gmod = std::exp((1.0 - f_vol) * std::log(ScalarT(thawed_.G)) + f_vol * std::log(ScalarT(frozen_.G)));
     ScalarT nu = (3.0 * Kmod - 2.0 * Gmod) / (2.0 * (3.0 * Kmod + Gmod));
     if (nu > nu_max_) {
       nu   = nu_max_;
@@ -571,13 +624,13 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     }
     P.lame   = Kmod - 2.0 * Gmod / 3.0;
     P.mu     = Gmod;
-    P.A      = (1.0 - f) * thawed_.A + f * frozen_.A;
-    P.C      = (1.0 - f) * thawed_.C + f * frozen_.C;
-    P.N      = (1.0 - f) * thawed_.N + f * frozen_.N;
-    P.kappa0 = (1.0 - f) * thawed_.kappa0 + f * frozen_.kappa0;
-    P.W      = (1.0 - f) * thawed_.W + f * frozen_.W;
-    P.D1     = (1.0 - f) * thawed_.D1 + f * frozen_.D1;
-    P.calpha = (1.0 - f) * thawed_.calpha + f * frozen_.calpha;
+    P.A      = (1.0 - f_vol) * thawed_.A + f_vol * frozen_.A;
+    P.C      = (1.0 - f_vol) * thawed_.C + f_vol * frozen_.C;
+    P.N      = (1.0 - f_vol) * thawed_.N + f_vol * frozen_.N;
+    P.calpha = (1.0 - f_vol) * thawed_.calpha + f_vol * frozen_.calpha;
+    P.kappa0 = (1.0 - f_sat) * thawed_.kappa0 + f_sat * frozen_.kappa0;
+    P.W      = (1.0 - f_sat) * thawed_.W + f_sat * frozen_.W;
+    P.D1     = (1.0 - f_sat) * thawed_.D1 + f_sat * frozen_.D1;
     P.D      = D_;
     P.theta  = theta_;
     P.L      = L_;
@@ -603,8 +656,56 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     return P;
   };
 
-  CapParameters<ScalarT> const P0 = map_params(f_old);
-  CapParameters<ScalarT> const P1 = map_params(f_ice);
+  // Cap-parameter state at the previous converged step. Read here rather
+  // than just before the integrator because the ice volume fraction is
+  // measured on the crush curve at this kappa.
+  ScalarT const kappa_old = capParameter_old_(cell, pt);
+
+  // Local initial (uncrushed) porosity. The ACE depth profile is the
+  // source where one is given; with none, the calibration porosity is
+  // used, which makes phi = S identically and recovers the pre-2026-08
+  // map. It is also what the profile overrides W with below, so with a
+  // profile n = n_0 exp(D1 dX - D2 dX^2) stays positive by construction.
+  RealType const n_initial = porosity > 0.0 ? porosity : reference_porosity_;
+
+  // Ice volume fraction phi = S n / n_ref, with the current porosity
+  // n = n_0 + eps_v^p. Note eps_v^p <= 0 in compaction (it runs from 0 at
+  // kappa0 to -W at full crush), so this SUBTRACTS the crushed-out pore
+  // volume; writing n_0 - eps_v^p would add it.
+  //
+  // Two deliberate choices keep this well posed:
+  //
+  //   - eps_v^p is read off the crush curve at kappa_old, so the
+  //     parameters are explicit in the plastic state. They stay fixed
+  //     across the integrator's substeps, which preserves the within-step
+  //     ramping and keeps the drift correction and the no-cap-contraction
+  //     clamp on the ground they were verified on. Making the parameters
+  //     implicit in kappa would couple them to the return mapping.
+  //
+  //   - the crush curve is evaluated on the pure-S map, map_params(S, S).
+  //     That is the map the pore-collapse group actually uses, and it
+  //     breaks what would otherwise be a circular definition: W is one of
+  //     the interpolated parameters, so a phi built from W(phi) would be
+  //     implicit, and self-reinforcing (crushing lowers phi, which lowers
+  //     W, which raises |eps_v^p|/W, which lowers phi again).
+  auto ice_fraction = [&](ScalarT const& S) {
+    CapParameters<ScalarT> const Ps = map_params(S, S);
+    ScalarT const evp = CapIntegrator<ScalarT>::compute_evp(Ps, kappa_old);
+    ScalarT       n   = n_initial + evp;
+    if (n < 0.0) n = 0.0;
+    ScalarT phi = S * n / reference_porosity_;
+    if (phi < 0.0) phi = 0.0;
+    if (phi > 1.0) phi = 1.0;
+    return phi;
+  };
+
+  ScalarT const phi_old = ice_fraction(f_old);
+  ScalarT const phi_new = ice_fraction(f_ice);
+
+  ice_volume_fraction_(cell, pt) = phi_new;
+
+  CapParameters<ScalarT> const P0 = map_params(phi_old, f_old);
+  CapParameters<ScalarT> const P1 = map_params(phi_new, f_ice);
 
   ScalarT const mu          = P1.mu;
   ScalarT const lame        = P1.lame;
@@ -626,7 +727,7 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     for (int j = 0; j < num_dims_; ++j)
       alphaVal(i, j) = backStress_old_(cell, pt, i, j);
 
-  ScalarT kappaVal = capParameter_old_(cell, pt);
+  ScalarT kappaVal = kappa_old;
 
   // Spectral functions of symmetric tensors, for the exp/log kinematics.
   auto fun_sym = [&](Tensor const& Asym, ScalarT (*fun)(ScalarT const&)) {

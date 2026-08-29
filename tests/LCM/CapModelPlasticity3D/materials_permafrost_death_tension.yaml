@@ -21,6 +21,13 @@ LCM:
       Output Crush Indicator: true
       Output Eqps Indicator: true
       Output Displacement Indicator: true
+      # Porosity at which the end members below were calibrated: the
+      # normalizer of the ice volume fraction phi = S n / n_ref that
+      # drives the cohesion/bonding and elasticity interpolation. Set to
+      # the frozen crushable volume W, so that an uncrushed frozen point
+      # sits exactly at the frozen end member.
+      Reference Porosity: 0.08
+
       Frozen Parameters:
         K: 1.517703284868067e10
         G: 9.001517087192591e9

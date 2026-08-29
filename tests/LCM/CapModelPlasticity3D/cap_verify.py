@@ -309,8 +309,13 @@ def porosity_main(exo):
     series = {}
     for w in w_qp:
         end = dict(ref.SALEM_END, W=w)
+        # n_ref is the deck's Reference Porosity, n0 the per-point profile
+        # value; W is overridden to the same profile value. The end members
+        # are identical here, so the ice volume fraction cannot move any
+        # parameter, but pass both explicitly rather than let them default.
         hist = ref.drive_permafrost(eps, lambda time: 1.0, nsteps,
-                                    end, end, SALEM_SHARED)
+                                    end, end, SALEM_SHARED,
+                                    n_ref=0.08, n0=w)
         P = ref.permafrost_map(1.0, end, end, SALEM_SHARED)
         series[w] = dict(
             sxx=np.array([h[1][0, 0] for h in hist]),
@@ -333,6 +338,92 @@ def porosity_main(exo):
     return 0 if ok else 1
 
 
+
+def volfrac_main(exo):
+    """Ice volume fraction driving the parameter map. Same porosity(z)
+    profile as porosity_main, but the end members DIFFER, so the profile
+    reaches cohesion, bonding and elasticity through phi = S n / n_ref
+    and not only the crushable volume W. Saturation is constant at 1.0,
+    so the two Gauss-point z-groups differ by porosity alone: shallow
+    (n = 0.10 = n_ref) sits at the frozen end member, deep (n = 0.04)
+    sits 60% of the way to the thawed one. If the kernel applied the
+    saturation rather than the volume fraction to those parameters, both
+    groups would be frozen and this comparison would fail."""
+    t, var = exo_open(exo)
+    nsteps = len(t) - 1
+    eps = lambda time: -0.02 * time * ref.I3
+
+    N_REF = 0.10
+    z_qp = (0.5 - 0.5 / np.sqrt(3.0), 0.5 + 0.5 / np.sqrt(3.0))
+    w_qp = [np.interp(z, [0.0, 1.0], [0.10, 0.04]) for z in z_qp]
+
+    mask = np.ones(len(t), dtype=bool)
+    if len(t) > 1:
+        mask[1] = False
+
+    ok = True
+
+    def check(name, a, b, scale, tol):
+        nonlocal ok
+        err = np.abs(np.asarray(a)[mask] - np.asarray(b)[mask]).max() / scale
+        status = 'ok' if err < tol else 'FAIL'
+        print(f'  {name:24s} max rel diff = {err:.3e}  [{status}]')
+        ok &= err < tol
+
+    print(f'== volfrac_profile: Albany ({exo}) vs cap_reference, {nsteps} steps ==')
+    TOL = 1.0e-4
+
+    series = {}
+    for w in w_qp:
+        # Mirror the kernel's ACE override: the porosity profile sets W at
+        # the point, on BOTH end members, so every interpolation of W
+        # returns w and the crush curve behind phi sees w as well.
+        frozen = dict(ref.SALEM_END, W=w)
+        thawed = dict(ref.THAWED_TEST_END, W=w)
+        hist = ref.drive_permafrost(eps, lambda time: 1.0, nsteps,
+                                    frozen, thawed,
+                                    ref.THAWED_TEST_SHARED,
+                                    n_ref=N_REF, n0=w)
+        # phi as the kernel writes it: formed from the saturation of this
+        # step and the kappa converged at the START of it, so entry n uses
+        # the kappa of entry n-1 (entry 0 uses its own, the initial state).
+        phis = []
+        for n, h in enumerate(hist):
+            kap = hist[max(0, n - 1)][2]
+            phis.append(ref.ice_volume_fraction(1.0, kap, frozen, thawed,
+                                                ref.THAWED_TEST_SHARED,
+                                                N_REF, w))
+        series[w] = dict(
+            sxx=np.array([h[1][0, 0] for h in hist]),
+            kappa=np.array([h[2] for h in hist]),
+            evp=np.array([h[3] for h in hist]),
+            phi=np.array(phis))
+
+    # The two groups must actually be driven apart by porosity, or the
+    # comparison below would pass on a kernel that ignored phi entirely.
+    spread = abs(series[w_qp[0]]['phi'][0] - series[w_qp[1]]['phi'][0])
+    print(f'  phi at t=0: ' +
+          ', '.join(f'n={w:.3f} -> {series[w]["phi"][0]:.4f}' for w in w_qp) +
+          f'   (spread {spread:.4f})')
+    if spread < 0.1:
+        print('  the two z-groups are not separated by porosity  [FAIL]')
+        ok = False
+
+    for key, exo_name in (('sxx', 'Cauchy_Stress_1'), ('kappa', 'Cap_Parameter'),
+                          ('evp', 'volPlastic_Strain'),
+                          ('phi', 'Ice_Volume_Fraction')):
+        o_sorted = np.sort(np.array(
+            [[series[w][key][i] for w in w_qp for _ in range(4)]
+             for i in range(len(t))]), axis=1)
+        a_sorted = np.sort(np.array(
+            [var(f'{exo_name}_{p}') for p in range(1, NUM_PTS + 1)]).T, axis=1)
+        scale = max(np.abs(o_sorted).max(), 1.0e-12)
+        check(f'{key} (sorted per-pt)', a_sorted, o_sorted, scale, TOL)
+
+    print('VERIFICATION', 'PASS' if ok else 'FAIL')
+    return 0 if ok else 1
+
+
 def main():
     exo, path = sys.argv[1], sys.argv[2]
     if path == 'death_distortion':
@@ -341,6 +432,8 @@ def main():
         return death_main(exo, path)
     if path == 'porosity_profile':
         return porosity_main(exo)
+    if path == 'volfrac_profile':
+        return volfrac_main(exo)
     p = ref.CapParams()
 
     if path == 'hydrostatic':

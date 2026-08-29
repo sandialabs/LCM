@@ -447,20 +447,23 @@ def permafrost_map(f, frozen, thawed, shared, nu_max=0.45, fp=None):
 
 def ice_volume_fraction(S, kappa, frozen, thawed, shared, n_ref,
                         n0=None, nu_max=0.45):
-    """phi = S n / n_ref with n = n0 + evp the current porosity, mirroring
-    the Permafrost kernel: evp (<= 0) is read off the crush curve at the
-    PREVIOUS converged kappa, so the parameters stay explicit in the
-    plastic state, and the crush curve is evaluated on the pure-S map,
-    which is what breaks the circularity of a W that is itself
-    interpolated. n0 defaults to n_ref (no porosity profile), which makes
-    phi = S up to accumulated compaction."""
+    """phi = S n / n_ref with n = n0 (1 - |evp|/W) the current porosity,
+    mirroring the Permafrost kernel. Compaction enters as the FRACTION of
+    the crushable volume consumed, not as the raw strain: the two agree
+    only when W = n0, which the ACE porosity override enforces but which
+    does not hold in general, and the raw form drives n negative whenever
+    W > n0. evp (<= 0) is read off the crush curve at the PREVIOUS
+    converged kappa, so the parameters stay explicit in the plastic
+    state, and the crush curve is evaluated on the pure-S map, which is
+    what breaks the circularity of a W that is itself interpolated. n0
+    defaults to n_ref (no porosity profile), which makes phi = S times
+    the fraction of pore space still open."""
     if n0 is None:
         n0 = n_ref
     Ps = permafrost_map(S, frozen, thawed, shared, nu_max)
-    n = n0 + evp_of_kappa(kappa, Ps)
-    if n < 0.0:
-        n = 0.0
-    return min(1.0, max(0.0, S * n / n_ref))
+    crushed = -evp_of_kappa(kappa, Ps) / Ps.W if Ps.W > 0.0 else 0.0
+    crushed = min(1.0, max(0.0, crushed))
+    return min(1.0, max(0.0, S * n0 * (1.0 - crushed) / n_ref))
 
 
 def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,

@@ -38,7 +38,11 @@ Extension: Permafrost and Erosion"):
                as Reference Porosity: the end members are calibrated AT
                it, so it is the n_ref that normalizes the ice volume
                fraction phi = S n / n_ref (cap-plasticity.tex,
-               Eq. "icefraction"). kappa0 COMMON to both end
+               Eq. "icefraction"). Emitting one number for both W and
+               Reference Porosity also makes W = n_0 at every point,
+               the case in which the crushed fraction in
+               n = n_0 (1 - |eps_v^p|/W) reduces to n_0 + eps_v^p.
+               kappa0 COMMON to both end
                members (see the calibration note in the doc: a frozen
                state read under a thawed kappa0 is reinterpreted as
                precompacted), placed outside the gravity stress range;

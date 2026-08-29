@@ -1085,9 +1085,7 @@ elastic parameters therefore interpolate on
 \begin{equation}
   \phi_{\mathrm{ice}} \;=\; \frac{S\,n}{n_{\mathrm{ref}}},
   \qquad
-  n \;=\; n_0 + \varepsilon_v^p,
-  \qquad
-  \phi_{\mathrm{ice}} \in [0,1] \text{ after clamping},
+  n \;=\; n_0 \left( 1 - \frac{|\varepsilon_v^p|}{W} \right),
   \label{eq:icefraction}
 \end{equation}
 where $n_0$ is the local uncrushed porosity (the \texttt{ACE Porosity
@@ -1095,10 +1093,21 @@ File} profile, or the constant \texttt{ACE Bulk Porosity}),
 $\varepsilon_v^p \le 0$ is the volumetric plastic strain on the crush
 curve of Eq.~\eqref{eq:kappa}, so that $n$ is the \emph{current}
 porosity, and $n_{\mathrm{ref}}$ is the \texttt{Reference Porosity},
-the porosity at which the two end-member sets were calibrated. Note
-the sign: $\varepsilon_v^p$ runs from $0$ at $\kappa_0$ to $-W$ at
-full crush, so Eq.~\eqref{eq:icefraction} subtracts the pore volume
-that has been crushed out.
+the porosity at which the two end-member sets were calibrated.
+$\phi_{\mathrm{ice}}$ is clamped to $[0,1]$, which binds only where
+the local porosity exceeds the calibration porosity.
+
+Compaction enters as the \emph{fraction} of the crushable volume
+consumed, $|\varepsilon_v^p| / W$, and not as the raw strain. The two
+readings coincide when $W = n_0$, which the ACE porosity override
+enforces by setting $W$ to the profile value, but they are not the
+same in general: where $W > n_0$ the difference
+$n_0 + \varepsilon_v^p$ subtracts a volume larger than the pore space
+present, drives $n$ negative, and reports no ice in material that is
+still frozen. Since $|\varepsilon_v^p| / W$ lies in $[0,1]$ by the cap
+lock of Section~\ref{sec:flow}, the form above keeps $n$ in
+$[0, n_0]$ with no clamp of its own and with no tacit assumption that
+$W$ and $n_0$ are the same quantity.
 
 The normalization is what makes $\phi_{\mathrm{ice}}$ an
 interpolation weight rather than a volume fraction in name only, and
@@ -1347,9 +1356,12 @@ porosity does double duty: it overrides the crushable volume $W$
 fills it --- and it is the uncrushed porosity $n_0$ of the ice
 volume fraction, Eq.~\eqref{eq:icefraction}, which is where the
 depth variation of porosity reaches the cohesion, bonding and
-elastic parameters. With no porosity source the calibration porosity
-$n_{\mathrm{ref}}$ stands in for $n_0$, which makes
-$\phi_{\mathrm{ice}} = S$ up to accumulated compaction. Peat
+elastic parameters. Driving both roles from the same profile is also
+what makes $W = n_0$ at every point, the case in which the crushed
+fraction of Eq.~\eqref{eq:icefraction} reduces to the plain
+difference $n_0 + \varepsilon_v^p$. With no porosity source the
+calibration porosity $n_{\mathrm{ref}}$ stands in for $n_0$, which
+makes $\phi_{\mathrm{ice}} = S$ up to accumulated compaction. Peat
 raises the eqps limit by the factor $(1 + \mathrm{peat})$, a
 provisional parity rule pending calibration. Sea level against time
 (\texttt{ACE Sea Level File} / \texttt{ACE Time File}) drives

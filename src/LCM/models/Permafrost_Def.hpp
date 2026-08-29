@@ -23,9 +23,11 @@
 //   crush             kappa0, W, D1       linear in S
 //   friction/shape    D, theta, L, phi,   thawed (sediment skeleton)
 //                     R, Q, psi, D2       values, map-independent
-// The current porosity is n = n_0 + eps_v^p with n_0 the ACE profile
-// value and eps_v^p (<= 0) read off the crush curve at the previous
-// converged kappa, so the parameters are explicit in the plastic state.
+// The current porosity is n = n_0 (1 - |eps_v^p| / W) with n_0 the ACE
+// profile value and eps_v^p (<= 0) read off the crush curve at the
+// previous converged kappa, so the parameters are explicit in the
+// plastic state. Compaction enters as the FRACTION of the crushable
+// volume consumed, which is the only form that does not assume W = n_0.
 // With n = n_ref and no compaction, phi = S and the map reduces to the
 // pre-2026-08 saturation map exactly.
 //
@@ -669,11 +671,21 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   RealType const n_initial = porosity > 0.0 ? porosity : reference_porosity_;
 
   // Ice volume fraction phi = S n / n_ref, with the current porosity
-  // n = n_0 + eps_v^p. Note eps_v^p <= 0 in compaction (it runs from 0 at
-  // kappa0 to -W at full crush), so this SUBTRACTS the crushed-out pore
-  // volume; writing n_0 - eps_v^p would add it.
   //
-  // Two deliberate choices keep this well posed:
+  //   n = n_0 (1 - |eps_v^p| / W).
+  //
+  // The crush curve measures compaction as a fraction of the crushable
+  // volume W, so that fraction, not the raw strain, is what applies to
+  // the pore volume actually present. Writing n = n_0 + eps_v^p instead
+  // is the same expression only when W = n_0, which the ACE porosity
+  // override does enforce (it sets W to the profile value) but which is
+  // not true in general: with W > n_0 the raw form subtracts a volume
+  // larger than the pore space and drives n negative, reporting no ice
+  // in material that is still frozen. In this form |eps_v^p| / W is in
+  // [0, 1] by the cap lock, so n stays in [0, n_0] with no clamp needed
+  // and no assumption that W and n_0 are the same number.
+  //
+  // Two further deliberate choices keep this well posed:
   //
   //   - eps_v^p is read off the crush curve at kappa_old, so the
   //     parameters are explicit in the plastic state. They stay fixed
@@ -689,11 +701,13 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   //     implicit, and self-reinforcing (crushing lowers phi, which lowers
   //     W, which raises |eps_v^p|/W, which lowers phi again).
   auto ice_fraction = [&](ScalarT const& S) {
-    CapParameters<ScalarT> const Ps = map_params(S, S);
-    ScalarT const evp = CapIntegrator<ScalarT>::compute_evp(Ps, kappa_old);
-    ScalarT       n   = n_initial + evp;
-    if (n < 0.0) n = 0.0;
-    ScalarT phi = S * n / reference_porosity_;
+    CapParameters<ScalarT> const Ps  = map_params(S, S);
+    ScalarT const                evp = CapIntegrator<ScalarT>::compute_evp(Ps, kappa_old);
+    ScalarT                      crushed{0.0};
+    if (Ps.W > 0.0) crushed = -evp / Ps.W;
+    if (crushed < 0.0) crushed = 0.0;
+    if (crushed > 1.0) crushed = 1.0;
+    ScalarT phi = S * n_initial * (1.0 - crushed) / reference_porosity_;
     if (phi < 0.0) phi = 0.0;
     if (phi > 1.0) phi = 1.0;
     return phi;

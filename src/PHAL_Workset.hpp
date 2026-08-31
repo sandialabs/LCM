@@ -16,8 +16,8 @@
 #include "Albany_StateInfoStruct.hpp"
 #include "Albany_ThyraTypes.hpp"
 #include "Albany_TpetraTypes.hpp"
-#include "Kokkos_ViewFactory.hpp"
 #include "PHAL_Setup.hpp"
+#include "Sacado_Fad_Kokkos_ViewFactory.hpp"
 #include "Teuchos_Comm.hpp"
 #include "Teuchos_RCP.hpp"
 

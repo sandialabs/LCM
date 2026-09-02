@@ -356,6 +356,42 @@ Three things are worth knowing before quoting a number from this path.
   deviatoric Cauchy stress. A laboratory that applied its own area correction,
   or none, is reporting something else at large strain. Convert the data.
 
+### Preparing digitized laboratory data
+
+`harness/prepare_data.py` converts the Arctic team's digitized curves (Engauge
+output with a metadata row in curly brackets) into files this path can read:
+
+```bash
+python prepare_data.py --out-dir data ~/test/calibration/Xu_Pc*_-6.csv
+python prepare_data.py --out-dir data --max-strain 0.20 ~/test/calibration/Yang_*.csv
+```
+
+It writes the harness's own column names (`strain_eng_x`, `stress_dev_x`), so
+`--data txc:data/Xu_Pc1e6_-6.csv` needs no column mapping, and it prints the
+`--set confining_pressure=` and `--set axial_strain=` line each file needs,
+read from the file's own metadata row.
+
+Three conversions, each of which the data has needed:
+
+- **Sign.** Detected from the axial strain column rather than assumed, and
+  reported per file, because the files received so far are compression positive
+  while the next batch is meant to be compression negative.
+- **Zero offset.** Digitized curves start at up to `2.3e5` Pa at zero strain,
+  from picking the curve off the axis. Removed.
+- **Truncation.** `--max-strain 0.20` for the Yang curves, whose last points
+  are Engauge extrapolating past the plotted data.
+
+**The volumetric column is never flipped**, and this is the one thing to get
+right by hand if you convert data yourself. It is plotted positive upward as
+dilation in the source figures, and expansion positive already *is* compression
+negative. Flipping it along with the other two inverts the dilatancy, which is
+the one quantity this data is uniquely able to constrain (`L`, `phi`, `Q`), and
+the resulting fit looks perfectly reasonable.
+
+`--volumetric` writes the volumetric curve to a companion file. Nothing
+consumes it yet: there is no volumetric comparison curve, which is the second
+gap on this path after the one below.
+
 ### One confining pressure per run
 
 `--set` is global to the run, so a single `calibrate` fits one confining
@@ -528,6 +564,7 @@ tools/calibration/
                              pressure, strain range, consolidation strain)
   harness/
     calibrate.py             the CLI: check / make-reference / calibrate
+    prepare_data.py          digitized laboratory curves -> harness CSVs
   examples/                  generated references and run output (git-ignored)
 ```
 

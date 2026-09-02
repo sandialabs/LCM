@@ -1,0 +1,204 @@
+#
+# Conventional triaxial compression (TXC) at constant confining pressure,
+# the load path of a laboratory triaxial cell, on a homogeneous cube.
+#
+# Two stages, both driven by the LOCA continuation parameter Time:
+#
+#   Time in [0, preload_fraction]   consolidation. The lateral tractions ramp
+#                                   from 0 to -Pc while the axial face is
+#                                   displaced to the elastic hydrostatic
+#                                   strain -Pc(1-2nu)/E. Under lateral
+#                                   tractions -Pc that prescribed axial strain
+#                                   returns an axial stress of exactly -Pc, so
+#                                   the state at the end of the stage is
+#                                   hydrostatic (verified: the residual
+#                                   deviator is 5e-4 of Pc under finite
+#                                   deformation, exactly zero under small
+#                                   strain). It is exact only while the
+#                                   response to Pc is elastic, which holds
+#                                   whenever Pc is inside the initial cap,
+#                                   |Pc| < |kappa0|/3.
+#
+#   Time in [preload_fraction, 1]   shear. The lateral tractions hold at -Pc
+#                                   and the axial face is displaced further by
+#                                   axial_strain, referred to the CONSOLIDATED
+#                                   length, which is what a laboratory reports.
+#
+# The reader trims the consolidation stage off the returned curve and rebases
+# displacement, strain and area to the consolidated state, so the curve starts
+# at zero strain with a hydrostatic stress, exactly as the experiment does.
+# See site_matcal.exodus_reader (preload_time) and site_matcal.load_paths.
+#
+# UNLIKE the other three decks this one has FREE degrees of freedom: eight of
+# the twenty-four, the lateral displacements of the two traction-loaded faces.
+# The lateral response is therefore predicted rather than prescribed, which is
+# what makes the path able to constrain the dilatancy parameters L, phi and Q.
+# Two consequences: the NOX status test needs a relative tolerance (a pure
+# absolute one cannot be met, since the residual floor is set by the traction
+# magnitude times machine epsilon), and force_y/force_z are NOT reaction
+# forces on this path, so stress_eng_y/stress_eng_z are meaningless here.
+#
+# The confining pressure is applied as an Albany "P" condition, which acts on
+# the REFERENCE normal: a dead load, not a follower load. At the lateral
+# strains these tests reach that is a sub-per-cent error in the confinement.
+#
+# jinja: preload_strain is the elastic hydrostatic axial strain at Pc, and
+# final_strain the total axial strain at the end of the run. Both are
+# recomputed on every evaluation, so they track a calibrated elastic_modulus
+# or poissons_ratio rather than going stale.
+# {% set preload_strain = -confining_pressure * (1.0 - 2.0 * poissons_ratio) / elastic_modulus %}
+# {% set final_strain = preload_strain + axial_strain * (1.0 + preload_strain) %}
+LCM:
+  Problem:
+    Name: Mechanics 3D
+    Solution Method: Continuation
+    Phalanx Graph Visualization Detail: 0
+    MaterialDB Filename: materials.yaml
+    Dirichlet BCs:
+      # Symmetry on the three faces at the origin, axial displacement on x+.
+      # The y+ and z+ faces carry tractions instead and are left free.
+      DBC on NS NodeSet0 for DOF X: 0.00000000e+00
+      DBC on NS NodeSet1 for DOF X:
+        BC Function: Array
+        Number of points: 3
+        Time Values: [0.0, {{ "%.8e"|format(preload_fraction) }}, 1.0]
+        BC Values: [0.0, {{ "%.8e"|format(preload_strain) }}, {{ "%.8e"|format(final_strain) }}]
+      DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
+      DBC on NS NodeSet4 for DOF Z: 0.00000000e+00
+    Neumann BCs:
+      # A positive "P" value is a compressive normal traction here: the
+      # condition enters the residual with the outward reference normal and
+      # the opposite sign, so P = +Pc gives sigma_nn = -Pc. Verified against
+      # the elastic solution.
+      Time Dependent NBC on SS SideSet3 for DOF all set P:
+        Time Values: [0.0, {{ "%.8e"|format(preload_fraction) }}, 1.0]
+        BC Values: [[0.0], [{{ "%.8e"|format(confining_pressure) }}], [{{ "%.8e"|format(confining_pressure) }}]]
+      Time Dependent NBC on SS SideSet5 for DOF all set P:
+        Time Values: [0.0, {{ "%.8e"|format(preload_fraction) }}, 1.0]
+        BC Values: [[0.0], [{{ "%.8e"|format(confining_pressure) }}], [{{ "%.8e"|format(confining_pressure) }}]]
+    Parameters:
+      Number: 1
+      Parameter 0: Time
+    Response Functions:
+      Number: 1
+      Response 0: Solution Average
+  Discretization:
+    # Single element. Sixteen of the twenty-four DOFs are prescribed; the
+    # remaining eight are the lateral displacements of the traction-loaded
+    # faces, which the solve returns. The deformation stays homogeneous, so
+    # the FE problem is still the material point.
+    1D Elements: 1
+    2D Elements: 1
+    3D Elements: 1
+    Method: STK3D
+    Interleaved Ordering: true
+    Exodus Output File Name: cap_txc.exo
+  Piro:
+    LOCA:
+      Bifurcation: { }
+      Constraints: { }
+      Predictor:
+        First Step Predictor: { }
+        Last Step Predictor: { }
+      Step Size:
+        # Finer than the other decks: the run covers a consolidation stage and
+        # a shear stage that reaches ten times the strain of the verification
+        # paths, and has to resolve a peak and the softening past it.
+        #
+        # Adaptive, not Constant, and this is not a nicety. With a constant
+        # step LOCA reports a step whose Newton solve failed and carries on,
+        # and Albany writes the unconverged state to Exodus like any other:
+        # the curve silently acquires points that are not solutions, and which
+        # steps fail depends on the parameters, so the objective a calibration
+        # sees stops being a smooth function of them. Adaptive stepping cuts
+        # the step and retries instead. Max Step Size is pinned to the initial
+        # one so a recovered step never coarsens the rest of the run.
+        Method: Adaptive
+        Initial Step Size: 2.50000000e-03
+        Min Step Size: 1.00000000e-06
+        Max Step Size: 2.50000000e-03
+        Failed Step Reduction Factor: 5.00000000e-01
+        Successful Step Increase Factor: 1.00000000e+00
+      Stepper:
+        Continuation Method: Natural
+        Initial Value: 0.00000000e+00
+        Continuation Parameter: Time
+        Max Steps: 500
+        Max Value: 1.00000000e+00
+        Return Failed on Reaching Max Steps: false
+        Min Value: 0.00000000e+00
+        Compute Eigenvalues: false
+        Eigensolver:
+          Method: Anasazi
+          Operator: Jacobian Inverse
+          Num Eigenvalues: 0
+    NOX:
+      Status Tests:
+        # The other decks prescribe every DOF, so their residual is identically
+        # zero and an absolute tolerance is met at once. Here the residual
+        # floor is set by the applied traction times machine epsilon (order
+        # 1e-7 N at Pc = 1e6 Pa), so a relative test carries the convergence
+        # and the scaled absolute test is only a floor for steps whose own
+        # initial residual is already tiny.
+        Test Type: Combo
+        Combo Type: OR
+        Number of Tests: 3
+        Test 0:
+          Test Type: RelativeNormF
+          Tolerance: 1.0e-08
+        Test 1:
+          Test Type: NormF
+          Norm Type: Two Norm
+          Scale Type: Scaled
+          Tolerance: 1.0e-06
+        Test 2:
+          Test Type: MaxIters
+          Maximum Iterations: 20
+      Direction:
+        Method: Newton
+        Newton:
+          Forcing Term Method: Constant
+          Rescue Bad Newton Solve: true
+          Stratimikos Linear Solver:
+            NOX Stratimikos Options: { }
+            Stratimikos:
+              Linear Solver Type: Belos
+              Linear Solver Types:
+                Belos:
+                  Solver Type: Block GMRES
+                  Solver Types:
+                    Block GMRES:
+                      Convergence Tolerance: 1.0e-10
+                      Output Frequency: 10
+                      Output Style: 1
+                      Verbosity: 0
+                      Maximum Iterations: 200
+                      Block Size: 1
+                      Num Blocks: 200
+                      Flexible Gmres: false
+              Preconditioner Type: Ifpack2
+              Preconditioner Types:
+                Ifpack2:
+                  Overlap: 1
+                  Prec Type: ILUT
+      Line Search:
+        Full Step:
+          Full Step: 1.0
+        Method: Full Step
+      Nonlinear Solver: Line Search Based
+      Printing:
+        Output Precision: 3
+        Output Processor: 0
+        Output Information:
+          Error: true
+          Warning: false
+          Outer Iteration: true
+          Parameters: false
+          Details: false
+          Linear Solver Details: false
+          Stepper Iteration: true
+          Stepper Details: false
+          Stepper Parameters: false
+      Solver Options:
+        Status Test Check Type: Minimal
+

@@ -20,8 +20,29 @@ against whichever curve the experiment actually produced:
   * ``strain_xx/yy/zz/xy`` -- the model's own small-strain tensor. Present
     ONLY under ``Finite Deformation: false``; the finite-deformation kernel
     consumes ``F`` and ``Fp`` and never forms this field.
+  * ``stress_dev_x/y/z`` -- the deviatoric (differential) Cauchy stress about
+    that axis, ``sigma_aa - (sigma_bb + sigma_cc)/2``. On a triaxial path with
+    equal lateral stresses this is exactly the ``sigma_1 - sigma_3`` a
+    laboratory reports, negative in compression.
   * ``time``, ``kappa`` and ``evp`` -- the LOCA continuation parameter, the cap
     hardening parameter, and the volumetric plastic strain.
+
+PRELOAD. ``preload_time`` (default 0.0, which changes nothing) is for load
+paths that consolidate before they load, i.e. ``txc``. Steps before it are
+dropped, and displacement, strain and the reference area are rebased to the
+state at that time: the curve then starts at zero strain from the consolidated
+configuration, which is where a laboratory triaxial test starts its axial
+strain. Lengths and areas are the CONSOLIDATED ones, so ``strain_eng`` and
+``stress_eng`` are referred to the specimen as it was when shearing began. At
+``preload_time = 0.0`` the rebasing is the identity (the run starts at zero
+displacement), so the other load paths are untouched.
+
+REACTION FORCES. ``force_<axis>`` is the reaction only where that axis's face
+is displacement-controlled. On the ``txc`` path the lateral faces carry
+tractions and their displacements are free, so ``force_y``/``force_z`` are
+converged residuals near zero and ``stress_eng_y``/``stress_eng_z`` are
+meaningless. The axial direction is prescribed on every path, so
+``force_x``/``stress_eng_x`` are always the reaction.
 
 Displacement and force are read from the nodal fields ``solution_<axis>`` and
 ``residual_<axis>`` on the face at the maximum coordinate along that axis:
@@ -127,7 +148,7 @@ _FIELD_MAP = {
 _AXES = ("x", "y", "z")
 
 
-def _load_displacement(ds):
+def _load_displacement(ds, start=0):
     """Return the nodal-derived fields for each axis whose nodal output and
     coordinates are present: ``displacement_<axis>``, ``force_<axis>``,
     ``strain_eng_<axis>``, ``strain_log_<axis>`` and ``stress_eng_<axis>``.
@@ -135,13 +156,16 @@ def _load_displacement(ds):
     The loaded face is the one at the maximum coordinate along the axis. Its
     displacement is the mean of ``solution_<axis>`` over the face nodes (they
     are equal for these homogeneous decks; the mean is simply robust) and its
-    force is the sum of ``residual_<axis>``, which is the reaction because
-    every DOF is prescribed.
+    force is the sum of ``residual_<axis>``, which is the reaction wherever
+    that face's DOFs are prescribed (see REACTION FORCES in the module
+    docstring).
 
-    ``L0`` is the undeformed extent along the axis and ``A0`` the undeformed
-    area of the face normal to it, both taken from the mesh coordinates, so
-    these hold for any box mesh rather than only the unit cube. Returns ``{}``
-    when the deck writes no nodal output.
+    ``start`` is the index of the step the strain measures are referred to:
+    0 (the default) for a path that loads from the undeformed state, the end
+    of the consolidation stage for one that preloads. The extent along each
+    axis and the area normal to it are taken at that step, so they are the
+    undeformed ones when ``start`` is 0 and the consolidated ones otherwise.
+    Returns ``{}`` when the deck writes no nodal output.
     """
     idx = _names(ds, "name_nod_var")
     if not idx:
@@ -157,7 +181,11 @@ def _load_displacement(ds):
             coord = np.array(ds.variables[key][:])
             extent[axis] = (coord, coord.max() - coord.min())
 
-    out = {}
+    # Extent along each axis at the reference step: the undeformed extent plus
+    # whatever that face had already moved by then. Collected first because the
+    # area normal to one axis is built from the other two.
+    ref_length = {}
+    disp_of = {}
     for axis in _AXES:
         disp_key, force_key = f"solution_{axis}", f"residual_{axis}"
         if axis not in extent or disp_key not in idx or force_key not in idx:
@@ -168,13 +196,21 @@ def _load_displacement(ds):
         if length <= 0.0:
             continue
         face = np.flatnonzero(coord >= coord.max() - 1.0e-8 * length)
-        disp = nodal(disp_key)[:, face].mean(axis=1)
-        force = nodal(force_key)[:, face].sum(axis=1)
-        out[f"displacement_{axis}"] = disp
+        disp = nodal(disp_key)[start:, face].mean(axis=1)
+        disp_of[axis] = (disp, nodal(force_key)[start:, face].sum(axis=1))
+        ref_length[axis] = length + disp[0]
+
+    out = {}
+    for axis, (disp, force) in disp_of.items():
+        length = ref_length[axis]
+        # Displacement and strain are measured from the reference step, so both
+        # start at zero there whether or not the path consolidated first.
+        moved = disp - disp[0]
+        out[f"displacement_{axis}"] = moved
         out[f"force_{axis}"] = force
 
-        stretch = 1.0 + disp / length
-        out[f"strain_eng_{axis}"] = disp / length
+        stretch = 1.0 + moved / length
+        out[f"strain_eng_{axis}"] = moved / length
         # Guard the log: a stretch at or below zero is a collapsed element,
         # which is a failed run rather than a curve worth reporting.
         with np.errstate(invalid="ignore", divide="ignore"):
@@ -183,27 +219,77 @@ def _load_displacement(ds):
 
         area = 1.0
         for other in _AXES:
-            if other != axis and other in extent and extent[other][1] > 0.0:
-                area *= extent[other][1]
+            if other != axis and other in ref_length:
+                area *= ref_length[other]
         out[f"stress_eng_{axis}"] = force / area
     return out
 
 
-def read_lcm_cap_exodus(file_path, file_type=None):
+class PreloadTrimmedReader:
+    """``read_lcm_cap_exodus`` bound to a preload time, as a picklable object.
+
+    MatCal ships the model (and with it the results reader) to worker
+    processes, so the reader has to survive pickling. A closure or a lambda
+    does not; a module-level class does.
+    """
+
+    def __init__(self, preload_time):
+        self.preload_time = float(preload_time)
+
+    def __call__(self, file_path, file_type=None):
+        return read_lcm_cap_exodus(file_path, file_type,
+                                   preload_time=self.preload_time)
+
+    def __repr__(self):
+        return f"PreloadTrimmedReader(preload_time={self.preload_time!r})"
+
+
+def _add_deviatoric(data):
+    """Add ``stress_dev_<axis>`` = ``sigma_aa - (sigma_bb + sigma_cc)/2`` for
+    every axis whose three normal Cauchy components are present. On a triaxial
+    path with equal lateral stresses this is ``sigma_1 - sigma_3``, the
+    differential stress a laboratory reports, negative in compression."""
+    normal = {a: f"stress_{a}{a}" for a in _AXES}
+    if not all(n in data for n in normal.values()):
+        return
+    for axis in _AXES:
+        others = [data[normal[a]] for a in _AXES if a != axis]
+        data[f"stress_dev_{axis}"] = data[normal[axis]] - 0.5 * (others[0] + others[1])
+
+
+def read_lcm_cap_exodus(file_path, file_type=None, preload_time=0.0):
     """Read ``file_path`` (an LCM cap-model Exodus output) and return a MatCal
     ``Data`` with ``time`` plus whichever of ``stress_*``, ``strain_*``,
     ``displacement_*``, ``force_*``, ``kappa`` and ``evp`` the run supports.
     ``file_type`` is accepted for MatCal's reader protocol and ignored (the
-    format is always Exodus)."""
+    format is always Exodus).
+
+    ``preload_time`` is the continuation parameter at which loading proper
+    begins on a path that consolidates first (``txc``). Steps before it are
+    dropped and the strain measures are referred to that state; see PRELOAD in
+    the module docstring. The default 0.0 keeps the whole run and refers the
+    strains to the undeformed mesh, which is what every other path wants."""
     ds = _open_exo(file_path)
     try:
         t, var, idx = _exo_accessor(ds)
-        data = {"time": t}
+        start = 0
+        if preload_time > 0.0:
+            # Nearest written step rather than a threshold: the deck places the
+            # end of consolidation on a step boundary, and a run that stopped
+            # inside the consolidation stage is a failure worth naming.
+            start = int(np.argmin(np.abs(t - preload_time)))
+            if t[-1] < preload_time:
+                raise RuntimeError(
+                    f"{file_path}: the run ended at time {t[-1]:.6g}, before the "
+                    f"end of the consolidation stage at {preload_time:.6g}; there "
+                    f"is no loading curve to read.")
+        data = {"time": t[start:]}
         for field, exo_name in _FIELD_MAP.items():
             base = exo_name[:-2] if exo_name.endswith("_1") else exo_name
             if exo_name in idx or base in idx:
-                data[field] = var(exo_name)
-        data.update(_load_displacement(ds))
+                data[field] = var(exo_name)[start:]
+        _add_deviatoric(data)
+        data.update(_load_displacement(ds, start=start))
     finally:
         close = getattr(ds, "close", None)
         if callable(close):

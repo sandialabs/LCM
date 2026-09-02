@@ -39,7 +39,8 @@ import os
 
 from matcal.core.models import UserExecutableModel
 
-from site_matcal.exodus_reader import read_lcm_cap_exodus
+from site_matcal.exodus_reader import (read_lcm_cap_exodus,
+                                       PreloadTrimmedReader)
 from site_matcal.platforms import get_albany, get_platform
 from site_matcal.load_paths import get_load_path
 
@@ -92,6 +93,53 @@ SALEM_LIMESTONE = dict(
 )
 
 
+# Frozen permafrost end member, the same parameter set as the Frozen
+# Parameters block of tests/LCM/ACE/MiniErosionPermafrost/
+# materials_mechanical_permafrost.yaml, with (K, G) = (5.5556e8, 4.1667e8)
+# written back as (E, nu) = (1.0e9, 0.2) and the shape parameters D, theta, L,
+# phi, R, Q, psi, D2 taken from the same file. Base SI, same keys as
+# SALEM_LIMESTONE.
+#
+# This is the set to start a frozen-soil calibration from, and the one the txc
+# path needs: SALEM_LIMESTONE is a rock whose cap sits at kappa0 = -8.05e6 Pa
+# while its unconfined deviatoric strength is 3.5e7 Pa, so every triaxial test
+# of it at a confinement inside its own cap is cap-dominated rather than a test
+# of the shear envelope, and A and C (6.892e8 and 6.752e8, whose difference is
+# the 1.4e7 that sets the strength) are not separately identifiable from one.
+PERMAFROST_FROZEN = dict(
+    elastic_modulus=1.0e9,               # Pa   (K = 5.5556e8, G = 4.1667e8)
+    poissons_ratio=0.2,                  # -
+    A=2.0e6,                             # Pa
+    D=4.0e-10,                           # 1/Pa
+    C=2.6794919243112305e5,              # Pa
+    theta=0.10,                          # -
+    R=5.0,                               # -
+    kappa0=-1.0e7,                       # Pa
+    W=0.60,                              # -    (the pore space; ACE porosity)
+    D1=1.0e-8,                           # 1/Pa
+    D2=0.0,                              # 1/Pa^2
+    calpha=1.0e9,                        # Pa
+    psi=1.0,                             # -
+    N=3.4641016151377546e5,              # Pa
+    L=4.0e-10,                           # 1/Pa
+    phi=0.08,                            # -
+    Q=5.0,                               # -
+)
+
+# Named starting parameter sets, selected with --defaults. SALEM_LIMESTONE is
+# the default because it is the set the three verification decks were built
+# around; PERMAFROST_FROZEN is the one the txc path and any frozen-soil
+# calibration wants.
+DEFAULT_SETS = {
+    "salem": SALEM_LIMESTONE,
+    "permafrost": PERMAFROST_FROZEN,
+}
+DEFAULT_SET = "salem"
+
+assert set(PERMAFROST_FROZEN) == set(SALEM_LIMESTONE), (
+    "every named default set must cover exactly the calibratable placeholders")
+
+
 # Kinematics used unless a caller says otherwise. This is the single place to
 # change it: both the library default below and the --finite-deformation /
 # --small-strain flag in harness/calibrate.py read it.
@@ -107,13 +155,14 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
     ----------
     load_path : str
         One of :data:`site_matcal.load_paths.LOAD_PATHS`
-        (``hydrostatic``/``confined``/``triaxial``).
+        (``hydrostatic``/``confined``/``triaxial``/``txc``).
     albany : str, optional
         Albany executable path. Default: the selected platform's Albany
         (``$LCM_ALBANY`` overrides).
     defaults : dict, optional
-        Constant overrides merged onto ``SALEM_LIMESTONE`` for placeholders not
-        being calibrated.
+        Constant overrides merged onto ``SALEM_LIMESTONE`` and onto the load
+        path's own deck constants, for placeholders not being calibrated. This
+        is how a ``txc`` run selects its confining pressure.
     platform : str, optional
         Platform name for Albany resolution / environment (default: auto).
     name : str, optional
@@ -132,7 +181,10 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
     # boolean rather than a number, so it is kept out of SALEM_LIMESTONE
     # (which doubles as the whitelist of calibratable placeholders) and
     # rendered as a lowercase literal Albany's YAML parser accepts.
-    constants = {**SALEM_LIMESTONE, **(defaults or {}),
+    # Deck constants (the confining pressure and the like) sit between the
+    # material defaults and the caller's overrides: they are defaults too, but
+    # they belong to the load path rather than to the material.
+    constants = {**SALEM_LIMESTONE, **lp.constants, **(defaults or {}),
                  "finite_deformation": "true" if finite_deformation else "false"}
     name = name or f"lcm_cap_{lp.name}"
 
@@ -144,10 +196,18 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
 
     model = UserExecutableModel(albany, lp.deck, results_filename=lp.exodus)
     # Both files are copied into every evaluation working directory and, being
-    # text, are jinja-rendered there. The deck has no placeholders (rendered
-    # unchanged); the materials file gets the parameter substitutions.
+    # text, are jinja-rendered there. The materials file gets the parameter
+    # substitutions; the three verification decks have no placeholders and are
+    # rendered unchanged, while input_txc.yaml uses the deck constants and
+    # derives its boundary conditions from the elastic constants, so it tracks
+    # a calibrated elastic_modulus or poissons_ratio instead of going stale.
     model.add_necessary_files(deck_path, materials_path)
     model.add_constants(**constants)
-    model._set_results_reader_object(read_lcm_cap_exodus)
+    # A path that consolidates before it loads reports its curve from the end
+    # of the consolidation; every other path reads the whole run.
+    preload_time = lp.preload_time(constants)
+    model._set_results_reader_object(
+        PreloadTrimmedReader(preload_time) if preload_time > 0.0
+        else read_lcm_cap_exodus)
     model.set_name(name)
     return model

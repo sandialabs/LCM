@@ -13,10 +13,29 @@ triaxial responses simultaneously.
                   non-associative terms are active (constrains A, C, theta,
                   psi, L, phi, Q). Uses the CapModelTriaxial materials file
                   (same placeholders, different block/material name).
+  * txc         - conventional triaxial compression: consolidate to a
+                  confining pressure, then shear axially with that pressure
+                  held. This is the laboratory test, so it is the path that
+                  takes measured triaxial data. Unlike the other three it
+                  prescribes only the axial direction; the lateral faces carry
+                  tractions and their displacement is predicted, which is what
+                  lets the path see dilatancy (L, phi, Q) as well as the shear
+                  envelope (A, C, D, theta).
 
 Each path records its ``axis``: the direction the deck loads hardest, which is
-the axial direction an experiment would report. It is ``x`` for all three
-decks (hydrostatic loads all three axes equally, so any axis would do).
+the axial direction an experiment would report. It is ``x`` for all four decks
+(hydrostatic loads all three axes equally, so any axis would do).
+
+A path may also carry ``constants``: deck placeholders that are not material
+parameters but describe the test, such as the confining pressure. They are
+rendered into the deck like any other jinja value and can be overridden with
+``--set``, so one deck covers a whole series of confining pressures. Only
+``txc`` has any; for the other three the dict is empty and nothing changes.
+
+``preload_time`` is the continuation parameter at which loading proper begins.
+It is nonzero only for ``txc``, whose run starts with a consolidation stage;
+the Exodus reader trims that stage off and refers the strains to the state at
+the end of it. See ``site_matcal.exodus_reader``.
 
 A **curve** says which pair of fields to compare, and is what makes the
 harness usable with whatever the laboratory measured. Under finite deformation
@@ -36,6 +55,15 @@ say which measure they mean:
                            The raw measured quantities, identical in meaning
                            under both kinematics, so the safest choice when
                            the reduction to stress and strain is in doubt.
+  * ``dev-stress-strain``  - engineering strain ``u/L0`` vs the deviatoric
+                           (differential) Cauchy stress
+                           ``sigma_aa - (sigma_bb + sigma_cc)/2`` (Pa). On a
+                           triaxial path with equal lateral stresses that is
+                           exactly the ``q = sigma_1 - sigma_3`` a triaxial
+                           laboratory reports, so this is the curve to use
+                           with ``txc`` data. It needs no confining pressure
+                           in the data file, since the confinement cancels out
+                           of the difference.
   * ``time-stress``        - LOCA continuation parameter vs axial Cauchy
                            stress. `time` runs over [0,1] and is affine in
                            applied displacement. Kept for regression checks
@@ -80,6 +108,11 @@ CURVES = {
         "load-displacement", "displacement_{a}", "force_{a}",
         units=("m", "N"),
         description="loaded-face displacement vs reaction force"),
+    "dev-stress-strain": Curve(
+        "dev-stress-strain", "strain_eng_{a}", "stress_dev_{a}",
+        units=("dimensionless", "Pa"),
+        description="engineering strain u/L0 vs deviatoric (differential) "
+                    "Cauchy stress sigma_1 - sigma_3"),
     "time-stress": Curve(
         "time-stress", "time", "stress_{a}{a}",
         units=("dimensionless", "Pa"),
@@ -90,17 +123,33 @@ DEFAULT_CURVE = "true-stress-strain"
 
 
 class LoadPath:
-    def __init__(self, name, deck, materials, exodus, axis):
+    def __init__(self, name, deck, materials, exodus, axis, constants=None,
+                 preload_constant=None):
         self.name = name
         self.deck = deck
         self.materials = materials
         self.exodus = exodus
         self.axis = axis
+        # Deck placeholders describing the test rather than the material.
+        self.constants = dict(constants or {})
+        # Which of them, if any, holds the continuation parameter at the end of
+        # the preload stage. Named rather than stored directly so that a --set
+        # override of it reaches the Exodus reader too.
+        self.preload_constant = preload_constant
 
     def fields(self, curve=DEFAULT_CURVE):
         """Return ``(independent_field, dependent_field)`` for ``curve`` on
         this path's axial direction."""
         return get_curve(curve).fields(self.axis)
+
+    def preload_time(self, constants=None):
+        """The continuation parameter at which loading proper begins, given the
+        constants actually in force (defaults merged with any ``--set``
+        overrides). Zero for every path that loads from the undeformed state."""
+        if self.preload_constant is None:
+            return 0.0
+        merged = {**self.constants, **(constants or {})}
+        return float(merged[self.preload_constant])
 
 
 LOAD_PATHS = {
@@ -113,7 +162,32 @@ LOAD_PATHS = {
     "triaxial": LoadPath(
         "triaxial", "input_triaxial.yaml", "materials_triaxial.yaml",
         "cap_triaxial.exo", axis="x"),
+    "txc": LoadPath(
+        "txc", "input_txc.yaml", "materials.yaml",
+        "cap_txc.exo", axis="x",
+        constants=dict(
+            # Cell pressure, Pa, as a positive magnitude. Held constant through
+            # the shear stage. One --set per curve of a confining-pressure
+            # series.
+            confining_pressure=1.0e6,
+            # Axial engineering strain applied during the shear stage,
+            # negative in compression, referred to the consolidated length.
+            # Cover the strain range of the data: a run that stops short of it
+            # gives MatCal nothing to interpolate onto at the far end.
+            axial_strain=-0.20,
+            # Fraction of the continuation run spent consolidating. Only large
+            # enough to resolve the ramp; the reader trims it off.
+            preload_fraction=0.1,
+        ),
+        preload_constant="preload_fraction"),
 }
+
+# Every deck placeholder that is not a material parameter, across all paths,
+# with its default. The command line uses this to decide whether a --set name
+# is legitimate and to report the defaults in --help.
+DECK_CONSTANTS = {name: value
+                  for path in LOAD_PATHS.values()
+                  for name, value in path.constants.items()}
 
 
 def get_load_path(name):

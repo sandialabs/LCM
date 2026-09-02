@@ -24,13 +24,22 @@ field, so the harness reconstructs strain from nodal displacement. The
 SALEM_LIMESTONE defaults are small-strain values from Sun, Chen & Ostien
 (2014): a sound starting point under finite deformation, not the answer.
 
+LOAD PATHS: hydrostatic, confined and triaxial prescribe every strain
+component and are the verification paths. ``txc`` is the laboratory test:
+consolidate to a confining pressure, then shear axially with that pressure
+held on traction-loaded lateral faces. Select the pressure with
+--set confining_pressure=... and the strain range with --set axial_strain=...
+(negative). It is the path that takes measured triaxial data.
+
 CURVES: --curve selects what is compared. ``true-stress-strain`` (default) uses
 logarithmic strain against Cauchy stress, the pair the finite-deformation
 kernel works in; ``eng-stress-strain`` uses engineering strain u/L0 against
 engineering stress force/A0, which is what most laboratory reports contain;
 ``load-displacement`` uses the loaded face's displacement and reaction force,
-which mean the same thing under both kinematics; ``time-stress`` uses the LOCA
-continuation parameter. Experimental CSVs must carry the matching column
+which mean the same thing under both kinematics; ``dev-stress-strain`` uses
+engineering strain against the deviatoric Cauchy stress sigma_1 - sigma_3,
+which is what a triaxial laboratory reports and the natural choice for txc;
+``time-stress`` uses the LOCA continuation parameter. Experimental CSVs must carry the matching column
 names, or be told which of their columns to use:
 
     python calibrate.py calibrate --load-path confined --curve eng-stress-strain --data confined:oedometer.csv:Strain:Stress_Pa --param R:20:35:22
@@ -63,7 +72,8 @@ import matcal as mc
 
 from site_matcal import (make_lcm_cap_model, SALEM_LIMESTONE, get_platform,
                          get_albany, get_load_path, CURVES, DEFAULT_CURVE,
-                         LOAD_PATHS, TEMPLATES_DIR, DEFAULT_FINITE_DEFORMATION)
+                         LOAD_PATHS, DECK_CONSTANTS, TEMPLATES_DIR,
+                         DEFAULT_FINITE_DEFORMATION, DEFAULT_SETS, DEFAULT_SET)
 
 DEFAULT_OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                "examples")
@@ -95,27 +105,58 @@ def _parse_param(spec):
             f"{' '.join(sorted(SALEM_LIMESTONE))}")
     try:
         lo, hi = float(parts[1]), float(parts[2])
-        init = float(parts[3]) if len(parts) == 4 else SALEM_LIMESTONE[name]
+        init_given = len(parts) == 4
+        # Without an explicit INIT the starting value comes from the selected
+        # --defaults set, which argparse has not read yet: park the parameter at
+        # the midpoint and let _reinit replace and range-check it.
+        init = float(parts[3]) if init_given else 0.5 * (lo + hi)
     except ValueError:
         raise argparse.ArgumentTypeError(
             f"bad --param {spec!r}: LO, HI and INIT must be numbers")
     if not lo < hi:
         raise argparse.ArgumentTypeError(
             f"--param {name}: LO ({lo:g}) must be below HI ({hi:g})")
-    if not lo <= init <= hi:
+    if init_given and not lo <= init <= hi:
         raise argparse.ArgumentTypeError(
             f"--param {name}: INIT ({init:g}) is outside [{lo:g}, {hi:g}]")
+    param = mc.Parameter(name, lo, hi, init)
+    # Remember whether the user pinned INIT, so that --defaults can supply it
+    # from the selected set when they did not. Checked in _reinit.
+    param._lcm_init_given = init_given
+    return param
+
+
+def _reinit(param, base):
+    """Return ``param`` with its starting value taken from ``base`` when the
+    user gave no INIT. ``_parse_param`` cannot do this itself: argparse types
+    run before --defaults has been read."""
+    if getattr(param, "_lcm_init_given", True):
+        return param
+    name = param.get_name()
+    lo, hi = param.get_lower_bound(), param.get_upper_bound()
+    init = base[name]
+    if not lo <= init <= hi:
+        which = "/".join(k for k, v in DEFAULT_SETS.items() if v is base)
+        raise SystemExit(
+            f"--param {name}: the {which} starting value {init:g} is outside "
+            f"the bounds [{lo:g}, {hi:g}]; either widen them, pick another "
+            f"--defaults set, or give an explicit INIT as "
+            f"{name}:{lo:g}:{hi:g}:<init>")
     return mc.Parameter(name, lo, hi, init)
 
 
 def _parse_kv(spec):
+    """NAME=VALUE -> (name, float). ``NAME`` is either a cap parameter or one
+    of the deck constants that describe the test itself (the txc confining
+    pressure and the like)."""
     key, sep, val = spec.partition("=")
     if not sep:
         raise argparse.ArgumentTypeError(f"bad --set {spec!r}; expected NAME=VALUE")
-    if key not in SALEM_LIMESTONE:
+    if key not in SALEM_LIMESTONE and key not in DECK_CONSTANTS:
         raise argparse.ArgumentTypeError(
-            f"--set {key}: not a cap placeholder; known: "
-            f"{' '.join(sorted(SALEM_LIMESTONE))}")
+            f"--set {key}: not a cap placeholder or deck constant; cap "
+            f"placeholders: {' '.join(sorted(SALEM_LIMESTONE))}; deck "
+            f"constants: {' '.join(sorted(DECK_CONSTANTS))}")
     try:
         return key, float(val)
     except ValueError:
@@ -341,7 +382,8 @@ def main(argv=None):
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("action", choices=["check", "make-reference", "calibrate"])
     ap.add_argument("--load-path", action="append", dest="load_paths",
-                    metavar="NAME", help="hydrostatic|confined|triaxial (repeatable)")
+                    metavar="NAME",
+                    help="hydrostatic|confined|triaxial|txc (repeatable)")
     ap.add_argument("--curve", choices=sorted(CURVES), default=DEFAULT_CURVE,
                     help=f"fields to compare (default: {DEFAULT_CURVE})")
     ap.add_argument("--param", action="append", type=_parse_param, dest="params",
@@ -350,9 +392,11 @@ def main(argv=None):
     ap.add_argument("--data", action="append", type=_parse_data, dest="data",
                     default=[], metavar="LOADPATH:CSV[:XCOL:YCOL]",
                     help="experimental data for a load path, base SI (repeatable)")
-    ap.add_argument("--set", action="append", type=_parse_kv, dest="defaults",
+    ap.add_argument("--set", action="append", type=_parse_kv, dest="sets",
                     default=[], metavar="NAME=VALUE",
-                    help="override a constant default, base SI (repeatable)")
+                    help="override a cap parameter or deck constant "
+                         f"({'|'.join(sorted(DECK_CONSTANTS))}), base SI "
+                         "(repeatable)")
     kin = ap.add_mutually_exclusive_group()
     kin.add_argument("--finite-deformation", dest="finite_deformation",
                      action="store_true", default=DEFAULT_FINITE_DEFORMATION,
@@ -362,6 +406,12 @@ def main(argv=None):
                      action="store_false",
                      help="infinitesimal-strain kinematics"
                           + ("" if DEFAULT_FINITE_DEFORMATION else " (default)"))
+    ap.add_argument("--defaults", choices=sorted(DEFAULT_SETS), default=DEFAULT_SET,
+                    help="starting parameter set that --param INIT and every "
+                         "un-fitted placeholder come from "
+                         f"(default: {DEFAULT_SET}). Use permafrost for txc "
+                         "and for any frozen-soil calibration; salem is a rock "
+                         "whose cap dominates every triaxial test of it.")
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
     ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)
@@ -374,14 +424,18 @@ def main(argv=None):
     load_paths = args.load_paths or ["confined"]
     for lp_name in load_paths:
         get_load_path(lp_name)          # fail early, with the list of known names
-    defaults = dict(args.defaults)
+    # The named set first, then the individual --set overrides on top of it.
+    base = DEFAULT_SETS[args.defaults]
+    defaults = {**base, **dict(args.sets)}
+    # --param INIT defaults to the named set's value, not always Salem's.
+    params = [_reinit(p, base) for p in args.params]
     data_map = {lp: (path, xcol, ycol) for lp, path, xcol, ycol in args.data}
 
     if args.action == "make-reference":
         make_reference(load_paths, defaults, args.out_dir, args.platform,
                        args.curve, args.finite_deformation)
     else:
-        calibrate(load_paths, args.params, data_map, defaults, args.out_dir,
+        calibrate(load_paths, params, data_map, defaults, args.out_dir,
                   args.platform, args.study, args.core_limit, args.curve,
                   args.finite_deformation)
     return 0

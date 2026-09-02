@@ -25,6 +25,7 @@ answer. This document assumes that is done.
 - [Quick start](#quick-start)
 - [Calibrating against your own data](#calibrating-against-your-own-data)
 - [Kinematics](#kinematics)
+- [Triaxial compression: the `txc` path](#triaxial-compression-the-txc-path)
 - [Units](#units)
 - [Reference](#reference)
 - [Layout](#layout)
@@ -113,6 +114,7 @@ problem, but it cannot be certain, so it warns rather than stopping.
 | `true-stress-strain` (default) | logarithmic strain `ln(1 + u/L0)` | Cauchy (true) stress | -, Pa |
 | `eng-stress-strain` | engineering strain `u/L0` | engineering stress `force/A0` | -, Pa |
 | `load-displacement` | face displacement | face reaction force | m, N |
+| `dev-stress-strain` | engineering strain `u/L0` | deviatoric Cauchy stress `sigma_1 - sigma_3` | -, Pa |
 | `time-stress` | LOCA continuation parameter | Cauchy stress | -, Pa |
 
 Pick whichever your instrument actually recorded, and read
@@ -134,6 +136,12 @@ engineering stress and strain, as most do, either pass
 | `hydrostatic` | equal compression on all three axes | the cap: `R`, `W`, `D1`, `kappa0`, `calpha` |
 | `confined` | 1D (oedometric) compression, lateral strains held at zero | shear and cap together |
 | `triaxial` | three unequal compressive strains | shear and non-associative terms: `A`, `C`, `theta`, `psi`, `L`, `phi`, `Q` |
+| `txc` | consolidate to a confining pressure, then shear at constant pressure | the same, and this is the one that takes measured data |
+
+The first three prescribe every strain component and are the verification
+paths, taken from `tests/LCM/CapModelPlasticity3D`. `txc` is the laboratory
+test: see [Triaxial compression](#triaxial-compression-the-txc-path) before
+using it.
 
 `--load-path` is repeatable. Each one you give becomes a separate comparison
 that the *same* parameter set has to satisfy, which is the whole point: cap
@@ -259,6 +267,104 @@ generates its reference with the same flag the subsequent `calibrate` uses, so
 the recovery tests below return the exact input parameters under both
 formulations. That checks the machinery, not the physics.
 
+## Triaxial compression: the `txc` path
+
+The other three paths prescribe all 24 degrees of freedom of the element, so
+the finite element problem is a material point with no solve in it. `txc` is
+the test a triaxial cell actually runs, and it is different in kind: only the
+axial direction is prescribed. The two lateral faces carry a constant normal
+traction and their displacement is **predicted**. That is what lets the path
+see dilatancy, because the specimen is free to change volume against the
+confinement, and it is why this is the path that takes measured triaxial data.
+
+### What the deck does
+
+One continuation run, two stages:
+
+| `Time` | stage | axial face | lateral faces |
+|--------|-------|-----------|---------------|
+| `0` to `preload_fraction` | consolidation | displaced to `-Pc(1-2nu)/E` | traction ramps `0` to `-Pc` |
+| `preload_fraction` to `1` | shear | displaced by `axial_strain` further | traction held at `-Pc` |
+
+The consolidation stage is exact, and not by luck: under lateral tractions
+`-Pc`, prescribing the axial strain at the elastic hydrostatic value returns an
+axial stress of exactly `-Pc`, so the state at the end of the stage is
+hydrostatic. Measured: the residual deviator is `5.4e-4` of `Pc` under finite
+deformation and `9e-15` of it under small strain. It is exact only while the
+response to `Pc` is elastic, which holds whenever `Pc` is inside the initial
+cap, `3 Pc < |kappa0|`.
+
+The elastic hydrostatic strain is computed **in the deck**, from
+`elastic_modulus` and `poissons_ratio`, and rendered on every evaluation. So it
+tracks those two if you calibrate them rather than going stale.
+
+The reader then trims the consolidation stage off the curve it returns and
+refers displacement, strain and the reference area to the consolidated state.
+The curve you compare against therefore starts at zero strain under a
+hydrostatic stress, which is exactly where a laboratory starts measuring.
+
+### Three decisions it adds
+
+```bash
+python calibrate.py calibrate --load-path txc --curve dev-stress-strain \
+    --defaults permafrost \
+    --set confining_pressure=1.0e6 --set axial_strain=-0.20 \
+    --data "txc:/path/to/test.csv:Axial Strain:q" --param A:1.5e6:2.5e6
+```
+
+- **`--set confining_pressure`** (Pa, a positive magnitude) is the cell
+  pressure. One per curve.
+- **`--set axial_strain`** (negative) is how far the shear stage goes. Make it
+  reach past the end of your data: MatCal interpolates the model onto the
+  data's abscissa, and a model curve that stops short leaves the far end
+  unconstrained.
+- **`--curve dev-stress-strain`** compares `q = sigma_1 - sigma_3` against
+  engineering axial strain, which is what a triaxial laboratory reports. The
+  confining pressure cancels out of the difference, so the data file needs only
+  the two columns the laboratory already has. Negative in compression, like
+  everything else here.
+
+### Use the permafrost defaults, not Salem
+
+`--defaults permafrost` is not a convenience on this path, it is close to a
+requirement. Salem limestone has its cap at `kappa0 = -8.05e6` Pa and an
+unconfined deviatoric strength of `3.5e7` Pa, so **every** triaxial test of it
+at a confinement inside its own cap is cap-dominated rather than a test of the
+shear envelope. Worse, its strength comes from `A - C = 1.4e7` Pa, a difference
+of two numbers near `6.8e8`: a 4 per cent change in `A` alone swings `A - C`
+through zero. Fitting `A` on `txc` with the Salem set and any honest bounds
+gives a response that is not even monotonic in `A` (peak `q` measured at
+`-49.8`, `-19.5`, `-24.1`, `-17.9`, `-46.8` MPa for `A` from `6.4e8` to
+`6.892e8`). That is the parameter set, not the deck. With
+`--defaults permafrost` the same sweep is a straight line.
+
+### What it costs in fidelity
+
+Three things are worth knowing before quoting a number from this path.
+
+- **The confining pressure is a dead load, not a follower load.** Albany's `P`
+  condition acts on the *reference* normal, so what is held constant is the
+  force on the undeformed face, not the Cauchy stress on the deformed one. The
+  lateral stress therefore drifts as the specimen dilates: measured `-1.0012e6`
+  at the start of shear and `-1.0679e6` at 20 per cent axial strain, so 0.2 per
+  cent at the peak and 6.7 per cent at the end of a long test. A follower
+  pressure condition would remove this and does not exist in Albany today.
+- **`force_y` and `force_z` are not reaction forces here,** because those faces
+  are free. `stress_eng_y` and `stress_eng_z` are meaningless on this path.
+  Everything axial is fine: the axial face is prescribed on every path.
+- **The area convention for `q` is yours to match.** The model reports the true
+  deviatoric Cauchy stress. A laboratory that applied its own area correction,
+  or none, is reporting something else at large strain. Convert the data.
+
+### One confining pressure per run
+
+`--set` is global to the run, so a single `calibrate` fits one confining
+pressure. A confining-pressure series is what pins `theta` and separates it
+from `A`, so fitting the series simultaneously is the obvious next step; it
+wants a MatCal *state* per pressure rather than a `--set`. Not built yet.
+
+---
+
 ## Units
 
 Everything here is **base SI**, with magnitudes written in scientific notation
@@ -309,7 +415,8 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 | `--finite-deformation` / `--small-strain` | Kinematics. Finite deformation is the default; see [Kinematics](#kinematics). |
 | `--param NAME:LO:HI[:INIT]` | Parameter to fit, base SI. Repeatable. |
 | `--data LOADPATH:CSV[:XCOL:YCOL]` | Experimental data for one load path, base SI. Repeatable. Defaults to `examples/<load_path>_reference.csv`. |
-| `--set NAME=VALUE` | Override a default without fitting it, base SI. Repeatable. |
+| `--set NAME=VALUE` | Override a cap parameter or a deck constant (`confining_pressure`, `axial_strain`, `preload_fraction`) without fitting it, base SI. Repeatable. |
+| `--defaults salem\|permafrost` | Starting parameter set: where `--param` `INIT` and every un-fitted placeholder come from. Default `salem`. |
 | `--study gradient\|scipy` | Dakota gradient study (default) or SciPy. |
 | `--platform rigel\|sirius\|cee` | Force a platform. Default: detected from the hostname. |
 | `--core-limit N` | Concurrent Albany evaluations. Default 4. |
@@ -330,6 +437,7 @@ both in the line it prints and nothing else changes silently.
 | Curve | `true-stress-strain` | `--curve eng-stress-strain` (or any other) | `DEFAULT_CURVE` in `site_matcal/load_paths.py` |
 | Kinematics | finite deformation | `--small-strain` | `DEFAULT_FINITE_DEFORMATION` in `site_matcal/lcm_model.py` |
 | Load path | `confined` | `--load-path NAME`, repeatable | - |
+| Parameter set | Salem limestone | `--defaults permafrost` | `DEFAULT_SET` in `site_matcal/lcm_model.py` |
 | Cores | 4 | `--core-limit N` | - |
 
 Each permanent default is a single named constant, read by both the library and
@@ -372,6 +480,13 @@ Chen and Ostien, *Acta Geotechnica* **9** (2014) 903-934, converted to base SI.
 | `kappa0` | `-8.05e6` | Pa | `phi` | `0.0` | - |
 | | | | `Q` | `28.0` | - |
 
+A second named set, `PERMAFROST_FROZEN`, holds the frozen end member of
+`tests/LCM/ACE/MiniErosionPermafrost/materials_mechanical_permafrost.yaml`
+(`E = 1.0e9`, `nu = 0.2`, `A = 2.0e6`, `C = 2.679e5`, `theta = 0.10`,
+`kappa0 = -1.0e7`, `W = 0.60`, `R = Q = 5.0`, `phi = 0.08`). Select it with
+`--defaults permafrost`. It is the set to start a frozen-soil calibration from
+and the one the `txc` path needs.
+
 ### Fields the simulation reports
 
 Available as `--curve` components and as CSV column names:
@@ -380,6 +495,7 @@ Available as `--curve` components and as CSV column names:
 |-------|---------|
 | `time` | LOCA continuation parameter, `[0, 1]` |
 | `stress_xx/yy/zz/xy` | Cauchy (true) stress |
+| `stress_dev_x/y/z` | deviatoric Cauchy stress about that axis, `sigma_aa - (sigma_bb + sigma_cc)/2`; `sigma_1 - sigma_3` on a triaxial path |
 | `stress_eng_x/y/z` | engineering stress, `force/A0` |
 | `strain_eng_x/y/z` | engineering strain, `u/L0` |
 | `strain_log_x/y/z` | logarithmic (true) strain, `ln(1 + u/L0)` |
@@ -401,19 +517,24 @@ tools/calibration/
     register_factories.py    clean-shell env + jinja templating (on import)
     platforms.py             platform registry: rigel, sirius, cee
     load_paths.py            load-path and curve registries
-    lcm_model.py             make_lcm_cap_model(...); SALEM_LIMESTONE defaults
+    lcm_model.py             make_lcm_cap_model(...); SALEM_LIMESTONE and
+                             PERMAFROST_FROZEN parameter sets
     exodus_reader.py         read_lcm_cap_exodus() -> MatCal Data
   templates/
-    materials.yaml           jinja cap params (CapModel)         hydrostatic, confined
+    materials.yaml           jinja cap params (CapModel)         hydrostatic, confined, txc
     materials_triaxial.yaml  jinja cap params (CapModelTriaxial)  triaxial
     input_{hydrostatic,confined,triaxial}.yaml   Albany decks (single element)
+    input_txc.yaml           Albany deck, triaxial cell (jinja: confining
+                             pressure, strain range, consolidation strain)
   harness/
     calibrate.py             the CLI: check / make-reference / calibrate
   examples/                  generated references and run output (git-ignored)
 ```
 
-The decks are copies of the verification decks in
+The first three decks are copies of the verification decks in
 `tests/LCM/CapModelPlasticity3D`, with the materials file jinja-templated.
+`input_txc.yaml` has no counterpart there: it is the laboratory test, and its
+own boundary conditions are templated as well.
 
 ---
 
@@ -456,6 +577,17 @@ harness and readers are platform-agnostic.
   to pin the shear and non-associative terms.
 - **Templates end with a blank line on purpose.** jinja2 strips one trailing
   newline, and Albany's YAML parser fails at end-of-file without one.
+- **On `txc`, keep `3 * confining_pressure` inside `|kappa0|`.** The exact
+  consolidation stage assumes the response to the cell pressure is elastic. Past
+  the cap it is not, and the state at the end of the stage stops being
+  hydrostatic, silently.
+- **`txc` steps adaptively, and the other three do not.** With a constant step
+  LOCA reports a step whose Newton solve failed and carries straight on, and
+  Albany writes the unconverged state to Exodus like any other point. The curve
+  then contains points that are not solutions, and since which steps fail
+  depends on the parameters, the objective stops being a smooth function of
+  them. Adaptive stepping cuts the step and retries. Failures are worth
+  grepping for in `simulation.out` when a `txc` fit misbehaves.
 - **The reference CSV is overwritten by `make-reference`,** including when you
   change `--curve`. If a later `calibrate` complains that a column is missing,
   regenerate the reference with the curve you actually want.
@@ -463,6 +595,54 @@ harness and readers are platform-agnostic.
 ---
 
 ## Verification status
+
+### Triaxial compression (`txc`), sirius, 2026-09-02
+
+Added with the path. Everything below is `--defaults permafrost`,
+`--curve dev-stress-strain`, finite deformation, `confining_pressure = 1.0e6`,
+`axial_strain = -0.20`, and zero LOCA convergence failures in every run.
+
+Forward run, the shape a triaxial test should have:
+
+| quantity | value |
+|----------|-------|
+| deviator at the end of consolidation | `-5.4e+02` Pa, against `Pc = 1.0e+06` |
+| peak `q` | `-4.272999e+06` Pa at 0.67 per cent axial strain |
+| `q` at 20 per cent axial strain | `-3.98e+06` Pa |
+| volumetric strain | `-0.0019` (compaction) then `+0.144` (dilation) |
+| lateral Cauchy stress | `-1.0012e+06` Pa at the peak, `-1.0679e+06` Pa at the end |
+
+The same run under `--small-strain`: deviator at the end of consolidation
+`-9.1e-09` Pa, so the consolidation stage is exact to roundoff once the finite
+deformation of the dead pressure load is out of the way; peak `q`
+`-4.258566e+06` Pa, 0.34 per cent from the finite-deformation value.
+
+Sweeping `A` about the truth, to check the objective is well conditioned:
+
+| `A` | `1.6e6` | `1.8e6` | `2.0e6` | `2.2e6` | `2.4e6` |
+|-----|---------|---------|---------|---------|---------|
+| peak `q` (Pa) | `-3.4304e+06` | `-3.8515e+06` | `-4.2730e+06` | `-4.6946e+06` | `-5.1164e+06` |
+
+Straight, to three digits, in equal steps. Round trips against a reference
+generated at the values above:
+
+| Study | Result | Convergence |
+|-------|--------|-------------|
+| `A` from `1.7e6` | `A: 2000000.0` | X-CONVERGENCE |
+| `A` with no `INIT` (taken from `--defaults permafrost`) | `A: 2000000.0` | X- AND RELATIVE FUNCTION CONVERGENCE |
+| `phi` from `0.02` | `phi: 0.079999999895` | X-CONVERGENCE |
+| `A`, `theta` from `(1.6e6, 0.20)` | `A: 2000000.0003`, `theta: 0.099999999957` | X-CONVERGENCE |
+
+`phi` is the point of the path: it is a non-associative *flow* parameter, and it
+is recoverable here only because the lateral faces are free, so the dilatancy it
+controls feeds back into the axial response. The last row says `A` and `theta`
+separate even at a single confining pressure, because the confinement drifts
+under the dead load and the envelope is therefore sampled over a range of `I1`.
+Do not read that as a reason to skip the pressure series: it is a weak
+separation resting on an artifact.
+
+The three verification paths were rerun after this change and reproduce every
+value in the table below to the digit, including all six round trips.
 
 ### Finite deformation (the default), all three platforms, 2026-08-26
 

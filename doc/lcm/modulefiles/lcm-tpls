@@ -17,10 +17,26 @@ if { [is-loaded lcm-cee] } {
   }
   # MPI paths are exported by the lcm build script after loading
   # AUE modules.  The Tcl module just needs to propagate them.
+  #
+  # INC and LIB are derived from BIN rather than read separately.  Reading an
+  # unset ::env() throws, and the guard above only covers MPI_BIN, so a caller
+  # that exported MPI_BIN alone used to abort this modulefile part way through.
+  # Under Lmod that error aborts the whole 'module load release', so
+  # ARCH/TOOL_CHAIN/BUILD_TYPE and INSTALL_DIR are never set and the failure
+  # surfaces much later as an empty compiler path in the CMake configure.
   if { [info exists ::env(MPI_BIN)] } {
-    setenv MPI_BIN $::env(MPI_BIN)
-    setenv MPI_INC $::env(MPI_INC)
-    setenv MPI_LIB $::env(MPI_LIB)
+    set mpi_bin $::env(MPI_BIN)
+    setenv MPI_BIN $mpi_bin
+    if { [info exists ::env(MPI_INC)] } {
+      setenv MPI_INC $::env(MPI_INC)
+    } else {
+      setenv MPI_INC $mpi_bin/../include
+    }
+    if { [info exists ::env(MPI_LIB)] } {
+      setenv MPI_LIB $::env(MPI_LIB)
+    } else {
+      setenv MPI_LIB $mpi_bin/../lib
+    }
   }
 } elseif { [is-loaded lcm-fedora] } {
   setenv BOOST_INC       /usr/include/boost

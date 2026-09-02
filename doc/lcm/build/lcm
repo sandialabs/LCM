@@ -50,6 +50,82 @@ if ! type module &>/dev/null; then
     fi
 fi
 
+#---------------------------------------------------------------------------
+# Publish the recorded toolchain under the names the LCM modulefiles and the
+# CMake configure read. Called once when the toolchain is first discovered and
+# again after every 'module purge' + 'module load', which is what makes it
+# survive a modulefile that owns one of these names. A no-op where no toolchain
+# was recorded (every platform whose modulefiles set these themselves).
+#---------------------------------------------------------------------------
+restore_toolchain() {
+    [ -n "${LCM_TOOLCHAIN_MPI_BIN:-}" ] || return 0
+    export PATH="$LCM_TOOLCHAIN_PATH:$PATH"
+    export LD_LIBRARY_PATH="$LCM_TOOLCHAIN_LD_LIBRARY_PATH:${LD_LIBRARY_PATH:-}"
+    export CC="$LCM_TOOLCHAIN_CC"
+    export CXX="$LCM_TOOLCHAIN_CXX"
+    export FC="$LCM_TOOLCHAIN_FC"
+    export OMPI_CC="$CC"
+    export OMPI_CXX="$CXX"
+    export OMPI_FC="$FC"
+    export MPI_BIN="$LCM_TOOLCHAIN_MPI_BIN"
+    export MPI_INC="$MPI_BIN/../include"
+    export MPI_LIB="$MPI_BIN/../lib"
+    export BOOST_ROOT="$LCM_TOOLCHAIN_BOOST_ROOT"
+    export BOOST_INC="$BOOST_ROOT/include"
+    export BOOST_LIB="$BOOST_ROOT/lib"
+    export BOOSTLIB_INC="$BOOST_ROOT/include"
+    export BOOSTLIB_LIB="$BOOST_ROOT/lib"
+    export NETCDF="$LCM_TOOLCHAIN_NETCDF_ROOT"
+    export NETCDF_INC="$NETCDF/include"
+    export NETCDF_LIB="$NETCDF/lib"
+}
+
+#---------------------------------------------------------------------------
+# Check that the toolchain the configure is about to use actually exists.
+#
+# Without this an unset MPI_BIN reaches CMake as the compiler path '/mpicxx'
+# and the run dies a hundred lines later inside the Albany configure, saying
+# nothing about where the path came from. Fail here instead, naming what is
+# missing.
+#---------------------------------------------------------------------------
+verify_toolchain() {
+    local problems=()
+    if [ -z "${MPI_BIN:-}" ]; then
+        problems+=("MPI_BIN is unset or empty")
+    else
+        local wrapper
+        for wrapper in mpicc mpicxx; do
+            [ -x "$MPI_BIN/$wrapper" ] || \
+                problems+=("no executable MPI wrapper at $MPI_BIN/$wrapper")
+        done
+    fi
+    local var
+    for var in CC CXX; do
+        [ -x "${!var:-}" ] || problems+=("$var='${!var:-}' is not an executable")
+    done
+    for var in BOOST_INC NETCDF_INC; do
+        [ -d "${!var:-}" ] || problems+=("$var='${!var:-}' is not a directory")
+    done
+
+    if [ ${#problems[@]} -gt 0 ]; then
+        echo "ERROR: the build environment is incomplete after loading module '$MODULE_NAME':" >&2
+        local p
+        for p in "${problems[@]}"; do echo "  - $p" >&2; done
+        echo >&2
+        echo "  MPI_BIN=${MPI_BIN:-UNSET}" >&2
+        echo "  CC=${CC:-UNSET}" >&2
+        echo "  CXX=${CXX:-UNSET}" >&2
+        echo "  BOOST_INC=${BOOST_INC:-UNSET}" >&2
+        echo "  NETCDF_INC=${NETCDF_INC:-UNSET}" >&2
+        echo "  LCM_TOOLCHAIN_MPI_BIN=${LCM_TOOLCHAIN_MPI_BIN:-UNSET}" >&2
+        echo >&2
+        echo "Run 'lcm env' to see the whole resolved environment. On a CEE LAN" >&2
+        echo "machine this usually means a module loaded by your .bashrc owns one" >&2
+        echo "of these variable names; start from a clean shell and retry." >&2
+        exit 1
+    fi
+}
+
 # On CEE LAN machines (hpws*, cee-*), load the AUE compiler/MPI/TPL stack.
 # The AUE modulefiles are NOT on the default MODULEPATH here (the SEMS init
 # leaves plain Tcl Environment Modules and does not add them), so we add the
@@ -86,29 +162,32 @@ case "$HN" in
             echo "  BOOST_ROOT=${BOOST_ROOT:-UNSET}  NETCDF_ROOT=${NETCDF_ROOT:-UNSET}"
             exit 1
         fi
-        # Export compiler and MPI paths for the LCM modulefiles / CMake config
-        # (Tcl modules can't see these via 'exec which').
-        export PATH="$(dirname $(which ld)):$(dirname $(which gcc)):$(dirname $(which mpicc)):$(dirname $(which cmake)):$PATH"
-        export LD_LIBRARY_PATH="$(dirname $(which gcc))/../lib64:$(dirname $(which mpicc))/../lib:${LD_LIBRARY_PATH:-}"
-        export CC="$(which gcc)"
-        export CXX="$(which g++)"
-        export FC="$(which gfortran)"
-        export MPI_BIN="$(dirname "$(which mpicc)")"
-        export MPI_INC="${MPI_BIN}/../include"
-        export MPI_LIB="${MPI_BIN}/../lib"
-        # The AUE cmake/ctest are found via PATH, but the 'module purge' in
-        # load_module removes every copy of this dir from PATH; remember it so
-        # load_module can re-prepend it (otherwise ctest falls back to the
-        # system /usr/bin/cmake, which is too old for Trilinos).
-        export AUE_CMAKE_BIN="$(dirname "$(which cmake)")"
-        # Concrete TPL paths (survive the later 'module purge').
-        export BOOST_INC="$BOOST_ROOT/include"
-        export BOOST_LIB="$BOOST_ROOT/lib"
-        export BOOSTLIB_INC="$BOOST_ROOT/include"
-        export BOOSTLIB_LIB="$BOOST_ROOT/lib"
-        export NETCDF_INC="$NETCDF_ROOT/include"
-        export NETCDF_LIB="$NETCDF_ROOT/lib"
-        export NETCDF="$NETCDF_ROOT"
+        # Record the toolchain under LCM_TOOLCHAIN_* names.
+        #
+        # These are the authoritative copy. The plain names below (CC, MPI_BIN,
+        # BOOST_INC, ...) are what the LCM modulefiles and CMake read, but they
+        # are ordinary environment variables that any modulefile may own: the
+        # 'module purge' in load_module unloads whatever the calling shell had
+        # loaded, and unloading a module that sets one of these names UNSETS it,
+        # taking our value with it. An empty MPI_BIN then reaches CMake as
+        # '-DCMAKE_CXX_COMPILER=/mpicxx', which is the failure this guards
+        # against. Nothing in any module tree touches the LCM_TOOLCHAIN_*
+        # names, so restore_toolchain can put the real values back afterwards.
+        LCM_TOOLCHAIN_PATH="$(dirname $(which ld)):$(dirname $(which gcc)):$(dirname $(which mpicc)):$(dirname $(which cmake))"
+        LCM_TOOLCHAIN_LD_LIBRARY_PATH="$(dirname $(which gcc))/../lib64:$(dirname $(which mpicc))/../lib"
+        LCM_TOOLCHAIN_CC="$(which gcc)"
+        LCM_TOOLCHAIN_CXX="$(which g++)"
+        LCM_TOOLCHAIN_FC="$(which gfortran)"
+        LCM_TOOLCHAIN_MPI_BIN="$(dirname "$(which mpicc)")"
+        LCM_TOOLCHAIN_BOOST_ROOT="$BOOST_ROOT"
+        LCM_TOOLCHAIN_NETCDF_ROOT="$NETCDF_ROOT"
+        export LCM_TOOLCHAIN_PATH LCM_TOOLCHAIN_LD_LIBRARY_PATH \
+               LCM_TOOLCHAIN_CC LCM_TOOLCHAIN_CXX LCM_TOOLCHAIN_FC \
+               LCM_TOOLCHAIN_MPI_BIN LCM_TOOLCHAIN_BOOST_ROOT \
+               LCM_TOOLCHAIN_NETCDF_ROOT
+        # Now publish them under the names the modulefiles read, so that the
+        # 'module load' in load_module sees them and propagates them too.
+        restore_toolchain
         # Keep the LCM modulefiles on MODULEPATH for the later 'module load'.
         export MODULEPATH="$LCM_DIR/LCM/doc/lcm/modulefiles${MODULEPATH:+:$MODULEPATH}"
         ;;
@@ -143,7 +222,7 @@ for arg in "$@"; do
         --help|-h)
             COMMANDS=(help)
             ;;
-        clean|config|build|test|all|help)
+        clean|config|build|test|all|env|help)
             COMMANDS+=("$arg")
             ;;
         trilinos|lcm)
@@ -176,6 +255,10 @@ Commands (can be chained):
   test                     Run tests for package
   all                      Full pipeline: clean + config + build + test
                            Builds trilinos then lcm
+  env                      Load the module and print the resolved build
+                           environment (compilers, MPI, TPLs). Runs nothing
+                           else; use it when a configure fails with a
+                           nonsense compiler or TPL path.
   help, --help, -h         Show this help
 
 Packages:
@@ -198,6 +281,7 @@ Examples:
   lcm clean config build lcm 32              # clean + configure + build
   lcm clean config build test lcm 168        # full pipeline for lcm
   lcm test lcm                               # test only
+  lcm env                                    # show the build environment
   lcm all 168                                # full pipeline (trilinos + lcm)
   lcm all 168 --module=serial-clang-release
   lcm all 168 --cdash -q
@@ -227,18 +311,20 @@ validate_package() {
 load_module() {
     module purge 2>/dev/null || true
     module load "$MODULE_NAME"
-    # 'module purge' above strips the AUE cmake/ctest dir from PATH; put it
-    # back so ctest configures with the AUE cmake (>=3.27) rather than the
-    # system one (see the CEE toolchain block above).
-    if [ -n "${AUE_CMAKE_BIN:-}" ]; then
-        export PATH="$AUE_CMAKE_BIN:$PATH"
-    fi
+    # 'module purge' just unloaded whatever the calling shell had loaded, which
+    # can strip the toolchain's PATH entries and unset the variables that name
+    # its compilers. Put the recorded values back before anything reads them.
+    restore_toolchain
+    verify_toolchain
     echo "Module:      $MODULE_NAME"
     echo "LCM_DIR:     $LCM_DIR"
     echo "ARCH:        ${ARCH:-unset}"
     echo "TOOL_CHAIN:  ${TOOL_CHAIN:-unset}"
     echo "BUILD_TYPE:  ${BUILD_TYPE:-unset}"
     echo "Threads:     $THREADS"
+    echo "MPI_BIN:     ${MPI_BIN:-unset}"
+    echo "CXX:         ${CXX:-unset}"
+    echo "cmake:       $(command -v cmake || echo NOT FOUND)"
 }
 
 #---------------------------------------------------------------------------
@@ -316,6 +402,25 @@ run_ctest() {
 for CMD in "${COMMANDS[@]}"; do
     if [ "$CMD" = "help" ]; then
         show_help
+        exit 0
+    fi
+    if [ "$CMD" = "env" ]; then
+        # Load the module and report the resolved build environment without
+        # running anything. This is the first thing to run when a configure
+        # fails with a nonsense compiler or TPL path.
+        load_module
+        echo
+        echo "Resolved toolchain:"
+        for v in CC CXX FC MPI_BIN MPI_INC MPI_LIB \
+                 BOOST_INC BOOST_LIB NETCDF NETCDF_INC NETCDF_LIB \
+                 INSTALL_DIR CXXFLAGS LCM_CXX_FLAGS; do
+            printf '  %-14s %s\n' "$v" "${!v:-unset}"
+        done
+        echo
+        echo "Tools on PATH:"
+        for t in cmake ctest gcc g++ mpicc mpicxx; do
+            printf '  %-14s %s\n' "$t" "$(command -v $t || echo NOT FOUND)"
+        done
         exit 0
     fi
     if [ "$CMD" = "all" ]; then

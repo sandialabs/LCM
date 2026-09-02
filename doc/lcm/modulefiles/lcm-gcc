@@ -8,11 +8,11 @@ if { [is-loaded lcm-cee] } {
   # On CEE LAN, compilers are loaded by the lcm build script
   # (aue/gcc via SEMS Lmod) before modules are processed.
   # CC/CXX/FC are exported by the lcm script; propagate them.
-  if { [info exists ::env(CC)] } {
-    setenv CC $::env(CC)
-    setenv CXX $::env(CXX)
-    setenv FC $::env(FC)
-  }
+  # Each is guarded separately: reading an unset ::env() throws, and under
+  # Lmod that error aborts the whole module load (see the note in lcm-tpls).
+  if { [info exists ::env(CC)] }  { setenv CC  $::env(CC)  }
+  if { [info exists ::env(CXX)] } { setenv CXX $::env(CXX) }
+  if { [info exists ::env(FC)] }  { setenv FC  $::env(FC)  }
 } elseif { [ file exists /opt/rh/gcc-toolset-15/root/usr/bin/gcc ] } {
   # Use GCC 15 via gcc-toolset-15 (Rigel/standalone RHEL)
   # Prepend to PATH so MPI wrappers (mpicxx, mpif90) find these compilers

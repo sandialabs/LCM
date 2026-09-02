@@ -76,6 +76,15 @@ AUE modules that `lcm` expects.
 
 Currently only GCC builds are supported on CEE (module `serial-gcc-release`).
 
+**If a configure fails with a nonsense compiler or TPL path** (for example
+`CMAKE_CXX_COMPILER: /mpicxx is not a full path to an existing compiler tool`),
+run `lcm env` first. It loads the module and prints the resolved compilers,
+MPI and TPL paths without running anything else, so you can see which variable
+is empty. The usual cause is a module loaded by your `.bashrc` that owns one of
+the names the build uses (`CC`, `MPI_BIN`, `BOOST_INC`, ...); `lcm` now
+restores its own values after loading the LCM module, and refuses to configure
+if any of them is still missing.
+
 ## Quick Start
 
 ### 1. Clone repositories

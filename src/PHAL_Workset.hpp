@@ -17,22 +17,7 @@
 #include "Albany_ThyraTypes.hpp"
 #include "Albany_TpetraTypes.hpp"
 #include "PHAL_Setup.hpp"
-// Sacado renamed Kokkos_ViewFactory.hpp to Sacado_Fad_Kokkos_ViewFactory.hpp
-// in Trilinos develop on 2026-08-31, moving createDynRankView[WithType] from
-// namespace Kokkos to namespace Sacado and leaving deprecated Kokkos wrappers
-// behind. LCM's call sites still use the Kokkos names, which both headers
-// provide, so accepting either name lets a Trilinos install from before the
-// rename keep building. Temporary: drop the fallback once the call sites move
-// to Sacado:: and everyone's Trilinos is newer than the rename.
-#if defined(__has_include)
-#if __has_include("Sacado_Fad_Kokkos_ViewFactory.hpp")
 #include "Sacado_Fad_Kokkos_ViewFactory.hpp"
-#else
-#include "Kokkos_ViewFactory.hpp"
-#endif
-#else
-#include "Sacado_Fad_Kokkos_ViewFactory.hpp"
-#endif
 #include "Teuchos_Comm.hpp"
 #include "Teuchos_RCP.hpp"
 

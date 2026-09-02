@@ -392,12 +392,30 @@ the resulting fit looks perfectly reasonable.
 consumes it yet: there is no volumetric comparison curve, which is the second
 gap on this path after the one below.
 
-### One confining pressure per run
+### Fitting a confining-pressure series
 
-`--set` is global to the run, so a single `calibrate` fits one confining
-pressure. A confining-pressure series is what pins `theta` and separates it
-from `A`, so fitting the series simultaneously is the obvious next step; it
-wants a MatCal *state* per pressure rather than a `--set`. Not built yet.
+Give `--data txc:...` once per curve. Each becomes a MatCal *state* of the one
+model, all of them are run at every parameter set, and one objective is formed
+over the lot, so a single parameter set has to fit the whole series:
+
+```bash
+python calibrate.py calibrate --load-path txc --curve dev-stress-strain \
+    --defaults permafrost --set elastic_modulus=7.0e7 \
+    --data txc:data/Xu_Pc3e5_-6.csv --data txc:data/Xu_Pc6e5_-6.csv \
+    --data txc:data/Xu_Pc8e5_-6.csv --data txc:data/Xu_Pc1e6_-6.csv \
+    --param A:1.2e6:2.6e6 --param theta:0.0:0.4
+```
+
+No `--set confining_pressure` here: each curve carries its own, read from the
+`# harness-state:` line `prepare_data.py` wrote into it, and applied as a
+per-state model constant that beats the deck default. The consolidation strain
+is recomputed per state too, so each deck preloads to its own pressure. `--set`
+still works and still applies to every state, which is what you want for a
+material parameter you are holding fixed.
+
+This is what separates `theta` from `A` honestly. A single curve samples the
+failure envelope over the narrow range of `I1` that one test sweeps, so `A` and
+`theta` trade off against each other; the series samples it at four pressures.
 
 ---
 
@@ -450,7 +468,7 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 | `--curve NAME` | `true-stress-strain` (default), `eng-stress-strain`, `load-displacement` or `time-stress`. |
 | `--finite-deformation` / `--small-strain` | Kinematics. Finite deformation is the default; see [Kinematics](#kinematics). |
 | `--param NAME:LO:HI[:INIT]` | Parameter to fit, base SI. Repeatable. |
-| `--data LOADPATH:CSV[:XCOL:YCOL]` | Experimental data for one load path, base SI. Repeatable. Defaults to `examples/<load_path>_reference.csv`. |
+| `--data LOADPATH:CSV[:XCOL:YCOL]` | Experimental data for one load path, base SI. Repeatable, including several times for one path: each curve then becomes a MatCal state and all are fitted with one parameter set. Defaults to `examples/<load_path>_reference.csv`. |
 | `--set NAME=VALUE` | Override a cap parameter or a deck constant (`confining_pressure`, `axial_strain`, `preload_fraction`) without fitting it, base SI. Repeatable. |
 | `--defaults salem\|permafrost` | Starting parameter set: where `--param` `INIT` and every un-fitted placeholder come from. Default `salem`. |
 | `--study gradient\|scipy` | Dakota gradient study (default) or SciPy. |

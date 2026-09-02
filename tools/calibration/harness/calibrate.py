@@ -182,6 +182,49 @@ def _parse_data(spec):
     return lp_name, path, xcol, ycol
 
 
+_STATE_LINE = "harness-state:"
+
+
+def _read_state_constants(path, known):
+    """Return the per-curve deck constants recorded in a CSV by prepare_data.py.
+
+    ``prepare_data.py`` writes a ``# harness-state: name=value ...`` comment
+    holding the constants that belong to that TEST rather than to the material,
+    which is what lets several curves at different confining pressures be fitted
+    together. Returns ``{}`` for a file that carries no such line, which is how
+    a hand-made CSV keeps working.
+    """
+    constants = {}
+    with open(path) as fh:
+        for line in fh:
+            if not line.lstrip().startswith("#"):
+                break
+            text = line.lstrip("# \t").rstrip()
+            if not text.startswith(_STATE_LINE):
+                continue
+            for field in text[len(_STATE_LINE):].split():
+                name, sep, value = field.partition("=")
+                if not sep:
+                    raise SystemExit(f"{path}: bad harness-state field {field!r}; "
+                                     f"expected name=value")
+                if name not in known:
+                    raise SystemExit(
+                        f"{path}: harness-state names {name!r}, which is not a "
+                        f"deck constant; known: {' '.join(sorted(known))}")
+                try:
+                    constants[name] = float(value)
+                except ValueError:
+                    raise SystemExit(f"{path}: harness-state {name}={value!r} "
+                                     f"is not a number")
+    return constants
+
+
+def _state_name(path):
+    """A MatCal state name from a data file name: it becomes a directory."""
+    stem = os.path.splitext(os.path.basename(path))[0]
+    return "".join(c if (c.isalnum() or c == "_") else "_" for c in stem)
+
+
 def _reference_csv(out_dir, load_path):
     return os.path.join(out_dir, f"{load_path}_reference.csv")
 
@@ -346,18 +389,47 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
         indep, dep = lp.fields(curve)
-        path, xcol, ycol = data_map.get(lp_name, (None, None, None))
-        data_path = os.path.abspath(path or _reference_csv(out_dir, lp_name))
-        if not os.path.isfile(data_path):
-            raise SystemExit(f"[{lp_name}] no data at {data_path}; run "
-                             f"make-reference or pass --data {lp_name}:<csv>")
-        experiment = _load_experiment(lp_name, data_path, indep, dep, xcol, ycol)
+        entries = data_map.get(lp_name) or [(None, None, None)]
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
                                    platform=platform,
                                    finite_deformation=finite_deformation)
+        datasets = []
+        stateful = False
+        for path, xcol, ycol in entries:
+            data_path = os.path.abspath(path or _reference_csv(out_dir, lp_name))
+            if not os.path.isfile(data_path):
+                raise SystemExit(f"[{lp_name}] no data at {data_path}; run "
+                                 f"make-reference or pass --data {lp_name}:<csv>")
+            experiment = _load_experiment(lp_name, data_path, indep, dep,
+                                          xcol, ycol)
+            # Constants that belong to this curve rather than to the material:
+            # the confining pressure and the strain range of that test. As
+            # state constants they beat the deck defaults and the --set
+            # overrides stay available for a single-curve run.
+            per_curve = _read_state_constants(data_path, lp.constants)
+            if per_curve or len(entries) > 1:
+                stateful = True
+                state = mc.State(_state_name(data_path), **per_curve)
+                experiment.set_state(state)
+                if per_curve:
+                    model.add_state_constants(state, **per_curve)
+                detail = " ".join(f"{k}={v:g}" for k, v in per_curve.items())
+                print(f"[{lp_name}] state {state.name}: {data_path}"
+                      + (f" ({detail})" if detail else ""))
+            else:
+                print(f"[{lp_name}] evaluation set: {data_path} "
+                      f"({indep} vs {dep})")
+            datasets.append(experiment)
+
         objective = mc.CurveBasedInterpolatedObjective(indep, dep)
-        study.add_evaluation_set(model, objective, experiment)
-        print(f"[{lp_name}] evaluation set: {data_path} ({indep} vs {dep})")
+        if stateful:
+            study.add_evaluation_set(
+                model, objective, mc.DataCollection(lp_name, *datasets))
+        else:
+            study.add_evaluation_set(model, objective, datasets[0])
+        if len(datasets) > 1:
+            print(f"[{lp_name}] {len(datasets)} curves fitted together "
+                  f"({indep} vs {dep})")
 
     study.set_core_limit(core_limit)
     print(f"platform={get_platform(platform).name} study={study_type} "
@@ -391,7 +463,10 @@ def main(argv=None):
                     help="calibrated parameter, base SI (repeatable)")
     ap.add_argument("--data", action="append", type=_parse_data, dest="data",
                     default=[], metavar="LOADPATH:CSV[:XCOL:YCOL]",
-                    help="experimental data for a load path, base SI (repeatable)")
+                    help="experimental data for a load path, base SI. "
+                         "Repeatable, INCLUDING several times for one load "
+                         "path: each curve then becomes a MatCal state and all "
+                         "of them are fitted with one parameter set.")
     ap.add_argument("--set", action="append", type=_parse_kv, dest="sets",
                     default=[], metavar="NAME=VALUE",
                     help="override a cap parameter or deck constant "
@@ -429,7 +504,11 @@ def main(argv=None):
     defaults = {**base, **dict(args.sets)}
     # --param INIT defaults to the named set's value, not always Salem's.
     params = [_reinit(p, base) for p in args.params]
-    data_map = {lp: (path, xcol, ycol) for lp, path, xcol, ycol in args.data}
+    # Repeatable per load path: one --data per experimental curve. Several on
+    # the same path become several MatCal states of one model.
+    data_map = {}
+    for lp_name, path, xcol, ycol in args.data:
+        data_map.setdefault(lp_name, []).append((path, xcol, ycol))
 
     if args.action == "make-reference":
         make_reference(load_paths, defaults, args.out_dir, args.platform,

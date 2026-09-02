@@ -220,6 +220,14 @@ def main(argv=None):
         comments = [f"converted from {os.path.basename(path)} by prepare_data.py",
                     "base SI, compression negative; "
                     "stress_dev_x is q = sigma_1 - sigma_3"]
+        # A machine-readable line the harness reads back: the deck constants
+        # that belong to THIS test rather than to the material. calibrate.py
+        # turns them into a MatCal state, which is what lets one run fit a
+        # whole confining-pressure series with one parameter set.
+        if pressure is not None:
+            comments.append(
+                f"harness-state: confining_pressure={pressure:.6e} "
+                f"axial_strain={suggest_axial_strain(report['max_strain'])}")
         comments += [f"{k}: {v}" for k, v in meta.items()]
         comments.append(f"sign convention of the source: {report['convention']}")
         comments.append(f"stress offset removed at zero strain: {report['offset']:.6e} Pa")

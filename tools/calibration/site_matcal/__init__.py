@@ -16,6 +16,7 @@ __all__ = []
 from . import register_factories  # noqa: F401
 
 from .exodus_reader import read_lcm_cap_exodus
+from .weighting import make_field_weight
 from .lcm_model import (make_lcm_cap_model, SALEM_LIMESTONE,
                         PERMAFROST_FROZEN, DEFAULT_SETS, DEFAULT_SET,
                         TEMPLATES_DIR, DEFAULT_FINITE_DEFORMATION)
@@ -25,6 +26,7 @@ from .load_paths import (LOAD_PATHS, get_load_path, LoadPath, DECK_CONSTANTS,
 
 __all__ += [
     "read_lcm_cap_exodus",
+    "make_field_weight",
     "make_lcm_cap_model",
     "SALEM_LIMESTONE",
     "PERMAFROST_FROZEN",

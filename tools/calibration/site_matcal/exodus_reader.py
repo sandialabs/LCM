@@ -20,6 +20,12 @@ against whichever curve the experiment actually produced:
   * ``strain_xx/yy/zz/xy`` -- the model's own small-strain tensor. Present
     ONLY under ``Finite Deformation: false``; the finite-deformation kernel
     consumes ``F`` and ``Fp`` and never forms this field.
+  * ``strain_vol`` -- the volumetric engineering strain, the sum of the three
+    ``strain_eng_<axis>``. On the ``txc`` path the lateral strains are
+    PREDICTED rather than prescribed, so this is the model's own dilatancy and
+    is the field to compare against a measured volumetric curve. On the other
+    three paths every strain component is prescribed, so it is an input and
+    comparing it measures nothing.
   * ``stress_dev_x/y/z`` -- the deviatoric (differential) Cauchy stress about
     that axis, ``sigma_aa - (sigma_bb + sigma_cc)/2``. On a triaxial path with
     equal lateral stresses this is exactly the ``sigma_1 - sigma_3`` a
@@ -222,6 +228,12 @@ def _load_displacement(ds, start=0):
             if other != axis and other in ref_length:
                 area *= ref_length[other]
         out[f"stress_eng_{axis}"] = force / area
+
+    # Volumetric strain, once every axis has reported. Engineering rather than
+    # logarithmic, to match both the axial measure above and what a triaxial
+    # laboratory reports.
+    if all(f"strain_eng_{a}" in out for a in _AXES):
+        out["strain_vol"] = sum(out[f"strain_eng_{a}"] for a in _AXES)
     return out
 
 

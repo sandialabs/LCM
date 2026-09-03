@@ -50,6 +50,15 @@ WHAT IT CHANGES, and why each is needed:
 The deviatoric stress ``q = sigma_1 - sigma_3`` is written as such, so nothing
 here needs to know the confining pressure: it cancels out of the difference.
 That is why ``--curve dev-stress-strain`` is the one to use with this data.
+
+VOLUMETRIC COLUMN. Where the source carries a volumetric curve, it is written
+as a third column, ``strain_vol``, linearly resampled onto the stress curve's
+strain grid so that one objective can compare both against the same axial
+strain (``--curve dev-stress-volumetric``). Resampling rather than assuming a
+shared grid is deliberate: the two curves come from different figures and the
+team has been asked to give the volumetric one its own strain column, so they
+will not always align. No extrapolation, so a stress point outside the
+volumetric curve's range is dropped and the count reported.
 """
 
 import argparse
@@ -116,6 +125,45 @@ def read_curves(path):
         return out
 
     return meta, pair(1), pair(2)
+
+
+def resample_volumetric(strain_stress, strain_volumetric):
+    """Return the volumetric strain sampled at the stress curve's strain grid.
+
+    The two curves have so far arrived on one shared grid, but they need not:
+    the volumetric curve is digitized from its own figure and the team has been
+    asked to give it its own strain column. Interpolating onto the stress grid
+    covers both cases and keeps one row per output line, which is what a single
+    comparison file needs.
+
+    Does NOT extrapolate. Returns ``(rows, n_dropped)`` where ``rows`` are the
+    stress points that fall inside the volumetric curve's range, each paired
+    with its interpolated volumetric strain.
+    """
+    if not strain_volumetric:
+        return None, 0
+    vx = [p[0] for p in strain_volumetric]
+    vy = [p[1] for p in strain_volumetric]
+    lo, hi = min(vx), max(vx)
+    order = sorted(range(len(vx)), key=lambda i: vx[i])
+    vx = [vx[i] for i in order]
+    vy = [vy[i] for i in order]
+
+    rows, dropped = [], 0
+    for strain, stress in strain_stress:
+        if strain < lo - 1.0e-12 or strain > hi + 1.0e-12:
+            dropped += 1
+            continue
+        # Plain linear interpolation; the grids are dense enough that anything
+        # cleverer would be inventing detail the digitizer did not capture.
+        j = 0
+        while j < len(vx) - 2 and vx[j + 1] < strain:
+            j += 1
+        x0, x1 = vx[j], vx[j + 1]
+        y0, y1 = vy[j], vy[j + 1]
+        t = 0.0 if x1 == x0 else (strain - x0) / (x1 - x0)
+        rows.append((strain, stress, y0 + t * (y1 - y0)))
+    return rows, dropped
 
 
 def convert(strain_stress, max_strain=None):
@@ -203,9 +251,10 @@ def main(argv=None):
                          "0.20 for the Yang curves, whose tails are Engauge "
                          "extrapolation")
     ap.add_argument("--volumetric", action="store_true",
-                    help="also write <name>-volumetric.csv (axial strain vs "
-                         "volumetric strain). The harness has no volumetric "
-                         "curve yet, so these are for keeping, not fitting.")
+                    help="also write <name>-volumetric.csv, the volumetric "
+                         "curve on its own unresampled grid. Not needed for "
+                         "fitting (the main file carries a strain_vol column); "
+                         "useful for plotting the measurement as digitized.")
     args = ap.parse_args(argv)
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -234,8 +283,28 @@ def main(argv=None):
         if args.max_strain is not None:
             comments.append(f"truncated at an axial strain of {args.max_strain}")
 
+        # One file per test. The volumetric column is resampled onto the
+        # stress curve's strain grid so a single objective can compare both
+        # against the same axial strain; a curve that asks only for
+        # stress_dev_x simply ignores the third column.
+        flip = report["convention"].startswith("compression positive")
+        volumetric = convert_volumetric(strain_volumetric, flip, args.max_strain)
+        combined, dropped = resample_volumetric(rows, volumetric)
+        if combined is not None:
+            header = ["strain_eng_x", "stress_dev_x", "strain_vol"]
+            body = combined
+            comments.append(
+                "strain_vol is the measured volumetric strain, linearly "
+                "resampled onto this file's strain grid; positive is dilation")
+            if dropped:
+                comments.append(
+                    f"{dropped} stress point(s) dropped: outside the "
+                    f"volumetric curve's strain range (no extrapolation)")
+        else:
+            header = ["strain_eng_x", "stress_dev_x"]
+            body = rows
         out = os.path.join(args.out_dir, f"{name}.csv")
-        write_csv(out, ["strain_eng_x", "stress_dev_x"], rows, comments)
+        write_csv(out, header, body, comments)
 
         if report["mixed_signs"]:
             failed = True
@@ -250,21 +319,25 @@ def main(argv=None):
         print(f"[{name}] {report['points_in']} -> {report['points_out']} points, "
               f"{report['convention']}, offset {report['offset']:.3e} Pa, "
               f"peak q {report['peak_q']:.4e} Pa at |eps| <= {report['max_strain']:.3f}")
+        if combined is not None:
+            span = (min(r[2] for r in combined), max(r[2] for r in combined))
+            print(f"    volumetric column: {len(combined)} rows, "
+                  f"{span[0]:+.4f} to {span[1]:+.4f}"
+                  + (f", {dropped} row(s) dropped outside its range" if dropped else ""))
+        else:
+            print(f"    no volumetric column: none in the source")
         if pressure is not None:
             print(f"    --data txc:{out} "
                   f"--set confining_pressure={pressure:.4e} "
                   f"--set axial_strain={suggest_axial_strain(report['max_strain'])}")
 
-        if args.volumetric and strain_volumetric:
-            flip = report["convention"].startswith("compression positive")
-            vol = convert_volumetric(strain_volumetric, flip, args.max_strain)
+        if args.volumetric and volumetric:
             vout = os.path.join(args.out_dir, f"{name}-volumetric.csv")
-            write_csv(vout, ["strain_eng_x", "strain_vol"], vol,
-                      comments + ["volumetric strain is dilation positive, "
-                                  "which is already compression negative, so "
-                                  "it is NOT flipped with the other columns"])
-            print(f"    volumetric: {vout} ({len(vol)} points, "
-                  f"{min(v[1] for v in vol):+.4f} to {max(v[1] for v in vol):+.4f})")
+            write_csv(vout, ["strain_eng_x", "strain_vol"], volumetric,
+                      comments + ["the volumetric curve on ITS OWN grid, "
+                                  "unresampled; kept for plotting, the "
+                                  "harness reads the combined file above"])
+            print(f"    also wrote the unresampled curve: {vout}")
 
     return 1 if failed else 0
 

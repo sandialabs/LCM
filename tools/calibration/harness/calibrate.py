@@ -73,7 +73,8 @@ import matcal as mc
 from site_matcal import (make_lcm_cap_model, SALEM_LIMESTONE, get_platform,
                          get_albany, get_load_path, CURVES, DEFAULT_CURVE,
                          LOAD_PATHS, DECK_CONSTANTS, TEMPLATES_DIR,
-                         DEFAULT_FINITE_DEFORMATION, DEFAULT_SETS, DEFAULT_SET)
+                         DEFAULT_FINITE_DEFORMATION, DEFAULT_SETS, DEFAULT_SET,
+                         make_field_weight)
 
 DEFAULT_OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                "examples")
@@ -161,6 +162,24 @@ def _parse_kv(spec):
         return key, float(val)
     except ValueError:
         raise argparse.ArgumentTypeError(f"--set {key}: {val!r} is not a number")
+
+
+def _parse_field_weight(spec):
+    """NAME=FACTOR -> (field_name, float). Scales one dependent field's
+    residual inside a multi-field objective."""
+    name, sep, value = spec.partition("=")
+    if not sep:
+        raise argparse.ArgumentTypeError(
+            f"bad --field-weight {spec!r}; expected FIELD=FACTOR")
+    try:
+        factor = float(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"--field-weight {name}: {value!r} is not a number")
+    if factor <= 0.0:
+        raise argparse.ArgumentTypeError(
+            f"--field-weight {name}: factor must be positive, got {factor:g}")
+    return name, factor
 
 
 def _parse_data(spec):
@@ -263,43 +282,60 @@ def _read_csv(path):
     return header, values
 
 
-def _load_experiment(lp_name, path, indep, dep, xcol, ycol):
-    """Read an experimental CSV into a MatCal ``Data`` with fields named
-    ``indep``/``dep``, mapping from ``xcol``/``ycol`` when given, and check
-    that the numbers look like base SI."""
+def _load_experiment(lp_name, path, indep, deps, xcol, ycol):
+    """Read an experimental CSV into a MatCal ``Data`` carrying ``indep`` and
+    every field in ``deps``, mapping from ``xcol``/``ycol`` when given, and
+    check that the numbers look like base SI.
+
+    ``xcol``/``ycol`` name a single dependent column, so they are only
+    meaningful for a single-field curve; a multi-field curve needs the
+    harness's own column names, which is what ``prepare_data.py`` writes.
+    """
     header, values = _read_csv(path)
-    xcol = xcol or indep
-    ycol = ycol or dep
-    missing = [c for c in (xcol, ycol) if c not in header]
+    if (xcol or ycol) and len(deps) > 1:
+        raise SystemExit(
+            f"[{lp_name}] --data ...:{xcol}:{ycol} names one dependent column, "
+            f"but --curve needs {len(deps)} ({', '.join(deps)}).\n"
+            f"  Give the file the harness's own column names instead; "
+            f"prepare_data.py writes them.")
+    x_name = xcol or indep
+    y_names = [ycol] if ycol else list(deps)
+    missing = [c for c in [x_name] + y_names if c not in header]
     if missing:
         raise SystemExit(
             f"[{lp_name}] {path}: column(s) {', '.join(missing)} not found.\n"
             f"  columns in the file: {', '.join(header)}\n"
-            f"  columns needed for --curve: {indep}, {dep}\n"
-            f"  Either rename the file's columns, or say which to use:\n"
+            f"  columns needed for --curve: {indep}, {', '.join(deps)}\n"
+            f"  Either rename the file's columns, or (single-field curves "
+            f"only) say which to use:\n"
             f"    --data {lp_name}:{path}:<x column>:<y column>\n"
             f"  If this is a generated reference in other coordinates, rerun\n"
             f"  make-reference with the same --curve.")
-    x = values[:, header.index(xcol)]
-    y = values[:, header.index(ycol)]
 
-    peak_y = np.abs(y).max()
-    if dep.startswith(("stress", "force")) and 0.0 < peak_y < _SMALL_STRESS:
-        print(f"[{lp_name}] WARNING: peak |{ycol}| is {peak_y:.3e}, which is very "
-              f"small for a base-SI {dep.split('_')[0]}. Is this column in MPa or "
-              f"kN? The harness is in Pa and N; convert the data, not the harness.",
-              file=sys.stderr)
+    x = values[:, header.index(x_name)]
     peak_x = np.abs(x).max()
     if indep.startswith("strain") and peak_x > 1.0:
-        print(f"[{lp_name}] WARNING: peak |{xcol}| is {peak_x:.3e}; strain is "
+        print(f"[{lp_name}] WARNING: peak |{x_name}| is {peak_x:.3e}; strain is "
               f"dimensionless here, so a value above 1 usually means the column "
               f"is in percent.", file=sys.stderr)
-    if np.all(y >= 0.0) and dep.startswith(("stress", "force")):
-        print(f"[{lp_name}] WARNING: {ycol} is never negative. These decks load "
-              f"in compression, which is negative in this sign convention; a "
-              f"compression-positive curve will not be matched.", file=sys.stderr)
 
-    return mc.convert_dictionary_to_data({indep: x, dep: y})
+    fields = {indep: x}
+    for dep, y_name in zip(deps, y_names):
+        y = values[:, header.index(y_name)]
+        fields[dep] = y
+        peak_y = np.abs(y).max()
+        if dep.startswith(("stress", "force")) and 0.0 < peak_y < _SMALL_STRESS:
+            print(f"[{lp_name}] WARNING: peak |{y_name}| is {peak_y:.3e}, which is "
+                  f"very small for a base-SI {dep.split('_')[0]}. Is this column "
+                  f"in MPa or kN? The harness is in Pa and N; convert the data, "
+                  f"not the harness.", file=sys.stderr)
+        if np.all(y >= 0.0) and dep.startswith(("stress", "force")):
+            print(f"[{lp_name}] WARNING: {y_name} is never negative. These decks "
+                  f"load in compression, which is negative in this sign "
+                  f"convention; a compression-positive curve will not be "
+                  f"matched.", file=sys.stderr)
+
+    return mc.convert_dictionary_to_data(fields)
 
 
 def check(platform=None):
@@ -358,7 +394,7 @@ def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deform
     os.makedirs(out_dir, exist_ok=True)
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
-        indep, dep = lp.fields(curve)
+        indep, deps = lp.fields(curve)
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
                                    platform=platform, name=f"ref_{lp_name}",
                                    finite_deformation=finite_deformation)
@@ -367,18 +403,19 @@ def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deform
         results = model.run(mc.State(lp_name), mc.ParameterCollection("truth"),
                             target_directory=run_dir)
         data = results.results_data
-        x = np.asarray(data[indep])
-        y = np.asarray(data[dep])
+        columns = [np.asarray(data[f]) for f in (indep, *deps)]
         out = _reference_csv(out_dir, lp_name)
-        np.savetxt(out, np.column_stack([x, y]), delimiter=",",
-                   header=f"{indep},{dep}", comments="")
-        print(f"[{lp_name}] wrote reference {out} ({len(x)} points, "
-              f"{curve}, {_kinematics(finite_deformation)}, "
-              f"peak |{dep}| = {np.abs(y).max():.6e})")
+        np.savetxt(out, np.column_stack(columns), delimiter=",",
+                   header=",".join((indep, *deps)), comments="")
+        peaks = "  ".join(f"peak |{d}| = {np.abs(c).max():.6e}"
+                          for d, c in zip(deps, columns[1:]))
+        print(f"[{lp_name}] wrote reference {out} ({len(columns[0])} points, "
+              f"{curve}, {_kinematics(finite_deformation)}, {peaks})")
 
 
 def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
-              study_type, core_limit, curve, finite_deformation):
+              study_type, core_limit, curve, finite_deformation,
+              field_weights=None):
     if not params:
         raise SystemExit("no --param given; nothing to calibrate")
 
@@ -388,7 +425,7 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
 
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
-        indep, dep = lp.fields(curve)
+        indep, deps = lp.fields(curve)
         entries = data_map.get(lp_name) or [(None, None, None)]
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
                                    platform=platform,
@@ -400,7 +437,7 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
             if not os.path.isfile(data_path):
                 raise SystemExit(f"[{lp_name}] no data at {data_path}; run "
                                  f"make-reference or pass --data {lp_name}:<csv>")
-            experiment = _load_experiment(lp_name, data_path, indep, dep,
+            experiment = _load_experiment(lp_name, data_path, indep, deps,
                                           xcol, ycol)
             # Constants that belong to this curve rather than to the material:
             # the confining pressure and the strain range of that test. As
@@ -418,10 +455,30 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
                       + (f" ({detail})" if detail else ""))
             else:
                 print(f"[{lp_name}] evaluation set: {data_path} "
-                      f"({indep} vs {dep})")
+                      f"({indep} vs {', '.join(deps)})")
             datasets.append(experiment)
 
-        objective = mc.CurveBasedInterpolatedObjective(indep, dep)
+        # One objective per dependent field, collected into a single
+        # evaluation set: the model still runs once per parameter set, each
+        # field is conditioned onto its own range, and a weight can be applied
+        # to one field without touching the others. See site_matcal.weighting
+        # for why this is not one objective over several fields.
+        weight_of = dict(field_weights or [])
+        unknown = [n for n in weight_of if n not in deps]
+        if unknown:
+            raise SystemExit(
+                f"[{lp_name}] --field-weight names {', '.join(unknown)}, which "
+                f"--curve {curve} does not compare; it uses "
+                f"{', '.join(deps)}")
+        objectives = []
+        for dep in deps:
+            obj = mc.CurveBasedInterpolatedObjective(indep, dep)
+            if dep in weight_of:
+                obj.set_field_weights(make_field_weight(weight_of[dep]))
+                print(f"[{lp_name}] weighting {dep} by {weight_of[dep]:g}")
+            objectives.append(obj)
+        objective = (objectives[0] if len(objectives) == 1
+                     else mc.ObjectiveCollection(f"{lp_name}_fields", *objectives))
         if stateful:
             study.add_evaluation_set(
                 model, objective, mc.DataCollection(lp_name, *datasets))
@@ -429,7 +486,7 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
             study.add_evaluation_set(model, objective, datasets[0])
         if len(datasets) > 1:
             print(f"[{lp_name}] {len(datasets)} curves fitted together "
-                  f"({indep} vs {dep})")
+                  f"({indep} vs {', '.join(deps)})")
 
     study.set_core_limit(core_limit)
     print(f"platform={get_platform(platform).name} study={study_type} "
@@ -487,6 +544,12 @@ def main(argv=None):
                          f"(default: {DEFAULT_SET}). Use permafrost for txc "
                          "and for any frozen-soil calibration; salem is a rock "
                          "whose cap dominates every triaxial test of it.")
+    ap.add_argument("--field-weight", action="append", type=_parse_field_weight,
+                    dest="field_weights", default=[], metavar="FIELD=FACTOR",
+                    help="scale one dependent field's residual inside a "
+                         "multi-field --curve (repeatable). Use it to count "
+                         "the volumetric response for less than the stress: "
+                         "--field-weight strain_vol=0.3")
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
     ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)
@@ -516,7 +579,7 @@ def main(argv=None):
     else:
         calibrate(load_paths, params, data_map, defaults, args.out_dir,
                   args.platform, args.study, args.core_limit, args.curve,
-                  args.finite_deformation)
+                  args.finite_deformation, args.field_weights)
     return 0
 
 

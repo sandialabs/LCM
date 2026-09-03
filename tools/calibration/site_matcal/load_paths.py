@@ -64,6 +64,18 @@ say which measure they mean:
                            with ``txc`` data. It needs no confining pressure
                            in the data file, since the confinement cancels out
                            of the difference.
+  * ``volumetric-strain``  - engineering axial strain vs volumetric strain
+                           ``strain_vol``. Only meaningful on ``txc``, whose
+                           lateral strains are predicted rather than
+                           prescribed.
+  * ``dev-stress-volumetric`` - both of the above at once, against the same
+                           axial strain, in one objective. This is the curve
+                           that makes the non-associative flow parameters
+                           (L, phi, Q) identifiable: the deviatoric response
+                           alone barely sees them. Measured on real data,
+                           sweeping phi from 0 to 0.16 moves the deviatoric
+                           error by 0.7 points of the data range while moving
+                           the volumetric error by a factor of 4.6.
   * ``time-stress``        - LOCA continuation parameter vs axial Cauchy
                            stress. `time` runs over [0,1] and is affine in
                            applied displacement. Kept for regression checks
@@ -81,18 +93,28 @@ appear, under these names, as columns of any experimental CSV.
 
 
 class Curve:
-    """A pair of fields to compare, parameterized by the load path's axis."""
+    """The fields to compare: one independent field and one or more dependent
+    ones, parameterized by the load path's axis.
+
+    More than one dependent field means they are compared TOGETHER, against the
+    same independent field, in a single objective. MatCal conditions each field
+    onto its own data range before differencing, so quantities of different
+    magnitude (a stress in Pa and a dimensionless strain) contribute
+    comparably without hand scaling; ``--field-weight`` adjusts the balance.
+    """
 
     def __init__(self, name, independent, dependent, units, description):
         self.name = name
         self._independent = independent
-        self._dependent = dependent
+        self._dependents = ((dependent,) if isinstance(dependent, str)
+                            else tuple(dependent))
         self.units = units
         self.description = description
 
     def fields(self, axis):
-        """Return ``(independent_field, dependent_field)`` for ``axis``."""
-        return (self._independent.format(a=axis), self._dependent.format(a=axis))
+        """Return ``(independent_field, (dependent_field, ...))`` for ``axis``."""
+        return (self._independent.format(a=axis),
+                tuple(d.format(a=axis) for d in self._dependents))
 
 
 CURVES = {
@@ -113,6 +135,16 @@ CURVES = {
         units=("dimensionless", "Pa"),
         description="engineering strain u/L0 vs deviatoric (differential) "
                     "Cauchy stress sigma_1 - sigma_3"),
+    "volumetric-strain": Curve(
+        "volumetric-strain", "strain_eng_{a}", "strain_vol",
+        units=("dimensionless", "dimensionless"),
+        description="engineering axial strain vs volumetric strain"),
+    "dev-stress-volumetric": Curve(
+        "dev-stress-volumetric", "strain_eng_{a}",
+        ("stress_dev_{a}", "strain_vol"),
+        units=("dimensionless", "Pa", "dimensionless"),
+        description="engineering axial strain vs BOTH the deviatoric stress "
+                    "and the volumetric strain, compared together"),
     "time-stress": Curve(
         "time-stress", "time", "stress_{a}{a}",
         units=("dimensionless", "Pa"),

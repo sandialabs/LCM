@@ -391,7 +391,7 @@ def check(platform=None):
 
 
 def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deformation,
-                   softening=False):
+                   softening=False, follower=False):
     os.makedirs(out_dir, exist_ok=True)
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
@@ -399,7 +399,8 @@ def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deform
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
                                    platform=platform, name=f"ref_{lp_name}",
                                    finite_deformation=finite_deformation,
-                                   softening=softening)
+                                   softening=softening,
+                                   follower=follower and lp_name == "txc")
         run_dir = os.path.join(out_dir, f"reference_run_{lp_name}")
         os.makedirs(run_dir, exist_ok=True)
         results = model.run(mc.State(lp_name), mc.ParameterCollection("truth"),
@@ -417,7 +418,7 @@ def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deform
 
 def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
               study_type, core_limit, curve, finite_deformation,
-              field_weights=None, softening=False):
+              field_weights=None, softening=False, follower=False):
     if not params:
         raise SystemExit("no --param given; nothing to calibrate")
 
@@ -432,7 +433,8 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
                                    platform=platform,
                                    finite_deformation=finite_deformation,
-                                   softening=softening)
+                                   softening=softening,
+                                   follower=follower and lp_name == "txc")
         datasets = []
         stateful = False
         for path, xcol, ycol in entries:
@@ -495,6 +497,7 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
     print(f"platform={get_platform(platform).name} study={study_type} "
           f"curve={curve} kinematics={_kinematics(finite_deformation)} "
           f"softening={'on' if softening else 'off'} "
+          f"follower={'on' if follower else 'off'} "
           f"params={[p.get_name() for p in params]}")
     # MatCal writes its working dirs / Dakota files into the CWD; run inside a
     # dedicated (git-ignored) directory so the source tree stays clean.
@@ -559,6 +562,13 @@ def main(argv=None):
                          "(CapSoftening.hpp). Fit or set coherence_residual, "
                          "failure_strain and failure_speed; they are inert "
                          "without this flag.")
+    ap.add_argument("--follower", action="store_true", default=False,
+                    help="treat the txc confining pressure as a follower "
+                         "load, by running each evaluation twice (see "
+                         "harness/txc_twopass.py). Albany's P condition acts "
+                         "on the reference normal, so without this the "
+                         "confining stress drifts up to 18 percent as the "
+                         "specimen dilates, which hides softening.")
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
     ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)
@@ -571,6 +581,10 @@ def main(argv=None):
     load_paths = args.load_paths or ["confined"]
     for lp_name in load_paths:
         get_load_path(lp_name)          # fail early, with the list of known names
+    if args.follower and "txc" not in load_paths:
+        print("WARNING: --follower applies only to the txc load path, which "
+              "is not in this run; the other paths apply no pressure, so the "
+              "flag does nothing here.", file=sys.stderr)
     # The named set first, then the individual --set overrides on top of it.
     base = DEFAULT_SETS[args.defaults]
     defaults = {**base, **dict(args.sets)}
@@ -584,11 +598,13 @@ def main(argv=None):
 
     if args.action == "make-reference":
         make_reference(load_paths, defaults, args.out_dir, args.platform,
-                       args.curve, args.finite_deformation, args.softening)
+                       args.curve, args.finite_deformation, args.softening,
+                       args.follower)
     else:
         calibrate(load_paths, params, data_map, defaults, args.out_dir,
                   args.platform, args.study, args.core_limit, args.curve,
-                  args.finite_deformation, args.field_weights, args.softening)
+                  args.finite_deformation, args.field_weights, args.softening,
+                  args.follower)
     return 0
 
 

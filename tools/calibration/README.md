@@ -342,13 +342,17 @@ gives a response that is not even monotonic in `A` (peak `q` measured at
 
 Three things are worth knowing before quoting a number from this path.
 
-- **The confining pressure is a dead load, not a follower load.** Albany's `P`
-  condition acts on the *reference* normal, so what is held constant is the
-  force on the undeformed face, not the Cauchy stress on the deformed one. The
-  lateral stress therefore drifts as the specimen dilates: measured `-1.0012e6`
-  at the start of shear and `-1.0679e6` at 20 per cent axial strain, so 0.2 per
-  cent at the peak and 6.7 per cent at the end of a long test. A follower
-  pressure condition would remove this and does not exist in Albany today.
+- **The confining pressure is a dead load unless you pass `--follower`.**
+  Albany's `P` condition acts on the *reference* normal, so what is held
+  constant is the force on the undeformed face, not the Cauchy stress on the
+  deformed one, and the lateral stress drifts as the specimen dilates: measured
+  3.5 per cent at 2 per cent axial strain and 18.3 per cent by 28 per cent. The
+  drift is in the direction that *hides* softening, so a softening parameter
+  fitted without the correction comes out biased. `--follower` runs each
+  evaluation twice (`harness/txc_twopass.py`), rewriting the lateral pressure
+  with the measured area ratio in between; one iteration holds the Cauchy
+  confining stress within 0.5 per cent. It is a stopgap for a follower-pressure
+  condition in Albany, which would also serve the ACE wave-pressure path.
 - **`force_y` and `force_z` are not reaction forces here,** because those faces
   are free. `stress_eng_y` and `stress_eng_z` are meaningless on this path.
   Everything axial is fine: the axial face is prescribed on every path.
@@ -472,6 +476,7 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 | `--set NAME=VALUE` | Override a cap parameter or a deck constant (`confining_pressure`, `axial_strain`, `preload_fraction`) without fitting it, base SI. Repeatable. |
 | `--defaults salem\|permafrost` | Starting parameter set: where `--param` `INIT` and every un-fitted placeholder come from. Default `salem`. |
 | `--softening` | Enable cohesion softening by bond breakage. The placeholders `coherence_residual`, `failure_strain`, `failure_speed` are inert without it. |
+| `--follower` | Treat the `txc` confining pressure as a follower load, by running each evaluation twice. Costs one extra Albany run per evaluation. |
 | `--study gradient\|scipy` | Dakota gradient study (default) or SciPy. |
 | `--platform rigel\|sirius\|cee` | Force a platform. Default: detected from the hostname. |
 | `--core-limit N` | Concurrent Albany evaluations. Default 4. |

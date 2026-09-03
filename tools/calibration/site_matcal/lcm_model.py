@@ -157,7 +157,7 @@ DEFAULT_FINITE_DEFORMATION = True
 def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
                        platform=None, name=None,
                        finite_deformation=DEFAULT_FINITE_DEFORMATION,
-                       softening=False):
+                       softening=False, follower=False):
     """Return a configured ``UserExecutableModel`` for an LCM cap load path.
 
     Parameters
@@ -184,6 +184,11 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
     softening : bool, optional
         Enable cohesion softening (the ``Softening`` flag). Off by default;
         the three softening placeholders are inert until it is on.
+    follower : bool, optional
+        Treat the confining pressure as a follower load on the ``txc`` path,
+        by running each evaluation twice through ``harness/txc_twopass.py``
+        (see that file). Off by default, and ignored on the other paths,
+        which apply no pressure. Costs one extra Albany run per evaluation.
     """
     lp = get_load_path(load_path)
     plat = get_platform(platform)
@@ -207,7 +212,21 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
         if not os.path.isfile(p):
             raise FileNotFoundError(f"template not found: {p}")
 
-    model = UserExecutableModel(albany, lp.deck, results_filename=lp.exodus)
+    # The follower correction replaces Albany with a driver that runs it
+    # twice, rewriting the lateral pressure with the measured area ratio in
+    # between; it leaves the same Exodus file, so nothing else changes.
+    executable = albany
+    if follower:
+        if lp.name != "txc":
+            raise ValueError(
+                f"follower pressure applies only to the txc load path, "
+                f"not {lp.name!r}, which applies no pressure")
+        executable = os.path.join(os.path.dirname(_THIS_DIR), "harness",
+                                  "txc_twopass.py")
+        if not os.access(executable, os.X_OK):
+            raise FileNotFoundError(f"not executable: {executable}")
+
+    model = UserExecutableModel(executable, lp.deck, results_filename=lp.exodus)
     # Both files are copied into every evaluation working directory and, being
     # text, are jinja-rendered there. The materials file gets the parameter
     # substitutions; the three verification decks have no placeholders and are

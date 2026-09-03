@@ -327,6 +327,7 @@ parameters and matters otherwise; the pre-2026 LCM code had it wrong
 (Appendix~\ref{sec:history}).
 
 \section{Flow Rule and Hardening Evolution}
+\label{sec:hardening}
 \label{sec:flow}
 
 The plastic strain rate follows the gradient of the plastic
@@ -420,6 +421,83 @@ apply wherever $\kappa$ is updated:
       rapidly toward $-\infty$ so that pore-collapse plasticity shuts off rather
       than stalling against an immobile cap.
 \end{itemize}
+
+\paragraph{Strain softening by loss of cohesion.}
+Frozen sand softens after its peak: in the Xu, Wu and Qi (2016)
+triaxial series at $-6\,^\circ$C the deviatoric stress falls to 62,
+70, 74 and 77 per cent of its peak by 26 per cent axial strain at
+$P_c = 3.0\times10^{5}$, $6.0\times10^{5}$, $8.0\times10^{5}$ and
+$1.0\times10^{6}$ Pa. Nothing above can produce that: the envelope
+$F_f$ is fixed and kinematic hardening only moves the back stress
+inside it. The physical mechanism is ice-bond breakage under shear,
+and the data locate it precisely --- the strength lost is 70 to 80
+per cent of the \emph{cohesive} share $A - C$ of the peak strength at
+every confining pressure, while the frictional share $\theta I_1$ is
+untouched.
+
+The model follows the LAME Kayenta implementation
+\citep{Brannon.Fossum.Strack:2009}, the production descendant of
+the GeoModel this cap model descends from, which carries a scalar
+\emph{coherence} (``one minus damage'') and blends an intact and a
+failed limit surface with it. Here the failed surface is the intact
+one with its cohesion reduced, so a single scalar
+$\omega \in [\omega_{\mathrm{res}}, 1]$ acts on the cohesive group
+alone:
+\begin{equation}
+  A - C \;\to\; \omega\,(A - C),
+  \qquad
+  N \;\to\; \omega\,N,
+  \label{eq:coherence-apply}
+\end{equation}
+implemented as $C \to A - \omega (A - C)$ so that $A$, $\theta$, the
+envelope curvature $C e^{D I_1}$ and every cap parameter are left as
+they are. This is the same algebra the Permafrost model applies for
+ocean-exposure weakening. When $N$ shrinks, a back stress that had
+reached the old $N$ is scaled back onto the new bounding surface
+$\sqrt{J_2^\alpha} \le N$, so that the reach of the translated yield
+surface, $(F_f - N) + \sqrt{J_2^\alpha}$, is the softened envelope
+and not more; the clamp in Eq.~\eqref{eq:halpha} only stops growth.
+
+Damage begins when the kinematic hardening is exhausted,
+$\sqrt{J_2^\alpha} \ge (1 - 10^{-6})\,N$ (Kayenta: \texttt{GFUN}
+$\le 10^{-6}$), and accumulates only on the shear branch
+$I_1 \ge \kappa$ (Kayenta: \texttt{.NOT.CONFINED}); nothing softens
+while the material is still hardening or while it is on the
+compaction cap, so the design rule of Section~\ref{sec:permafrost}
+that environmental softening never flows through $\kappa$ holds here
+too. The driver is the equivalent plastic strain accumulated after
+onset, $s$, and the law is Kayenta's logistic in that strain,
+\begin{equation}
+  \omega(s) \;=\; \omega_{\mathrm{res}}
+    + \bigl(1 - \omega_{\mathrm{res}}\bigr)\,
+      \frac{1 + e^{-2k}}{1 + e^{-2k\,(1 - s/\varepsilon_f)}},
+  \label{eq:coherence}
+\end{equation}
+which is 1 at $s = 0$, halfway to the residual at $s = \varepsilon_f$
+(\texttt{Failure Strain}), and tends to $\omega_{\mathrm{res}}$
+(\texttt{Coherence Residual}) with a sharpness set by $k$
+(\texttt{Failure Speed}: Kayenta's own guidance is that $\sim 0.1$ is
+gradual and $\sim 30$ abrupt). Coherence never heals. The coherence
+converged at the previous step is applied to the whole of the
+current step, the same one-step lag the Permafrost map uses for
+$\varepsilon_v^p$; with several hundred steps per test the lag is
+invisible. Two states carry it, \texttt{Coherence} and
+\texttt{Damage\_Strain}, and both kernels share the code in
+\texttt{CapSoftening.hpp}. The reference implementation mirrors it,
+and \texttt{CapModel\_Verify\_softening} and
+\texttt{Permafrost\_Verify\_softening} compare the full coherence
+history on a deviatoric path (axial compression with lateral
+extension, since confined compression of Salem limestone never leaves
+the elastic range on the shear branch) to $2\times10^{-15}$.
+
+Two things Kayenta does that this deliberately does not: reduce the
+elastic moduli by the coherence (nothing in a monotonic triaxial test
+constrains it), and drive damage by time rather than strain (rate
+dependence through a crack growth time, the natural hook when creep
+comes up). And one thing neither does: a softening material point is
+well posed, a softening continuum is not --- a boundary-value problem
+with this law localizes and depends on its mesh until a length scale
+is introduced. That regularization is a separate decision.
 
 \section{Integration: Substepped Explicit Scheme}
 \label{sec:integration}
@@ -807,6 +885,11 @@ Input name & Symbol & Salem & Units & Meaning \\
 \texttt{L}       & $L$        & 3.94e-10 & $\sigma^{-1}$ & pressure scale, plastic potential \\
 \texttt{phi}     & $\phi$     & 0.0      & ---           & linear pressure slope, plastic potential \\
 \texttt{Q}       & $Q$        & 28.0     & ---           & cap aspect ratio, plastic potential \\
+\midrule
+\texttt{Softening}          & ---  & false & --- & cohesion softening on/off, Eq.~\eqref{eq:coherence} \\
+\texttt{Coherence Residual} & $\omega_{\mathrm{res}}$ & \emph{required} & --- & coherence at full damage, $(0, 1]$ \\
+\texttt{Failure Strain}     & $\varepsilon_f$ & \emph{required} & --- & damage strain at half loss \\
+\texttt{Failure Speed}      & $k$  & \emph{required} & --- & sharpness of the fall \\
 \midrule
 \texttt{Substep Tolerance} & STOL & $10^{-4}$ & --- &
   relative stress-error target per substep \\
@@ -1426,6 +1509,11 @@ Input name & Default & Meaning \\
 \texttt{ACE Stiffness Weakening Factor}  & 1 & '' \\
 \texttt{ACE Eqps Limit Weakening Factor} & 1 & '' \\
 \midrule
+\texttt{Softening}, \texttt{Coherence Residual}, \texttt{Failure Strain},
+\texttt{Failure Speed} & off &
+  cohesion softening, applied on top of the ice-fraction map;
+  Section~\ref{sec:hardening} \\
+\midrule
 \texttt{Finite Deformation}, \texttt{Substep Tolerance},
 \texttt{Maximum Substeps} & &
   as in Section~\ref{sec:parameters} \\
@@ -1549,6 +1637,13 @@ J.~Frederick, A.~Mota, I.~Tezaur, and D.~Bull.
 \newblock A thermo-mechanical terrestrial model of {Arctic} coastal erosion.
 \newblock {\em Journal of Computational and Applied Mathematics}, 397:113533,
   2021.
+
+\bibitem[Brannon et~al.(2009)Brannon, Fossum, and Strack]{Brannon.Fossum.Strack:2009}
+R.~M. Brannon, A.~F. Fossum, and O.~E. Strack.
+\newblock Kayenta: Theory and user's guide.
+\newblock Technical Report SAND2009-2282, Sandia National Laboratories, 2009.
+\newblock The softening form followed here is the one in the LAME source,
+  \texttt{kayenta\_model.F}, subroutine \texttt{KMM\_UPDSFT}.
 
 \bibitem[Fossum and Brannon(2004)]{Fossum.Brannon:2004}
 A.~F. Fossum and R.~M. Brannon.

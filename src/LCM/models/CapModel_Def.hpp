@@ -57,12 +57,30 @@ CapModelKernel<EvalT, Traits>::CapModelKernel(
 {
   finite_deformation_ = p->get<bool>("Finite Deformation", false);
 
+  // Strain softening by bond breakage (CapSoftening.hpp). Off by default,
+  // and when on, all three numbers are required: a residual coherence, the
+  // damage strain at half loss, and the failure speed. No defaults for the
+  // same reason Reference Porosity has none: a silent value would decouple
+  // the model from its calibration.
+  softening_.enabled = p->get<bool>("Softening", false);
+  if (softening_.enabled) {
+    softening_.residual       = p->get<RealType>("Coherence Residual");
+    softening_.failure_strain = p->get<RealType>("Failure Strain");
+    softening_.failure_speed  = p->get<RealType>("Failure Speed");
+    ALBANY_ASSERT(softening_.residual > 0.0 && softening_.residual <= 1.0,
+                  "Coherence Residual must lie in (0, 1]");
+    ALBANY_ASSERT(softening_.failure_strain > 0.0, "Failure Strain must be positive");
+    ALBANY_ASSERT(softening_.failure_speed > 0.0, "Failure Speed must be positive");
+  }
+
   // retrieve appropriate field name strings
   std::string const cauchy_string           = stateName("Cauchy_Stress");
   std::string const backStress_string       = stateName("Back_Stress");
   std::string const capParameter_string     = stateName("Cap_Parameter");
   std::string const eqps_string             = stateName("eqps");
   std::string const volPlasticStrain_string = stateName("volPlastic_Strain");
+  std::string const coherence_string        = stateName("Coherence");
+  std::string const damage_strain_string    = stateName("Damage_Strain");
   std::string const strain_string           = stateName("Strain");
   std::string const F_string                = stateName("F");
   std::string const J_string                = stateName("J");
@@ -97,6 +115,8 @@ CapModelKernel<EvalT, Traits>::CapModelKernel(
   setEvaluatedField(capParameter_string, dl->qp_scalar);
   setEvaluatedField(eqps_string, dl->qp_scalar);
   setEvaluatedField(volPlasticStrain_string, dl->qp_scalar);
+  setEvaluatedField(coherence_string, dl->qp_scalar);
+  setEvaluatedField(damage_strain_string, dl->qp_scalar);
 
   // define the state variables
   // stress
@@ -113,6 +133,10 @@ CapModelKernel<EvalT, Traits>::CapModelKernel(
 
   // volPlasticStrain
   addStateVariable(volPlasticStrain_string, dl->qp_scalar, "scalar", 0.0, true, true);
+  // Softening states. Old copies are needed (the driver accumulates and
+  // coherence never heals); output only when asked, like the indicators.
+  addStateVariable(coherence_string, dl->qp_scalar, "scalar", 1.0, true, p->get<bool>("Output Coherence", false));
+  addStateVariable(damage_strain_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Damage Strain", false));
 }
 
 template <typename EvalT, typename Traits>
@@ -126,6 +150,8 @@ CapModelKernel<EvalT, Traits>::init(
   std::string backStress_string       = stateName("Back_Stress");
   std::string capParameter_string     = stateName("Cap_Parameter");
   std::string eqps_string             = stateName("eqps");
+  std::string coherence_string        = stateName("Coherence");
+  std::string damage_strain_string    = stateName("Damage_Strain");
   std::string volPlasticStrain_string = stateName("volPlastic_Strain");
   std::string strain_string           = stateName("Strain");
   std::string F_string                = stateName("F");
@@ -148,6 +174,8 @@ CapModelKernel<EvalT, Traits>::init(
   capParameter_     = *eval_fields[capParameter_string];
   eqps_             = *eval_fields[eqps_string];
   volPlasticStrain_ = *eval_fields[volPlasticStrain_string];
+  coherence_        = *eval_fields[coherence_string];
+  damage_strain_    = *eval_fields[damage_strain_string];
   if (finite_deformation_) Fp_ = *eval_fields[Fp_string];
 
   // get old state variables
@@ -162,6 +190,8 @@ CapModelKernel<EvalT, Traits>::init(
   capParameter_old_     = (*workset.stateArrayPtr)[capParameter_string + "_old"];
   eqps_old_             = (*workset.stateArrayPtr)[eqps_string + "_old"];
   volPlasticStrain_old_ = (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
+  coherence_old_        = (*workset.stateArrayPtr)[coherence_string + "_old"];
+  damage_strain_old_    = (*workset.stateArrayPtr)[damage_strain_string + "_old"];
 }
 
 template <typename EvalT, typename Traits>
@@ -292,6 +322,15 @@ CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
   P.Q      = Q_;
   P.lame   = lame;
   P.mu     = mu;
+  // Softening: the coherence converged at the previous step reduces the
+  // cohesive group for this whole step (an explicit lag of one step, the
+  // same choice the Permafrost map makes for eps_v^p), and the back stress
+  // is pulled onto its shrunken bounding surface before integrating.
+  ScalarT const omega_old = coherence_old_(cell, pt);
+  if (softening_.enabled) {
+    CapSoftening<ScalarT>::apply(P, omega_old);
+    CapSoftening<ScalarT>::project_backstress(alphaVal, P.N);
+  }
   integ.p0 = P;
   integ.p1 = P;
   integ.substep_tolerance = substep_tolerance_;
@@ -339,6 +378,20 @@ CapModelKernel<EvalT, Traits>::operator()(int cell, int pt) const
   capParameter_(cell, pt)     = kappaVal;
   eqps_(cell, pt)             = eqps_old_(cell, pt) + deqps;
   volPlasticStrain_(cell, pt) = volPlasticStrain_old_(cell, pt) + devolps;
+
+  // Damage driver and coherence. Onset is tested on the end-of-step state
+  // (back stress exhausted, on the shear branch); coherence never heals.
+  // sigmaVal is Cauchy here in finite deformation; the onset test only
+  // needs the sign of I1 - kappa, and the integrator's Kirchhoff stress
+  // differs from it by the positive factor J, so the branch is the same.
+  {
+    ScalarT const s_new = softening_.advance(damage_strain_old_(cell, pt), deqps,
+                                             Jdet * sigmaVal, alphaVal, kappaVal, P.N);
+    ScalarT omega_new = softening_.coherence(s_new);
+    if (omega_new > omega_old) omega_new = omega_old;
+    damage_strain_(cell, pt) = s_new;
+    coherence_(cell, pt)     = omega_new;
+  }
 }
 
 }  // namespace LCM

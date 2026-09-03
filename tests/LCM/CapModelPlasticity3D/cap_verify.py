@@ -457,12 +457,34 @@ def main():
     elif path == 'permafrost_f05':
         eps = lambda t: np.diag([-0.04 * t, 0.0, 0.0])
         f_of_t = lambda t: 0.5
+    elif path in ('confined_softening', 'permafrost_softening'):
+        # Confined compression with cohesion softening: the back stress
+        # saturates early on this path (the death_backstress case trips at
+        # 0.95), so damage begins well inside the 4 percent and the
+        # coherence falls from 1 toward the residual. Numbers match
+        # materials_softening.yaml / materials_permafrost_softening.yaml.
+        # Deviatoric path: confined compression of Salem never yields on the
+        # shear branch (its oedometric stress path climbs below the
+        # envelope), so it cannot exercise softening.
+        eps = lambda t: np.diag([-0.030 * t, 0.012 * t, 0.012 * t])
+        f_of_t = lambda t: 1.0
+        # failure_strain small enough that the damage strain passes it inside
+        # the path, so the logistic is exercised through its midpoint.
+        soften = ref.Softening(residual=0.3, failure_strain=2.0e-3, failure_speed=2.0)
+        # Cap pushed out of reach (100x Salem) so the path is shear-dominated.
+        p = ref.CapParams(kappa0=-8.05e8)
+        SOFT_END = dict(ref.SALEM_END, kappa0=-8.05e8)
     else:
         sys.exit(f'unknown path {path}')
 
     t, sxx, syy, szz, sxy, kappa, evp = exo_series(exo)
     nsteps = len(t) - 1
-    if path.startswith('permafrost_'):
+    if path == 'permafrost_softening':
+        hist = ref.drive_permafrost(eps, f_of_t, nsteps, SOFT_END,
+                                    SOFT_END, SALEM_SHARED, soften=soften)
+    elif path == 'confined_softening':
+        hist = ref.drive(eps, nsteps, p, soften=soften)
+    elif path.startswith('permafrost_'):
         hist = ref.drive_permafrost(eps, f_of_t, nsteps, ref.SALEM_END,
                                     ref.THAWED_TEST_END, ref.THAWED_TEST_SHARED)
     elif path.endswith('_fd'):
@@ -505,6 +527,19 @@ def main():
     check('sigma_zz', szz, o_szz, scale_s, TOL)
     check('kappa', kappa, o_kap, scale_k, TOL)
     check('vol plastic strain', evp, o_evp, scale_e, TOL)
+
+    if path.endswith('_softening'):
+        # The coherence itself, and proof that the case exercised the
+        # mechanism: it must have left 1 and not merely sat there.
+        _, var = exo_open(exo)
+        coh = var('Coherence')
+        o_coh = np.array([h[-1] for h in hist])
+        check('coherence', coh, o_coh, 1.0, TOL)
+        # Past the logistic midpoint (residual + half the range = 0.65).
+        engaged = o_coh.min() < 0.6
+        print(f'  coherence range          {o_coh.min():.4f} .. {o_coh.max():.4f}  '
+              f'[{"ok" if engaged else "FAIL: softening never engaged"}]')
+        ok &= engaged
 
     if path == 'hydrostatic':
         # Analytic identities at the final state: I1 = X(kappa) on the

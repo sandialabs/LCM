@@ -390,14 +390,16 @@ def check(platform=None):
     return 0 if ok else 1
 
 
-def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deformation):
+def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deformation,
+                   softening=False):
     os.makedirs(out_dir, exist_ok=True)
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
         indep, deps = lp.fields(curve)
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
                                    platform=platform, name=f"ref_{lp_name}",
-                                   finite_deformation=finite_deformation)
+                                   finite_deformation=finite_deformation,
+                                   softening=softening)
         run_dir = os.path.join(out_dir, f"reference_run_{lp_name}")
         os.makedirs(run_dir, exist_ok=True)
         results = model.run(mc.State(lp_name), mc.ParameterCollection("truth"),
@@ -415,7 +417,7 @@ def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deform
 
 def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
               study_type, core_limit, curve, finite_deformation,
-              field_weights=None):
+              field_weights=None, softening=False):
     if not params:
         raise SystemExit("no --param given; nothing to calibrate")
 
@@ -429,7 +431,8 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
         entries = data_map.get(lp_name) or [(None, None, None)]
         model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
                                    platform=platform,
-                                   finite_deformation=finite_deformation)
+                                   finite_deformation=finite_deformation,
+                                   softening=softening)
         datasets = []
         stateful = False
         for path, xcol, ycol in entries:
@@ -491,6 +494,7 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
     study.set_core_limit(core_limit)
     print(f"platform={get_platform(platform).name} study={study_type} "
           f"curve={curve} kinematics={_kinematics(finite_deformation)} "
+          f"softening={'on' if softening else 'off'} "
           f"params={[p.get_name() for p in params]}")
     # MatCal writes its working dirs / Dakota files into the CWD; run inside a
     # dedicated (git-ignored) directory so the source tree stays clean.
@@ -550,6 +554,11 @@ def main(argv=None):
                          "multi-field --curve (repeatable). Use it to count "
                          "the volumetric response for less than the stress: "
                          "--field-weight strain_vol=0.3")
+    ap.add_argument("--softening", action="store_true", default=False,
+                    help="enable cohesion softening by bond breakage "
+                         "(CapSoftening.hpp). Fit or set coherence_residual, "
+                         "failure_strain and failure_speed; they are inert "
+                         "without this flag.")
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
     ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)
@@ -575,11 +584,11 @@ def main(argv=None):
 
     if args.action == "make-reference":
         make_reference(load_paths, defaults, args.out_dir, args.platform,
-                       args.curve, args.finite_deformation)
+                       args.curve, args.finite_deformation, args.softening)
     else:
         calibrate(load_paths, params, data_map, defaults, args.out_dir,
                   args.platform, args.study, args.core_limit, args.curve,
-                  args.finite_deformation, args.field_weights)
+                  args.finite_deformation, args.field_weights, args.softening)
     return 0
 
 

@@ -1,0 +1,69 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: Permafrost
+  Materials:
+    # Failure/death verification deck (both end members = Salem
+    # limestone, constant ice saturation 1.0, so the trajectory is the
+    # already-verified CapModel path) -- backstress saturation: confined compression saturates the
+    # kinematic hardening, sqrt(J2(alpha)) -> N (G^alpha = 0).
+    Permafrost:
+      Material Model:
+        Model Name: Permafrost
+      Finite Deformation: false
+      # Same softening as materials_softening.yaml, through the Permafrost
+      # kernel: both end members are Salem and the ice saturation is 1, so
+      # the only thing this case adds over confined_softening is that the
+      # coherence multiplies on top of the ice-fraction map.
+      # kappa0 is 100x the Salem value: the confined path then stays on the
+      # shear branch (I1 > kappa), where damage is allowed. On the cap branch
+      # it is excluded by design, and the Salem cap would swallow this path.
+      Softening: true
+      Coherence Residual: 0.3
+      Failure Strain: 2.0e-3
+      Failure Speed: 2.0
+      Output Coherence: true
+      Output Damage Strain: true
+      Output Failure Modes: true
+      Output Failure State: true
+      Output Cell Death: true
+      Output Tension Indicator: true
+      Output Backstress Indicator: true
+      Output Crush Indicator: true
+      Output Eqps Indicator: true
+      Output Displacement Indicator: true
+      # Porosity at which the end members below were calibrated: the
+      # normalizer of the ice volume fraction phi = S n / n_ref that
+      # drives the cohesion/bonding and elasticity interpolation. Set to
+      # the frozen crushable volume W, so that an uncrushed frozen point
+      # sits exactly at the frozen end member.
+      Reference Porosity: 0.08
+
+      Frozen Parameters:
+        K: 1.517703284868067e10
+        G: 9.001517087192591e9
+        A: 6.892e8
+        C: 6.752e8
+        N: 6.0e6
+        kappa0: -8.05e8
+        W: 0.08
+        D1: 1.47e-9
+        calpha: 1.0e11
+      Thawed Parameters:
+        K: 1.517703284868067e10
+        G: 9.001517087192591e9
+        A: 6.892e8
+        C: 6.752e8
+        N: 6.0e6
+        kappa0: -8.05e8
+        W: 0.08
+        D1: 1.47e-9
+        calpha: 1.0e11
+        D: 3.94e-10
+        theta: 0.0
+        L: 3.94e-10
+        phi: 0.0
+        R: 28.0
+        Q: 28.0
+        psi: 1.0
+        D2: 0.0

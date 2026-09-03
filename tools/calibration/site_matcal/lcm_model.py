@@ -90,6 +90,11 @@ SALEM_LIMESTONE = dict(
     L=3.94e-10,                  # 1/Pa    (3.94e-4 1/MPa)
     phi=0.0,                     # -
     Q=28.0,                      # -
+    # Cohesion softening (CapSoftening.hpp), inert unless softening=True:
+    # residual coherence, damage strain at half loss, failure speed.
+    coherence_residual=1.0,      # -
+    failure_strain=1.0,          # -
+    failure_speed=1.0,           # -
 )
 
 
@@ -124,6 +129,9 @@ PERMAFROST_FROZEN = dict(
     L=4.0e-10,                           # 1/Pa
     phi=0.08,                            # -
     Q=5.0,                               # -
+    coherence_residual=1.0,              # -    (softening inert by default)
+    failure_strain=1.0,                  # -
+    failure_speed=1.0,                   # -
 )
 
 # Named starting parameter sets, selected with --defaults. SALEM_LIMESTONE is
@@ -148,7 +156,8 @@ DEFAULT_FINITE_DEFORMATION = True
 
 def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
                        platform=None, name=None,
-                       finite_deformation=DEFAULT_FINITE_DEFORMATION):
+                       finite_deformation=DEFAULT_FINITE_DEFORMATION,
+                       softening=False):
     """Return a configured ``UserExecutableModel`` for an LCM cap load path.
 
     Parameters
@@ -172,6 +181,9 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
         Kinematics for the ``Finite Deformation`` flag in the materials file.
         Default :data:`DEFAULT_FINITE_DEFORMATION`. See the KINEMATICS note in
         the module docstring.
+    softening : bool, optional
+        Enable cohesion softening (the ``Softening`` flag). Off by default;
+        the three softening placeholders are inert until it is on.
     """
     lp = get_load_path(load_path)
     plat = get_platform(platform)
@@ -185,7 +197,8 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
     # material defaults and the caller's overrides: they are defaults too, but
     # they belong to the load path rather than to the material.
     constants = {**SALEM_LIMESTONE, **lp.constants, **(defaults or {}),
-                 "finite_deformation": "true" if finite_deformation else "false"}
+                 "finite_deformation": "true" if finite_deformation else "false",
+                 "softening": "true" if softening else "false"}
     name = name or f"lcm_cap_{lp.name}"
 
     deck_path = os.path.join(TEMPLATES_DIR, lp.deck)

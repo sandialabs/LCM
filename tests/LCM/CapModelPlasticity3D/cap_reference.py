@@ -168,6 +168,53 @@ def halpha(dgds, alpha, p):
     return p.calpha * Galpha * dev
 
 
+class Softening:
+    """Strain softening by loss of cohesion, mirroring CapSoftening.hpp,
+    which follows the LAME Kayenta model (kayenta_model.F, KMM_UPDSFT):
+    a coherence omega in [residual, 1] driven by the equivalent plastic
+    strain accumulated after the back stress is exhausted, through
+    Kayenta's logistic c(s) = (1 + e^-2k) / (1 + e^{-2k (1 - s/eps_f)}),
+    omega = residual + (1 - residual) c(s); it never heals. The cohesive
+    group is reduced by omega: A - C -> omega (A - C), N -> omega N;
+    friction, curvature and the cap are untouched."""
+    ONSET_TOL = 1.0e-6          # Kayenta: damage begins when GFUN <= 1e-6
+
+    def __init__(self, residual, failure_strain, failure_speed):
+        assert 0.0 < residual <= 1.0 and failure_strain > 0.0 and failure_speed > 0.0
+        self.residual = residual
+        self.failure_strain = failure_strain
+        self.failure_speed = failure_speed
+
+    def coherence(self, s):
+        k = self.failure_speed
+        c = (1.0 + np.exp(-2.0 * k)) / (1.0 + np.exp(-2.0 * k * (1.0 - s / self.failure_strain)))
+        return self.residual + (1.0 - self.residual) * c
+
+    @staticmethod
+    def apply(P, omega):
+        """Return a copy of P with the cohesive group reduced by omega."""
+        Q = BlendParams(**{k: getattr(P, k) for k in BlendParams.FIELDS})
+        Q.C = P.A - omega * (P.A - P.C)
+        Q.N = omega * P.N
+        return Q
+
+    @staticmethod
+    def project_backstress(alpha, N):
+        mag = np.sqrt(0.5 * np.tensordot(alpha, alpha))
+        if mag > N and mag > 0.0:
+            return (N / mag) * alpha
+        return alpha
+
+    def advance(self, s_old, deqps, sigma, alpha, kappa, N):
+        started = s_old > 0.0
+        on_shear = np.trace(sigma) >= kappa
+        mag = np.sqrt(0.5 * np.tensordot(alpha, alpha))
+        exhausted = N > 0.0 and mag >= (1.0 - self.ONSET_TOL) * N
+        if (started or exhausted) and on_shear:
+            return s_old + deqps
+        return s_old
+
+
 def hkappa(dgds, kappa, p):
     ded = dedkappa(kappa, p)
     if ded == 0.0:
@@ -286,29 +333,47 @@ def integrate_step(sigma_n, alpha_n, kappa_n, deps, p, p_begin=None,
     return sigma, alpha, kappa
 
 
-def drive(eps_of_t, nsteps, p):
-    """Integrate a strain history; returns list of (t, sigma, kappa, evp)."""
+def drive(eps_of_t, nsteps, p, soften=None):
+    """Integrate a strain history; returns list of
+    (t, sigma, kappa, evp, coherence). With `soften` (a Softening) the
+    coherence converged at the previous step reduces the cohesive group for
+    the whole step and the back stress is projected onto its shrunken
+    bounding surface first, mirroring the kernel's one-step lag."""
     sigma = np.zeros((3, 3))
     alpha = np.zeros((3, 3))
     kappa = p.kappa0
     eps_prev = eps_of_t(0.0)
-    out = [(0.0, sigma.copy(), kappa, 0.0)]
+    out = [(0.0, sigma.copy(), kappa, 0.0, 1.0)]
     evp = 0.0
+    s_dmg = 0.0
+    omega = 1.0
+    P_full = as_blendable(p)
     Cinv_vol = 1.0 / (3 * p.lame + 2 * p.mu)   # for volumetric plastic strain
     for n in range(1, nsteps + 1):
         t = n / nsteps
         eps = eps_of_t(t)
         deps = eps - eps_prev
-        sigma_tr = sigma + p.Ce(deps)
-        sigma_new, alpha, kappa = integrate_step(sigma, alpha, kappa, deps, p)
-        # plastic strain increment = C^-1 : (sigma_tr - sigma_new); only the
-        # volumetric part is tracked here.
+        P = P_full
+        if soften is not None:
+            P = Softening.apply(P_full, omega)
+            alpha = Softening.project_backstress(alpha, P.N)
+        sigma_tr = sigma + ce_apply(P, deps)
+        sigma_new, alpha, kappa = integrate_step(sigma, alpha, kappa, deps, P)
+        # plastic strain increment = C^-1 : (sigma_tr - sigma_new)
         dsig = sigma_tr - sigma_new
         devolps = Cinv_vol * np.trace(dsig)
         evp += devolps
+        if soften is not None:
+            tr_d = np.trace(dsig)
+            deps_p = (tr_d / (9.0 * (P.lame + 2.0 * P.mu / 3.0))) * I3 \
+                     + (1.0 / (2.0 * P.mu)) * (dsig - (tr_d / 3.0) * I3)
+            dev_p = deps_p - np.trace(deps_p) / 3.0 * I3
+            deqps = np.sqrt(2.0 / 3.0) * np.linalg.norm(dev_p)
+            s_dmg = soften.advance(s_dmg, deqps, sigma_new, alpha, kappa, P.N)
+            omega = min(omega, soften.coherence(s_dmg))
         sigma = sigma_new
         eps_prev = eps
-        out.append((t, sigma.copy(), kappa, evp))
+        out.append((t, sigma.copy(), kappa, evp, omega))
     return out
 
 
@@ -467,7 +532,7 @@ def ice_volume_fraction(S, kappa, frozen, thawed, shared, n_ref,
 
 
 def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
-                     nu_max=0.45, n_ref=None, n0=None):
+                     nu_max=0.45, n_ref=None, n0=None, soften=None):
     """Strain-driven history with per-step ice saturation, mirroring the
     kernel exactly: parameters ramp from the previous step's state to the
     current one inside the integrator; the stored stress is re-expressed
@@ -485,9 +550,11 @@ def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
     kappa = frozen['kappa0']
     f_prev = f_of_t(0.0)
     eps_prev = eps_of_t(0.0)
-    out = [(0.0, sigma.copy(), kappa, 0.0, alpha.copy(), 0.0)]
+    out = [(0.0, sigma.copy(), kappa, 0.0, alpha.copy(), 0.0, 1.0)]
     evp = 0.0
     eqps = 0.0
+    s_dmg = 0.0
+    omega = 1.0
     for n in range(1, nsteps + 1):
         t = n / nsteps
         f = f_of_t(t)
@@ -499,6 +566,12 @@ def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
                                   n_ref, n0, nu_max)
         P0 = permafrost_map(phi_prev, frozen, thawed, shared, nu_max, fp=f_prev)
         P1 = permafrost_map(phi, frozen, thawed, shared, nu_max, fp=f)
+        if soften is not None:
+            # Coherence multiplies on top of the ice-fraction map, with the
+            # previous step's value for the whole step.
+            P0 = Softening.apply(P0, omega)
+            P1 = Softening.apply(P1, omega)
+            alpha = Softening.project_backstress(alpha, P1.N)
         eps = eps_of_t(t)
         deps = eps - eps_prev
         # sigma_n <- C(f) : C(f_prev)^-1 : sigma_n
@@ -514,11 +587,15 @@ def drive_permafrost(eps_of_t, f_of_t, nsteps, frozen, thawed, shared,
         deps_p = (tr_d / (9.0 * K1)) * I3 + (1.0 / (2.0 * P1.mu)) * (dsig - (tr_d / 3.0) * I3)
         evp += np.trace(deps_p)
         dev_p = deps_p - np.trace(deps_p) / 3.0 * I3
-        eqps += np.sqrt(2.0 / 3.0) * np.linalg.norm(dev_p)
+        deqps = np.sqrt(2.0 / 3.0) * np.linalg.norm(dev_p)
+        eqps += deqps
+        if soften is not None:
+            s_dmg = soften.advance(s_dmg, deqps, sigma_new, alpha, kappa, P1.N)
+            omega = min(omega, soften.coherence(s_dmg))
         sigma = sigma_new
         f_prev = f
         eps_prev = eps
-        out.append((t, sigma.copy(), kappa, evp, alpha.copy(), eqps))
+        out.append((t, sigma.copy(), kappa, evp, alpha.copy(), eqps, omega))
     return out
 
 
@@ -574,7 +651,7 @@ def selfcheck():
     #    stress sits at I1 = X(kappa) and evp must equal the crush curve.
     p1 = CapParams()
     hist = drive(lambda t: -0.02 * t * I3, 200, p1)
-    t, sig, kap, evp = hist[-1]
+    t, sig, kap, evp = hist[-1][:4]
     I1f = np.trace(sig)
     Xf = X_of_kappa(kap, p1)
     evp_curve = evp_of_kappa(kap, p1)
@@ -591,7 +668,8 @@ def selfcheck():
 
 def print_history(hist):
     print("# t  sxx syy szz sxy sxz syz  kappa  evp")
-    for t, sig, kap, evp in hist:
+    for h in hist:
+        t, sig, kap, evp = h[:4]
         print(f"{t:.6f} {sig[0,0]:.8e} {sig[1,1]:.8e} {sig[2,2]:.8e} "
               f"{sig[0,1]:.8e} {sig[0,2]:.8e} {sig[1,2]:.8e} "
               f"{kap:.8e} {evp:.8e}")

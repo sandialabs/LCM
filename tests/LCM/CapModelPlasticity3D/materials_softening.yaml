@@ -1,0 +1,49 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: CapModel
+  Materials:
+    # Salem limestone, associative parameter set: Table 1 of Sun, Chen &
+    # Ostien, Acta Geotechnica 9 (2014) 903-934, converted to base SI:
+    # stress in Pa, D/L/D1 in 1/Pa, D2 in 1/Pa^2, magnitudes in scientific
+    # notation with no prefixed units. The model is unit-agnostic, so this
+    # is only a convention; it matches the ACE production decks and
+    # tools/calibration.
+    CapModel:
+      Material Model:
+        Model Name: Cap
+      # Small-strain model: this flag routes MechanicsProblem to compute
+      # the infinitesimal Strain field the kernel consumes.
+      Finite Deformation: false
+      # Cohesion softening by bond breakage (CapSoftening.hpp), the Kayenta
+      # form: coherence falls from 1 toward the residual as the equivalent
+      # plastic strain accumulated after back-stress exhaustion passes the
+      # failure strain, at a sharpness set by the failure speed. On the
+      # confined path the back stress saturates early, so this engages well
+      # inside the 4 percent and the reference must follow it exactly.
+      # kappa0 is 100x the Salem value: the confined path then stays on the
+      # shear branch (I1 > kappa), where damage is allowed. On the cap branch
+      # it is excluded by design, and the Salem cap would swallow this path.
+      Softening: true
+      Coherence Residual: 0.3
+      Failure Strain: 2.0e-3
+      Failure Speed: 2.0
+      Output Coherence: true
+      Output Damage Strain: true
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 2.2547e10}
+      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.2524}
+      A: 6.892e8
+      D: 3.94e-10
+      C: 6.752e8
+      theta: 0.0
+      R: 28.0
+      kappa0: -8.05e8
+      W: 0.08
+      D1: 1.47e-9
+      D2: 0.0
+      calpha: 1.0e11
+      psi: 1.0
+      N: 6.0e6
+      L: 3.94e-10
+      phi: 0.0
+      Q: 28.0

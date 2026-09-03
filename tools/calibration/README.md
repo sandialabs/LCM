@@ -471,6 +471,7 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 | `--data LOADPATH:CSV[:XCOL:YCOL]` | Experimental data for one load path, base SI. Repeatable, including several times for one path: each curve then becomes a MatCal state and all are fitted with one parameter set. Defaults to `examples/<load_path>_reference.csv`. |
 | `--set NAME=VALUE` | Override a cap parameter or a deck constant (`confining_pressure`, `axial_strain`, `preload_fraction`) without fitting it, base SI. Repeatable. |
 | `--defaults salem\|permafrost` | Starting parameter set: where `--param` `INIT` and every un-fitted placeholder come from. Default `salem`. |
+| `--softening` | Enable cohesion softening by bond breakage. The placeholders `coherence_residual`, `failure_strain`, `failure_speed` are inert without it. |
 | `--study gradient\|scipy` | Dakota gradient study (default) or SciPy. |
 | `--platform rigel\|sirius\|cee` | Force a platform. Default: detected from the hostname. |
 | `--core-limit N` | Concurrent Albany evaluations. Default 4. |
@@ -533,6 +534,15 @@ Chen and Ostien, *Acta Geotechnica* **9** (2014) 903-934, converted to base SI.
 | `R` | `28.0` | - | `L` | `3.94e-10` | 1/Pa |
 | `kappa0` | `-8.05e6` | Pa | `phi` | `0.0` | - |
 | | | | `Q` | `28.0` | - |
+
+Three more placeholders, `coherence_residual`, `failure_strain` and
+`failure_speed`, drive the cohesion-softening law (Kayenta's form, see
+`CapSoftening.hpp` and the developers guide) and are inert unless the run is
+made with `--softening`. Softening is what the post-peak fall of the frozen-sand
+curves needs: the strength lost is 70 to 80 percent of the cohesive share at
+every confining pressure, which is exactly the reduction the law applies. Fit
+them on the `txc` path with the two-pass follower correction, since the dead
+confining load hides part of the softening they are meant to capture.
 
 A second named set, `PERMAFROST_FROZEN`, holds the frozen end member of
 `tests/LCM/ACE/MiniErosionPermafrost/materials_mechanical_permafrost.yaml`

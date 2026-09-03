@@ -41,6 +41,9 @@ foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           materials_permafrost_death_distortion.yaml
           input_porosity.yaml materials_permafrost_porosity.yaml
           input_volfrac.yaml materials_permafrost_volfrac.yaml
+          input_confined_softening.yaml materials_softening.yaml
+          input_confined_permafrost_softening.yaml
+          materials_permafrost_softening.yaml
           depth_test.txt porosity_test.txt
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
@@ -82,6 +85,32 @@ if (CAP_PY_OK)
              WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     set_tests_properties(CapModel_Verify_${case} PROPERTIES LABELS "LCM;Tpetra;Forward")
   endforeach()
+  # Cohesion softening (Kayenta form, CapSoftening.hpp) on the confined
+  # path, through both kernels, verified against the reference including
+  # the coherence history; the verify script also checks the mechanism
+  # actually engaged.
+  foreach(case confined_softening permafrost_softening)
+    if (case STREQUAL "confined_softening")
+      set(_soft_input input_confined_softening.yaml)
+      set(_soft_exo cap_confined_softening.exo)
+      set(_soft_name CapModel_Verify_softening)
+    else()
+      set(_soft_input input_confined_permafrost_softening.yaml)
+      set(_soft_exo permafrost_softening.exo)
+      set(_soft_name Permafrost_Verify_softening)
+    endif()
+    add_test(NAME ${_soft_name}
+             COMMAND ${CMAKE_COMMAND}
+                     "-DTEST_PROG=${SerialAlbany.exe}"
+                     "-DINPUT=${_soft_input}"
+                     "-DEXO=${_soft_exo}"
+                     "-DPATHMODE=${case}"
+                     "-DPYTHON=${PYTHON3_FOR_CAP}"
+                     -P runverify.cmake
+             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    set_tests_properties(${_soft_name} PROPERTIES LABELS "LCM;Tpetra;Forward")
+  endforeach()
+
   # Permafrost Phase-0 scaffold: must reproduce CapModel/reference exactly
   add_test(NAME Permafrost_Equivalence_confined
            COMMAND ${CMAKE_COMMAND}

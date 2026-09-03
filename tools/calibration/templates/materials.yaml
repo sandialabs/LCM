@@ -39,4 +39,11 @@ LCM:
       L: {{ L }}
       phi: {{ phi }}
       Q: {{ Q }}
+      # Cohesion softening by bond breakage (CapSoftening.hpp): off unless
+      # --softening. The three numbers are placeholders like any other, so
+      # they can be fitted; with softening off they are inert.
+      Softening: {{ softening }}
+      Coherence Residual: {{ coherence_residual }}
+      Failure Strain: {{ failure_strain }}
+      Failure Speed: {{ failure_speed }}
 

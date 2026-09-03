@@ -9,6 +9,8 @@
 
 #include "KernelConstitutiveModel.hpp"
 
+#include "CapSoftening.hpp"
+
 namespace LCM {
 
 template <typename EvalT, typename Traits>
@@ -67,6 +69,11 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   ScalarField capParameter_;
   ScalarField eqps_;
   ScalarField volPlasticStrain_;
+  // Strain softening (see CapSoftening.hpp): coherence and the damage
+  // strain that drives it. Both always exist as states; with softening
+  // off they stay at 1 and 0.
+  ScalarField coherence_;
+  ScalarField damage_strain_;
 
   // Failure indicators (each normalized so 1 means exhaustion of the
   // underlying mechanism) and the death bookkeeping fields.
@@ -110,6 +117,8 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray eqps_old_;
   Albany::MDArray volPlasticStrain_old_;
   Albany::MDArray ice_sat_state_old_;
+  Albany::MDArray coherence_old_;
+  Albany::MDArray damage_strain_old_;
 
   // Per-(cell, pt) failure-mode bitmask, carried as an STK-backed element
   // state so it follows each cell correctly when the discretization
@@ -213,6 +222,11 @@ struct PermafrostKernel : public ParallelKernel<EvalT, Traits>
 
   RealType substep_tolerance_;
   int      max_substeps_;
+
+  // Cohesion softening by ice-bond breakage; off unless the deck enables
+  // it. Applied on top of the ice-volume-fraction map: thaw removes ice,
+  // shear breaks ice bonds, both reduce the same cohesive group.
+  CapSoftening<ScalarT> softening_;
 
   // Failure criteria. Each indicator reaches 1 at exhaustion of its
   // mechanism; a criterion is enabled by a positive threshold (or limit)

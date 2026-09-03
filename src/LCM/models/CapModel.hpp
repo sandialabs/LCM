@@ -9,6 +9,8 @@
 
 #include "KernelConstitutiveModel.hpp"
 
+#include "CapSoftening.hpp"
+
 namespace LCM {
 
 template <typename EvalT, typename Traits>
@@ -60,6 +62,11 @@ struct CapModelKernel : public ParallelKernel<EvalT, Traits>
   ScalarField capParameter_;
   ScalarField eqps_;
   ScalarField volPlasticStrain_;
+  // Strain softening (see CapSoftening.hpp): coherence and the damage
+  // strain that drives it. Both always exist as states; with softening
+  // off they stay at 1 and 0.
+  ScalarField coherence_;
+  ScalarField damage_strain_;
 
   // Old state arrays
   Albany::MDArray stress_old_;
@@ -70,9 +77,14 @@ struct CapModelKernel : public ParallelKernel<EvalT, Traits>
   Albany::MDArray capParameter_old_;
   Albany::MDArray eqps_old_;
   Albany::MDArray volPlasticStrain_old_;
+  Albany::MDArray coherence_old_;
+  Albany::MDArray damage_strain_old_;
 
   // Finite-deformation (exponential/logarithmic map) kinematics flag
   bool finite_deformation_;
+
+  // Cohesion softening by bond breakage; off unless the deck enables it.
+  CapSoftening<ScalarT> softening_;
 
   // Material parameters
   RealType A_;

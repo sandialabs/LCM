@@ -143,6 +143,20 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   substep_tolerance_ = p->get<RealType>("Substep Tolerance", 1.0e-4);
   max_substeps_      = p->get<int>("Maximum Substeps", 200);
 
+  // Strain softening by ice-bond breakage (CapSoftening.hpp). Off by
+  // default; when on, all three numbers are required, with no defaults,
+  // for the reason Reference Porosity has none.
+  softening_.enabled = p->get<bool>("Softening", false);
+  if (softening_.enabled) {
+    softening_.residual       = p->get<RealType>("Coherence Residual");
+    softening_.failure_strain = p->get<RealType>("Failure Strain");
+    softening_.failure_speed  = p->get<RealType>("Failure Speed");
+    ALBANY_ASSERT(softening_.residual > 0.0 && softening_.residual <= 1.0,
+                  "Coherence Residual must lie in (0, 1]");
+    ALBANY_ASSERT(softening_.failure_strain > 0.0, "Failure Strain must be positive");
+    ALBANY_ASSERT(softening_.failure_speed > 0.0, "Failure Speed must be positive");
+  }
+
   // Failure criteria: a positive threshold (or limit) enables each
   // criterion; the default 0 disables it. The thresholds for the
   // asymptotic indicators (tension, backstress, crush) must be < 1.
@@ -239,6 +253,8 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   std::string const backStress_string       = stateName("Back_Stress");
   std::string const capParameter_string     = stateName("Cap_Parameter");
   std::string const eqps_string             = stateName("eqps");
+  std::string const coherence_string        = stateName("Coherence");
+  std::string const damage_strain_string    = stateName("Damage_Strain");
   std::string const volPlasticStrain_string = stateName("volPlastic_Strain");
   std::string const strain_string           = stateName("Strain");
   std::string const F_string                = stateName("F");
@@ -295,6 +311,8 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   setEvaluatedField(capParameter_string, dl->qp_scalar);
   setEvaluatedField(eqps_string, dl->qp_scalar);
   setEvaluatedField(volPlasticStrain_string, dl->qp_scalar);
+  setEvaluatedField(coherence_string, dl->qp_scalar);
+  setEvaluatedField(damage_strain_string, dl->qp_scalar);
 
   setEvaluatedField(tension_indicator_string, dl->qp_scalar);
   setEvaluatedField(backstress_indicator_string, dl->qp_scalar);
@@ -326,6 +344,10 @@ PermafrostKernel<EvalT, Traits>::PermafrostKernel(
   addStateVariable(eqps_string, dl->qp_scalar, "scalar", 0.0, true, true);
 
   addStateVariable(volPlasticStrain_string, dl->qp_scalar, "scalar", 0.0, true, true);
+
+  // Softening states: coherence starts intact at 1, the damage driver at 0.
+  addStateVariable(coherence_string, dl->qp_scalar, "scalar", 1.0, true, p->get<bool>("Output Coherence", false));
+  addStateVariable(damage_strain_string, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output Damage Strain", false));
 
   // Failure indicators (output-only) and the death bookkeeping states.
   // The failure_modes bitmask is the only one that needs its old state.
@@ -360,6 +382,8 @@ PermafrostKernel<EvalT, Traits>::init(
   std::string backStress_string       = stateName("Back_Stress");
   std::string capParameter_string     = stateName("Cap_Parameter");
   std::string eqps_string             = stateName("eqps");
+  std::string coherence_string        = stateName("Coherence");
+  std::string damage_strain_string    = stateName("Damage_Strain");
   std::string volPlasticStrain_string = stateName("volPlastic_Strain");
   std::string strain_string           = stateName("Strain");
   std::string F_string                = stateName("F");
@@ -393,6 +417,8 @@ PermafrostKernel<EvalT, Traits>::init(
   capParameter_     = *eval_fields[capParameter_string];
   eqps_             = *eval_fields[eqps_string];
   volPlasticStrain_ = *eval_fields[volPlasticStrain_string];
+  coherence_        = *eval_fields[coherence_string];
+  damage_strain_    = *eval_fields[damage_strain_string];
   if (finite_deformation_) Fp_ = *eval_fields[Fp_string];
   ice_sat_state_ = *eval_fields["Ice_Saturation_State"];
 
@@ -425,6 +451,8 @@ PermafrostKernel<EvalT, Traits>::init(
   capParameter_old_     = (*workset.stateArrayPtr)[capParameter_string + "_old"];
   eqps_old_             = (*workset.stateArrayPtr)[eqps_string + "_old"];
   volPlasticStrain_old_ = (*workset.stateArrayPtr)[volPlasticStrain_string + "_old"];
+  coherence_old_        = (*workset.stateArrayPtr)[coherence_string + "_old"];
+  damage_strain_old_    = (*workset.stateArrayPtr)[damage_strain_string + "_old"];
   ice_sat_state_old_    = (*workset.stateArrayPtr)["Ice_Saturation_State_old"];
   failure_modes_old_    = (*workset.stateArrayPtr)["failure_modes_old"];
 
@@ -516,6 +544,8 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
     eqps_(cell, pt)             = eqps_old_(cell, pt);
     volPlasticStrain_(cell, pt) = volPlasticStrain_old_(cell, pt);
     ice_sat_state_(cell, pt)    = ice_sat_state_old_(cell, pt);
+    coherence_(cell, pt)        = coherence_old_(cell, pt);
+    damage_strain_(cell, pt)    = damage_strain_old_(cell, pt);
 
     tension_indicator_(cell, pt)      = 0.0;
     backstress_indicator_(cell, pt)   = 0.0;
@@ -718,8 +748,19 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
 
   ice_volume_fraction_(cell, pt) = phi_new;
 
-  CapParameters<ScalarT> const P0 = map_params(phi_old, f_old);
-  CapParameters<ScalarT> const P1 = map_params(phi_new, f_ice);
+  CapParameters<ScalarT> P0 = map_params(phi_old, f_old);
+  CapParameters<ScalarT> P1 = map_params(phi_new, f_ice);
+
+  // Softening: the coherence converged at the previous step reduces the
+  // cohesive group of both parameter sets (an explicit lag of one step,
+  // the same choice this map makes for eps_v^p). It multiplies on top of
+  // the ice-volume-fraction interpolation: thaw removes ice, shear breaks
+  // ice bonds, and both act on the same group.
+  ScalarT const omega_old = coherence_old_(cell, pt);
+  if (softening_.enabled) {
+    CapSoftening<ScalarT>::apply(P0, omega_old);
+    CapSoftening<ScalarT>::apply(P1, omega_old);
+  }
 
   ScalarT const mu          = P1.mu;
   ScalarT const lame        = P1.lame;
@@ -742,6 +783,11 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
       alphaVal(i, j) = backStress_old_(cell, pt, i, j);
 
   ScalarT kappaVal = kappa_old;
+
+  // With the cohesive group reduced, N may now sit below the stored back
+  // stress; pull it onto its bounding surface so the reach of the yield
+  // surface is the softened envelope and not more.
+  if (softening_.enabled) CapSoftening<ScalarT>::project_backstress(alphaVal, P1.N);
 
   // Spectral functions of symmetric tensors, for the exp/log kinematics.
   auto fun_sym = [&](Tensor const& Asym, ScalarT (*fun)(ScalarT const&)) {
@@ -844,6 +890,9 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   integ.max_substeps      = max_substeps_;
 
   Tensor sigmaVal = integ.integrate(sigmaN, alphaVal, kappaVal, depsilon, f_tolerance);
+  // The integrator's stress (Kirchhoff in finite deformation), kept for the
+  // softening onset test below; sigmaVal itself becomes Cauchy later.
+  Tensor const sigma_integ = sigmaVal;
 
   // Plastic strain increment from the stress correction (zero in the
   // elastic case, where sigmaVal == sigmaTr).
@@ -1096,6 +1145,19 @@ PermafrostKernel<EvalT, Traits>::operator()(int cell, int pt) const
   capParameter_(cell, pt)     = kappaVal;
   eqps_(cell, pt)             = eqps_old_(cell, pt) + deqps;
   volPlasticStrain_(cell, pt) = volPlasticStrain_old_(cell, pt) + devolps;
+
+  // Damage driver and coherence: onset on the end-of-step state (back
+  // stress exhausted, shear branch), no healing. The onset test needs
+  // only the sign of I1 - kappa, which the Kirchhoff/Cauchy factor J does
+  // not change, so the integrator's stress space is used as is.
+  {
+    ScalarT const s_new = softening_.advance(damage_strain_old_(cell, pt), deqps,
+                                             sigma_integ, alphaVal, kappaVal, P1.N);
+    ScalarT omega_new = softening_.coherence(s_new);
+    if (omega_new > omega_old) omega_new = omega_old;
+    damage_strain_(cell, pt) = s_new;
+    coherence_(cell, pt)     = omega_new;
+  }
 }
 
 }  // namespace LCM

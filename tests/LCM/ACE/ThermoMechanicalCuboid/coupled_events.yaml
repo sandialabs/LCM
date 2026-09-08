@@ -1,0 +1,21 @@
+LCM:
+  Alternating System:
+    Model Input Files: ['thermal.yaml', 'mechanical.yaml']
+    # Two event intervals with their own time steps; see runtest_events.cmake
+    # for the step sequence they must produce.
+    Event Initial Times File: 'events_initial_times.txt'
+    Event Final Times File: 'events_final_times.txt'
+    Event Time Steps File: 'events_time_steps.txt'
+    Initial Time: 0.0 #   [sec]
+    Final Time: 7200.0 # 2 hours [sec]
+    Initial Time Step: 900.0 # [sec]
+    Maximum Steps: 10000
+    Minimum Time Step: 1.0e-04 # [sec]
+    Maximum Time Step: 900.0 # [sec]
+    Reduction Factor: 0.5
+    Amplification Factor: 1.1
+    Exodus Write Interval: 1
+  Problem:
+    Solution Method: ACE Sequential Thermo-Mechanical
+    Phalanx Graph Visualization Detail: 0
+...

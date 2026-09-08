@@ -17,8 +17,26 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cuboid.g
                ${CMAKE_CURRENT_BINARY_DIR}/cuboid.g COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/depth.txt
                ${CMAKE_CURRENT_BINARY_DIR}/depth.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/coupled_events.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/coupled_events.yaml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/events_initial_times.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/events_initial_times.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/events_final_times.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/events_final_times.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/events_time_steps.txt
+               ${CMAKE_CURRENT_BINARY_DIR}/events_time_steps.txt COPYONLY)
 
 get_filename_component(testName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 add_test(ACE_${testName} ${SerialAlbany.exe} coupled.yaml)
-set_tests_properties(ACE_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward")
+set_tests_properties(ACE_${testName} PROPERTIES LABELS "LCM;Tpetra;Forward"
+                     RESOURCE_LOCK ACE_${testName}_workdir)
+
+# Event intervals: same cuboid, two intervals with their own time steps.
+# Both tests write thermal.e and mechanical.e here, hence the lock.
+add_test(NAME ACE_${testName}_Events
+         COMMAND ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+                 -DTEST_ARGS=coupled_events.yaml
+                 -P ${CMAKE_CURRENT_SOURCE_DIR}/runtest_events.cmake)
+set_tests_properties(ACE_${testName}_Events PROPERTIES LABELS "LCM;Tpetra;Forward"
+                     RESOURCE_LOCK ACE_${testName}_workdir)

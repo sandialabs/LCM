@@ -47,14 +47,15 @@ validate_intervals(std::vector<ST> const& initial_times, std::vector<ST> const& 
   auto const initials_size = initial_times.size();
   auto const finals_size   = final_times.size();
   auto const steps_size    = time_steps.size();
-  auto const all_equal     = initials_size == finals_size == steps_size;
+  auto const all_equal     = initials_size == finals_size && finals_size == steps_size;
   ALBANY_ASSERT(
       all_equal == true,
       "Event interval arrays have different sizes, " << "Initial Times : " << initials_size << ", Final Times : " << finals_size << ", Steps Size"
                                                      << steps_size);
+  ALBANY_ASSERT(steps_size > 0, "Event interval arrays are empty.");
   auto prev_ti = initial_times[0];
   auto prev_tf = final_times[0];
-  for (auto i = 0; i < steps_size; ++i) {
+  for (size_t i = 0; i < steps_size; ++i) {
     auto const ti = initial_times[i];
     auto const tf = final_times[i];
     auto const dt = time_steps[i];
@@ -79,7 +80,7 @@ int
 find_time_interval_index(std::vector<ST> const& initial_times, std::vector<ST> const& final_times, ST time)
 {
   for (size_t i = 0; i < initial_times.size(); ++i) {
-    if (time >= initial_times[i] && time <= final_times[i]) {
+    if (time >= initial_times[i] && time < final_times[i]) {
       return i;  // Time value is within this interval
     }
   }
@@ -101,7 +102,7 @@ bool
 is_within_interval(std::vector<ST> const& initial_times, std::vector<ST> const& final_times, ST time, int interval_index)
 {
   if (interval_index == -1) return false;
-  return initial_times[interval_index] <= time && time <= final_times[interval_index];
+  return initial_times[interval_index] <= time && time < final_times[interval_index];
 }
 
 }  // anonymous namespace
@@ -147,8 +148,8 @@ ACEThermoMechanical::ACEThermoMechanical(Teuchos::RCP<Teuchos::ParameterList> co
     std::string tf_filename = alt_system_params_->get<std::string>("Event Final Times File");
     std::string dt_filename = alt_system_params_->get<std::string>("Event Time Steps File");
     event_initial_times_    = LCM::vectorFromFile(ti_filename);
-    event_final_times_      = LCM::vectorFromFile(ti_filename);
-    event_time_steps_       = LCM::vectorFromFile(ti_filename);
+    event_final_times_      = LCM::vectorFromFile(tf_filename);
+    event_time_steps_       = LCM::vectorFromFile(dt_filename);
     validate_intervals(event_initial_times_, event_final_times_, event_time_steps_);
   }
 
@@ -791,6 +792,7 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
   // If initial time is within an interval, reset to its beginning
   ST   time_step{initial_time_step_};
+  ST   step_outside_intervals{initial_time_step_};
   auto interval_index = find_time_interval_index(event_initial_times_, event_final_times_, initial_time_);
   if (interval_index != -1) {
     initial_time_ = event_initial_times_[interval_index];
@@ -946,6 +948,21 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
 
   // Time-stepping loop
   while (stop < maximum_steps_ && current_time < final_time_) {
+    // Land exactly on the boundaries of event intervals. This must precede
+    // the computation of next_time below: the solve targets next_time, so a
+    // step clipped after the solve would advance the clock by a different
+    // amount than the solution.
+    if (interval_index != -1) {
+      time_step = std::min(time_step, event_final_times_[interval_index] - current_time);
+      time_step = std::max(time_step, min_time_step_);
+    } else {
+      auto const next_interval_index = find_next_interval_index(event_initial_times_, event_final_times_, current_time);
+      if (next_interval_index < static_cast<int>(event_initial_times_.size())) {
+        time_step = std::min(time_step, event_initial_times_[next_interval_index] - current_time);
+        time_step = std::max(time_step, min_time_step_);
+      }
+    }
+
     if (interval_index != -1) {
       *fos_ << delim << std::endl;
       *fos_ << "Subclycling within an event interval.\n";
@@ -1218,17 +1235,6 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       setICVecs(next_time, subdomain);
     }
 
-    if (interval_index != -1) {
-      time_step = std::min(time_step, event_final_times_[interval_index] - current_time);
-      time_step = std::max(time_step, min_time_step_);
-    } else {
-      auto const next_interval_index = find_time_interval_index(event_initial_times_, event_final_times_, current_time);
-      if (next_interval_index < event_initial_times_.size()) {
-        time_step = std::min(time_step, event_initial_times_[next_interval_index] - current_time);
-        time_step = std::max(time_step, min_time_step_);
-      }
-    }
-
     ++stop;
     current_time += time_step;
 
@@ -1241,8 +1247,22 @@ ACEThermoMechanical::ThermoMechanicalLoopDynamics() const
       break;
     }
 
-    interval_index         = find_time_interval_index(event_initial_times_, event_final_times_, current_time);
-    auto const in_interval = is_within_interval(event_initial_times_, event_final_times_, current_time, interval_index);
+    auto const previous_interval_index = interval_index;
+    interval_index                     = find_time_interval_index(event_initial_times_, event_final_times_, current_time);
+    auto const in_interval             = is_within_interval(event_initial_times_, event_final_times_, current_time, interval_index);
+
+    // Event intervals carry their own time step. On entering one, switch to it
+    // and remember the step in effect outside; on leaving, resume that step
+    // rather than growing back from the interval's step by the amplification
+    // factor. Adjacent intervals hand over directly.
+    if (in_interval == true && interval_index != previous_interval_index) {
+      if (previous_interval_index == -1) step_outside_intervals = time_step;
+      time_step = event_time_steps_[interval_index];
+      *fos_ << "\nINFO: Entering event interval " << interval_index << " with time step " << time_step << '\n';
+    } else if (in_interval == false && previous_interval_index != -1) {
+      time_step = step_outside_intervals;
+      *fos_ << "\nINFO: Leaving event interval " << previous_interval_index << ", resuming time step " << time_step << '\n';
+    }
 
     // Step successful. Try to increase the time step.
     auto const increased_step = std::min(max_time_step_, increase_factor_ * time_step);

@@ -27,8 +27,4 @@ if { [is-loaded lcm-cee] } {
   setenv FC [exec which gfortran]
 }
 
-if { [is-loaded lcm-fedora] } {
-  setenv CXXFLAGS "-std=c++20 -Wno-terminate -Wno-deprecated-declarations"
-} else {
-  setenv CXXFLAGS "-std=c++20"
-}
+setenv CXXFLAGS "-std=c++20"

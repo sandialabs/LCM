@@ -236,6 +236,12 @@ include(CTest)
 # Make Albany inherit Trilinos compiler flags. The most important are the presence or absence of -NDEBUG (which can
 # affect linking for complicated reasons) and -std=c++11.
 set(CMAKE_CXX_FLAGS "${Trilinos_CXX_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}")
+# Trilinos exports -Wno-deprecated-declarations. Inheriting it would hide the
+# deprecation of Trilinos APIs that LCM calls until they are removed and the
+# build breaks, so let those warn. -Wno-terminate was added in 2017 for
+# destructors that threw; nothing in LCM triggers it any more.
+string(REGEX REPLACE "-Wno-deprecated-declarations|-Wno-terminate" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+string(REGEX REPLACE "  +" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 # GAH - temporarily set Albany flags for clang debugging SET(CMAKE_CXX_FLAGS "-ggdb -std=c++11 -O2 -march=native
 # -DNDEBUG")
 

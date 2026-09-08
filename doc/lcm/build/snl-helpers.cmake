@@ -65,7 +65,23 @@ function(snl_config SOURCE_DIR BUILD_DIR CONFIG_OPTS ERR)
 endfunction(snl_config)
 
 function(snl_build BUILD_DIR NUM_THREADS TARGET ERR)
-  set(CTEST_USE_LAUNCHERS 1)
+  # ctest_build counts errors in one of two ways. With CTEST_USE_LAUNCHERS it
+  # reads the per-command records that the launcher writes and does NOT scan
+  # the build output; without it, it scans the output for error patterns.
+  # The launcher only exists if the tree was configured with
+  # CTEST_USE_LAUNCHERS on (see the LCM configure options). Claiming it for a
+  # tree configured without it counted 267 fatal errors as "0 Compiler errors"
+  # on CEE and let the test suite run against a missing executable. So claim
+  # the launcher only when the cache says the tree has it.
+  set(CTEST_USE_LAUNCHERS 0)
+  if (EXISTS "${BUILD_DIR}/CMakeCache.txt")
+    file(STRINGS "${BUILD_DIR}/CMakeCache.txt" LAUNCHER_LINE
+         REGEX "^CTEST_USE_LAUNCHERS:[A-Z]+=(ON|TRUE|1|YES)$")
+    if (LAUNCHER_LINE)
+      set(CTEST_USE_LAUNCHERS 1)
+    endif()
+  endif()
+  message("snl_build: CTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS} for ${BUILD_DIR}")
   # Load CTestCustom.cmake before building, not only before testing: it is
   # what teaches ctest_build to count linker failures, and without it a failed
   # link is reported as zero errors and this function returns success.

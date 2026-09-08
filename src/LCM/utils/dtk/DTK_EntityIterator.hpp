@@ -61,9 +61,16 @@ namespace DataTransferKit
   set the default predicate always return true for any entity.
 */
 //---------------------------------------------------------------------------//
-class EntityIterator : public std::iterator<std::forward_iterator_tag, Entity>
+class EntityIterator
 {
   public:
+    // Iterator traits. std::iterator, the former base class, is deprecated.
+    using iterator_category = std::forward_iterator_tag;
+    using value_type        = Entity;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = Entity*;
+    using reference         = Entity&;
+
     /*!
      * \brief Constructor.
      */

@@ -65,9 +65,9 @@ ScalarL2ProjectionResidual<EvalT, Traits>::postRegistrationSetup(typename Traits
   this->utils.setFieldData(TResidual, fm);
 
   // Allocate workspace for temporary variables
-  // tauStress = Kokkos::createDynRankView(v.get_view(), "XXX", worksetSize,
+  // tauStress = Sacado::createDynRankView(v.get_view(), "XXX", worksetSize,
   // numQPs, numDims, numDims);
-  tauH = Kokkos::createDynRankView(projectedStress.get_view(), "XXX", worksetSize, numQPs);
+  tauH = Sacado::createDynRankView(projectedStress.get_view(), "XXX", worksetSize, numQPs);
 }
 
 //*****

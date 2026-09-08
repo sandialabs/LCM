@@ -66,9 +66,9 @@ TLPoroPlasticityResidMomentum<EvalT, Traits>::postRegistrationSetup(typename Tra
   if (enableTransient) this->utils.setFieldData(wBF, fm);
 
   // Works space FCs
-  F_inv   = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  F_invT  = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  JF_invT = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  F_inv   = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  F_invT  = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  JF_invT = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
 }
 
 //*****

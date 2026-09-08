@@ -58,7 +58,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::operator()(const team_member& 
   int const end_loop   = thread_idx + threads_per_team > (numCells * numQPs) ? (numCells * numQPs) : (thread_idx + threads_per_team);
   ScalarT   gradVal_tmp;
 
-  Kokkos::parallel_for(Kokkos::TeamThreadRange(thread, thread_idx, end_loop), [=](int& indx) {
+  Kokkos::parallel_for(Kokkos::TeamThreadRange(thread, thread_idx, end_loop), [this](int& indx) {
     int const cell = indx / numCells;
     int const qp = indx    = indx / numCells;
     int const vector_range = numNodes - 1;

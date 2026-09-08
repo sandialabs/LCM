@@ -126,11 +126,11 @@ SurfaceHDiffusionDefResidual<EvalT, Traits>::postRegistrationSetup(typename Trai
   refWeights = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
 
   // Allocate workspace
-  artificalDL  = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
-  stabilizedDL = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
-  flux         = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
+  artificalDL  = Sacado::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
+  stabilizedDL = Sacado::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
+  flux         = Sacado::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
 
-  pterm = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
+  pterm = Sacado::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs);
 
   // Pre-Calculate reference element quantitites
   cubature->getCubature(refPoints, refWeights);

@@ -59,8 +59,8 @@ IsoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(ty
   grad_at_cub_points = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numNodes, numQPs, numDims);
   refPoints          = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numDims);
   refWeights         = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
-  dxdxi              = Kokkos::createDynRankView(isoMeshSizeField.get_view(), "XXX", numDims, numDims);
-  dEDdxi             = Kokkos::createDynRankView(isoMeshSizeField.get_view(), "XXX", numDims);
+  dxdxi              = Sacado::createDynRankView(isoMeshSizeField.get_view(), "XXX", numDims, numDims);
+  dEDdxi             = Sacado::createDynRankView(isoMeshSizeField.get_view(), "XXX", numDims);
 
   // Pre-Calculate reference element quantitites
   cubature->getCubature(refPoints, refWeights);
@@ -163,7 +163,7 @@ AnisoMeshSizeField<PHAL::AlbanyTraits::Residual, Traits>::postRegistrationSetup(
   grad_at_cub_points = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numNodes, numQPs, numDims);
   refPoints          = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs, numDims);
   refWeights         = Kokkos::DynRankView<RealType, PHX::Device>("XXX", numQPs);
-  dxdxi              = Kokkos::createDynRankView(anisoMeshSizeField.get_view(), "XXX", numDims, numDims);
+  dxdxi              = Sacado::createDynRankView(anisoMeshSizeField.get_view(), "XXX", numDims, numDims);
 
   // Pre-Calculate reference element quantitites
   cubature->getCubature(refPoints, refWeights);

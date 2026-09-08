@@ -66,8 +66,8 @@ NSNeutronEqResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDat
   this->utils.setFieldData(NResidual, fm);
 
   // Allocate workspace
-  flux     = Kokkos::createDynRankView(Neutron.get_view(), "XXX", numCells, numQPs, numDims);
-  abscoeff = Kokkos::createDynRankView(Neutron.get_view(), "XXX", numCells, numQPs);
+  flux     = Sacado::createDynRankView(Neutron.get_view(), "XXX", numCells, numQPs, numDims);
+  abscoeff = Sacado::createDynRankView(Neutron.get_view(), "XXX", numCells, numQPs);
 }
 
 //*****

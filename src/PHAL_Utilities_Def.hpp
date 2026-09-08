@@ -283,11 +283,11 @@ create_copy(std::string const& name, const Kokkos::DynRankView<T, P...>& src)
     // FAD types: use createDynRankViewWithType which correctly handles
     // the hidden scalar dimension via the ViewFactory mechanism.
     if      (r == 0) dst = dst_type(name);
-    else if (r == 1) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0));
-    else if (r == 2) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1));
-    else if (r == 3) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2));
-    else if (r == 4) dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2), src.extent(3));
-    else             dst = Kokkos::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2), src.extent(3), src.extent(4));
+    else if (r == 1) dst = Sacado::createDynRankViewWithType<dst_type>(src, name, src.extent(0));
+    else if (r == 2) dst = Sacado::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1));
+    else if (r == 3) dst = Sacado::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2));
+    else if (r == 4) dst = Sacado::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2), src.extent(3));
+    else             dst = Sacado::createDynRankViewWithType<dst_type>(src, name, src.extent(0), src.extent(1), src.extent(2), src.extent(3), src.extent(4));
   } else {
     // Non-FAD types: use direct constructor with explicit extents.
     if      (r == 0) dst = dst_type(name);

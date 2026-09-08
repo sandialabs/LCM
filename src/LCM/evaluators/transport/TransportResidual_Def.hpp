@@ -158,7 +158,7 @@ TransportResidual<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDa
   this->utils.setFieldData(residual_, fm);
 
   // initialize term1_
-  term1_ = Kokkos::createDynRankView(scalar_.get_view(), "XXX", num_cells_, num_pts_);
+  term1_ = Sacado::createDynRankView(scalar_.get_view(), "XXX", num_cells_, num_pts_);
 }
 
 template <typename EvalT, typename Traits>

@@ -59,10 +59,10 @@ TLElasResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, 
   this->utils.setFieldData(Residual, fm);
 
   // Works space FCs
-  F_inv   = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  F_invT  = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  JF_invT = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  P       = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  F_inv   = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  F_invT  = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  JF_invT = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  P       = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
 }
 
 //*****

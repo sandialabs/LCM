@@ -207,15 +207,13 @@ void IntrepidCell::mapToCellPhysicalFrame( const MDArray &parametric_coords,
 bool IntrepidCell::pointInReferenceCell( const MDArray &reference_point,
                                          const double tolerance )
 {
-    // Intrepid2 checkPointInclusion expects a rank-1 point view.
-    int sdim = reference_point.extent_int( 1 );
-    Kokkos::DynRankView<Scalar, Kokkos::HostSpace> point( "point", sdim );
-    for ( int d = 0; d < sdim; ++d )
-    {
-        point( d ) = reference_point( 0, d );
-    }
-    return Intrepid2::CellTools<Kokkos::HostSpace>::checkPointInclusion(
-        point, d_topology, tolerance );
+    // Intrepid2 checkPointwiseInclusion takes a rank-2 (P,D) point view and
+    // writes one inclusion flag per point. Its single-point predecessor,
+    // checkPointInclusion, is deprecated.
+    Kokkos::DynRankView<int, Kokkos::HostSpace> in_cell( "in_cell", 1 );
+    Intrepid2::CellTools<Kokkos::HostSpace>::checkPointwiseInclusion(
+        in_cell, reference_point, d_topology, tolerance );
+    return in_cell( 0 ) != 0;
 }
 
 //---------------------------------------------------------------------------//

@@ -48,7 +48,7 @@ NSTauM<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData d, PHX::
   this->utils.setFieldData(TauM, fm);
 
   // Allocate workspace
-  normGc = Kokkos::createDynRankView(Gc.get_view(), "XXX", numCells, numQPs);
+  normGc = Sacado::createDynRankView(Gc.get_view(), "XXX", numCells, numQPs);
 }
 
 //*****

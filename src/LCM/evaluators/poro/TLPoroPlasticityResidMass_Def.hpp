@@ -140,22 +140,22 @@ TLPoroPlasticityResidMass<EvalT, Traits>::postRegistrationSetup(typename Traits:
 
   if (haveMechanics) {
     // Works space FCs
-    C        = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    Cinv     = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    F_inv    = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    F_invT   = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    JF_invT  = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    KJF_invT = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    Kref     = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    C        = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    Cinv     = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    F_inv    = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    F_invT   = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    JF_invT  = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    KJF_invT = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    Kref     = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
   }
 
   // Allocate workspace
-  flux   = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
-  fluxdt = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
-  pterm  = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs);
-  tpterm = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numNodes, numQPs);
+  flux   = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
+  fluxdt = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
+  pterm  = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs);
+  tpterm = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numNodes, numQPs);
 
-  if (haveAbsorption) aterm = Kokkos::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs);
+  if (haveAbsorption) aterm = Sacado::createDynRankView(TGrad.get_view(), "XXX", worksetSize, numQPs);
 }
 
 //*****

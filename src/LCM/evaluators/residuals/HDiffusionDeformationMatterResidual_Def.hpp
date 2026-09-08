@@ -136,18 +136,18 @@ HDiffusionDeformationMatterResidual<EvalT, Traits>::postRegistrationSetup(typena
   this->utils.setFieldData(TResidual, fm);
 
   // Allocate workspace for temporary variables
-  Hflux        = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims);
-  pterm        = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
-  tpterm       = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numNodes, numQPs);
-  artificalDL  = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
-  stabilizedDL = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
-  C            = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  Cinv         = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-  // CinDLTgrad = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize,
+  Hflux        = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims);
+  pterm        = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
+  tpterm       = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize, numNodes, numQPs);
+  artificalDL  = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
+  stabilizedDL = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs);
+  C            = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  Cinv         = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+  // CinDLTgrad = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize,
   // numQPs, numDims);
-  // CinDLTgrad_old = Kokkos::createDynRankView(DL.get_view(), "XXX",
+  // CinDLTgrad_old = Sacado::createDynRankView(DL.get_view(), "XXX",
   // worksetSize, numQPs, numDims);
-  CinvTaugrad = Kokkos::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims);
+  CinvTaugrad = Sacado::createDynRankView(DL.get_view(), "XXX", worksetSize, numQPs, numDims);
 }
 
 //*****

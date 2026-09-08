@@ -56,7 +56,7 @@ CahnHillRhoResid<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupDat
 
   this->utils.setFieldData(rhoResidual, fm);
 
-  gamma_term = Kokkos::createDynRankView(rhoGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
+  gamma_term = Sacado::createDynRankView(rhoGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
 }
 
 //*****

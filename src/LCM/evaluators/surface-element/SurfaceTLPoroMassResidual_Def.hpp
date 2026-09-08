@@ -113,17 +113,17 @@ SurfaceTLPoroMassResidual<EvalT, Traits>::postRegistrationSetup(typename Traits:
 
   if (haveMech) {
     // Works space FCs
-    C        = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    Cinv     = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    F_inv    = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    F_invT   = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    JF_invT  = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    KJF_invT = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
-    Kref     = Kokkos::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    C        = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    Cinv     = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    F_inv    = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    F_invT   = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    JF_invT  = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    KJF_invT = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
+    Kref     = Sacado::createDynRankView(J.get_view(), "XXX", worksetSize, numQPs, numDims, numDims);
   }
 
   // Allocate workspace
-  flux = Kokkos::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
+  flux = Sacado::createDynRankView(scalarGrad.get_view(), "XXX", worksetSize, numQPs, numDims);
 
   // Pre-Calculate reference element quantitites
   cubature->getCubature(refPoints, refWeights);

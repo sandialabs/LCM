@@ -51,8 +51,8 @@ KernelConstitutiveModel<EvalT, Traits, Kernel>::computeState(
   // supercomputers
   auto kernel_ptr = kernel_.get();
 
-  Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::Schedule<Kokkos::Dynamic>>(0, workset.numCells), [=](int cell) {
-    for (int pt = 0; pt < num_pts_; ++pt) {
+  Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::Schedule<Kokkos::Dynamic>>(0, workset.numCells), [kernel_ptr, num_pts = num_pts_](int cell) {
+    for (int pt = 0; pt < num_pts; ++pt) {
       (*kernel_ptr)(cell, pt);
     }
   });

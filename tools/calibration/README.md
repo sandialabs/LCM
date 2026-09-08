@@ -115,6 +115,8 @@ problem, but it cannot be certain, so it warns rather than stopping.
 | `eng-stress-strain` | engineering strain `u/L0` | engineering stress `force/A0` | -, Pa |
 | `load-displacement` | face displacement | face reaction force | m, N |
 | `dev-stress-strain` | engineering strain `u/L0` | deviatoric Cauchy stress `sigma_1 - sigma_3` | -, Pa |
+| `volumetric-strain` | engineering axial strain | volumetric strain, dilation positive | -, - |
+| `dev-stress-volumetric` | engineering axial strain | **both** the deviatoric stress and the volumetric strain, one objective each | -, Pa, - |
 | `time-stress` | LOCA continuation parameter | Cauchy stress | -, Pa |
 
 Pick whichever your instrument actually recorded, and read
@@ -388,13 +390,18 @@ Three conversions, each of which the data has needed:
 **The volumetric column is never flipped**, and this is the one thing to get
 right by hand if you convert data yourself. It is plotted positive upward as
 dilation in the source figures, and expansion positive already *is* compression
-negative. Flipping it along with the other two inverts the dilatancy, which is
-the one quantity this data is uniquely able to constrain (`L`, `phi`, `Q`), and
-the resulting fit looks perfectly reasonable.
+negative. Flipping it along with the other two inverts the dilatancy, and the
+resulting fit looks perfectly reasonable.
 
-`--volumetric` writes the volumetric curve to a companion file. Nothing
-consumes it yet: there is no volumetric comparison curve, which is the second
-gap on this path after the one below.
+The volumetric response is what reaches the flow rule at all. The axial curve
+alone cannot: `phi` scales the plastic volume change, which leaves the
+deviatoric stress-strain curve almost untouched, so a fit to `q` alone returns
+whatever `phi` it started from. Of the non-associative group only `phi` is
+pinned by one series of triaxial tests; `L` and `Q` need a wider range of
+stress paths. `prepare_data.py` therefore writes the volumetric strain as a
+third column, `strain_vol`, resampled onto the stress curve's strain grid, so
+that `--curve dev-stress-volumetric` fits both at once. `--volumetric`
+additionally writes the measurement on its own grid, for plotting only.
 
 ### Fitting a confining-pressure series
 
@@ -403,11 +410,14 @@ model, all of them are run at every parameter set, and one objective is formed
 over the lot, so a single parameter set has to fit the whole series:
 
 ```bash
-python calibrate.py calibrate --load-path txc --curve dev-stress-strain \
-    --defaults permafrost --set elastic_modulus=7.0e7 \
+python calibrate.py calibrate --load-path txc --curve dev-stress-volumetric \
+    --defaults permafrost --set elastic_modulus=6.4e7 --softening --follower \
     --data txc:data/Xu_Pc3e5_-6.csv --data txc:data/Xu_Pc6e5_-6.csv \
     --data txc:data/Xu_Pc8e5_-6.csv --data txc:data/Xu_Pc1e6_-6.csv \
-    --param A:1.2e6:2.6e6 --param theta:0.0:0.4
+    --param A:2.0e5:2.5e6:1.13e6 --param theta:0.0:0.6:0.218 \
+    --param phi:0.0:0.30:0.0856 \
+    --param coherence_residual:0.05:0.95:0.30 --param failure_strain:1.0e-3:0.25:0.03 \
+    --param failure_speed:0.2:20.0:2.0 --field-weight strain_vol=0.3 --core-limit 32
 ```
 
 No `--set confining_pressure` here: each curve carries its own, read from the
@@ -420,6 +430,18 @@ material parameter you are holding fixed.
 This is what separates `theta` from `A` honestly. A single curve samples the
 failure envelope over the narrow range of `I1` that one test sweeps, so `A` and
 `theta` trade off against each other; the series samples it at four pressures.
+
+**Fit the softening together with the envelope, never after it.** Holding `A`,
+`theta` and `phi` at values fitted without softening and then fitting the three
+softening parameters alone returns almost no softening (a coherence residual of
+0.90 with the failure strain at its bound). The envelope-only fit had to
+compromise between the peaks and the tails and undershoots every peak by 11 to
+17 per cent, so softening on top of it can only make the peaks worse and the
+optimizer suppresses it. Fitted together, the objective drops by a factor of
+7.6 and the envelope rises to meet the peaks. The check that this is right:
+`theta` then lands at 0.2236 against 0.218 from a Mohr-Coulomb fit to the four
+peaks alone, where the envelope-only fit had been dragged down to 0.2010. See
+[Verification status](#verification-status) for the numbers.
 
 ---
 
@@ -469,7 +491,7 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 | Option | Meaning |
 |--------|---------|
 | `--load-path NAME` | `hydrostatic`, `confined` or `triaxial`. Repeatable. Default `confined`. |
-| `--curve NAME` | `true-stress-strain` (default), `eng-stress-strain`, `load-displacement` or `time-stress`. |
+| `--curve NAME` | `true-stress-strain` (default), `eng-stress-strain`, `load-displacement`, `dev-stress-strain`, `volumetric-strain`, `dev-stress-volumetric` or `time-stress`. |
 | `--finite-deformation` / `--small-strain` | Kinematics. Finite deformation is the default; see [Kinematics](#kinematics). |
 | `--param NAME:LO:HI[:INIT]` | Parameter to fit, base SI. Repeatable. |
 | `--data LOADPATH:CSV[:XCOL:YCOL]` | Experimental data for one load path, base SI. Repeatable, including several times for one path: each curve then becomes a MatCal state and all are fitted with one parameter set. Defaults to `examples/<load_path>_reference.csv`. |
@@ -477,6 +499,7 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 | `--defaults salem\|permafrost` | Starting parameter set: where `--param` `INIT` and every un-fitted placeholder come from. Default `salem`. |
 | `--softening` | Enable cohesion softening by bond breakage. The placeholders `coherence_residual`, `failure_strain`, `failure_speed` are inert without it. |
 | `--follower` | Treat the `txc` confining pressure as a follower load, by running each evaluation twice. Costs one extra Albany run per evaluation. |
+| `--field-weight FIELD=FACTOR` | Scale one dependent field's objective, for curves with several (`dev-stress-volumetric`). `strain_vol=0.3` is what the frozen-sand fits used. Repeatable. |
 | `--study gradient\|scipy` | Dakota gradient study (default) or SciPy. |
 | `--platform rigel\|sirius\|cee` | Force a platform. Default: detected from the hostname. |
 | `--core-limit N` | Concurrent Albany evaluations. Default 4. |
@@ -666,6 +689,37 @@ harness and readers are platform-agnostic.
 
 ## Verification status
 
+### Frozen silty sand at -6 C, the first real data, rigel, 2026-09-07
+
+Xu et al., four confining pressures fitted at once with the command in
+[Fitting a confining-pressure series](#fitting-a-confining-pressure-series):
+`--curve dev-stress-volumetric --softening --follower --field-weight strain_vol=0.3`,
+run on rigel with `--core-limit 32`. Fitted:
+
+| Parameter | Envelope only | With softening |
+|-----------|---------------|----------------|
+| `A - C` | `6.890e5` Pa | `7.410e5` Pa |
+| `theta` | 0.2010 | 0.2236 |
+| `phi` | 0.0856 | 0.0823 |
+| `coherence_residual`, `failure_strain`, `failure_speed` | - | 0.676, 0.117, 1.77 |
+
+| `confining_pressure` | `q` rms, envelope only | `q` rms, with softening | peak error | softening ratio, data / model | `strain_vol` rms |
+|-----|------|------|------|------|------|
+| `3e5` | 11.5 % | 3.2 % | -6.8 % | 0.621 / 0.700 | 22 % |
+| `6e5` | 9.5 % | 3.7 % | -4.3 % | 0.695 / 0.754 | 30 % |
+| `8e5` | 8.1 % | 1.8 % | -2.8 % | 0.739 / 0.780 | 35 % |
+| `1e6` | 7.3 % | 2.7 % | -1.4 % | 0.773 / 0.800 | 41 % |
+
+rms is relative to the data range of the field; the softening ratio is
+`q(end) / q(peak)` at about 26 per cent axial strain. What the fit reproduces:
+the envelope and the post-peak fall together, the peaks to a few per cent, and
+the trend of more softening at lower confinement. What it does not: the last
+0.03 to 0.08 of the softening ratio, and the volumetric magnitude, where the
+model compacts 2 to 3 per cent early while the measurement does not compact at
+all. That early compaction is elastic and cap behavior, which `phi` cannot
+reach, and it is what a hydrostatic or oedometric test on the same soil would
+pin. The 0.3 weight is deliberate: it lets the deviatoric fit win the trade.
+
 ### Triaxial compression (`txc`), sirius, 2026-09-02
 
 Added with the path. Everything below is `--defaults permafrost`,
@@ -703,9 +757,13 @@ generated at the values above:
 | `phi` from `0.02` | `phi: 0.079999999895` | X-CONVERGENCE |
 | `A`, `theta` from `(1.6e6, 0.20)` | `A: 2000000.0003`, `theta: 0.099999999957` | X-CONVERGENCE |
 
-`phi` is the point of the path: it is a non-associative *flow* parameter, and it
-is recoverable here only because the lateral faces are free, so the dilatancy it
-controls feeds back into the axial response. The last row says `A` and `theta`
+`phi` is the point of the path: it is a non-associative *flow* parameter, and
+this is the only path on which the axial response sees it at all, because the
+lateral faces are free and the dilatancy it controls feeds back weakly into
+`q`. Do not over-read the round trip. It converges because the reference is the
+model's own exact, noise-free curve; on the measured curves a fit of `q` alone
+returned `phi` essentially where it started, and it took the volumetric curve
+(`--curve dev-stress-volumetric`) to move it. The last row says `A` and `theta`
 separate even at a single confining pressure, because the confinement drifts
 under the dead load and the envelope is therefore sampled over a range of `I1`.
 Do not read that as a reason to skip the pressure series: it is a weak
@@ -798,3 +856,4 @@ scale. Converged calibration results are likewise unaffected, because
 `CurveBasedInterpolatedObjective` conditions each field onto a fixed range
 before differencing (MatCal's `RangeDataConditioner`), leaving the objective
 dimensionless.
+

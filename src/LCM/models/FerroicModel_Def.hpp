@@ -89,11 +89,14 @@ FerroicModel<EvalT>::computeState(
 
         case FM::ExplicitMethod::SCALED_DESCENT: {
           FM::ScaledDescent(domainSwitching, xi);
+          break;
         }
         case FM::ExplicitMethod::DESCENT_NORM: {
           FM::DescentNorm(domainSwitching, xi);
+          break;
         }
       }
+      break;
     }
 
     case FM::IntegrationType::IMPLICIT: {

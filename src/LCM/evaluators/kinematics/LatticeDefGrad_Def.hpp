@@ -100,9 +100,9 @@ LatticeDefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       Jbar /= vol;
       // Jbar = std::exp(Jbar);
       for (int qp = 0; qp < numQPs; ++qp) {
+        wJbar = std::exp((1 - alpha) * Jbar + alpha * std::log(1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp))));
         for (int i = 0; i < numDims; ++i) {
           for (int j = 0; j < numDims; ++j) {
-            wJbar = std::exp((1 - alpha) * Jbar + alpha * std::log(1 + VH(cell, qp) * (Ctotal(cell, qp) - CtotalRef(cell, qp))));
             latticeDefGrad(cell, qp, i, j) *= std::pow(wJbar, -1. / 3.);
           }
         }

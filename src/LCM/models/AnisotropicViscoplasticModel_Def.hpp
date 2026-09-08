@@ -185,6 +185,7 @@ AnisotropicViscoplasticModel<EvalT, Traits>::computeState(typename Traits::EvalD
       Fe         = Fm * minitensor::inverse(Fpn);
       Cpinv      = minitensor::inverse(Fpn) * minitensor::transpose(minitensor::inverse(Fpn));
       be         = Fm * Cpinv * minitensor::transpose(Fm);
+      mubar      = minitensor::trace(be) * mu / (num_dims_);
       ScalarT Je = std::sqrt(minitensor::det(be));
       s          = mu * minitensor::dev(be);
       p          = 0.5 * bulk * (Je * Je - 1.);

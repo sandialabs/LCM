@@ -121,9 +121,9 @@ SurfaceVectorGradient<EvalT, Traits>::evaluateFields(typename Traits::EvalData w
 
       // Jbar = std::exp(Jbar);
       for (int qp = 0; qp < numQPs; ++qp) {
+        wJbar = std::exp((1 - alpha) * Jbar + alpha * std::log(J(cell, qp)));
         for (int i = 0; i < numDims; ++i) {
           for (int j = 0; j < numDims; ++j) {
-            wJbar = std::exp((1 - alpha) * Jbar + alpha * std::log(J(cell, qp)));
             defGrad(cell, qp, i, j) *= std::pow(wJbar / J(cell, qp), 1. / 3.);
           }
         }

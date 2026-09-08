@@ -52,6 +52,7 @@ Coord2RBM(Teuchos::RCP<Thyra_MultiVector> const& coordMV, int const Ndof, int co
           }
         }
         /* There is no break here and that is on purpose */
+        [[fallthrough]];
       case 3:
         for (ii = 0; ii < 3 + NscalarDof; ii++) { /* upper left = [ I ] */
           for (jj = 0; jj < 3 + NscalarDof; jj++) {
@@ -170,6 +171,7 @@ Coord2RBM_nonElasticity(Teuchos::RCP<Thyra_MultiVector> const& coordMV, int cons
         jj = 2 + NscalarDof;
         traits_class.ArrObj(dof, ii, jj) *= -1.0;
         /* There is no break here and that is on purpose */
+        [[fallthrough]];
       case 2:
         for (ii = 0; ii < 2 + NscalarDof; ii++) { /* upper left = [ I ] */
           for (jj = 0; jj < 2 + NscalarDof; jj++) {

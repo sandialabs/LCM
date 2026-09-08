@@ -189,7 +189,7 @@ SolutionFileResponseFunction<Norm>::MatrixMarketFile(char const* filename, Teuch
   // Compute the offset for each processor for when it should start storing
   // values
   const auto spmd_vs = getSpmdVectorSpace(mv->range());
-  int        offset;
+  int        offset = 0;  // the ScanSum that computed it is commented out below; used only in the message
   // map.Comm().ScanSum(&numMyPoints, &offset, 1); // ScanSum will compute
   // offsets for us offset -= numMyPoints; // readjust for my PE
 

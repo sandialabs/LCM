@@ -96,9 +96,9 @@ DefGrad<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
       Jbar /= vol;
 
       for (int qp = 0; qp < numQPs; ++qp) {
+        wJbar = std::exp((1 - alpha) * std::log(Jbar) + alpha * std::log(J(cell, qp)));
         for (int i = 0; i < numDims; ++i) {
           for (int j = 0; j < numDims; ++j) {
-            wJbar = std::exp((1 - alpha) * std::log(Jbar) + alpha * std::log(J(cell, qp)));
             defgrad(cell, qp, i, j) *= std::cbrt(wJbar / J(cell, qp));
           }
         }

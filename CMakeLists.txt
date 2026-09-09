@@ -242,6 +242,19 @@ set(CMAKE_CXX_FLAGS "${Trilinos_CXX_COMPILER_FLAGS} ${CMAKE_CXX_FLAGS}")
 # destructors that threw; nothing in LCM triggers it any more.
 string(REGEX REPLACE "-Wno-deprecated-declarations|-Wno-terminate" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 string(REGEX REPLACE "  +" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+# albanyLib and LCM are mutually dependent shared libraries: the problem and
+# solver factories in albanyLib construct classes that live in LCM. Because LCM
+# depends on albanyLib, CMake places libLCM before libalbanyLib on every
+# executable's link line, and a linker that defaults to --as-needed, as
+# Ubuntu's does, discards libLCM before it reaches libalbanyLib's references
+# to it. An executable whose own objects use no LCM symbol then fails to link
+# with undefined references from libalbanyLib (utNodalFieldProjector on the
+# GitHub runner, from the first CI run until this was found). Keep every
+# library that is listed.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
+endif()
 # GAH - temporarily set Albany flags for clang debugging SET(CMAKE_CXX_FLAGS "-ggdb -std=c++11 -O2 -march=native
 # -DNDEBUG")
 

@@ -108,23 +108,34 @@ function(snl_build BUILD_DIR NUM_THREADS TARGET ERR)
   set(${ERR} 0 PARENT_SCOPE)
 endfunction(snl_build)
 
-function(snl_test BUILD_DIR)
+function(snl_test BUILD_DIR ERR)
   message("ctest_read_custom_files(${CTEST_BINARY_DIRECTORY})")
   ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
+  # RETURN_VALUE is nonzero when any test failed or could not run. Without it
+  # the driver reported success over failing tests: the GitHub CI was green
+  # with two failing tests from its first run until this was found.
   if (DEFINED TEST_FILTER AND NOT "${TEST_FILTER}" STREQUAL "")
     message("snl_test: filtering with INCLUDE \"${TEST_FILTER}\"")
     ctest_test(
       BUILD "${BUILD_DIR}"
       INCLUDE "${TEST_FILTER}"
       APPEND
+      RETURN_VALUE TEST_RC
     )
   else()
     ctest_test(
       BUILD "${BUILD_DIR}"
       APPEND
+      RETURN_VALUE TEST_RC
     )
   endif()
   snl_submit("Test")
+  if (TEST_RC)
+    message(WARNING "Tests failed (ctest_test returned ${TEST_RC})")
+    set(${ERR} ${TEST_RC} PARENT_SCOPE)
+    return()
+  endif()
+  set(${ERR} 0 PARENT_SCOPE)
 endfunction(snl_test)
 
 function(snl_do_subproject)
@@ -194,7 +205,14 @@ function(snl_do_subproject)
     endif()
   endif()
   if (SNL_DO_TEST)
-    snl_test("${SNL_BUILD_DIR}")
+    snl_test("${SNL_BUILD_DIR}" TEST_ERR)
+    message("snl_test()  returned ${TEST_ERR}")
+    if (TEST_ERR)
+      if (SNL_RESULT_VARIABLE)
+        set(${SNL_RESULT_VARIABLE} ${TEST_ERR} PARENT_SCOPE)
+      endif()
+      return()
+    endif()
   else()
     # Run ctest with a pattern that matches nothing to generate an empty
     # test result set, then submit it.  CDash requires a Test submission

@@ -58,5 +58,5 @@ message("${COMPARE_COMMAND}")
 execute_process(COMMAND ${COMPARE_COMMAND}
                 RESULT_VARIABLE HAD_ERROR)
 if(HAD_ERROR)
-  message(FATAL_ERROR "Parallel-consistency test failed: np4 erosion set differs from serial")
+  message(FATAL_ERROR "Parallel-consistency test failed: either the np4 erosion set differs from serial, or the comparison script itself failed (a missing Python module shows as a traceback above)")
 endif()

@@ -23,7 +23,7 @@ jobs:
           cmake g++ gfortran git \
           libhdf5-openmpi-dev liblapack-dev libnetcdf-dev \
           libopenmpi-dev mpi-default-bin environment-modules \
-          libgtest-dev
+          libgtest-dev python3-numpy python3-scipy
 
     - name: Clone Trilinos
       run: |

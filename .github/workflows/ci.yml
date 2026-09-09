@@ -43,3 +43,17 @@ jobs:
         export MODULEPATH=$LCM_DIR/LCM/doc/lcm/modulefiles:$MODULEPATH
         module load release
         ./lcm all $(nproc) --quiet
+
+    # The ctest script swallows the compiler's output, so a failed build shows
+    # only "N Compiler errors" in the run log. The driver's own log and ctest's
+    # Build.xml carry the actual messages.
+    - name: Upload build logs
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: |
+          ${{ github.workspace }}/*.log
+          ${{ github.workspace }}/lcm-build-serial-gcc-release/Testing/**/Build.xml
+          ${{ github.workspace }}/lcm-build-serial-gcc-release/Testing/Temporary/LastTest.log
+        if-no-files-found: warn

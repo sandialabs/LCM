@@ -14,10 +14,10 @@
 #                                   hydrostatic (verified: the residual
 #                                   deviator is 5e-4 of Pc under finite
 #                                   deformation, exactly zero under small
-#                                   strain). It is exact only while the
-#                                   response to Pc is elastic, which holds
-#                                   whenever Pc is inside the initial cap,
-#                                   |Pc| < |kappa0|/3.
+#                                   strain). When Pc crushes the cap, the
+#                                   plastic compaction of the crush curve is
+#                                   added (see preload_strain below), so the
+#                                   stage still ends hydrostatic.
 #
 #   Time in [preload_fraction, 1]   shear. The lateral tractions hold at -Pc
 #                                   and the axial face is displaced further by
@@ -42,11 +42,25 @@
 # the REFERENCE normal: a dead load, not a follower load. At the lateral
 # strains these tests reach that is a sub-per-cent error in the confinement.
 #
-# jinja: preload_strain is the elastic hydrostatic axial strain at Pc, and
+# jinja: preload_strain is the hydrostatic axial strain at Pc, and
 # final_strain the total axial strain at the end of the run. Both are
-# recomputed on every evaluation, so they track a calibrated elastic_modulus
-# or poissons_ratio rather than going stale.
-# {% set preload_strain = -confining_pressure * (1.0 - 2.0 * poissons_ratio) / elastic_modulus %}
+# recomputed on every evaluation, so they track the calibrated parameters
+# rather than going stale.
+#
+# preload_strain is the elastic part -Pc(1-2nu)/E plus, when -3 Pc lies
+# beyond the initial hydrostat intercept X0 = kappa0 - R F_f(kappa0), a third
+# of the plastic compaction the crush curve gives there. Under a hydrostatic
+# stress the flow is purely volumetric and the stress sits at I1 = X, so
+# eps_v^p = W (exp[D1 Xbar - D2 Xbar^2] - 1) with Xbar = -3 Pc - X0 is exact,
+# and the stage ends hydrostatic even when consolidation crushes the cap, as
+# it does for frozen soils whose cap starts near zero pressure. When Pc is
+# inside the cap the plastic part is zero and the elastic formula, and every
+# verification result, is unchanged. Jinja has no exp; e ** x serves.
+# {% set Ff0 = A - C * 2.718281828459045 ** (D * kappa0) - theta * kappa0 %}
+# {% set X0 = kappa0 - R * Ff0 %}
+# {% set Xbar = [0.0, -3.0 * confining_pressure - X0] | min %}
+# {% set evp = W * (2.718281828459045 ** (D1 * Xbar - D2 * Xbar * Xbar) - 1.0) if Xbar < 0.0 else 0.0 %}
+# {% set preload_strain = -confining_pressure * (1.0 - 2.0 * poissons_ratio) / elastic_modulus + evp / 3.0 %}
 # {% set final_strain = preload_strain + axial_strain * (1.0 + preload_strain) %}
 LCM:
   Problem:
@@ -113,17 +127,20 @@ LCM:
         # sees stops being a smooth function of them. Adaptive stepping cuts
         # the step and retries instead. Max Step Size is pinned to the initial
         # one so a recovered step never coarsens the rest of the run.
+        # step_size is a deck constant (default 2.5e-3) so a run can refine it:
+        # a material whose cap is active from the start of shear needs smaller
+        # steps than the default for a step-independent answer.
         Method: Adaptive
-        Initial Step Size: 2.50000000e-03
+        Initial Step Size: {{ "%.8e"|format(step_size) }}
         Min Step Size: 1.00000000e-06
-        Max Step Size: 2.50000000e-03
+        Max Step Size: {{ "%.8e"|format(step_size) }}
         Failed Step Reduction Factor: 5.00000000e-01
         Successful Step Increase Factor: 1.00000000e+00
       Stepper:
         Continuation Method: Natural
         Initial Value: 0.00000000e+00
         Continuation Parameter: Time
-        Max Steps: 500
+        Max Steps: {{ 500 if step_size >= 2.5e-3 else (1.25 / step_size) | int }}
         Max Value: 1.00000000e+00
         Return Failed on Reaching Max Steps: false
         Min Value: 0.00000000e+00

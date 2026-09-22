@@ -164,6 +164,25 @@ def _parse_kv(spec):
         raise argparse.ArgumentTypeError(f"--set {key}: {val!r} is not a number")
 
 
+def _parse_curve(spec):
+    """CURVE or LOADPATH=CURVE -> (load_path or None, curve)."""
+    lp_name, sep, name = spec.rpartition("=")
+    if sep and lp_name not in LOAD_PATHS:
+        raise argparse.ArgumentTypeError(
+            f"--curve {spec}: unknown load path {lp_name!r}; known: "
+            f"{' '.join(sorted(LOAD_PATHS))}")
+    if name not in CURVES:
+        raise argparse.ArgumentTypeError(
+            f"--curve {spec}: unknown curve {name!r}; known: {' '.join(sorted(CURVES))}")
+    return (lp_name or None), name
+
+
+def _curve_for(curves, lp_name):
+    """The curve for one load path: its own ``PATH=CURVE``, else the bare
+    ``--curve``, else the default."""
+    return curves.get(lp_name) or curves.get(None) or DEFAULT_CURVE
+
+
 def _parse_field_weight(spec):
     """NAME=FACTOR -> (field_name, float). Scales one dependent field's
     residual inside a multi-field objective."""
@@ -238,20 +257,22 @@ def _read_state_constants(path, known):
     return constants
 
 
-#: Steps per knot interval of a prescribed history. Two, so the element sees
-#: the path between knots at least once before the next reversal; the knots
-#: themselves are always hit exactly.
+#: Steps per knot interval of a prescribed history, by default. Two, so the
+#: element sees the path between knots at least once before the next reversal;
+#: the knots themselves are always hit exactly. --history-substeps raises it: a
+#: material whose cap starts near zero pressure needs small increments, since
+#: an elastic trial far past the cap can be returned to the wrong side of it.
 HISTORY_SUBSTEPS = 2
 
 
-def _hydrostatic_history(path):
+def _hydrostatic_history(path, substeps=HISTORY_SUBSTEPS):
     """Deck placeholders prescribing the volume history in a hydrostatic
     record converted by ``prepare_data.py``, or None for a file without one.
 
     The file carries ``time`` and ``strain_vol = J - 1`` at each knot. Every
     face of the unit cube moves by ``J^(1/3) - 1``, so the element follows the
     measured volume change exactly under finite deformation, and a constant
-    step of ``1 / (HISTORY_SUBSTEPS (knots - 1))`` lands on every knot.
+    step of ``1 / (substeps (knots - 1))`` lands on every knot.
     """
     header, values = _read_csv(path)
     if "time" not in header or "strain_vol" not in header:
@@ -271,18 +292,18 @@ def _hydrostatic_history(path):
         "bc_points": len(t),
         "bc_times": "[" + ", ".join(f"{x:.12e}" for x in t) + "]",
         "bc_values": "[" + ", ".join(f"{x:.12e}" for x in u) + "]",
-        "bc_step": f"{1.0 / (HISTORY_SUBSTEPS * intervals):.12e}",
-        "bc_max_steps": HISTORY_SUBSTEPS * intervals + 1,
+        "bc_step": f"{1.0 / (substeps * intervals):.12e}",
+        "bc_max_steps": substeps * intervals + 1,
     }
 
 
-def _history_defaults(lp_name, entries, defaults):
+def _history_defaults(lp_name, entries, defaults, substeps=HISTORY_SUBSTEPS):
     """``defaults`` extended with the prescribed history of the one data file
     on the hydrostatic path that carries one. Several histories would need one
     deck per MatCal state, which the harness does not do yet."""
     if lp_name != "hydrostatic":
         return defaults
-    found = [(p, h) for p, h in ((path, _hydrostatic_history(os.path.abspath(path)))
+    found = [(p, h) for p, h in ((path, _hydrostatic_history(os.path.abspath(path), substeps))
                                  for path, _, _ in entries if path) if h]
     if not found:
         return defaults
@@ -447,16 +468,18 @@ def check(platform=None):
     return 0 if ok else 1
 
 
-def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deformation,
-                   softening=False, follower=False, data_map=None):
+def make_reference(load_paths, defaults, out_dir, platform, curves, finite_deformation,
+                   softening=False, follower=False, data_map=None,
+                   substeps=HISTORY_SUBSTEPS):
     os.makedirs(out_dir, exist_ok=True)
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
+        curve = _curve_for(curves, lp_name)
         indep, deps = lp.fields(curve)
         # A --data file here only supplies a prescribed history; the run is
         # still a forward model evaluation at the given parameters.
         path_defaults = _history_defaults(lp_name, (data_map or {}).get(lp_name, []),
-                                          defaults)
+                                          defaults, substeps)
         model = make_lcm_cap_model(load_path=lp_name, defaults=path_defaults,
                                    platform=platform, name=f"ref_{lp_name}",
                                    finite_deformation=finite_deformation,
@@ -478,8 +501,9 @@ def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deform
 
 
 def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
-              study_type, core_limit, curve, finite_deformation,
-              field_weights=None, softening=False, follower=False):
+              study_type, core_limit, curves, finite_deformation,
+              field_weights=None, softening=False, follower=False,
+              substeps=HISTORY_SUBSTEPS):
     if not params:
         raise SystemExit("no --param given; nothing to calibrate")
 
@@ -487,11 +511,19 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
                  "scipy": mc.ScipyMinimizeStudy}[study_type]
     study = study_cls(*params)
 
+    weight_of = dict(field_weights or [])
+    used = {d for n in load_paths for d in get_load_path(n).fields(_curve_for(curves, n))[1]}
+    unknown = [n for n in weight_of if n not in used]
+    if unknown:
+        raise SystemExit(f"--field-weight names {', '.join(unknown)}, which no "
+                         f"--curve in this run compares; they use {', '.join(sorted(used))}")
+
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
+        curve = _curve_for(curves, lp_name)
         indep, deps = lp.fields(curve)
         entries = data_map.get(lp_name) or [(None, None, None)]
-        path_defaults = _history_defaults(lp_name, entries, defaults)
+        path_defaults = _history_defaults(lp_name, entries, defaults, substeps)
         model = make_lcm_cap_model(load_path=lp_name, defaults=path_defaults,
                                    platform=platform,
                                    finite_deformation=finite_deformation,
@@ -530,13 +562,6 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
         # field is conditioned onto its own range, and a weight can be applied
         # to one field without touching the others. See site_matcal.weighting
         # for why this is not one objective over several fields.
-        weight_of = dict(field_weights or [])
-        unknown = [n for n in weight_of if n not in deps]
-        if unknown:
-            raise SystemExit(
-                f"[{lp_name}] --field-weight names {', '.join(unknown)}, which "
-                f"--curve {curve} does not compare; it uses "
-                f"{', '.join(deps)}")
         objectives = []
         for dep in deps:
             obj = mc.CurveBasedInterpolatedObjective(indep, dep)
@@ -557,7 +582,8 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
 
     study.set_core_limit(core_limit)
     print(f"platform={get_platform(platform).name} study={study_type} "
-          f"curve={curve} kinematics={_kinematics(finite_deformation)} "
+          f"curves={','.join(f'{n}:{_curve_for(curves, n)}' for n in load_paths)} "
+          f"kinematics={_kinematics(finite_deformation)} "
           f"softening={'on' if softening else 'off'} "
           f"follower={'on' if follower else 'off'} "
           f"params={[p.get_name() for p in params]}")
@@ -582,8 +608,13 @@ def main(argv=None):
     ap.add_argument("--load-path", action="append", dest="load_paths",
                     metavar="NAME",
                     help="hydrostatic|confined|triaxial|txc (repeatable)")
-    ap.add_argument("--curve", choices=sorted(CURVES), default=DEFAULT_CURVE,
-                    help=f"fields to compare (default: {DEFAULT_CURVE})")
+    ap.add_argument("--curve", action="append", type=_parse_curve, dest="curves",
+                    default=[], metavar="[LOADPATH=]CURVE",
+                    help=f"fields to compare: {'|'.join(sorted(CURVES))} "
+                         f"(default: {DEFAULT_CURVE}). A bare name applies to "
+                         "every load path; LOADPATH=CURVE to one, which lets a "
+                         "run compare --curve hydrostatic=time-stress with "
+                         "--curve txc=dev-stress-strain")
     ap.add_argument("--param", action="append", type=_parse_param, dest="params",
                     default=[], metavar="NAME:LO:HI[:INIT]",
                     help="calibrated parameter, base SI (repeatable)")
@@ -631,6 +662,10 @@ def main(argv=None):
                          "on the reference normal, so without this the "
                          "confining stress drifts up to 18 percent as the "
                          "specimen dilates, which hides softening.")
+    ap.add_argument("--history-substeps", type=int, default=HISTORY_SUBSTEPS,
+                    metavar="N",
+                    help="steps per knot of a prescribed hydrostatic history "
+                         f"(default {HISTORY_SUBSTEPS})")
     ap.add_argument("--study", choices=["gradient", "scipy"], default="gradient")
     ap.add_argument("--platform", default=None, help="rigel|sirius|cee (default: auto)")
     ap.add_argument("--core-limit", type=int, default=4)
@@ -654,19 +689,22 @@ def main(argv=None):
     params = [_reinit(p, base) for p in args.params]
     # Repeatable per load path: one --data per experimental curve. Several on
     # the same path become several MatCal states of one model.
+    curves = {}
+    for lp_name, name in args.curves:
+        curves[lp_name] = name
     data_map = {}
     for lp_name, path, xcol, ycol in args.data:
         data_map.setdefault(lp_name, []).append((path, xcol, ycol))
 
     if args.action == "make-reference":
         make_reference(load_paths, defaults, args.out_dir, args.platform,
-                       args.curve, args.finite_deformation, args.softening,
-                       args.follower, data_map)
+                       curves, args.finite_deformation, args.softening,
+                       args.follower, data_map, args.history_substeps)
     else:
         calibrate(load_paths, params, data_map, defaults, args.out_dir,
-                  args.platform, args.study, args.core_limit, args.curve,
+                  args.platform, args.study, args.core_limit, curves,
                   args.finite_deformation, args.field_weights, args.softening,
-                  args.follower)
+                  args.follower, args.history_substeps)
     return 0
 
 

@@ -221,6 +221,10 @@ LOAD_PATHS = {
             # Fraction of the continuation run spent consolidating. Only large
             # enough to resolve the ramp; the reader trims it off.
             preload_fraction=0.1,
+            # Continuation step, a fraction of the whole run. Refine it when
+            # the cap is active from the start of shear, and check that the
+            # answer no longer changes.
+            step_size=2.5e-3,
         ),
         preload_constant="preload_fraction"),
 }

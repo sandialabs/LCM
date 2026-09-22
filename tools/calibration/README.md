@@ -403,6 +403,58 @@ third column, `strain_vol`, resampled onto the stress curve's strain grid, so
 that `--curve dev-stress-volumetric` fits both at once. `--volumetric`
 additionally writes the measurement on its own grid, for plotting only.
 
+### Measured records and hydrostatic histories
+
+The Lee frozen-soil data (SAND2002-0524) are laboratory records rather than
+digitized curves, and they include a hydrostatic test. `prepare_data.py`
+recognizes both and handles them differently from the digitized format, whose
+conversion is unchanged:
+
+```bash
+python prepare_data.py --out-dir data --toe-correct Lee-AFS-TA-01.csv Lee-AFS-TA-03.csv
+python prepare_data.py --out-dir data --toe-correct --max-strain 0.0245 Lee-AFS-TA-02.csv
+python prepare_data.py --out-dir data --max-pressure 1.0e8 Lee-AFS-HS-12.csv
+```
+
+- **Sign convention stated in the file.** A `SignConven` field
+  (`CompressPos` or `CompressNeg`) applies to every column, the volumetric one
+  included, and replaces both the detection and the rule that the volumetric
+  column is never flipped. In the Lee files volume strain is compaction
+  positive, so the Xu rule would invert their dilatancy.
+- **Measured triaxial records**, recognized by an axial strain that goes back
+  and forth, lose the rows before the zero of axial strain (in the Lee files
+  they are not consolidation: they disagree with the hydrostatic test at the
+  same pressure by up to a factor of 40), are smoothed by a moving average of
+  `--window` rows (7), and are thinned to points where the strain has
+  advanced and the strain or the stress has changed appreciably, which keeps
+  the steep initial rise. `--toe-correct` moves the strain origin to where a
+  least-squares line through the rise, between 5 and 30 percent of the peak
+  stress, reaches zero stress, and re-zeroes the volumetric column there. For
+  the three Lee tests the fitted slopes, `4.8e8`, `1.25e9` and `2.7e9` Pa,
+  agree with the moduli in Table 6 of the report.
+- **Hydrostatic records** (`TestType: HS`) become a history for the
+  `hydrostatic` load path: `time, stress_xx, strain_vol` at knots uniform in
+  time, including every reversal of the pressure, with `stress_xx = -P` and
+  `strain_vol = J - 1` from the axial and radial strains. `--max-pressure`
+  truncates it; the report attributes the change in the Lee test near `1e8`
+  Pa to pressure melting of the ice.
+
+Given such a file, the hydrostatic path prescribes that volume history on the
+element, `J^(1/3) - 1` on every face with two steps per knot, and compares the
+pressure at the same times:
+
+```bash
+python calibrate.py calibrate --load-path hydrostatic --curve time-stress \
+    --defaults permafrost --data hydrostatic:data/Lee-AFS-HS-12.csv --param ...
+```
+
+Pressure against volumetric strain cannot be the comparison: with unloading
+and reloading that curve doubles back on itself. Time as the abscissa is well
+posed and still weighs the unloading branches, which carry the bulk modulus.
+The deck's defaults reproduce the verification ramp exactly, so every other
+use of the path is unchanged. One history per run: several hydrostatic tests
+would need a deck per MatCal state.
+
 ### Fitting a confining-pressure series
 
 Give `--data txc:...` once per curve. Each becomes a MatCal *state* of the one

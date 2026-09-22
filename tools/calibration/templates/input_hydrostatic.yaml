@@ -6,6 +6,14 @@
 # against cap_reference.py (200 steps, matching the LOCA step count so
 # the explicit integrator sees identical strain increments).
 #
+# The boundary-condition arrays and the step count are placeholders. Their
+# defaults (site_matcal.load_paths) render the verification ramp above
+# exactly. Given a measured hydrostatic history (prepare_data.py, TestType
+# HS), calibrate.py replaces them with the knots of that history: the same
+# displacement J^(1/3) - 1 on every face of the unit cube, a uniform time grid,
+# and a constant step that lands on every knot, so no reversal of the
+# loading is stepped over.
+#
 LCM:
   Problem:
     Name: Mechanics 3D
@@ -16,21 +24,21 @@ LCM:
       DBC on NS NodeSet0 for DOF X: 0.00000000e+00
       DBC on NS NodeSet1 for DOF X:
         BC Function: Array
-        Number of points: 2
-        Time Values: [0.0, 1.0]
-        BC Values: [0.0, -2.00000000e-02]
+        Number of points: {{ bc_points }}
+        Time Values: {{ bc_times }}
+        BC Values: {{ bc_values }}
       DBC on NS NodeSet2 for DOF Y: 0.00000000e+00
       DBC on NS NodeSet3 for DOF Y:
         BC Function: Array
-        Number of points: 2
-        Time Values: [0.0, 1.0]
-        BC Values: [0.0, -2.00000000e-02]
+        Number of points: {{ bc_points }}
+        Time Values: {{ bc_times }}
+        BC Values: {{ bc_values }}
       DBC on NS NodeSet4 for DOF Z: 0.00000000e+00
       DBC on NS NodeSet5 for DOF Z:
         BC Function: Array
-        Number of points: 2
-        Time Values: [0.0, 1.0]
-        BC Values: [0.0, -2.00000000e-02]
+        Number of points: {{ bc_points }}
+        Time Values: {{ bc_times }}
+        BC Values: {{ bc_values }}
     Parameters:
       Number: 1
       Parameter 0: Time
@@ -55,13 +63,13 @@ LCM:
         First Step Predictor: { }
         Last Step Predictor: { }
       Step Size:
-        Initial Step Size: 5.00000000e-03
+        Initial Step Size: {{ bc_step }}
         Method: Constant
       Stepper:
         Continuation Method: Natural
         Initial Value: 0.00000000e+00
         Continuation Parameter: Time
-        Max Steps: 200
+        Max Steps: {{ bc_max_steps }}
         Max Value: 1.00000000e+00
         Return Failed on Reaching Max Steps: false
         Min Value: 0.00000000e+00

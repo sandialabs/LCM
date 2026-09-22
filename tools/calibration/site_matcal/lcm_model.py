@@ -201,7 +201,7 @@ def make_lcm_cap_model(load_path="confined", albany=None, defaults=None,
     # Deck constants (the confining pressure and the like) sit between the
     # material defaults and the caller's overrides: they are defaults too, but
     # they belong to the load path rather than to the material.
-    constants = {**SALEM_LIMESTONE, **lp.constants, **(defaults or {}),
+    constants = {**SALEM_LIMESTONE, **lp.constants, **lp.history, **(defaults or {}),
                  "finite_deformation": "true" if finite_deformation else "false",
                  "softening": "true" if softening else "false"}
     name = name or f"lcm_cap_{lp.name}"

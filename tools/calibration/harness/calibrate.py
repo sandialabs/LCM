@@ -238,6 +238,63 @@ def _read_state_constants(path, known):
     return constants
 
 
+#: Steps per knot interval of a prescribed history. Two, so the element sees
+#: the path between knots at least once before the next reversal; the knots
+#: themselves are always hit exactly.
+HISTORY_SUBSTEPS = 2
+
+
+def _hydrostatic_history(path):
+    """Deck placeholders prescribing the volume history in a hydrostatic
+    record converted by ``prepare_data.py``, or None for a file without one.
+
+    The file carries ``time`` and ``strain_vol = J - 1`` at each knot. Every
+    face of the unit cube moves by ``J^(1/3) - 1``, so the element follows the
+    measured volume change exactly under finite deformation, and a constant
+    step of ``1 / (HISTORY_SUBSTEPS (knots - 1))`` lands on every knot.
+    """
+    header, values = _read_csv(path)
+    if "time" not in header or "strain_vol" not in header:
+        return None
+    t = values[:, header.index("time")]
+    jac = 1.0 + values[:, header.index("strain_vol")]
+    if np.any(np.diff(t) <= 0.0) or t[0] != 0.0 or abs(t[-1] - 1.0) > 1.0e-12:
+        raise SystemExit(f"{path}: a history needs times rising from 0 to 1")
+    spacing = np.diff(t)
+    if np.ptp(spacing) > 1.0e-9 * spacing.mean():
+        raise SystemExit(f"{path}: history knots must be uniform in time")
+    if np.any(jac <= 0.0):
+        raise SystemExit(f"{path}: strain_vol must stay above -1")
+    u = np.cbrt(jac) - 1.0
+    intervals = len(t) - 1
+    return {
+        "bc_points": len(t),
+        "bc_times": "[" + ", ".join(f"{x:.12e}" for x in t) + "]",
+        "bc_values": "[" + ", ".join(f"{x:.12e}" for x in u) + "]",
+        "bc_step": f"{1.0 / (HISTORY_SUBSTEPS * intervals):.12e}",
+        "bc_max_steps": HISTORY_SUBSTEPS * intervals + 1,
+    }
+
+
+def _history_defaults(lp_name, entries, defaults):
+    """``defaults`` extended with the prescribed history of the one data file
+    on the hydrostatic path that carries one. Several histories would need one
+    deck per MatCal state, which the harness does not do yet."""
+    if lp_name != "hydrostatic":
+        return defaults
+    found = [(p, h) for p, h in ((path, _hydrostatic_history(os.path.abspath(path)))
+                                 for path, _, _ in entries if path) if h]
+    if not found:
+        return defaults
+    if len(found) > 1:
+        raise SystemExit("[hydrostatic] more than one data file carries a "
+                         "prescribed history; fit them in separate runs")
+    path, history = found[0]
+    print(f"[hydrostatic] prescribing the volume history of {path} "
+          f"({history['bc_points']} knots, {history['bc_max_steps'] - 1} steps)")
+    return {**defaults, **history}
+
+
 def _state_name(path):
     """A MatCal state name from a data file name: it becomes a directory."""
     stem = os.path.splitext(os.path.basename(path))[0]
@@ -391,12 +448,16 @@ def check(platform=None):
 
 
 def make_reference(load_paths, defaults, out_dir, platform, curve, finite_deformation,
-                   softening=False, follower=False):
+                   softening=False, follower=False, data_map=None):
     os.makedirs(out_dir, exist_ok=True)
     for lp_name in load_paths:
         lp = get_load_path(lp_name)
         indep, deps = lp.fields(curve)
-        model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
+        # A --data file here only supplies a prescribed history; the run is
+        # still a forward model evaluation at the given parameters.
+        path_defaults = _history_defaults(lp_name, (data_map or {}).get(lp_name, []),
+                                          defaults)
+        model = make_lcm_cap_model(load_path=lp_name, defaults=path_defaults,
                                    platform=platform, name=f"ref_{lp_name}",
                                    finite_deformation=finite_deformation,
                                    softening=softening,
@@ -430,7 +491,8 @@ def calibrate(load_paths, params, data_map, defaults, out_dir, platform,
         lp = get_load_path(lp_name)
         indep, deps = lp.fields(curve)
         entries = data_map.get(lp_name) or [(None, None, None)]
-        model = make_lcm_cap_model(load_path=lp_name, defaults=defaults,
+        path_defaults = _history_defaults(lp_name, entries, defaults)
+        model = make_lcm_cap_model(load_path=lp_name, defaults=path_defaults,
                                    platform=platform,
                                    finite_deformation=finite_deformation,
                                    softening=softening,
@@ -599,7 +661,7 @@ def main(argv=None):
     if args.action == "make-reference":
         make_reference(load_paths, defaults, args.out_dir, args.platform,
                        args.curve, args.finite_deformation, args.softening,
-                       args.follower)
+                       args.follower, data_map)
     else:
         calibrate(load_paths, params, data_map, defaults, args.out_dir,
                   args.platform, args.study, args.core_limit, args.curve,

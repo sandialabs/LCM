@@ -156,7 +156,7 @@ DEFAULT_CURVE = "true-stress-strain"
 
 class LoadPath:
     def __init__(self, name, deck, materials, exodus, axis, constants=None,
-                 preload_constant=None):
+                 preload_constant=None, history=None):
         self.name = name
         self.deck = deck
         self.materials = materials
@@ -168,6 +168,10 @@ class LoadPath:
         # the preload stage. Named rather than stored directly so that a --set
         # override of it reaches the Exodus reader too.
         self.preload_constant = preload_constant
+        # Deck placeholders for a prescribed loading history. Not settable
+        # with --set (they are arrays); calibrate.py fills them from a
+        # measured history, and these defaults render the verification ramp.
+        self.history = dict(history or {})
 
     def fields(self, curve=DEFAULT_CURVE):
         """Return ``(independent_field, dependent_field)`` for ``curve`` on
@@ -187,7 +191,14 @@ class LoadPath:
 LOAD_PATHS = {
     "hydrostatic": LoadPath(
         "hydrostatic", "input_hydrostatic.yaml", "materials.yaml",
-        "cap_hydrostatic.exo", axis="x"),
+        "cap_hydrostatic.exo", axis="x",
+        # The face displacement against the continuation parameter, and the
+        # stepping that resolves it. These defaults are the verification
+        # ramp, eps(t) = -0.02 t I in 200 steps, rendered to the same text the
+        # deck carried before it was templated.
+        history=dict(bc_points=2, bc_times="[0.0, 1.0]",
+                     bc_values="[0.0, -2.00000000e-02]",
+                     bc_step="5.00000000e-03", bc_max_steps=200)),
     "confined": LoadPath(
         "confined", "input_confined.yaml", "materials.yaml",
         "cap_confined.exo", axis="x"),

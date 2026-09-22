@@ -543,11 +543,12 @@ A curve supplied in MPa is fit by stress-like parameters `1e6` too small.
 | Option | Meaning |
 |--------|---------|
 | `--load-path NAME` | `hydrostatic`, `confined` or `triaxial`. Repeatable. Default `confined`. |
-| `--curve NAME` | `true-stress-strain` (default), `eng-stress-strain`, `load-displacement`, `dev-stress-strain`, `volumetric-strain`, `dev-stress-volumetric` or `time-stress`. |
+| `--curve [LOADPATH=]CURVE` | `true-stress-strain` (default), `eng-stress-strain`, `load-displacement`, `dev-stress-strain`, `volumetric-strain`, `dev-stress-volumetric` or `time-stress`. A bare name applies to every load path; `LOADPATH=CURVE` to one, so a joint run can use `--curve hydrostatic=time-stress --curve txc=dev-stress-strain`. Repeatable. |
 | `--finite-deformation` / `--small-strain` | Kinematics. Finite deformation is the default; see [Kinematics](#kinematics). |
 | `--param NAME:LO:HI[:INIT]` | Parameter to fit, base SI. Repeatable. |
 | `--data LOADPATH:CSV[:XCOL:YCOL]` | Experimental data for one load path, base SI. Repeatable, including several times for one path: each curve then becomes a MatCal state and all are fitted with one parameter set. Defaults to `examples/<load_path>_reference.csv`. |
-| `--set NAME=VALUE` | Override a cap parameter or a deck constant (`confining_pressure`, `axial_strain`, `preload_fraction`) without fitting it, base SI. Repeatable. |
+| `--set NAME=VALUE` | Override a cap parameter or a deck constant (`confining_pressure`, `axial_strain`, `preload_fraction`, `step_size`) without fitting it, base SI. Repeatable. |
+| `--history-substeps N` | Steps per knot of a prescribed hydrostatic history. Default 2; see the note on step size below. |
 | `--defaults salem\|permafrost` | Starting parameter set: where `--param` `INIT` and every un-fitted placeholder come from. Default `salem`. |
 | `--softening` | Enable cohesion softening by bond breakage. The placeholders `coherence_residual`, `failure_strain`, `failure_speed` are inert without it. |
 | `--follower` | Treat the `txc` confining pressure as a follower load, by running each evaluation twice. Costs one extra Albany run per evaluation. |
@@ -722,10 +723,23 @@ harness and readers are platform-agnostic.
   to pin the shear and non-associative terms.
 - **Templates end with a blank line on purpose.** jinja2 strips one trailing
   newline, and Albany's YAML parser fails at end-of-file without one.
-- **On `txc`, keep `3 * confining_pressure` inside `|kappa0|`.** The exact
-  consolidation stage assumes the response to the cell pressure is elastic. Past
-  the cap it is not, and the state at the end of the stage stops being
-  hydrostatic, silently.
+- **On `txc`, consolidation past the cap is accounted for.** The axial strain
+  of the consolidation stage is the elastic part plus a third of the plastic
+  compaction the crush curve gives at `I1 = -3 Pc`, so the stage ends
+  hydrostatic even when the cell pressure crushes the cap, as it does for a
+  frozen soil whose cap starts near zero pressure. Inside the cap the plastic
+  part is zero and the result is unchanged. For the Lee tests the residual
+  deviator at the start of shear is `2e4` to `2e5` Pa, below 5 per cent of the
+  peak.
+- **Refine the step when the cap starts near zero pressure, and check.** An
+  elastic trial far past such a cap can be returned to the wrong side of it,
+  onto a tensile stress, when the cap's branch point `kappa0` is on the
+  tensile side, as it is for the Lee soil. This is a robustness defect of the
+  return mapping, not of the harness, and small increments avoid it. The Lee
+  fits use `--history-substeps 20` (hydrostatic pressure within `1.5e-3` of its
+  range of the 40-step answer; the default 2 is off by 10 per cent) and
+  `--set step_size=5.0e-4` on `txc` (deviator within `1.7e-3` of its peak of
+  the `2.5e-4` answer; the default `2.5e-3` is off by up to 3.5 per cent).
 - **`txc` steps adaptively, and the other three do not.** With a constant step
   LOCA reports a step whose Newton solve failed and carries straight on, and
   Albany writes the unconverged state to Exodus like any other point. The curve
@@ -740,6 +754,41 @@ harness and readers are platform-agnostic.
 ---
 
 ## Verification status
+
+### Alaskan frozen soil at -10 C (Lee et al., SAND2002-0524), sirius, 2026-09-22
+
+One hydrostatic test to `1.25e8` Pa, fitted below `1e8` Pa, and three
+triaxial tests at `6.9e6`, `1.38e7` and `2.07e7` Pa, converted as in
+[Measured records and hydrostatic histories](#measured-records-and-hydrostatic-histories).
+Finite deformation, follower correction on `txc`, converged stepping, no
+softening, associative flow as in the report's own model.
+
+| Parameter | Value | How it was obtained |
+|-----------|-------|---------------------|
+| `elastic_modulus`, `poissons_ratio` | `3.6e9` Pa, 0.48 | bulk modulus `3.0e10` Pa from the unloading and reloading slopes of the hydrostatic test (`3.18e10`, `2.87e10`; the report gives `2.95e10`), Poisson ratio chosen so that E matches the report's unload-reload Young's modulus of about `3.5e9` Pa |
+| `A`, `C`, `D`, `theta` | `3.69e6` Pa, `1.45e6` Pa, `2.82e-8` 1/Pa, 0 | the report's envelope; solving the envelope at the ends of the lowest and highest pressure tests gives `A = 3.69e6`, `C = 1.56e6` |
+| `R` | 22.55 | the report |
+| `kappa0` | `2.21e7` Pa | fitted on the hydrostatic test, at the bound `X0 = 0`: the soil yields under any hydrostatic compression, as the report found (`X0 = -1.08e5` Pa) |
+| `W`, `D1`, `D2` | 0.0192, `8.11e-9` 1/Pa, 0 | fitted on the hydrostatic test |
+| `N`, `calpha` | `5.81e5` Pa, `2.39e7` Pa | fitted on the three triaxial tests, deviator stress only |
+| `L`, `phi`, `Q`, `psi` | `2.82e-8` 1/Pa, 0, 22.55, 1 | associative |
+
+| rms, per cent of the data range | hydrostatic pressure | `6.9e6` Pa | `1.38e7` Pa | `2.07e7` Pa |
+|-------------|------|------|------|------|
+| the report's parameters, in this model | 2.3 | 21.1 | 45.7 | 22.4 |
+| cap fitted, no kinematic hardening | 3.2 | 14.4 | 9.6 | 10.6 |
+| cap and kinematic hardening fitted | 3.2 | 8.2 | 5.9 | 5.6 |
+
+The report's set reproduces its own figures here, which confirms the
+mapping: a good hydrostatic fit, and triaxial curves that rise far too softly
+because its shear modulus is `4.96e7` Pa, the elasticity absorbing plastic
+hardening. Deviator stress at 2 per cent axial strain, model against data:
+`4.06e6`/`4.07e6`, `4.64e6`/`4.67e6`, `5.01e6`/`4.63e6` Pa.
+
+Not fitted: the volumetric strain in shear. In all three triaxial records the
+volume strain equals the axial strain for the first 0.012 of shear, which
+means zero radial strain and is not physical, and the report does not explain
+it. The model compacts 0.003 where these records show 0.010 to 0.018.
 
 ### Frozen silty sand at -6 C, the first real data, rigel, 2026-09-07
 

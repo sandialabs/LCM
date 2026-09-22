@@ -17,8 +17,14 @@ if { [is-loaded lcm-cee] } {
   setenv FC [exec which gfortran]
 }
 
+# -Wno-inconsistent-missing-override: recent clang (>=21) emits ~50 of these
+# warnings from Trilinos Belos headers (e.g. BelosPCPGSolMgr.hpp). They are
+# harmless, but in the parallel build their interleaved output can be misparsed
+# by CTest as a compiler error, which fails the build and skips `make install`
+# -- see the 2026-09-22 algol clang nightly. Suppressing them keeps the clang
+# build deterministically clean. gcc is unaffected (it does not warn here).
 if { [is-loaded lcm-fedora] } {
-  setenv CXXFLAGS "-std=c++20 -Wno-implicit-int-float-conversion"
+  setenv CXXFLAGS "-std=c++20 -Wno-implicit-int-float-conversion -Wno-inconsistent-missing-override"
 } else {
-  setenv CXXFLAGS "-std=c++20"
+  setenv CXXFLAGS "-std=c++20 -Wno-inconsistent-missing-override"
 }

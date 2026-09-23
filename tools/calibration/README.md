@@ -731,15 +731,18 @@ harness and readers are platform-agnostic.
   part is zero and the result is unchanged. For the Lee tests the residual
   deviator at the start of shear is `2e4` to `2e5` Pa, below 5 per cent of the
   peak.
-- **Refine the step when the cap starts near zero pressure, and check.** An
-  elastic trial far past such a cap can be returned to the wrong side of it,
-  onto a tensile stress, when the cap's branch point `kappa0` is on the
-  tensile side, as it is for the Lee soil. This is a robustness defect of the
-  return mapping, not of the harness, and small increments avoid it. The Lee
-  fits use `--history-substeps 20` (hydrostatic pressure within `1.5e-3` of its
-  range of the 40-step answer; the default 2 is off by 10 per cent) and
-  `--set step_size=5.0e-4` on `txc` (deviator within `1.7e-3` of its peak of
-  the `2.5e-4` answer; the default `2.5e-3` is off by up to 3.5 per cent).
+- **Check that the answer does not depend on the step.** The return
+  mapping used to integrate plastically from inside the yield surface, and
+  with the cap's branch point on the tensile side, as for the Lee soil, a
+  large increment was returned onto a tensile stress (issue 125, fixed: the
+  elastic part of an increment is now applied first). Since the fix the
+  hydrostatic history is converged at the default two steps per knot, within
+  `2.3e-3` of the 20-step answer (it was 10 per cent off before). The `txc`
+  path at its default step still differs from the converged answer by 1.4 to
+  3.1 per cent on the Lee tests, before and after the fix alike: that is the
+  ordinary discretization error of large deviatoric increments, and the Lee
+  fits use `--set step_size=5.0e-4`, within `1.7e-3` of the `2.5e-4`
+  answer.
 - **`txc` steps adaptively, and the other three do not.** With a constant step
   LOCA reports a step whose Newton solve failed and carries straight on, and
   Albany writes the unconverged state to Exodus like any other point. The curve

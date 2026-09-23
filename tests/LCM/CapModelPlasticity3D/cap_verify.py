@@ -438,6 +438,13 @@ def main():
 
     if path == 'hydrostatic':
         eps = lambda t: -0.02 * t * ref.I3
+    elif path == 'hydrostatic_tensile':
+        # materials_tensile_branch.yaml: branch point on the tensile side.
+        eps = lambda t: -0.01 * t * ref.I3
+        p = ref.CapParams(E=3.6e9, nu=0.48, A=3.69e6, C=1.45e6, D=2.82e-8,
+                          theta=0.0, R=22.55, kappa0=1.48e7, W=0.05, D1=8.1e-9,
+                          D2=0.0, calpha=1.0e9, psi=1.0, N=0.0, L=2.82e-8,
+                          phi=0.0, Q=22.55)
     elif path == 'confined':
         eps = lambda t: np.diag([-0.04 * t, 0.0, 0.0])
     elif path == 'triaxial':
@@ -554,6 +561,34 @@ def main():
         print(f'  evp vs crush curve       rel diff = {e2:.3e}  '
               f'[{"ok" if e2 < 1e-2 else "FAIL"}]')
         ok &= e1 < 1e-2 and e2 < 1e-2
+
+    if path == 'hydrostatic_tensile':
+        # Physics, independent of the integrator's algorithm. A monotone
+        # hydrostatic compression can never produce a tensile stress, I1 can
+        # never increase, and every plastic step ends on the hydrostat at
+        # I1 = X(kappa). And the answer must not depend on the step: the
+        # reference at ten times as many steps.
+        I1 = (sxx + syy + szz)[mask]
+        k = kappa[mask]
+        tensile = int(np.sum(I1 > 0.0))
+        rises = float(np.max(np.diff(I1), initial=0.0))
+        print(f'  tensile steps            {tensile}  [{"ok" if tensile == 0 else "FAIL"}]')
+        print(f'  largest rise of I1       {rises:.3e} Pa  [{"ok" if rises <= 1.0e-6 * np.abs(I1).max() else "FAIL"}]')
+        ok &= tensile == 0 and rises <= 1.0e-6 * np.abs(I1).max()
+        # The identity holds to the drift tolerance |f| < 1e-12 E^2, which
+        # here is 1.3e7 Pa^2 and, through df/dI1 on the hydrostat, about 27 Pa
+        # in I1: 1e-6 of |X|. The uncorrected integrator misses it by order 1.
+        plastic = np.nonzero(np.abs(np.diff(k)) > 0.0)[0] + 1
+        X = np.array([ref.X_of_kappa(kk, p) for kk in k[plastic]])
+        e1 = np.max(np.abs(I1[plastic] - X) / np.abs(X)) if len(plastic) else 0.0
+        print(f'  I1 vs X(kappa), plastic  rel diff = {e1:.3e} over {len(plastic)} steps  '
+              f'[{"ok" if len(plastic) and e1 < 1e-5 else "FAIL"}]')
+        ok &= bool(len(plastic)) and e1 < 1e-5
+        fine = ref.drive(eps, 10 * nsteps, p)[::10]
+        f_sxx = np.array([h[1][0, 0] for h in fine])
+        e2 = np.abs(sxx[mask] - f_sxx[mask]).max() / scale_s
+        print(f'  vs reference at 10x steps rel diff = {e2:.3e}  [{"ok" if e2 < 1e-3 else "FAIL"}]')
+        ok &= e2 < 1e-3
 
     print('VERIFICATION', 'PASS' if ok else 'FAIL')
     return 0 if ok else 1

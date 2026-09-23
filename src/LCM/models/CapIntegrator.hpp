@@ -375,6 +375,82 @@ struct CapIntegrator
   }
 
   //
+  // Fraction a in [0, 1) of the strain increment that is elastic: the
+  // stress sigma(a) = sigma_n + C(P_a) : (a depsilon), with the parameters
+  // P_a blended to pseudo-time a as the substeps blend them, first reaches
+  // the yield surface at a. Called only when the full elastic trial is
+  // outside the surface.
+  //
+  //   * sigma_n outside the surface (a parameter change between steps moved
+  //     the surface past it): 0, the whole increment is plastic, as before.
+  //   * sigma_n inside: Pegasus iteration on f(a) between 0 and 1.
+  //   * sigma_n on the surface and the increment loading: 0.
+  //   * sigma_n on the surface and the increment first unloading, then
+  //     reloading through the surface further on: the crossing is
+  //     bracketed by a scan, then found by Pegasus iteration.
+  //
+  // Evaluated on plain values, like the substep controls, so the Residual
+  // and Jacobian evaluations take identical branches.
+  //
+  double
+  elastic_fraction(
+      Tensor const&  sigmaN,
+      Tensor const&  alphaVal,
+      ScalarT const& kappaVal,
+      Tensor const&  depsilon,
+      ScalarT const& f_tolerance) const
+  {
+    auto value = [](ScalarT const& x) { return Sacado::ScalarValue<ScalarT>::eval(x); };
+    auto f_at  = [&](double a) {
+      Params const Pa = blend(p0, p1, a);
+      Tensor const sa = sigmaN + minitensor::dotdot(elastic_tangent(Pa), Tensor(a * depsilon));
+      return value(compute_f(Pa, sa, alphaVal, kappaVal));
+    };
+    double const tol = value(f_tolerance);
+    double const f0  = f_at(0.0);
+    if (f0 > tol) return 0.0;
+
+    double lo = 0.0, flo = f0, hi = 1.0, fhi = f_at(1.0);
+    if (fhi <= 0.0) return 0.0;  // defensive: the caller found the trial outside
+    if (f0 >= -tol) {
+      // On the surface. Loading from it: no elastic part.
+      Tensor const dfds = compute_dfdsigma(p0, sigmaN, alphaVal, kappaVal);
+      double const rate = value(minitensor::dotdot(dfds, minitensor::dotdot(elastic_tangent(p0), depsilon)));
+      if (rate >= 0.0) return 0.0;
+      // Unloading first: bracket the later crossing.
+      int const n_scan = 16;
+      double    a_prev = 0.0, f_prev = f0;
+      bool      inside = false, found = false;
+      for (int j = 1; j <= n_scan; ++j) {
+        double const a  = static_cast<double>(j) / n_scan;
+        double const fa = (j == n_scan) ? fhi : f_at(a);
+        if (fa < -tol) inside = true;
+        if (inside && fa > 0.0) {
+          lo = a_prev, flo = f_prev, hi = a, fhi = fa;
+          found = true;
+          break;
+        }
+        a_prev = a, f_prev = fa;
+      }
+      if (!found || flo >= 0.0) return 0.0;
+    }
+
+    // Pegasus iteration on [lo, hi], f(lo) < 0 < f(hi).
+    for (int it = 0; it < 60; ++it) {
+      double const a  = hi - fhi * (hi - lo) / (fhi - flo);
+      double const fa = f_at(a);
+      if (std::abs(fa) <= tol || (hi - lo) < 1.0e-15) return std::max(0.0, std::min(a, 1.0));
+      if (fa * fhi < 0.0) {
+        lo = hi, flo = fhi;
+      } else {
+        flo = flo * fhi / (fhi + fa);
+      }
+      hi = a, fhi = fa;
+    }
+    return std::max(0.0, std::min(hi, 1.0));
+  }
+
+  //
   // Integrate one strain increment from the converged state
   // {sigma_n, alpha, kappa}: elastic trial, then Sloan-style adaptive
   // substepping (modified-Euler RK1/RK2 pairs with relative stress-error
@@ -529,9 +605,27 @@ struct CapIntegrator
     double const STOL   = substep_tolerance;
     double const dT_min = 1.0 / static_cast<double>(max_substeps);
 
+    // Elastic fraction of the increment (Sloan, Abbo and Sheng 2001). The
+    // plastic rates below are valid only ON the yield surface: evaluated at
+    // an interior point, df/dsigma is not the normal to anything the stress
+    // has reached, and the plastic multiplier it gives is meaningless. When
+    // the multiplier comes out negative it is clamped to zero and the
+    // interior part behaves elastically, which is why the omission went
+    // unnoticed; but with the cap branch point on the tensile side
+    // (kappa > 0) the origin lies in the cap region, the multiplier comes
+    // out positive, and a large increment is returned onto a TENSILE stress
+    // (issue #125). So the elastic part of the
+    // increment is applied first, up to the surface, and only the remainder
+    // is integrated elastoplastically, starting on the surface.
+    double const alpha_e = elastic_fraction(sigmaN, alphaVal, kappaVal, depsilon, f_tolerance);
+
     sigmaVal = sigmaN;  // integrate from the converged state, not the trial
-    double T  = 0.0;
-    double dT = 1.0;
+    if (alpha_e > 0.0) {
+      Params const Pe = blend(p0, p1, alpha_e);
+      sigmaVal        = sigmaN + minitensor::dotdot(elastic_tangent(Pe), Tensor(alpha_e * depsilon));
+    }
+    double T  = alpha_e;
+    double dT = 1.0 - alpha_e;
     int    nsub = 0;
     int const nsub_max = 4 * max_substeps;  // rejected attempts included
 

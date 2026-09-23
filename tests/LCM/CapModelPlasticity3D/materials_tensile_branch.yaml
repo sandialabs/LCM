@@ -1,0 +1,32 @@
+LCM:
+  ElementBlocks:
+    Block0:
+      material: CapModel
+  Materials:
+    # Lee-like frozen-soil parameters (SAND2002-0524, tools/calibration
+    # README): a cap whose branch point kappa0 lies on the tensile side,
+    # stiff elasticity (bulk modulus 3e10 Pa), no kinematic hardening. W is
+    # larger than the calibrated value so the path stays short of cap lock.
+    CapModel:
+      Material Model:
+        Model Name: Cap
+      # Small-strain model: this flag routes MechanicsProblem to compute
+      # the infinitesimal Strain field the kernel consumes.
+      Finite Deformation: false
+      Elastic Modulus: {Elastic Modulus Type: Constant, Value: 3.6e9}
+      Poissons Ratio: {Poissons Ratio Type: Constant, Value: 0.48}
+      A: 3.69e6
+      D: 2.82e-8
+      C: 1.45e6
+      theta: 0.0
+      R: 22.55
+      kappa0: 1.48e7
+      W: 0.05
+      D1: 8.1e-9
+      D2: 0.0
+      calpha: 1.0e9
+      psi: 1.0
+      N: 0.0
+      L: 2.82e-8
+      phi: 0.0
+      Q: 22.55

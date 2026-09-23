@@ -276,6 +276,48 @@ def drift_correct(sigma, alpha, kappa, p, tol, max_iter=20):
     return sigma, alpha, kappa
 
 
+def elastic_fraction(sigma_n, alpha_n, kappa_n, deps, p0, p1, tol):
+    """Mirror of CapIntegrator::elastic_fraction: the fraction of the
+    increment that is elastic, found by Pegasus iteration on
+    f(sigma_n + C(P_a) : (a deps)) with the parameters blended to a."""
+    def f_at(a):
+        Pa = blend_params(p0, p1, a)
+        return yield_f(sigma_n + ce_apply(Pa, a * deps), alpha_n, kappa_n, Pa)
+    f0 = f_at(0.0)
+    if f0 > tol:
+        return 0.0
+    lo, flo, hi, fhi = 0.0, f0, 1.0, f_at(1.0)
+    if fhi <= 0.0:
+        return 0.0
+    if f0 >= -tol:
+        dfds = num_grad_sigma(yield_f, sigma_n, alpha_n, kappa_n, p0)
+        if np.sum(dfds * ce_apply(p0, deps)) >= 0.0:
+            return 0.0
+        n_scan, a_prev, f_prev, inside, found = 16, 0.0, f0, False, False
+        for j in range(1, n_scan + 1):
+            a = j / n_scan
+            fa = fhi if j == n_scan else f_at(a)
+            if fa < -tol:
+                inside = True
+            if inside and fa > 0.0:
+                lo, flo, hi, fhi, found = a_prev, f_prev, a, fa, True
+                break
+            a_prev, f_prev = a, fa
+        if not found or flo >= 0.0:
+            return 0.0
+    for _ in range(60):
+        a = hi - fhi * (hi - lo) / (fhi - flo)
+        fa = f_at(a)
+        if abs(fa) <= tol or (hi - lo) < 1.0e-15:
+            return max(0.0, min(a, 1.0))
+        if fa * fhi < 0.0:
+            lo, flo = hi, fhi
+        else:
+            flo = flo * fhi / (fhi + fa)
+        hi, fhi = a, fa
+    return max(0.0, min(hi, 1.0))
+
+
 def integrate_step(sigma_n, alpha_n, kappa_n, deps, p, p_begin=None,
                    tol_scale=None, stol=1.0e-4, max_substeps=200):
     """Sloan-style adaptive substepping: modified-Euler (RK1/RK2) pairs
@@ -299,8 +341,12 @@ def integrate_step(sigma_n, alpha_n, kappa_n, deps, p, p_begin=None,
         tol = tol_scale
     dT_min = 1.0 / max_substeps
 
+    # Elastic part first, up to the surface; see CapIntegrator::integrate.
+    a_e = elastic_fraction(sigma_n, alpha_n, kappa_n, deps, p0, p1, tol)
     sigma, alpha, kappa = sigma_n.copy(), alpha_n.copy(), kappa_n
-    T, dT = 0.0, 1.0
+    if a_e > 0.0:
+        sigma = sigma_n + ce_apply(blend_params(p0, p1, a_e), a_e * deps)
+    T, dT = a_e, 1.0 - a_e
     nsub, nsub_max = 0, 4 * max_substeps
     while T < 1.0 and nsub < nsub_max:
         deps_sub = dT * deps

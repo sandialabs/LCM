@@ -547,9 +547,26 @@ increment $\strainincr$:
 \item \emph{Elastic trial} via~\eqref{eq:trial_small}. If
       $f(\stress^{\mathrm{tr}}, \backstress_n, \kappa_n) \le 0$,
       accept the trial and stop.
-\item \emph{Substepping}, starting from the converged state (not the
-      trial), with pseudo-time $T \in [0,1]$, $\Delta T = 1$
-      initially, and $\Delta T_{\min} = 1/\texttt{Maximum Substeps}$.
+\item \emph{Elastic fraction.} The rates \eqref{eq:rates} hold only
+      on the yield surface, so the elastic part of the increment is
+      applied first. The fraction $a \in [0,1)$ at which
+      $f\big(\stress_n + \Celast(P_a) : a\,\strainincr\big) = 0$,
+      with the parameters blended to $P_a$, is found by Pegasus
+      iteration when $\stress_n$ is inside the surface; it is zero when
+      $\stress_n$ is on the surface and the increment loads it, and it
+      is bracketed by a scan when $\stress_n$ is on the surface and the
+      increment first unloads, then reloads
+      \citep{Sloan.Abbo.Sheng:2001}. The stress is advanced elastically
+      to the crossing. Without this step the rates are evaluated at an
+      interior point: where the resulting multiplier is negative it is
+      clamped to zero and the interior part behaves elastically, but
+      with the branch point on the tensile side ($\kappa > 0$) the
+      origin lies in the cap region, the multiplier is positive, and a
+      large increment is returned onto a tensile stress (LCM issue 125).
+\item \emph{Substepping} of the remainder, starting from the crossing
+      (not the trial), with pseudo-time $T \in [a,1]$,
+      $\Delta T = 1 - a$ initially, and
+      $\Delta T_{\min} = 1/\texttt{Maximum Substeps}$.
       While $T < 1$:
       \begin{enumerate}
       \item Evaluate the increments \eqref{eq:rates} at the current

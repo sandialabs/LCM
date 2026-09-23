@@ -45,6 +45,7 @@ foreach(f input_hydrostatic.yaml input_confined.yaml input_triaxial.yaml
           input_confined_permafrost_softening.yaml
           materials_permafrost_softening.yaml
           depth_test.txt porosity_test.txt
+          input_hydrostatic_tensile.yaml materials_tensile_branch.yaml
           cap_reference.py cap_verify.py runverify.cmake)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${f}
                  ${CMAKE_CURRENT_BINARY_DIR}/${f} COPYONLY)
@@ -68,7 +69,7 @@ if (CAP_PY_OK)
            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
   set_tests_properties(CapModel_Oracle_SelfCheck PROPERTIES LABELS "LCM;Tpetra;Forward")
 
-  foreach(case hydrostatic confined triaxial confined_coarse confined_fd triaxial_fd)
+  foreach(case hydrostatic hydrostatic_tensile confined triaxial confined_coarse confined_fd triaxial_fd)
     if (case STREQUAL "confined_coarse")
       set(_cap_pathmode confined)
     else()

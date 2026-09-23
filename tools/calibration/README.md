@@ -403,6 +403,24 @@ third column, `strain_vol`, resampled onto the stress curve's strain grid, so
 that `--curve dev-stress-volumetric` fits both at once. `--volumetric`
 additionally writes the measurement on its own grid, for plotting only.
 
+**Know what the volumetric column measures.** The harness's `strain_vol` is
+`eps_a + 2 eps_r`, the sum of the engineering strains, which is what a
+laboratory computes from axial and lateral gauges. A cell that measures the
+specimen's volume directly, with a sensor in its oil circuit, reports `J - 1`
+instead. The two differ at large strain: a specimen at constant volume at an
+axial strain of -0.15 has `eps_a + 2 eps_r = +0.019`. Compared unconverted,
+that difference reads as compaction, and the fit pulls the cap in to supply
+it. `--volume-change` declares the column to be `J - 1` and converts it:
+
+```bash
+python prepare_data.py --out-dir data --volume-change Yang_b_*_-6*.csv
+```
+
+Lateral strains that a paper derives from such a measurement are `J - 1`
+data too. The test is to pair the axial and lateral curves at equal stress: if
+`eps_a + 2 eps_r` reproduces the reported volume strain to digitizing
+accuracy, the lateral curve was computed from the volume, not measured.
+
 ### Measured records and hydrostatic histories
 
 The Lee frozen-soil data (SAND2002-0524) are laboratory records rather than
@@ -757,6 +775,79 @@ harness and readers are platform-agnostic.
 ---
 
 ## Verification status
+
+### Frozen sand at -4 and -6 C (Yang et al., 2010), sirius and rigel, 2026-09-23
+
+Two papers on one sand, digitized by Diana Bull: Yang, Lai and Li, Cold
+Regions Science and Technology 60 (2010) 245-250, nine triaxial tests at -4 C
+and water content 0.15, confining pressures `5e5` to `1.8e7` Pa, deviator
+stress only; and Yang, Lai and Chang, Cold Regions Science and Technology 64
+(2010) 39-45, at -6 C, six confining pressures from `5e5` to `1.2e7` Pa at
+water content 0.15 with volume strain, and water contents 0.10, 0.15 and 0.20
+at `5e5` and `1e7` Pa. The -6 C volume strain is `J - 1` from the cell's oil
+circuit and is converted with `--volume-change` (see
+[Preparing digitized laboratory data](#preparing-digitized-laboratory-data)).
+The -4 C curves are truncated at 0.20. Finite deformation, follower
+correction, volume weight 0.3.
+
+Two ways of fitting were run and compared:
+
+- **Staged** (sirius). Stage A takes `E` from the initial slopes, `nu` from the
+  initial slope of the volume strain, and `A`, `C`, `D` through the maximum of
+  each test, with no simulation. Stage B fits `N`, `calpha`, `phi`, `kappa0`,
+  `W`, `D1` with those held. About 30 minutes per fit.
+- **Simultaneous** (rigel, `--core-limit 160`). All 14 parameters of the -6 C
+  set at once: 25 evaluations in 2.5 hours.
+
+**Keep the initial elastic domain alive at the lowest pressure.** Its size at
+the consolidated state is `F_f(-3 Pc) - N`. With the cohesion `A - C` free,
+the optimizer drives it to zero at `Pc = 5e5` Pa: Newton fails at the end of
+consolidation in the first follower pass, the second pass runs past its
+traction table, and Albany aborts in `TimeTracBC` ("Time is growing
+unbounded!"), which MatCal reports as exit code 250 and ends the study. A
+bound on `N` only moves the failure, because `C` and `D` then rise to meet it.
+The staged fits fix `A - C = 1.5e6` Pa from the data; the accepted
+simultaneous fits end with `F_f - N` at `7.2e5` Pa or more.
+
+| Parameter | -6 C, w = 0.15 | -6 C, w = 0.20 | -4 C, w = 0.15 |
+|-----------|----------------|----------------|----------------|
+| `elastic_modulus`, `poissons_ratio` | `2.440e8`, 0.3528 | `4.927e8`, 0.2846 | `1.910e8`, 0.3528 |
+| `A`, `C` | `5.6045e6`, `3.3334e6` | `3.5807e6`, `2.9136e6` | `3.9135e6`, `2.4135e6` |
+| `D` | `6.642e-8` | `2.675e-7` | `1.6749e-7` |
+| `N`, `calpha` | `1.8e6` (bound), `6.391e7` | `9.117e5`, `1.167e7` | `1.376e6`, `2.478e7` |
+| `phi` | -0.02151 | 0.02392 | -0.02151 |
+| `kappa0`, `W`, `D1` | `-1.3324e7`, `2.0e-3` (bound), `5.0e-9` (bound) | `-1.4029e7`, 0.0453, `5.0e-9` (bound) | as -6 C, w = 0.15 |
+| fitted | simultaneous; false convergence on a plateau, then `R` freed: relative function convergence at `R = 4.995` | simultaneous; relative function convergence | staged, flow and cap from -6 C; `E`, `N`, `calpha` fitted |
+
+Held in all three: `theta = 0`, `L = 0`, `D2 = 0`, `R = 5`. No softening.
+
+| rms, per cent of the data range | `5e5` | `1e6` | `3e6` | `8e6` | `1e7` | `1.2e7` Pa |
+|-----|------|------|------|------|------|------|
+| -6 C, `q`, simultaneous / staged | 8.0 / 8.7 | 5.4 / 3.7 | 7.0 / 8.5 | 2.4 / 3.2 | 6.4 / 3.6 | 4.5 / 4.1 |
+| -6 C, volume, simultaneous / staged | 25 / 15 | 15 / 15 | 20 / 58 | 6 / 26 | 13 / 10 | 13 / 17 |
+
+At -4 C, `q` rms is 2.3 to 6.9 per cent from `1e6` to `1.4e7` Pa, 11.9 at
+`5e5` Pa, which softens, and 18.9 at `1.8e7` Pa, where the measured strength
+falls with confinement. At w = 0.20: 1.4 and 2.1 per cent in `q`, 12.6 and 6.1
+in volume.
+
+What the data show about the model:
+
+- **The cap carries no compaction at w = 0.15.** It bounds the strength at high
+  pressure, but `W` and `D1` sit on their lower bounds. A second basin exists,
+  found from an interior start: cap at the origin, `R = 14.7`, `W = 0.0185`.
+  It fits the volume slightly better and `q` worse, with an abrupt yield knee
+  near `5e6` Pa at high pressure, and its objective is 14 per cent higher.
+- **Softening never begins.** Onset requires the back stress within `1e-6` of
+  `N` and the stress on the shear branch. With `N / calpha` near 0.02 in
+  plastic strain, that takes about 0.3, twice the range of these tests. The
+  three softening parameters had zero gradient in every run, and the
+  post-peak falls at `5e5` and `1e6` Pa stay unfitted.
+- **w = 0.10 is not representable at `1e7` Pa.** It compacts 5.5 per cent, about
+  its air-void content (porosity 0.264 against an ice fraction of 0.213), while
+  `q` rises to `1.43e7` Pa. That is compaction hardening in shear; an engaged
+  cap only lowers the strength here, and a cap near the origin with a large
+  crush volume ends in the Newton failure above.
 
 ### Alaskan frozen soil at -10 C (Lee et al., SAND2002-0524), sirius, 2026-09-22
 

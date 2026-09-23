@@ -60,6 +60,23 @@ team has been asked to give the volumetric one its own strain column, so they
 will not always align. No extrapolation, so a stress point outside the
 volumetric curve's range is dropped and the count reported.
 
+VOLUME CHANGE, NOT STRAIN SUM. The harness's ``strain_vol`` is the sum of
+the three engineering strains of the element, ``eps_a + 2 eps_r``, the
+small-strain measure a laboratory computes from axial and lateral gauges. A
+cell that measures the specimen's volume directly (a volume sensor in the oil
+circuit, as in Yang, Lai and Chang 2010) reports ``J - 1`` instead, and the
+two differ at large strain: a specimen at constant volume at an axial strain of
+-0.15 has ``eps_a + 2 eps_r = +0.019``. Comparing ``J - 1`` data against the
+sum reads that geometric term as dilatancy, and a fit then pulls the cap in to
+supply compaction that is not there. ``--volume-change`` declares the
+volumetric column to be ``J - 1`` and converts it, for a homogeneous
+cylinder, with ``1 + eps_r = sqrt(J / (1 + eps_a))`` and
+``strain_vol = eps_a + 2 eps_r`` (compression negative). Lateral strains that a
+paper derives from such a measurement are ``J - 1`` data too: if pairing the
+axial and lateral curves reproduces the measured volume strain as
+``eps_a + 2 eps_r`` to digitizing accuracy, the lateral curve was computed
+from it. The unresampled ``--volumetric`` file is left as measured.
+
 SIGN CONVENTION FIELD. A metadata field ``SignConven`` (``CompressPos`` or
 ``CompressNeg``) states the convention of EVERY column, the volumetric one
 included, and when present it replaces both the detection above and the rule
@@ -490,6 +507,17 @@ def convert_volumetric(strain_volumetric, flip, max_strain=None, stated=None):
     return rows
 
 
+def volume_change_to_strain_sum(rows):
+    """``(strain_eng_x, stress_dev_x, J - 1)`` rows -> the same rows with the
+    third column as ``eps_a + 2 eps_r``, compression negative, for a
+    homogeneous cylinder. See VOLUME CHANGE, NOT STRAIN SUM."""
+    out = []
+    for strain, stress, change in rows:
+        radial = np.sqrt((1.0 + change) / (1.0 + strain)) - 1.0
+        out.append((strain, stress, strain + 2.0 * radial))
+    return out
+
+
 def write_csv(path, header, rows, comments):
     with open(path, "w", newline="") as fh:
         for line in comments:
@@ -525,6 +553,10 @@ def main(argv=None):
                          "curve on its own unresampled grid. Not needed for "
                          "fitting (the main file carries a strain_vol column); "
                          "useful for plotting the measurement as digitized.")
+    ap.add_argument("--volume-change", action="store_true",
+                    help="the volumetric column is the measured volume change "
+                         "J - 1 (a cell volume sensor), not eps_a + 2 eps_r; "
+                         "convert it to the harness measure")
     ap.add_argument("--window", type=int, default=7,
                     help="measured records: rows in the moving average "
                          "(default 7)")
@@ -580,12 +612,18 @@ def main(argv=None):
         flip = report["convention"].startswith("compression positive")
         volumetric = convert_volumetric(strain_volumetric, flip, args.max_strain, stated)
         combined, dropped = resample_volumetric(rows, volumetric)
+        if combined is not None and args.volume_change:
+            combined = volume_change_to_strain_sum(combined)
         if combined is not None:
             header = ["strain_eng_x", "stress_dev_x", "strain_vol"]
             body = combined
             comments.append(
                 "strain_vol is the measured volumetric strain, linearly "
                 "resampled onto this file's strain grid; positive is dilation")
+            if args.volume_change:
+                comments.append(
+                    "strain_vol converted from the measured volume change "
+                    "J - 1 to eps_a + 2 eps_r (--volume-change)")
             if dropped:
                 comments.append(
                     f"{dropped} stress point(s) dropped: outside the "

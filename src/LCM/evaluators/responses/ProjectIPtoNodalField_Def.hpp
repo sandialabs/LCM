@@ -188,10 +188,10 @@ ProjectIPtoNodalFieldQuadrature::ProjectIPtoNodalFieldQuadrature(
   bf_const_                                                    = decltype(bf_const_)("my BF", node_qp_scalar);
   wbf_                                                         = decltype(wbf_)("my wBF", node_qp_scalar);
   wbf_const_                                                   = decltype(wbf_const_)("my wBF", node_qp_scalar);
-  auto bf_data = PHX::KokkosViewFactory<RealType, PHX::Device::array_layout, PHX::Device>::buildView(bf_.fieldTag());
+  auto bf_data = PHX::KokkosViewFactory<RealType, PHX::Device::execution_space::array_layout, PHX::Device>::buildView(bf_.fieldTag());
   bf_.setFieldData(bf_data);
   bf_const_.setFieldData(bf_data);
-  auto wbf_data = PHX::KokkosViewFactory<MeshScalarT, PHX::Device::array_layout, PHX::Device>::buildView(wbf_.fieldTag());
+  auto wbf_data = PHX::KokkosViewFactory<MeshScalarT, PHX::Device::execution_space::array_layout, PHX::Device>::buildView(wbf_.fieldTag());
   wbf_.setFieldData(wbf_data);
   wbf_const_.setFieldData(wbf_data);
 }
@@ -560,7 +560,7 @@ ProjectIPtoNodalField<PHAL::AlbanyTraits::Residual, Traits>::ProjectIPtoNodalFie
   test_ip_field_ = decltype(test_ip_field_)(ip_field_names_.back(), dl->qp_scalar);
   ip_fields_.push_back(PHX::MDField<ScalarT const>(ip_field_names_.back(), dl->qp_scalar));
   auto&                                                                           f = ip_fields_.back();
-  typedef PHX::KokkosViewFactory<ScalarT, PHX::Device::array_layout, PHX::Device> ViewFactory;
+  typedef PHX::KokkosViewFactory<ScalarT, PHX::Device::execution_space::array_layout, PHX::Device> ViewFactory;
   std::vector<PHX::index_size_type>                                               dims;
   dims.push_back(100);
   auto test_data = ViewFactory::buildView(f.fieldTag(), dims);

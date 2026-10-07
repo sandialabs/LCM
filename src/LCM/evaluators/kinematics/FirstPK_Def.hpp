@@ -174,7 +174,7 @@ FirstPK<EvalT, Traits>::evaluateFields(typename Traits::EvalData workset)
     Kokkos::parallel_for(no_small_strain_Policy(0, workset.numCells), *this);
   }
 #if defined(ALBANY_TIMER)
-  PHX::Device::fence();
+  PHX::Device::execution_space().fence();
   auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
   long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
   long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();

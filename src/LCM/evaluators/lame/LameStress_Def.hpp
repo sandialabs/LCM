@@ -84,7 +84,7 @@ LameStressBase<EvalT, Traits>::postRegistrationSetup(typename Traits::SetupData 
   this->utils.setFieldData(stressField, fm);
   for (unsigned int i = 0; i < lameMaterialModelStateVariableFields.size(); ++i) this->utils.setFieldData(lameMaterialModelStateVariableFields[i], fm);
 
-  typedef PHX::KokkosViewFactory<RealType, PHX::Device::array_layout, PHX::Device> ViewFactory;
+  typedef PHX::KokkosViewFactory<RealType, PHX::Device::execution_space::array_layout, PHX::Device> ViewFactory;
   this->stressFieldRealType  = PHX::MDField<RealType, Cell, QuadPoint, Dim, Dim>("stress_RealType", this->tensor_dl);
   this->defGradFieldRealType = PHX::MDField<RealType, Cell, QuadPoint, Dim, Dim>("defGrad_RealType", this->tensor_dl);
   this->stressFieldRealType.setFieldData(ViewFactory::buildView(this->stressFieldRealType.fieldTag()));

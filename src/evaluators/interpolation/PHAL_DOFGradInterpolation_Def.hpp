@@ -110,7 +110,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits
   // GradBF);
 
 #if defined(ALBANY_TIMER)
-  PHX::Device::fence();
+  PHX::Device::execution_space().fence();
   auto start = std::chrono::high_resolution_clock::now();
 #endif
   //  Kokkos::deep_copy(grad_val_qp.get_kokkos_view(), 0.0);
@@ -130,7 +130,7 @@ DOFGradInterpolationBase<EvalT, Traits, ScalarT>::evaluateFields(typename Traits
 #endif
 
 #if defined(ALBANY_TIMER)
-  PHX::Device::fence();
+  PHX::Device::execution_space().fence();
   auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
   long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
   long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
@@ -174,7 +174,7 @@ FastSolutionGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename
   // GradBF);
 
 #if defined(ALBANY_TIMER)
-  PHX::Device::fence();
+  PHX::Device::execution_space().fence();
   auto start = std::chrono::high_resolution_clock::now();
 #endif
 
@@ -184,7 +184,7 @@ FastSolutionGradInterpolationBase<PHAL::AlbanyTraits::Jacobian, Traits, typename
   Kokkos::parallel_for(FastSolutionGradInterpolationBase_Jacobian_Policy(0, workset.numCells), *this);
 
 #if defined(ALBANY_TIMER)
-  PHX::Device::fence();
+  PHX::Device::execution_space().fence();
   auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
   long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
   long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();

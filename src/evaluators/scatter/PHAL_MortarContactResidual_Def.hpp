@@ -123,7 +123,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Residual, Traits>::evaluateFields(type
   cudaCheckError();
 
 #if defined(ALBANY_TIMER)
-  PHX::Device::fence();
+  PHX::Device::execution_space().fence();
   auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
   long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
   long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
@@ -418,7 +418,7 @@ MortarContactResidual<PHAL::AlbanyTraits::Jacobian, Traits>::evaluateFields(type
   }
 
 #if defined(ALBANY_TIMER)
-  PHX::Device::fence();
+  PHX::Device::execution_space().fence();
   auto      elapsed      = std::chrono::high_resolution_clock::now() - start;
   long long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
   long long millisec     = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();

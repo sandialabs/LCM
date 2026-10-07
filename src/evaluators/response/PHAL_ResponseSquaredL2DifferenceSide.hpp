@@ -41,7 +41,7 @@ class ResponseSquaredL2DifferenceSideBase : public PHAL::SeparableScatterScalarR
   int                                 sideDim;
   int                                 numQPs;
   int                                 fieldDim;
-  std::vector<PHX::Device::size_type> dims;
+  std::vector<PHX::Device::execution_space::size_type> dims;
 
   bool          target_value;
   TargetScalarT target_value_val;

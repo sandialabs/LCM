@@ -1,319 +1,162 @@
 #!/usr/bin/env python3
+"""
+Imprint crystal lattice orientations on a genesis mesh as element attributes,
+for CrystalPlasticity with "Read Lattice Orientation From Mesh: true".
 
-# This script requires exodus.py
+    python3 imprint_orientation_on_mesh.py -m mesh.g -r mesh_Rotations.txt [-o out.g] [--combine-blocks]
+
+Rotations file: one rotation matrix R per element block, in the order of the
+blocks in the mesh file, written row by row: R11 R12 R13 R21 R22 R23 R31 R32 R33.
+Lines starting with '#' are ignored. This is the same file that
+write_file_material.py reads, where the columns of R are the lattice basis
+vectors in global components ("Basis Vector 1/2/3").
+
+Attribute convention: each element gets nine attributes, R written row by row
+(R11 R12 R13 R21 ... R33), where the columns of R are the lattice basis
+vectors in global components. LCM's CrystalPlasticity reads them back the same
+way, so a mesh orientation and the same "Basis Vector 1/2/3" input describe
+the same lattice. This is the layout of the meshes made with the original
+version of this script (2016).
+
+With --combine-blocks, all blocks are merged into a single block (they must
+share the element type), and each element keeps the orientation of the block
+it came from. Element order, and hence the element map and side sets, is
+unchanged because the blocks are concatenated in file order.
+
+To use the mesh, set "Read Lattice Orientation From Mesh: true" in the
+material (at the same level as "Crystal Elasticity", not inside it) and declare
+the field in the discretization:
+
+    Required Fields Info:
+      Number Of Fields: 1
+      Field 0:
+        Field Name: Lattice_Orientation
+        Field Type: Elem Scalar
+        Field Origin: Mesh
+
+See tests/LCM/CrystalPlasticity/SingleElement3d/ElasticShearRotated3dMesh.yaml.
+
+Requires exodus3.py (or exodus.py) from SEACAS on PYTHONPATH.
+"""
 
 import argparse
-import exodus
-from lcm_postprocess._core import InputError
-import math
 import os
-import string
 import sys
 import time
 
-def compute_euler_angles(matrices_rotation=None):
-    phis = [np.arccos(m[2,2]) for m in matrices_rotation]
-    sines = np.sin(phis)
-    phis1 = [np.arctan2(m[2,0]/sine_val, -m[2,1]/sine_val) for m in matrices_rotation]
-    phis2 = [np.arctan2(m[0,2]/sine_val, m[1,2]/sine_val) for m in matrices_rotation]
-    # case for sin(Phi) == 0: if sine_val == 0, phi2 = 0, and ph1 = atan2(R21,R11)
-    phis1[np.abs(sines) < 1e-10] = math.atan2(R_12, R_11)    
-    phis2[np.abs(sines) < 1e-10] = 0.0
-    return phis1, phis, phis2
+import numpy as np
 
-def print_info(genesis_input=None):
-    print " "
-    print "Database version:         " + str(round(genesis_input.version.value,2))
-    print "Database title:           " + genesis_input.title()
-    print "Database dimensions:      " + str(genesis_input.num_dimensions())
-    print "Number of nodes:          " + str(genesis_input.num_nodes())
-    print "Number of elements:       " + str(genesis_input.num_elems())
-    print "Number of element blocks: " + str(genesis_input.num_blks())
-    print "Number of node sets:      " + str(genesis_input.num_node_sets())
-    print "Number of side sets:      " + str(genesis_input.num_side_sets())
-    print " "
+try:
+    import exodus3 as exodus
+except ImportError:
+    import exodus
 
-def initialize_genesis(genesis_input=None, genesis_output_name=None):
-    if os.path.exists(genesis_output_name):
-        os.remove(genesis_output_name)
-    num_blocks_input = genesis_input.num_blks()
-    if args.combine_blocks == True:
-        num_blocks_output = 1
-    else:
-        num_blocks_output = num_blocks_input
-    genesis_output = exodus.exodus(
-        genesis_output_name,
-       'w',
-       'numpy',
-       genesis_input.title(),
-       genesis_input.num_dimensions(),
-       genesis_input.num_nodes(),
-       genesis_input.num_elems(),
-       num_blocks_output,
-       genesis_input.num_node_sets(),
-       genesis_input.num_side_sets())
-    return genesis_output
+NUM_ATTRIBUTES = 9
 
-def write_qa_records(genesis_input=None, genesis_output=None):
-    qa_records = genesis_input.get_qa_records()
-    sw_name = 'imprint_orientation_on_mesh.py'
-    sw_descriptor = '1.0'
-    sw_data = time.strftime('%Y-%m-%d')
-    timestamp = time.strftime('%H:%M:%S')
-    qa_records.append((sw_name, sw_descriptor, sw_data, timestamp))
-    genesis_output.put_qa_records(qa_records)
 
-def transfer_genesis(genesis_input=None, genesis_output_name=None):
-    genesis_output = initialize_genesis(
-        genesis_input=genesis_input, genesis_output_name=genesis_output_name)
-    write_qa_records(genesis_input=genesis_input, genesis_output=genesis_output)
+def read_rotations(file_name):
+    rotations = np.loadtxt(file_name, comments='#', ndmin=2)
+    if rotations.shape[1] != NUM_ATTRIBUTES:
+        sys.exit(f'{file_name}: expected 9 values per line (a 3x3 rotation matrix), found {rotations.shape[1]}')
+    rotations = rotations.reshape((-1, 3, 3))
+    for k, R in enumerate(rotations):
+        error = max(np.abs(R.T @ R - np.eye(3)).max(), abs(np.linalg.det(R) - 1.0))
+        if error > 1.0e-6:
+            sys.exit(f'{file_name}: matrix {k + 1} is not a proper rotation (error {error:.1e})')
+    return rotations
 
-    return genesis_output
 
-if __name__ == "__main__":
+def imprint(mesh_name, rotations_name, output_name, combine_blocks):
+    mesh = exodus.exodus(mesh_name, mode='r', array_type='numpy')
+    block_ids = list(mesh.get_elem_blk_ids())
+    rotations = read_rotations(rotations_name)
+    if len(rotations) != len(block_ids):
+        sys.exit(f'{rotations_name} has {len(rotations)} rotations but {mesh_name} has {len(block_ids)} element blocks')
+    if any(mesh.num_attr(b) > 0 for b in block_ids):
+        sys.exit(f'{mesh_name}: meshes with existing element attributes are not supported')
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--meshfile', help='Specify mesh filename', default=None)
-    parser.add_argument('-c', '--combine_blocks', type=bool, help = 'Combine elements into single block', default=True)
-    parser.add_argument('-r', '--rotfile', help = 'Specify rotations filename.', default=None)
-    parser.add_argument('-o', '--orientation_format', help = 'Specify "matrix" or "angles" format', default='matrix')
+    blocks = []
+    for block_id, R in zip(block_ids, rotations):
+        connectivity, num_elems, num_nodes_per_elem = mesh.get_elem_connectivity(block_id)
+        # R row by row; its columns are the lattice basis vectors
+        attributes = np.tile(R.flatten(), num_elems)
+        blocks.append(dict(id=block_id, type=mesh.elem_type(block_id), num_elems=num_elems,
+                           num_nodes=num_nodes_per_elem, connectivity=np.asarray(connectivity).flatten(),
+                           attributes=attributes))
+    block_names = list(mesh.get_elem_blk_names())
 
+    if combine_blocks and len(blocks) > 1:
+        types = {(b['type'], b['num_nodes']) for b in blocks}
+        if len(types) > 1:
+            sys.exit(f'--combine-blocks needs a single element type; found {sorted(types)}')
+        blocks = [dict(id=blocks[0]['id'], type=blocks[0]['type'], num_elems=sum(b['num_elems'] for b in blocks),
+                       num_nodes=blocks[0]['num_nodes'],
+                       connectivity=np.concatenate([b['connectivity'] for b in blocks]),
+                       attributes=np.concatenate([b['attributes'] for b in blocks]))]
+        block_names = [block_names[0]]
+
+    if os.path.exists(output_name):
+        os.remove(output_name)
+    out = exodus.exodus(output_name, mode='w', array_type='numpy', title=mesh.title(),
+                        numDims=mesh.num_dimensions(), numNodes=mesh.num_nodes(), numElems=mesh.num_elems(),
+                        numBlocks=len(blocks), numNodeSets=mesh.num_node_sets(), numSideSets=mesh.num_side_sets())
+
+    qa_records = list(mesh.get_qa_records())
+    qa_records.append(('imprint_orientation_on_mesh.py', '2.0', time.strftime('%Y-%m-%d'), time.strftime('%H:%M:%S')))
+    out.put_qa_records(qa_records)
+
+    out.put_coord_names(mesh.get_coord_names())
+    out.put_coords(*mesh.get_coords())
+    out.put_node_id_map(mesh.get_node_id_map())
+    out.put_elem_id_map(mesh.get_elem_id_map())
+
+    out.put_concat_elem_blk([b['id'] for b in blocks], [b['type'] for b in blocks],
+                            [b['num_elems'] for b in blocks], [b['num_nodes'] for b in blocks],
+                            [NUM_ATTRIBUTES for b in blocks], 1)
+    for b in blocks:
+        out.put_elem_connectivity(b['id'], b['connectivity'])
+        out.put_elem_attr(b['id'], b['attributes'])
+    out.put_elem_blk_names(block_names)
+
+    node_set_ids = list(mesh.get_node_set_ids())
+    for ns in node_set_ids:
+        num_nodes, num_df = mesh.get_node_set_params(ns)
+        out.put_node_set_params(ns, num_nodes, num_df)
+        out.put_node_set(ns, mesh.get_node_set_nodes(ns))
+        if num_df > 0:
+            out.put_node_set_dist_fact(ns, mesh.get_node_set_dist_facts(ns))
+    if node_set_ids:
+        out.put_node_set_names(mesh.get_node_set_names())
+
+    side_set_ids = list(mesh.get_side_set_ids())
+    for ss in side_set_ids:
+        num_sides, num_df = mesh.get_side_set_params(ss)
+        out.put_side_set_params(ss, num_sides, num_df)
+        elems, sides = mesh.get_side_set(ss)
+        out.put_side_set(ss, elems, sides)
+        if num_df > 0:
+            out.put_side_set_dist_fact(ss, mesh.get_side_set_dist_fact(ss))
+    if side_set_ids:
+        out.put_side_set_names(mesh.get_side_set_names())
+
+    out.close()
+    mesh.close()
+    print(f'Wrote {output_name}: {len(blocks)} block(s), {NUM_ATTRIBUTES} orientation attributes per element')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-m', '--meshfile', required=True, help='input genesis mesh')
+    parser.add_argument('-r', '--rotfile', help='rotations file (default: <mesh base>_Rotations.txt)')
+    parser.add_argument('-o', '--output', help='output mesh (default: <mesh base>_orientation.g)')
+    parser.add_argument('--combine-blocks', action='store_true', help='merge all element blocks into one')
     args = parser.parse_args()
 
-    if args.meshfile is not None:
-        if args.rotfile is None:
-            basename = args.meshfile.splitext()[0]
-            args.rotfile = basename + '_Rotations.txt'
-    else:
-        if args.rotfile is not None:
-            basename = args.rotfile.replace('_Rotations.txt','')
-            args.meshfile = basename + '.g'
-        else:
-            names_file = os.walk('.').next()[2]
-            names_potential = [n for n in names_file if n.endswith('_Rotations.txt')]
-            if len(names_potential) is 1:
-                basename = names_potential[0].replace('_Rotations.txt','')
-                args.rotfile = basename + '_Rotations.txt'
-                args.meshfile = basename + '.g'
-            else:
-                raise InputError('Non-unique or missing assumed base file name')
-
-    assert(os.path.isfile(args.meshfile))
-    assert(os.path.isfile(args.rotfile))
-
-    genesis_input = exodus.exodus(args.meshfile, mode='r', array_type='numpy')
-
-    # Read the orientation data
-    orientations = np.loadtxt(args.rotfile, ndmin=2)
-    num_orientations = orientations.shape[0]
-    num_dims = int(np.sqrt(orientations.shape[1]))
-    assert(num_dims**2 == orientations.shape[1])
-
-    # Print database parameters from genesis_input
-    print_info(genesis_input=genesis_input)
-
-    genesis_output_name = os.path.splitext(
-        genesis_input_name)[0] + '_orientation.g'
-
-    genesis_output = transfer_genesis(
-        genesis_input=genesis_input, genesis_output_name=genesis_output_name)
-
-    
-
-    
-
-    if args.orientation_format == 'matrix':
-        num_orientation_attributes = num_dims**2
-    elif args.orientation_format == 'angles':
-        num_orientation_attributes = num_dims
-    else:
-        raise Exception('orientation_format must be defined')    
-
-    genesis_output.put_coord_names(genesis_input.get_coord_names())
-    genesis_output.put_coords(*genesis_input.get_coords())
-
-    node_id_map = genesis_input.get_node_id_map()
-    elem_id_map = genesis_input.get_elem_id_map()
-    define_maps = int(len(node_id_map) + len(elem_id_map) > 0)
-
-    if len(node_id_map) > 0:
-        genesis_output.put_node_id_map(node_id_map)
-
-    if len(elem_id_map) > 0:
-        genesis_output.put_elem_id_map(elem_id_map)
-
-    block_ids_input = genesis_input.get_elem_blk_ids()
-    block_num_attributes = [num_orientation_attributes for b in block_ids_input]
-
-    if args.combine_blocks is False:
-        block_ids_output = block_ids_input
-        block_elem_types = [genesis_input.elem_type(b) for b in block_ids_input]
-        block_connectivity, block_num_elem, block_num_nodes_per_elem = zip(
-            *[genesis_input.get_elem_connectivity(b) for b in block_ids_input])
-    else:
-        block_ids_output = [1]
-        block_elem_types = [genesis_input.elem_type(block_ids_input[0])]
-        block_connectivity, block_num_elem, block_num_nodes_per_elem = zip(
-            *[genesis_input.get_elem_connectivity(block_ids_input[0])])
-        for b in block_ids_input:
-            assert(genesis_input.elem_type[b] == block_elem_types[0])
-            bc, be, bn = genesis_input.get_elem_connectivity(b)
-            assert(bc == block_connectivity[0])
-            assert(bn == block_num_nodes_per_elem[0])
+    base = os.path.splitext(args.meshfile)[0]
+    rotfile = args.rotfile or base + '_Rotations.txt'
+    output = args.output or base + '_orientation.g'
+    imprint(args.meshfile, rotfile, output, args.combine_blocks)
 
 
-
-
-    genesis_output.put_concat_elem_blk(
-        block_ids_output,
-        block_elem_types,
-        block_num_elem,
-        block_num_nodes_per_elem,
-        block_num_attributes,
-        define_maps)
-        
-    for block_id in block_ids_output:
-        genesis_output.put_elem_connectivity(block_id, block_connectivity[block_id])
-        genesis_output.put_elem_attr(block_id, block_attributes[block_id])
-
-    for node_set_id in node_set_ids:
-        genesis_output.put_node_set_params(node_set_id, len(node_set_nodes[node_set_id]), len(node_set_distribution_factors[node_set_id]))
-        genesis_output.put_node_set(node_set_id, node_set_nodes[node_set_id])
-        genesis_output.put_node_set_dist_fact(node_set_id, node_set_distribution_factors[node_set_id])
-
-    for side_set_id in side_set_ids:
-        genesis_output.put_side_set_params(side_set_id, len(side_set_elements[side_set_id]), len(side_set_distribution_factors[side_set_id]))
-        genesis_output.put_side_set(side_set_id, side_set_elements[side_set_id], side_set_sides[side_set_id])
-        genesis_output.put_side_set_dist_fact(side_set_id, side_set_distribution_factors[side_set_id])
-
-    genesis_output.close()
-
-    
-
-    
-    block_attributes = {}
-    for block_id in block_ids:
-        elem_attrs = []
-        num_attributes = genesis_input.num_attr(block_id)
-        if num_attributes > 0:
-            mesh_has_attributes = True
-            elem_attrs = genesis_input.get_elem_attr(block_id)
-        block_attributes[block_id] = elem_attrs
-    if any([genesis_input.num_attr(b) > 0 for b in block_ids_input]):
-        raise Exception('\nMeshes with existing attributes are not supported.')
-
-    node_set_ids = genesis_input.get_node_set_ids()
-    if len(node_set_ids) > 0:
-        node_set_params = {n:genesis_input.get_node_set_params(n) for n in node_set_ids}
-        node_set_nodes = {n:genesis_input.get_node_set_nodes(n) for n in node_set_ids}
-        node_set_distribution_factors = {n:genesis_input.get_node_set_dist_facts(n) for n in node_set_ids}
-
-    side_set_ids = genesis_input.get_side_set_ids()
-    if len(side_set_ids) > 0:
-        side_set_parameters = {s:genesis_input.get_side_set_params(s) for s in side_set_ids}
-        element_ids, side_ids = zip(*[genesis_input.get_side_set(s) for s in side_set_ids])
-        side_set_elements = {i:e for i,e in zip(side_set_ids, element_ids)}
-        side_set_sides = {i:s for i,s in zip(side_set_ids, side_ids)}
-        side_set_distribution_factors = {s:genesis_input.get_side_set_dist_fact(s) for s in side_set_ids}
-
-    # Create attributes for the orientations
-
-    idx = np.argsort(block_ids_input)
-
-    block_orientations = {}
-
-    sorted_block_ids = []
-    for block_id in block_ids:
-        sorted_block_ids.append(block_id)
-    sorted_block_ids.sort()
-
-    block_orientations = {}
-    for i, orientation in enumerate(orientations):
-        block_id = sorted_block_ids[i]
-        block_orientations[block_id] = []
-        if args.orientation_format == 'angles':
-            euler_angles = EulerAngles(orientation.reshape((num_dims,num_dims)))
-            for j in range(num_orientation_attributes):
-                block_orientations[block_id].append(euler_angles[j])
-        else:
-            # store the transpose of the rotation matrix on the mesh
-            block_orientations.extend(
-                orientation.reshape((3,3)).T.flatten().tolist())
-
-    for i in range(len(block_ids)):
-        block_id = block_ids[i]
-        for j in range(block_num_elem[i]):
-            for k in range(num_orientation_attributes):
-                block_attributes[block_id].append(block_orientations[block_id][k])
-
-    # Combine all blocks with an orientation assigned to them into a single block
-
-    if combine_blocks:
-
-        print "Combining all blocks with an orientation assigned to them into a single block ..."
-
-        # Placeholder for functionality that allows only specific blocks to be combined
-        blocks_to_combine = block_ids[:]
-
-        sorted_blocks_to_combine = blocks_to_combine[:]
-        sorted_blocks_to_combine.sort()
-        combined_block_id = sorted_blocks_to_combine[0]
-
-        grain_elem_types = {}
-        grain_num_elem = {}
-        grain_num_nodes_per_elem = {}
-        grain_num_attributes = {}
-        for i in range(len(block_ids)):
-            block_id = block_ids[i]
-            if block_id in blocks_to_combine:
-                grain_elem_types[block_id] = block_elem_types[i]
-                grain_num_elem[block_id] = block_num_elem[i]
-                grain_num_nodes_per_elem[block_id] = block_num_nodes_per_elem[i]
-                grain_num_attributes[block_id] = block_num_attributes[i]
-
-        combined_block_elem_type = grain_elem_types[grain_elem_types.keys()[0]]
-        combined_block_num_elem = 0
-        combined_block_num_nodes_per_elem = grain_num_nodes_per_elem[grain_num_nodes_per_elem.keys()[0]]
-        combined_block_num_attributes = grain_num_attributes[grain_num_attributes.keys()[0]]
-        combined_block_connectivity = []
-        combined_block_attributes = []
-
-        for block_id in blocks_to_combine:
-            combined_block_num_elem += grain_num_elem[block_id]
-            combined_block_connectivity.extend(block_connectivity[block_id])
-            combined_block_attributes.extend(block_attributes[block_id])
-
-        initial_block_ids = block_ids[:]
-        index = len(initial_block_ids) - 1
-        for i in range(len(initial_block_ids)):
-            block_id = initial_block_ids[index]
-            if block_id in blocks_to_combine:
-                if block_id != combined_block_id:
-                    block_ids.pop(index)
-                    block_elem_types.pop(index)
-                    block_num_elem.pop(index)
-                    block_num_nodes_per_elem.pop(index)
-                    block_num_attributes.pop(index)
-            index = index - 1
-
-        for i in range(len(block_ids)):
-            if block_ids[i] == combined_block_id:
-                block_elem_types[i] = combined_block_elem_type
-                block_num_elem[i] = combined_block_num_elem
-                block_num_nodes_per_elem[i] = combined_block_num_nodes_per_elem
-                block_num_attributes[i] = combined_block_num_attributes
-                block_connectivity[combined_block_id] = combined_block_connectivity
-                block_attributes[combined_block_id] = combined_block_attributes
-
-                print "  combined_block_id", combined_block_id
-                print "  num elem", block_num_elem[i]
-                print "  num nodes per ele", block_num_nodes_per_elem[i]
-                print "  num attr", block_num_attributes[i]
-                print "  conn array len", len(block_connectivity[combined_block_id])
-                print "  attr array len", len(block_attributes[combined_block_id])
-        
-    # Write ExodusII file
-
-    
-
-    
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,18 @@
+LCM:
+  ElementBlocks:
+    block_1:
+      material: Metal
+  Materials:
+    Metal:
+      Material Model:
+        Model Name: CrystalPlasticity
+      Crystal Elasticity:
+        C11: 168.40000
+        C12: 121.40000000
+        C44: 75.40000000
+      Read Lattice Orientation From Mesh: true
+      Output Cauchy Stress: true
+      Output Fp: true
+      Output Lp: true
+      Output Mechanical Source: true
+...

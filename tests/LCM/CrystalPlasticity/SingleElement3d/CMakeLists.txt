@@ -8,6 +8,14 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${runtest.cmake}
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleHexElement.g
                ${CMAKE_CURRENT_BINARY_DIR}/SingleHexElement.g COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/SingleHexElement_orientation.g
+               ${CMAKE_CURRENT_BINARY_DIR}/SingleHexElement_orientation.g COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ElasticShearRotated3dMesh.yaml
+               ${CMAKE_CURRENT_BINARY_DIR}/ElasticShearRotated3dMesh.yaml COPYONLY)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/CrystalElasticityRotated3dMesh_Material.yaml
+  ${CMAKE_CURRENT_BINARY_DIR}/CrystalElasticityRotated3dMesh_Material.yaml
+  COPYONLY)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ElasticShear3d.yaml
                ${CMAKE_CURRENT_BINARY_DIR}/ElasticShear3d.yaml COPYONLY)
@@ -59,3 +67,19 @@ add_test(
     -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
     -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
     ${runtest.cmake})
+
+# Same problem as ElasticShearRotated3d, with the lattice orientation read from
+# element attributes written by imprint_orientation_on_mesh.py instead of
+# "Basis Vector 1/2/3". It must reproduce the ElasticShearRotated3d gold.
+set(OUTFILE "ElasticShearRotated3dMesh.e")
+set(REF_FILE "ElasticShearRotated3d.gold.e")
+add_test(
+  NAME CrystalPlasticity_${testName}_ElasticShearRotated3dMesh
+  COMMAND
+    ${CMAKE_COMMAND} "-DTEST_PROG=${SerialAlbany.exe}"
+    -DTEST_NAME=ElasticShearRotated3d -DTEST_ARGS=ElasticShearRotated3dMesh.yaml
+    -DMPIMNP=1 -DSEACAS_EXODIFF=${SEACAS_EXODIFF} -DREF_FILENAME=${REF_FILE}
+    -DOUTPUT_FILENAME=${OUTFILE} -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+    ${runtest.cmake})
+set_tests_properties(CrystalPlasticity_${testName}_ElasticShearRotated3dMesh
+                     PROPERTIES LABELS "LCM;Tpetra;Forward")

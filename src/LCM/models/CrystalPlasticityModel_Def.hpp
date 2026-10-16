@@ -71,10 +71,8 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
   Teuchos::ParameterList e_list = p->sublist("Crystal Elasticity");
 
-  if (p->isParameter("Read Lattice Orientation From Mesh")) {
-    read_orientations_from_mesh_ = true;
-  } else {
-    read_orientations_from_mesh_ = false;
+  read_orientations_from_mesh_ = p->get<bool>("Read Lattice Orientation From Mesh", false);
+  if (read_orientations_from_mesh_ == false) {
     // TODO check if basis is given else default
     // NOTE default to coordinate axes; construct 3rd direction if only 2 given
     element_block_orientation_.set_dimension(CP::MAX_DIM);
@@ -362,8 +360,8 @@ CrystalPlasticityKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT 
   }
 
   if (read_orientations_from_mesh_) {
-    rotation_matrix_transpose_ = workset.wsLatticeOrientation;
-    ALBANY_ASSERT(rotation_matrix_transpose_.is_null() == false, "Rotation matrix not found on genesis mesh");
+    lattice_orientation_ = workset.wsLatticeOrientation;
+    ALBANY_ASSERT(lattice_orientation_.is_null() == false, "Rotation matrix not found on genesis mesh");
   }
 
   // extract dependent MDFields
@@ -499,9 +497,13 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   if (read_orientations_from_mesh_) {
+    // The nine element attributes are the orientation matrix R written row
+    // by row, R11 R12 R13 R21 ... R33, where the columns of R are the lattice
+    // basis vectors in global components, as for "Basis Vector 1/2/3" in the
+    // input. See lcm_preprocess/imprint_orientation_on_mesh.py.
     for (int i = 0; i < CP::MAX_DIM; ++i) {
       for (int j = 0; j < CP::MAX_DIM; ++j) {
-        orientation_matrix(i, j) = rotation_matrix_transpose_[cell][i * CP::MAX_DIM + j];
+        orientation_matrix(i, j) = lattice_orientation_[cell][i * CP::MAX_DIM + j];
       }
     }
   } else {

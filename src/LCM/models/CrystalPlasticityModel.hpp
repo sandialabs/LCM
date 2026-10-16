@@ -265,7 +265,7 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
 
   RealType dt_{0.0};
 
-  Teuchos::ArrayRCP<Albany::EntityValueView> rotation_matrix_transpose_;
+  Teuchos::ArrayRCP<Albany::EntityValueView> lattice_orientation_;
 };
 
 template <typename EvalT, typename Traits>

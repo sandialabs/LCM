@@ -316,19 +316,23 @@ CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
 
   minitensor::Index const num_slip_sys = slip_family.num_slip_sys_;
 
-  // Compute the effective dislocation density at step n
+  // The latent and auxiliary matrices are indexed by the slip systems of
+  // this family, so gather the family's densities before multiplying.
+  minitensor::Vector<ArgT, NumSlipT> densities_family(num_slip_sys);
+
   bool dd_negative = false;
-  for (minitensor::Index ss_index_i(0); ss_index_i < num_slip_sys; ++ss_index_i) {
-    if (state_hardening_np1[ss_index_i] < 0.0) {
+  for (minitensor::Index ss_index(0); ss_index < num_slip_sys; ++ss_index) {
+    densities_family[ss_index] = state_hardening_np1[slip_family.slip_system_indices_[ss_index]];
+    if (densities_family[ss_index] < 0.0) {
       dd_negative = true;
-      // std::cout << state_hardening_np1;
     }
   }
   if (dd_negative) {
     std::cout << "Warning: Dislocation density at np1 is negative" << std::endl;
   }
 
-  minitensor::Vector<ArgT, NumSlipT> densities_forest = slip_family.latent_matrix_ * state_hardening_np1;
+  // Compute the effective dislocation density at step n
+  minitensor::Vector<ArgT, NumSlipT> densities_forest = slip_family.latent_matrix_ * densities_family;
 
   // Update dislocation densities
   auto const phardening_params = slip_family.phardening_parameters_;
@@ -370,7 +374,11 @@ CP::DislocationDensityHardeningLaw<NumDimT, NumSlipT, ArgT>::harden(
     state_hardening_np1[ss_index_global] = state_hardening_n[ss_index_global] + dt * driver_hardening * std::abs(rate_slip[ss_index_global]);
   }
 
-  minitensor::Vector<ArgT, NumSlipT> const densities_parallel = slip_family.aux_matrix_ * state_hardening_np1;
+  for (minitensor::Index ss_index(0); ss_index < num_slip_sys; ++ss_index) {
+    densities_family[ss_index] = state_hardening_np1[slip_family.slip_system_indices_[ss_index]];
+  }
+
+  minitensor::Vector<ArgT, NumSlipT> const densities_parallel = slip_family.aux_matrix_ * densities_family;
 
   for (minitensor::Index ss_index(0); ss_index < num_slip_sys; ++ss_index) {
     auto const ss_index_global = slip_family.slip_system_indices_[ss_index];

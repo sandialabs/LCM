@@ -259,7 +259,7 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
   // define the state variables
 
   // eqps
-  addStateVariable(eqps_string_, dl->qp_scalar, "scalar", 0.0, false, p->get<bool>("Output eqps", false));
+  addStateVariable(eqps_string_, dl->qp_scalar, "scalar", 0.0, true, p->get<bool>("Output eqps", false));
 
   // Re
   addStateVariable(Re_string_, dl->qp_tensor, "identity", 0.0, false, p->get<bool>("Output Re", false));
@@ -398,6 +398,7 @@ CrystalPlasticityKernel<EvalT, Traits>::init(Workset& workset, FieldMap<ScalarT 
 
   previous_plastic_deformation_ = (*workset.stateArrayPtr)[Fp_string_ + "_old"];
   previous_defgrad_             = (*workset.stateArrayPtr)[F_string_ + "_old"];
+  previous_eqps_                = (*workset.stateArrayPtr)[eqps_string_ + "_old"];
 
   dt_ = SSV::eval(delta_time_(0));
 
@@ -1030,7 +1031,7 @@ CrystalPlasticityKernel<EvalT, Traits>::finalize(
   ///
   minitensor::Tensor<ScalarT, CP::MAX_DIM> const Dp = minitensor::sym(Lp_np1);
 
-  eqps_(cell, pt) += dt_ * std::sqrt(2.0 / 3.0 * SSV::eval(minitensor::dotdot(Dp, Dp)));
+  eqps_(cell, pt) = previous_eqps_(cell, pt) + dt_ * std::sqrt(2.0 / 3.0 * SSV::eval(minitensor::dotdot(Dp, Dp)));
 
   // The xtal rotation from the polar decomp of Fe.
   minitensor::Tensor<ScalarT, CP::MAX_DIM> Fe(num_dims_);

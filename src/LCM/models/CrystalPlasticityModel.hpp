@@ -261,6 +261,8 @@ class CrystalPlasticityKernel : public ParallelKernel<EvalT, Traits>
 
   Albany::MDArray previous_defgrad_;
 
+  Albany::MDArray previous_eqps_;
+
   RealType dt_{0.0};
 
   Teuchos::ArrayRCP<Albany::EntityValueView> rotation_matrix_transpose_;

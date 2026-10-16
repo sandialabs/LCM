@@ -359,7 +359,9 @@ run_ctest() {
     local PREFIX="${PACKAGE}-${BUILD_ID_STRING}"
     local LOG_FILE="$LCM_DIR/${PREFIX}.log"
 
-    ctest $CTEST_VERBOSITY --timeout 180 -S "$BUILD_SCRIPT" \
+    # Per-test limit. The longest tests take about 150 s on an idle host;
+    # leave room for a loaded one.
+    ctest $CTEST_VERBOSITY --timeout 600 -S "$BUILD_SCRIPT" \
         -DPACKAGE:STRING="$PACKAGE" \
         -DBUILD_THREADS:STRING="$THREADS" \
         -DCLEAN_BUILD:BOOL="$CLEAN_BUILD" \

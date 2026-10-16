@@ -169,6 +169,11 @@ CrystalPlasticityKernel<EvalT, Traits>::CrystalPlasticityKernel(
 
     slip_system.slip_family_index_ = ss_list.get<int>("Slip Family", 0);
 
+    ALBANY_ASSERT(
+        slip_system.slip_family_index_ >= 0 && slip_system.slip_family_index_ < num_family_,
+        "Slip System " << num_ss + 1 << " has Slip Family " << slip_system.slip_family_index_ << ", but Number of Slip Families is "
+                       << num_family_ << ". Slip families are numbered from 0; set Number of Slip Families accordingly.");
+
     CP::SlipFamily<CP::MAX_DIM, CP::MAX_SLIP>& slip_family = slip_families_[slip_system.slip_family_index_];
 
     minitensor::Index slip_system_index = slip_family.num_slip_sys_;

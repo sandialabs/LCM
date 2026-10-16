@@ -273,11 +273,11 @@ if __name__ == "__main__":
 
     BasisVector1, BasisVector2, BasisVector3 = ConstructBasisVectors(R_active)
 
-    # The ComputeCauchyStress() function uses R_passive to determine the components of the elasticity
-    # tesnsor, which is aligned with the crystal lattice, as seen by an observer in the global reference frame
-    R_passive = Transpose(R_active)
-
-    CauchyStress = ComputeCauchyStress(C11, C12, C44, R_passive, DeformationGradient)
+    # The basis vectors are the columns of R_active, i.e. the lattice axes in the global frame, and the
+    # slip systems are rotated with the same matrix. ComputeCauchyStress() computes
+    # C'_ijkl = R_im R_jn R_ko R_lp C_mnop, so R_active gives the lattice elasticity tensor in the
+    # global frame.
+    CauchyStress = ComputeCauchyStress(C11, C12, C44, R_active, DeformationGradient)
 
     print "\nElastic Constants"
     print "C11 =", C11

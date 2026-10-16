@@ -503,8 +503,11 @@ CrystalPlasticityKernel<EvalT, Traits>::operator()(int cell, int pt) const
   }
 
   // Set the rotated elasticity tensor, slip normals, slip directions,
-  // and projection operator
-  C = minitensor::kronecker(orientation_matrix, C_unrotated);
+  // and projection operator. The orientation matrix maps lattice to global
+  // components, as for the slip vectors below. MiniTensor's kronecker(A, B)
+  // computes A_pi A_qj A_mk A_nl B_pqmn, so it takes the transpose to give
+  // C_ijkl = R_ip R_jq R_km R_ln C0_pqmn.
+  C = minitensor::kronecker(minitensor::transpose(orientation_matrix), C_unrotated);
   for (int num_ss = 0; num_ss < num_slip_; ++num_ss) {
     auto& slip_system = element_slip_systems.at(num_ss);
 

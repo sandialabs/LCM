@@ -1150,8 +1150,9 @@ temperature--dependent yield in metal plasticity --- the constitutive
 structure is fixed and the environment acts only through the
 coefficients. Let $S \in [0,1]$ be the ice saturation, with $S = 1$
 fully frozen and $S = 0$ fully thawed. At each integration point the
-kernel evaluates every cap parameter as a function of $S$ and hands the
-resulting parameter set to the shared integrator of
+kernel evaluates every cap parameter as a function of $S$ or of the ice
+volume fraction $\phi_{\mathrm{ice}}$ of Eq.~\eqref{eq:icefraction},
+which is computed from $S$, and hands the resulting parameter set to the shared integrator of
 Section~\ref{sec:integration}.
 
 The material input carries two calibrated end-member parameter sets,
@@ -1254,16 +1255,16 @@ separation of channels as the design constraint recorded at the end
 of this section.
 
 Writing $y_{\mathrm f}$ and $y_{\mathrm t}$ for the frozen and thawed
-values of a parameter, and abbreviating
-$\phi \equiv \phi_{\mathrm{ice}}$, the rules are
+values of a parameter, the rules are
 \begin{equation}
   \begin{aligned}
-    y(\phi) &= (1-\phi)\,y_{\mathrm t} + \phi\,y_{\mathrm f}
+    y(\phi_{\mathrm{ice}}) &= (1-\phi_{\mathrm{ice}})\,y_{\mathrm t}
+      + \phi_{\mathrm{ice}}\,y_{\mathrm f}
       && \text{for } y \in \{A,\,C,\,N,\,c^\alpha\},
     \\
-    K(\phi) &= K_{\mathrm t}^{\,1-\phi}\,K_{\mathrm f}^{\,\phi},
-    \qquad
-    G(\phi) = G_{\mathrm t}^{\,1-\phi}\,G_{\mathrm f}^{\,\phi},
+    y(\phi_{\mathrm{ice}}) &= y_{\mathrm t}^{\,1-\phi_{\mathrm{ice}}}\,
+      y_{\mathrm f}^{\,\phi_{\mathrm{ice}}}
+      && \text{for } y \in \{K,\,G\},
     \\
     y(S) &= (1-S)\,y_{\mathrm t} + S\,y_{\mathrm f}
       && \text{for } y \in \{\kappa_0,\,W,\,D_1\},
@@ -1304,8 +1305,8 @@ $\Fdef$ before the mechanical response is evaluated.
 fixed Poisson's ratio, which scales $K$ and $G$ together. The
 underlying mechanism is sound --- permafrost stiffness is governed by
 what fills the pores and whether it bonds the grains, so the moduli
-are properly functions of $S$ (temperature acts only through the
-freezing curve) --- but the partition between the elastic constants
+are properly functions of the ice content, here $\phi_{\mathrm{ice}}$
+(temperature acts only through the freezing curve) --- but the partition between the elastic constants
 must differ. The thaw transition replaces pore ice
 ($G \approx 3.5 \times 10^{9}$~Pa, $K \approx 9 \times 10^{9}$~Pa)
 with pore water ($G = 0$, $K \approx 2.2 \times 10^{9}$~Pa) inside a

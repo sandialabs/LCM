@@ -25,13 +25,15 @@ def _open_exo(fname):
     numpy/scipy stack already provides. Both expose ds.variables[name][:] as
     ndarrays. Requiring netCDF4 made these tests silently skip on hosts that
     lack it; the scipy fallback lets them run there too."""
+    # A netCDF4 compiled against another numpy major version raises ValueError
+    # on import ("numpy.dtype size changed"); treat it as absent.
     try:
         import netCDF4
-        return netCDF4.Dataset(fname)
-    except ImportError:
+    except (ImportError, ValueError):
         from scipy.io import netcdf_file
         # mmap=False so the arrays stay valid after the file object is closed.
         return netcdf_file(fname, "r", mmap=False)
+    return netCDF4.Dataset(fname)
 
 
 def exo_open(fname):

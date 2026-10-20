@@ -46,11 +46,16 @@ class _Exo:
 
     def __init__(self, path):
         self._backend = None
+        # A netCDF4 compiled against another numpy major version raises
+        # ValueError on import ("numpy.dtype size changed"); treat it as absent.
         try:
             import netCDF4  # noqa: F401
+        except (ImportError, ValueError):
+            netCDF4 = None
+        if netCDF4 is not None:
             self._d = netCDF4.Dataset(path)
             self._backend = "netCDF4"
-        except ImportError:
+        else:
             from scipy.io import netcdf_file
             # mmap=False so arrays stay valid after the file is closed.
             self._d = netcdf_file(path, "r", mmap=False)

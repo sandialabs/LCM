@@ -19,9 +19,21 @@ set -e
 # or fall back to the current working directory.
 #---------------------------------------------------------------------------
 if [ -z "$LCM_DIR" ]; then
-    # Script lives in <workspace>/LCM/doc/lcm/build/lcm
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    CANDIDATE="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
+    # Script lives in <workspace>/LCM/doc/lcm/build/lcm, four levels below the
+    # workspace. It is usually invoked through a symbolic link in the workspace
+    # (README Quick Start), so follow links to the file itself first; the loop
+    # avoids 'readlink -f', which older macOS releases lack.
+    SCRIPT_PATH="${BASH_SOURCE[0]}"
+    while [ -L "$SCRIPT_PATH" ]; do
+        LINK_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+        SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+        case "$SCRIPT_PATH" in
+            /*) ;;
+            *) SCRIPT_PATH="$LINK_DIR/$SCRIPT_PATH" ;;
+        esac
+    done
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+    CANDIDATE="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
     if [ -d "$CANDIDATE/LCM/doc/lcm" ]; then
         export LCM_DIR="$CANDIDATE"
     else
@@ -340,6 +352,18 @@ run_ctest() {
 
     if [ ! -f "$BUILD_SCRIPT" ]; then
         echo "ERROR: Cannot find $BUILD_SCRIPT"
+        exit 1
+    fi
+
+    # Build directories, install directories and logs are written into the
+    # workspace, and the Trilinos source is read from $LCM_DIR/Trilinos.
+    if [ ! -w "$LCM_DIR" ]; then
+        echo "ERROR: LCM_DIR=$LCM_DIR is not writable; set LCM_DIR to your own workspace."
+        exit 1
+    fi
+    if [ "$PACKAGE" = "trilinos" ] && [ ! -f "$LCM_DIR/Trilinos/CMakeLists.txt" ]; then
+        echo "ERROR: No Trilinos source in $LCM_DIR/Trilinos; clone it there:"
+        echo "  cd $LCM_DIR && git clone -b develop https://github.com/trilinos/Trilinos.git"
         exit 1
     fi
 

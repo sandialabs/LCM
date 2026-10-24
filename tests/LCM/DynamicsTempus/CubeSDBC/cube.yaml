@@ -36,12 +36,14 @@ LCM:
     Exodus Write Interval: 1
   Regression Results:
     Number of Comparisons: 3
-    # Values rebaselined against the DBC-elimination + DTK Schwarz code path.
-    # The legacy weak-DBC values were 1.149184988919e-01 / 0 / -1.552445033242e-01;
-    # the elimination path agrees to ~7 sig figs but exceeds the original
-    # 1e-7 tolerance; relax to 1e-5 to absorb floating-point ordering drift
-    # without losing the response-magnitude check.
-    Test Values: [8.991849889192e-02, 0.000000000000e+00, -1.552445033242e-01]
+    # Responses of the solution at the final time t = 1, with the eliminated
+    # Dirichlet values restored at t = 1 (u_z = 1 on nodelist_6). They equal
+    # the values of the former weak Dirichlet implementation. The value
+    # 8.991849889192e-02 stored from 2026-06-06 to 2026-10-24 restored u_z at
+    # t = 0.85, the start of the last step, because Piro evaluated the final
+    # responses without x_dot. Trilinos PR 15857 (Piro, 2026-10-23) passes
+    # t and x_dot, so this test requires Trilinos develop of that date or later.
+    Test Values: [1.149184988919e-01, 0.000000000000e+00, -1.552445033242e-01]
     Relative Tolerance: 1.0e-7
     Absolute Tolerance: 1.0e-7
   Piro:

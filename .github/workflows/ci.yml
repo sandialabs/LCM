@@ -46,7 +46,9 @@ jobs:
 
     # The ctest script swallows the compiler's output, so a failed build shows
     # only "N Compiler errors" in the run log. The driver's own log and ctest's
-    # Build.xml carry the actual messages.
+    # Build.xml carry the actual messages. The run log shows only Passed or
+    # Failed per test. The computed values and messages are in the test
+    # log of ctest, which the dashboard script names LastTest_<stamp>.log.
     - name: Upload build logs
       if: failure()
       uses: actions/upload-artifact@v4
@@ -55,5 +57,5 @@ jobs:
         path: |
           ${{ github.workspace }}/*.log
           ${{ github.workspace }}/lcm-build-serial-gcc-release/Testing/**/Build.xml
-          ${{ github.workspace }}/lcm-build-serial-gcc-release/Testing/Temporary/LastTest.log
+          ${{ github.workspace }}/lcm-build-serial-gcc-release/Testing/Temporary/LastTest_*.log
         if-no-files-found: warn

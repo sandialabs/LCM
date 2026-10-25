@@ -12,7 +12,11 @@ jobs:
 
     env:
       LCM_DIR: ${{ github.workspace }}
-      OMPI_MCA_rmaps_base_oversubscribe: 1
+      # Open MPI 5 counts physical cores as slots, fewer than the 4 ranks of
+      # the parallel tests on a hosted runner. Its process launcher, PRRTE,
+      # reads this variable. The Open MPI 4 variable
+      # OMPI_MCA_rmaps_base_oversubscribe has no effect on it.
+      PRTE_MCA_rmaps_default_mapping_policy: ":oversubscribe"
 
     steps:
     - name: Install dependencies
@@ -24,6 +28,17 @@ jobs:
           libhdf5-openmpi-dev liblapack-dev libnetcdf-dev \
           libopenmpi-dev mpi-default-bin environment-modules \
           libgtest-dev python3-numpy python3-scipy
+
+    # The image behind ubuntu-latest changes without notice. The versions
+    # printed here identify the toolchain of each run.
+    - name: Print toolchain
+      run: |
+        echo "Runner image: $ImageOS $ImageVersion"
+        . /etc/os-release && echo "OS: $PRETTY_NAME"
+        g++ --version | head -1
+        echo "cmake: $(command -v cmake)"; cmake --version | head -1
+        mpiexec --version | head -1
+        lscpu | grep -E '^(CPU\(s\)|Thread\(s\) per core|Core\(s\) per socket|Socket\(s\)):'
 
     - name: Clone Trilinos
       run: |
